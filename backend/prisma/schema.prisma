@@ -1,0 +1,112 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Employee {
+  id              Int                @id @default(autoincrement())
+  firstName       String?            @db.VarChar(52)
+  lastName        String?            @db.VarChar(52)
+  phone           String?            @unique @db.VarChar(15)
+  password        String
+  email           String             @unique @db.VarChar(52)
+  role            Role               @default(USER)
+  status          Status             @default(ACTIVE)
+  lastLogin       DateTime?
+  errorLoginCount Int                @default(0) @db.SmallInt
+  rndToken        String
+  avatar          String?
+  departmentId    Int
+  department      Department         @relation(fields: [departmentId], references: [id], onDelete: Cascade)
+  createdAt       DateTime           @default(now())
+  updatedAt       DateTime           @updatedAt
+  emotionCheckIns EmotionCheckIn[]
+  criticalTimes   CriticalEmployee[]
+  aiAnalysis      AIAnalysis[]
+}
+
+model Otp {
+  id            Int      @id @default(autoincrement())
+  phone         String   @unique @db.VarChar(15)
+  otp           String
+  rememberToken String
+  count         Int      @default(0) @db.SmallInt
+  error         Int      @default(0) @db.SmallInt
+  verifyToken   String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+model EmotionCheckIn {
+  id           Int          @id @default(autoincrement())
+  checkInTime  DateTime
+  emoji        String
+  textFeeling  String
+  emotionScore Int
+  employeeId   Int
+  employee     Employee     @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+  aiAnalysis   AIAnalysis[]
+}
+
+model CriticalEmployee {
+  id           Int        @id @default(autoincrement())
+  status       Status     @default(CRITICAL)
+  notes        String
+  emotionScore Int
+  departmentId Int
+  department   Department @relation(fields: [departmentId], references: [id], onDelete: Cascade)
+  employeeId   Int
+  employee     Employee   @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+}
+
+model AIAnalysis {
+  id               Int            @id @default(autoincrement())
+  employeeId       Int
+  employee         Employee       @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+  emotionCheckInId Int
+  emotionCheckIn   EmotionCheckIn @relation(fields: [emotionCheckInId], references: [id], onDelete: Cascade)
+  input            String
+  output           String
+  createdAt        DateTime       @default(now())
+  updatedAt        DateTime       @updatedAt
+}
+
+model Department {
+  id                Int                @id @default(autoincrement())
+  name              String             @unique @db.VarChar(52)
+  employees         Employee[]
+  criticalEmployees CriticalEmployee[]
+}
+
+model Setting {
+  id    Int    @id @default(autoincrement())
+  key   String @unique @db.VarChar(50)
+  value String @db.VarChar(200)
+}
+
+enum Role {
+  USER
+  ADMIN
+  SUPERADMIN
+}
+
+enum Status {
+  ACTIVE
+  CRITICAL
+  WATCHLIST
+}
