@@ -5,8 +5,10 @@ import helmet from "helmet"
 import morgan from "morgan"
 import cookieParser from "cookie-parser"
 import { limiter } from "./middlewares/rate-limitter"
+import cron from "node-cron"
 
 import routes from "./routes/v1"
+import { createOrUpdateSettingStatus, getSettingStatus } from "./services/system-service"
 
 export const app = express()
 
@@ -44,4 +46,15 @@ app.use((error: any, req: Request, res: Response, next: NextFunction) => {
     res.status(status).json({
         message, error: errorCode
     })
+})
+
+//* cron job works on every specific time we set and use main thread
+//* For heavy tasks, it is ideal for worker thread
+cron.schedule("* 5 * * *", async () => {
+    console.log('Running a taks at every 5 minutes for testing purpose.')
+    const setting = await getSettingStatus("maintenance")
+    if (setting?.value === 'true') {
+        await createOrUpdateSettingStatus("maintenance", 'false')
+        console.log("Now maintainance mode is off.")
+    }
 })
