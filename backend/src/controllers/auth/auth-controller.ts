@@ -2,11 +2,11 @@ import bcrypt from 'bcrypt'
 import { NextFunction, Request, Response } from "express"
 import { body, validationResult } from "express-validator"
 import jwt from 'jsonwebtoken'
-import { errorCodes } from "../../config/error-codes"
-import { createOTP, getEmployeeByEmail, getOTPRowByEmail, updateEmployeeData, updateOTP } from "../../services/auth-services"
-import { checkEmployeeIfExits, checkEmployeeIfNotExits, checkModelIfExits, checkOTPErrorIfSameDate, checkOTPRow, createHttpErrors } from "../../utils/check"
-import { generateHashedValue, generateToken } from "../../utils/generate"
 import moment from 'moment'
+import { errorCodes } from "../../config/error-codes"
+import { createEmployee, createOTP, getEmployeeByEmail, getOTPRowByEmail, updateEmployeeData, updateOTP } from "../../services/auth-services"
+import { checkEmployeeIfExits, checkEmployeeIfNotExits, checkOTPErrorIfSameDate, checkOTPRow, createHttpErrors } from "../../utils/check"
+import { generateHashedValue, generateToken } from "../../utils/generate"
 
 export const register = [
     body("email", "Invalid Email format.")
@@ -208,6 +208,123 @@ export const verifyOTP = [
             message: "OTP is successfully verified.",
             email: result.email,
             token: result.verifyToken
+        })
+    }
+]
+
+export const confirmPassword = [
+    body("email", "Invalid Email format.")
+        .trim()
+        .isEmpty()
+        .isEmail().withMessage("Invalid email format.")
+        .custom(value => {
+            if (!value.endsWith("@ata.it.th")) {
+                throw new Error("Email must be from @ata.it.th domain.")
+            }
+            return true
+        }),
+    body("password", "Password must be at least 8 digits.")
+        .trim()
+        .notEmpty()
+        .matches(/^[\d]+$/)
+        .isLength({ min: 8, max: 8 }),
+    body('token', "Invalid Token.")
+        .trim()
+        .notEmpty()
+        .escape(),
+    async (req: Request, res: Response, next: NextFunction) => {
+        const errors = validationResult(req).array({ onlyFirstError: true })
+        if (errors.length > 0) return next(createHttpErrors({
+            message: errors[0].msg,
+            status: 400,
+            code: errorCodes.invalid
+        }))
+
+        const { email, password, token, } = req.body
+        const employee = await getEmployeeByEmail(email)
+        checkEmployeeIfExits(employee)
+
+        const otpRow = await getOTPRowByEmail(email)
+        checkOTPRow(otpRow)
+
+        //* OTP error count is over-limit
+        if (otpRow?.error === 5) {
+            return next(createHttpErrors({
+                message: "Your request is over-limit. Please try again.",
+                status: 400,
+                code: errorCodes.attack,
+            }))
+        }
+
+        if (otpRow!.verifyToken !== token) {
+            const otpData = {
+                error: 5
+            }
+
+            await updateOTP(otpRow!.id, otpData)
+
+            return next(createHttpErrors({
+                message: 'Invalid Token.',
+                status: 400,
+                code: errorCodes.invalid,
+            }))
+        }
+
+        const isExpired = moment().diff(otpRow!.updatedAt, 'minutes') > 10
+
+        if (isExpired) {
+            return next(createHttpErrors({
+                message: 'Session expired. Please try again.',
+                status: 403,
+                code: errorCodes.otpExpired,
+            }))
+        }
+
+        const hashPassword = await generateHashedValue(password)
+        const rndToken = "@TODO://"
+
+        const employeeData = {
+            email,
+            password: hashPassword,
+            rndToken
+        }
+
+        const newEmp = await createEmployee(employeeData)
+
+        const accessTokenPayload = { id: newEmp!.id }
+        const refreshTokenPayload = { id: newEmp!.id, email: newEmp!.email }
+
+        const accessToken = jwt.sign(
+            accessTokenPayload,
+            process.env.ACCESS_TOKEN_SECRET!,
+            { expiresIn: 60 * 15 }
+        )
+
+        const refreshToken = jwt.sign(
+            refreshTokenPayload,
+            process.env.REFRESH_TOKEN_SECRET!,
+            { expiresIn: '30d' }
+        )
+
+        const updatedEmployeeData = { rndToken: refreshToken }
+
+        await updateEmployeeData(newEmp!.id, updatedEmployeeData)
+
+        res.cookie("accessToken", accessToken, {
+            httpOnly: true,
+            sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'strict',
+            secure: process.env.NODE_ENV === 'production',
+            maxAge: 1000 * 60 * 15,
+            path: '/'
+        }).cookie("refreshToken", refreshToken, {
+            httpOnly: true,
+            sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'strict',
+            secure: process.env.NODE_ENV === 'production',
+            maxAge: 1000 * 60 * 60 * 24 * 30,
+            path: '/'
+        }).status(201).json({
+            message: "Successfully created an account.",
+            empId: newEmp.id
         })
     }
 ]

@@ -14,6 +14,12 @@ export const getEmployeeById = async (id: number) => {
     })
 }
 
+export const createEmployee = async (data: any) => {
+    return await prisma.employee.create({
+        data
+    })
+}
+
 export const updateEmployeeData = async (id: number, data: any) => {
     return await prisma.employee.update({
         where: { id },
