@@ -1,8 +1,8 @@
 import express from "express"
-import { test } from "../../../controllers/user/user-controller"
+import { testAdmin } from "../../../controllers/admin/admin-controller"
 
 const router = express.Router()
 
-router.post("/create", test)
+router.get("/test", testAdmin)
 
 export default router
