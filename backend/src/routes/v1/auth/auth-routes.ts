@@ -1,11 +1,11 @@
 import express from "express"
-import { login, register } from "../../../controllers/auth/auth-controller"
+import { login, register, verifyOTP } from "../../../controllers/auth/auth-controller"
 
 const router = express.Router()
 
 //* Register process
 router.post("/register", register)
-router.post("/verify-otp")
+router.post("/verify-otp", verifyOTP)
 router.post("/confirm-password")
 
 //* login process

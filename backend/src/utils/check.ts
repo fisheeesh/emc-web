@@ -49,3 +49,12 @@ export const checkOTPErrorIfSameDate = (isSameDate: boolean, errorCount: number)
         throw error
     }
 }
+
+export const checkOTPRow = (otpRow: any) => {
+    if (!otpRow) {
+        const error: any = new Error('Phone number is incorrect.')
+        error.status = 400
+        error.code = errorCodes.invalid
+        throw error
+    }
+}

@@ -32,3 +32,10 @@ export const createOTP = async (data: any) => {
         data
     })
 }
+
+export const updateOTP = async (id: number, data: any) => {
+    return await prisma.otp.update({
+        where: { id },
+        data
+    })
+}
