@@ -7,6 +7,6 @@ const router = express.Router()
 router.get("/test", auth, test)
 
 //* emotion check-in process
-router.get("/check-in", auth, emotionCheckIn)
+router.post("/check-in", auth, emotionCheckIn)
 
 export default router

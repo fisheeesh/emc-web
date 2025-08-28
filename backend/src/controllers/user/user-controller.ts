@@ -1,10 +1,12 @@
-import { NextFunction, Request, Response } from "express"
+import { NextFunction, Request, Response, text } from "express"
 import { body, validationResult } from "express-validator"
 import sanitizeHtml from 'sanitize-html'
 import { errorCodes } from "../../config/error-codes"
-import { getEmployeeById } from "../../services/auth-services"
+import { ScoreQueue, ScoreQueueEvents } from "../../jobs/queues/score-queue"
+import { getEmployeeById, updateEmployeeData } from "../../services/auth-services"
 import { authorize } from "../../utils/authorize"
 import { checkEmployeeIfNotExits, createHttpErrors } from "../../utils/check"
+import { createEmotionCheckIn, getEmpAverageScore } from "../../services/emotion-services"
 
 interface CustomRequest extends Request {
     employeeId?: number
@@ -46,5 +48,43 @@ export const emotionCheckIn = [
         checkEmployeeIfNotExits(emp)
 
         const [emoji, textFeeling] = moodMessage.split(',')
+
+        const job = await ScoreQueue.add("calculate-score", {
+            moodMessage
+        }, {
+            attempts: 3,
+            backoff: {
+                type: 'exponential',
+                delay: 1000
+            }
+        })
+
+        //* the full response from model
+        const raw = await job.waitUntilFinished(ScoreQueueEvents)
+        //* find last number in string
+        const match = raw.match(/-?\d+(\.\d+)?$/);
+        const score = match ? parseFloat(match[0]) : null;
+
+        const data: any = {
+            employeeId: emp!.id,
+            emoji,
+            textFeeling,
+            emotionScore: score
+        }
+
+        await createEmotionCheckIn(data)
+
+        const avg = await getEmpAverageScore(emp!.id)
+
+        const updatedEmpData = {
+            avgScore: avg._avg.emotionScore
+        }
+
+        await updateEmployeeData(emp!.id, updatedEmpData)
+
+        res.status(200).json({
+            message: "Successfully checked in.",
+            score
+        })
     }
 ]
