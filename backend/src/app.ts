@@ -6,6 +6,8 @@ import morgan from "morgan"
 import cookieParser from "cookie-parser"
 import { limiter } from "./middlewares/rate-limitter"
 
+import routes from "./routes/v1"
+
 export const app = express()
 
 var whitelist = ['http://localhost:5173', 'http://localhost:4000']
@@ -31,6 +33,8 @@ app.use(morgan("dev"))
     .use(compression({}))
     .use(limiter)
     .use(cookieParser())
+
+app.use(routes)
 
 app.use((error: any, req: Request, res: Response, next: NextFunction) => {
     const status = error.status || 500

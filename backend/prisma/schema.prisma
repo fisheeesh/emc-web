@@ -109,4 +109,5 @@ enum Status {
   ACTIVE
   CRITICAL
   WATCHLIST
+  FREEZE
 }
