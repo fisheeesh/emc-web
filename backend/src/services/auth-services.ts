@@ -14,7 +14,16 @@ export const getEmployeeById = async (id: number) => {
     })
 }
 
-export const createEmployee = async (data: any) => {
+export const createEmployee = async (empData: any) => {
+    const data = {
+        ...empData,
+        department: {
+            connectOrCreate: {
+                where: { name: empData.department },
+                create: { name: empData.department }
+            }
+        }
+    }
     return await prisma.employee.create({
         data
     })

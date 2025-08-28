@@ -4,14 +4,15 @@ import { body, validationResult } from "express-validator"
 import jwt from 'jsonwebtoken'
 import moment from 'moment'
 import { errorCodes } from "../../config/error-codes"
-import { createEmployee, createOTP, getEmployeeByEmail, getOTPRowByEmail, updateEmployeeData, updateOTP } from "../../services/auth-services"
+import { createEmployee, createOTP, getEmployeeByEmail, getEmployeeById, getOTPRowByEmail, updateEmployeeData, updateOTP } from "../../services/auth-services"
 import { checkEmployeeIfExits, checkEmployeeIfNotExits, checkOTPErrorIfSameDate, checkOTPRow, createHttpErrors } from "../../utils/check"
 import { generateHashedValue, generateToken } from "../../utils/generate"
+import { departments } from '../../config/constants'
 
 export const register = [
-    body("email", "Invalid Email format.")
+    body("email", "Invalid email format.")
         .trim()
-        .isEmpty()
+        .notEmpty()
         .isEmail().withMessage("Invalid email format.")
         .custom(value => {
             if (!value.endsWith("@ata.it.th")) {
@@ -40,7 +41,7 @@ export const register = [
         //* generate token which will be necessary in verifity OTP
         const token = generateToken()
 
-        const otpRow = await getOTPRowByEmail(employee!.email)
+        const otpRow = await getOTPRowByEmail(email)
 
         let result;
         if (!otpRow) {
@@ -101,9 +102,9 @@ export const register = [
 ]
 
 export const verifyOTP = [
-    body("email", "Invalid Email format.")
+    body("email", "Invalid email format.")
         .trim()
-        .isEmpty()
+        .notEmpty()
         .isEmail().withMessage("Invalid email format.")
         .custom(value => {
             if (!value.endsWith("@ata.it.th")) {
@@ -213,9 +214,9 @@ export const verifyOTP = [
 ]
 
 export const confirmPassword = [
-    body("email", "Invalid Email format.")
+    body("email", "Invalid email format.")
         .trim()
-        .isEmpty()
+        .notEmpty()
         .isEmail().withMessage("Invalid email format.")
         .custom(value => {
             if (!value.endsWith("@ata.it.th")) {
@@ -223,6 +224,16 @@ export const confirmPassword = [
             }
             return true
         }),
+    body("department", "Invalid department.")
+        .trim()
+        .notEmpty()
+        .custom(value => {
+            if (!departments.includes(value)) {
+                throw new Error("Invalid department.")
+            }
+            return true
+        })
+        .escape(),
     body("password", "Password must be at least 8 digits.")
         .trim()
         .notEmpty()
@@ -240,7 +251,7 @@ export const confirmPassword = [
             code: errorCodes.invalid
         }))
 
-        const { email, password, token, } = req.body
+        const { email, department, password, token, } = req.body
         const employee = await getEmployeeByEmail(email)
         checkEmployeeIfExits(employee)
 
@@ -285,6 +296,7 @@ export const confirmPassword = [
 
         const employeeData = {
             email,
+            department,
             password: hashPassword,
             rndToken
         }
@@ -330,9 +342,9 @@ export const confirmPassword = [
 ]
 
 export const login = [
-    body("email", "Invalid Email format.")
+    body("email", "Invalid email format.")
         .trim()
-        .isEmpty()
+        .notEmpty()
         .isEmail().withMessage("Invalid email format.")
         .custom((value) => {
             if (!value.endsWith("@ata.it.th")) {
@@ -450,3 +462,59 @@ export const login = [
         })
     }
 ]
+
+export const logout = async (req: Request, res: Response, next: NextFunction) => {
+    const refreshToken = req.cookies ? req.cookies.refreshToken : null
+
+    if (!refreshToken) return next(createHttpErrors({
+        message: "You are not authenticated employee.",
+        status: 401,
+        code: errorCodes.unauthenticated
+    }))
+
+    let decoded;
+    try {
+        decoded = jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET!) as { id: number, email: string }
+    } catch (error) {
+        return next(createHttpErrors({
+            message: 'You are not an authenticated user.',
+            code: errorCodes.unauthenticated,
+            status: 401,
+        }))
+    }
+
+    if (isNaN(decoded.id)) return next(createHttpErrors({
+        message: "You are not authenticated employee.",
+        status: 401,
+        code: errorCodes.unauthenticated
+    }))
+
+    const emp = await getEmployeeById(decoded.id)
+    checkEmployeeIfNotExits(emp)
+
+    if (emp!.email !== decoded.email) return next(createHttpErrors({
+        message: "You are not authenticated employee.",
+        status: 401,
+        code: errorCodes.unauthenticated
+    }))
+
+    const empData = {
+        rndToken: generateToken()
+    }
+
+    await updateEmployeeData(emp!.id, empData)
+
+    res.clearCookie('accessToken', {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'strict',
+        path: '/'
+    }).clearCookie('refreshToken', {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'strict',
+        path: '/'
+    }).status(200).json({
+        message: "Successfully logged out. See you soon.!"
+    })
+}
