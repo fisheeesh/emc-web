@@ -7,6 +7,7 @@
     "test": "jest",
     "wait": "npm-run-all --parallel dev:node image cache",
     "dev": "nodemon src/index.ts",
+    "score": "nodemon src/jobs/workers/score-worker.ts",
     "image": "nodemon src/jobs/workers/image-worker.ts",
     "cache": "nodemon src/jobs/workers/cache-worker.ts",
     "build": "tsc -p .",
@@ -42,7 +43,10 @@
     "typescript": "^5.9.2"
   },
   "dependencies": {
+    "@ai-sdk/groq": "^2.0.16",
+    "ai": "^5.0.26",
     "bcrypt": "^6.0.0",
+    "bullmq": "^5.58.2",
     "compression": "^1.8.1",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
