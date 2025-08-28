@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from "express"
 import { getEmployeeById } from "../services/auth-services"
-import { createHttpErrors } from "../utils/helpers"
+import { createHttpErrors } from "../utils/check"
 import { errorCodes } from "../config/error-codes"
 
 interface CustomRequest extends Request {

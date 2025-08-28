@@ -1,5 +1,6 @@
 export const errorCodes = {
     invalid: 'Error_Invalid',
+    notFound: "Errro_NotFound",
     unauthenticated: 'Error_Unauthenticated',
     attack: "Error_Attack",
     accessTokenExpired: "Error_AccessTokenExpired",

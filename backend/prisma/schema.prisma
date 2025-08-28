@@ -38,7 +38,7 @@ model Employee {
 
 model Otp {
   id            Int      @id @default(autoincrement())
-  phone         String   @unique @db.VarChar(15)
+  email         String   @unique @db.VarChar(15)
   otp           String
   rememberToken String
   count         Int      @default(0) @db.SmallInt

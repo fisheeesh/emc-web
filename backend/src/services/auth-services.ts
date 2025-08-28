@@ -20,3 +20,15 @@ export const updateEmployeeData = async (id: number, data: any) => {
         data
     })
 }
+
+export const getOTPRowByEmail = async (email: string) => {
+    return await prisma.otp.findUnique({
+        where: { email }
+    })
+}
+
+export const createOTP = async (data: any) => {
+    return await prisma.otp.create({
+        data
+    })
+}
