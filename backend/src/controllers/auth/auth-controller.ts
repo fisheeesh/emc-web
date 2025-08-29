@@ -7,7 +7,7 @@ import { errorCodes } from "../../config/error-codes"
 import { createEmployee, createOTP, getEmployeeByEmail, getEmployeeById, getOTPRowByEmail, updateEmployeeData, updateOTP } from "../../services/auth-services"
 import { checkEmployeeIfExits, checkEmployeeIfNotExits, checkOTPErrorIfSameDate, checkOTPRow, createHttpErrors } from "../../utils/check"
 import { generateHashedValue, generateToken } from "../../utils/generate"
-import { departments } from '../../config/constants'
+import { DEPARTMENTS } from '../../config/constants'
 
 export const register = [
     body("email", "Invalid email format.")
@@ -228,7 +228,7 @@ export const confirmPassword = [
         .trim()
         .notEmpty()
         .custom(value => {
-            if (!departments.includes(value)) {
+            if (!DEPARTMENTS.includes(value)) {
                 throw new Error("Invalid department.")
             }
             return true
@@ -253,12 +253,14 @@ export const confirmPassword = [
 
         const { email, department, password, token, } = req.body
         const employee = await getEmployeeByEmail(email)
+        //* Check if existing employee or not
         checkEmployeeIfExits(employee)
 
+        //* By this time OTP must be sent to employee
         const otpRow = await getOTPRowByEmail(email)
         checkOTPRow(otpRow)
 
-        //* OTP error count is over-limit
+        //* OTP error count is over-limit or not
         if (otpRow?.error === 5) {
             return next(createHttpErrors({
                 message: "Your request is over-limit. Please try again.",
@@ -267,6 +269,7 @@ export const confirmPassword = [
             }))
         }
 
+        //* If token mismatch -> **might be attack**
         if (otpRow!.verifyToken !== token) {
             const otpData = {
                 error: 5
@@ -283,6 +286,7 @@ export const confirmPassword = [
 
         const isExpired = moment().diff(otpRow!.updatedAt, 'minutes') > 10
 
+        //* If token expired -> tell user to try again.
         if (isExpired) {
             return next(createHttpErrors({
                 message: 'Session expired. Please try again.',
@@ -291,6 +295,7 @@ export const confirmPassword = [
             }))
         }
 
+        //* All ok -> store hashed password to db along with refreshToken as rndToken for security
         const hashPassword = await generateHashedValue(password)
         const rndToken = "@TODO://"
 
@@ -303,6 +308,7 @@ export const confirmPassword = [
 
         const newEmp = await createEmployee(employeeData)
 
+        //* Create tokens and add some payloads to it
         const accessTokenPayload = { id: newEmp!.id }
         const refreshTokenPayload = { id: newEmp!.id, email: newEmp!.email }
 
@@ -365,6 +371,9 @@ export const login = [
             code: errorCodes.invalid
         }))
 
+        //! Check if the req is from mobile **flutter**
+        const platform = req.header('x-platform')
+
         const { email, password } = req.body
 
         const employee = await getEmployeeByEmail(email)
@@ -426,7 +435,7 @@ export const login = [
         const accessToken = jwt.sign(
             accessTokenPayload,
             process.env.ACCESS_TOKEN_SECRET!,
-            { expiresIn: 60 * 15 }
+            { expiresIn: 60 * 2 }
         )
 
         const refreshToken = jwt.sign(
@@ -443,29 +452,39 @@ export const login = [
 
         await updateEmployeeData(employee!.id, employeeData)
 
-
-        res.cookie("accessToken", accessToken, {
-            httpOnly: true,
-            secure: process.env.NODE_ENV === 'production',
-            sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'strict',
-            maxAge: 1000 * 60 * 15,
-            path: '/'
-        }).cookie("refreshToken", refreshToken, {
-            httpOnly: true,
-            secure: process.env.NODE_ENV === 'production',
-            sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'strict',
-            maxAge: 1000 * 60 * 60 * 24 * 30,
-            path: '/'
-        }).status(200).json({
-            message: "Successfully logged in.",
-            employeeId: employee!.id
-        })
+        if (platform === 'mobile') {
+            return res.status(200).json({
+                message: "Successfully logged in from mobile.",
+                employeeId: employee!.id,
+                accessToken,
+                refreshToken,
+            });
+        } else {
+            res.cookie("accessToken", accessToken, {
+                httpOnly: true,
+                secure: process.env.NODE_ENV === 'production',
+                sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'strict',
+                maxAge: 1000 * 60 * 2,
+                path: '/'
+            }).cookie("refreshToken", refreshToken, {
+                httpOnly: true,
+                secure: process.env.NODE_ENV === 'production',
+                sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'strict',
+                maxAge: 1000 * 60 * 60 * 24 * 30,
+                path: '/'
+            }).status(200).json({
+                message: "Successfully logged in from web.",
+                employeeId: employee!.id
+            })
+        }
     }
 ]
 
 export const logout = async (req: Request, res: Response, next: NextFunction) => {
+    //* To logout, there must be an anthenticated user
     const refreshToken = req.cookies ? req.cookies.refreshToken : null
 
+    //* Check user is able to logout
     if (!refreshToken) return next(createHttpErrors({
         message: "You are not authenticated employee.",
         status: 401,
@@ -474,6 +493,7 @@ export const logout = async (req: Request, res: Response, next: NextFunction) =>
 
     let decoded;
     try {
+        //* Check user is able to logout
         decoded = jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET!) as { id: number, email: string }
     } catch (error) {
         return next(createHttpErrors({
@@ -483,6 +503,7 @@ export const logout = async (req: Request, res: Response, next: NextFunction) =>
         }))
     }
 
+    //* Check user is able to logout
     if (isNaN(decoded.id)) return next(createHttpErrors({
         message: "You are not authenticated employee.",
         status: 401,
@@ -492,6 +513,7 @@ export const logout = async (req: Request, res: Response, next: NextFunction) =>
     const emp = await getEmployeeById(decoded.id)
     checkEmployeeIfNotExits(emp)
 
+    //* Check user is able to logout
     if (emp!.email !== decoded.email) return next(createHttpErrors({
         message: "You are not authenticated employee.",
         status: 401,
@@ -499,6 +521,7 @@ export const logout = async (req: Request, res: Response, next: NextFunction) =>
     }))
 
     const empData = {
+        //* store refresh token for security -> will necessary in rotating token process
         rndToken: generateToken()
     }
 

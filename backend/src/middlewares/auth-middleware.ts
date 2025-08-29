@@ -10,17 +10,20 @@ interface CustomRequest extends Request {
 }
 
 export const auth = async (req: CustomRequest, res: Response, next: NextFunction) => {
-    //* For mobil api calls only
-    const platform = req.header('x-platform')
-    if (platform === 'mobile') {
-        const accessTokenMobile = req.headers.authorization?.split(' ')[1]
-        console.log('Request from mobile: ', accessTokenMobile)
-    } else {
-        console.log('Request from web')
-    }
+    const platform = req.header("x-platform");
 
-    const accessToken = req.cookies ? req.cookies.accessToken : null
-    const refreshToken = req.cookies ? req.cookies.refreshToken : null
+    let accessToken: string | null = null;
+    let refreshToken: string | null = null;
+
+    if (platform === "mobile") {
+        //* For mobile → tokens come from headers
+        accessToken = req.headers.authorization?.split(" ")[1] || null;
+        refreshToken = req.header("x-refresh-token") || null;
+    } else {
+        //* For web → tokens come from cookies
+        accessToken = req.cookies?.accessToken || null;
+        refreshToken = req.cookies?.refreshToken || null;
+    }
 
     if (!refreshToken) return next(createHttpErrors({
         message: "You are not authenticated employee.",
@@ -47,13 +50,8 @@ export const auth = async (req: CustomRequest, res: Response, next: NextFunction
         }))
 
         const employee = await getEmployeeById(decoded.id)
-        if (!employee) return next(createHttpErrors({
-            message: "You are not authenticated employee.",
-            status: 401,
-            code: errorCodes.unauthenticated
-        }))
 
-        if (employee.email !== decoded.email || employee.rndToken !== refreshToken) return next(createHttpErrors({
+        if (!employee || employee.email !== decoded.email || employee.rndToken !== refreshToken) return next(createHttpErrors({
             message: "You are not authenticated employee.",
             status: 401,
             code: errorCodes.unauthenticated
@@ -65,7 +63,7 @@ export const auth = async (req: CustomRequest, res: Response, next: NextFunction
         const newAccessToken = jwt.sign(
             accessTokenPayload,
             process.env.ACCESS_TOKEN_SECRET!,
-            { expiresIn: 60 * 15 }
+            { expiresIn: 60 * 2 }
         )
 
         const newRefreshToken = jwt.sign(
@@ -74,19 +72,32 @@ export const auth = async (req: CustomRequest, res: Response, next: NextFunction
             { expiresIn: 60 * 60 * 24 * 30 }
         )
 
-        res.cookie("accessToken", newAccessToken, {
-            httpOnly: true,
-            secure: process.env.NODE_ENV === 'production',
-            sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'strict',
-            maxAge: 1000 * 60 * 15,
-            path: '/'
-        }).cookie("refreshToken", newRefreshToken, {
-            httpOnly: true,
-            secure: process.env.NODE_ENV === 'production',
-            sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'strict',
-            maxAge: 1000 * 60 * 60 * 24 * 30,
-            path: '/'
-        })
+        if (platform === "mobile") {
+            //* return JSON tokens to mobile
+            // return res.status(200).json({
+            //     message: "Token refreshed",
+            //     accessToken: newAccessToken,
+            //     refreshToken: newRefreshToken
+            // });
+            res.setHeader("x-access-token", newAccessToken);
+            res.setHeader("x-refresh-token", newRefreshToken);
+        } else {
+            res.cookie("accessToken", newAccessToken, {
+                httpOnly: true,
+                secure: process.env.NODE_ENV === 'production',
+                sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'strict',
+                maxAge: 1000 * 60 * 2,
+                path: '/'
+            }).cookie("refreshToken", newRefreshToken, {
+                httpOnly: true,
+                secure: process.env.NODE_ENV === 'production',
+                sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'strict',
+                maxAge: 1000 * 60 * 60 * 24 * 30,
+                path: '/'
+            })
+        }
+
+        console.log("rotation done")
 
         req.employeeId = employee.id
         next()

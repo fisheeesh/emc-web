@@ -7,6 +7,7 @@ import { getEmployeeById, updateEmployeeData } from "../../services/auth-service
 import { authorize } from "../../utils/authorize"
 import { checkEmployeeIfNotExits, createHttpErrors } from "../../utils/check"
 import { createEmotionCheckIn, getEmpAverageScore } from "../../services/emotion-services"
+import { CRITICAL_POINT } from "../../config/constants"
 
 interface CustomRequest extends Request {
     employeeId?: number
@@ -76,15 +77,30 @@ export const emotionCheckIn = [
 
         const avg = await getEmpAverageScore(emp!.id)
 
-        const updatedEmpData = {
-            avgScore: avg._avg.emotionScore
+        let updatedEmpData;
+        const isCritical = avg._avg.emotionScore !== null && Number(avg._avg.emotionScore) <= CRITICAL_POINT
+        if (isCritical) {
+            /**
+             * * emp's status -> cirtical, avgScore, lastCritical
+             * * criEmp -> insert
+             * * aiAnalyziz -> generate
+             */
+            updatedEmpData = {
+                status: "CRITICAL",
+                avgScore: avg._avg.emotionScore
+            }
+        } else {
+            updatedEmpData = {
+                avgScore: avg._avg.emotionScore
+            }
         }
 
         await updateEmployeeData(emp!.id, updatedEmpData)
 
         res.status(200).json({
             message: "Successfully checked in.",
-            score
+            score,
+            isCritical
         })
     }
 ]
