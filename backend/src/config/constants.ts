@@ -1,4 +1,4 @@
-export const departments = [
+export const DEPARTMENTS = [
     "HR",
     "Sales",
     "Marketing",
@@ -7,3 +7,5 @@ export const departments = [
     "Operations",
     "Admin"
 ]
+
+export const CRITICAL_POINT = -0.8

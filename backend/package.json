@@ -44,6 +44,7 @@
   },
   "dependencies": {
     "@ai-sdk/groq": "^2.0.16",
+    "@ai-sdk/openai": "^2.0.23",
     "ai": "^5.0.26",
     "bcrypt": "^6.0.0",
     "bullmq": "^5.58.2",
