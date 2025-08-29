@@ -1,13 +1,16 @@
-import { NextFunction, Request, Response, text } from "express"
+import { NextFunction, Request, Response } from "express"
 import { body, validationResult } from "express-validator"
 import sanitizeHtml from 'sanitize-html'
+import { PrismaClient } from "../../../generated/prisma"
+import { CRITICAL_POINT } from "../../config/constants"
 import { errorCodes } from "../../config/error-codes"
 import { ScoreQueue, ScoreQueueEvents } from "../../jobs/queues/score-queue"
-import { getEmployeeById, updateEmployeeData } from "../../services/auth-services"
+import { getEmployeeById } from "../../services/auth-services"
 import { authorize } from "../../utils/authorize"
 import { checkEmployeeIfNotExits, createHttpErrors } from "../../utils/check"
-import { createEmotionCheckIn, getEmpAverageScore } from "../../services/emotion-services"
-import { CRITICAL_POINT } from "../../config/constants"
+import { AnalysisQueue, AnalysisQueueEvents } from "../../jobs/queues/analysis-queue"
+
+const prisma = new PrismaClient()
 
 interface CustomRequest extends Request {
     employeeId?: number
@@ -66,41 +69,106 @@ export const emotionCheckIn = [
         const match = raw.match(/-?\d+(\.\d+)?$/);
         const score = match ? parseFloat(match[0]) : null;
 
-        const data: any = {
-            employeeId: emp!.id,
-            emoji,
-            textFeeling,
-            emotionScore: score
+        try {
+            const isCritical = await prisma.$transaction(async (tx) => {
+                //* Insert emotion check-in
+                await tx.emotionCheckIn.create({
+                    data: {
+                        employeeId: emp!.id,
+                        emoji: emoji.trim(),
+                        textFeeling: textFeeling.trim(),
+                        emotionScore: +score!
+                    }
+                })
+
+                //* Update employee running totals
+                const updatedEmp = await tx.employee.update({
+                    where: { id: emp!.id },
+                    data: {
+                        emotionSum: { increment: +score! },
+                        emotionCount: { increment: 1 }
+                    }
+                })
+
+                //* Calculate new avgScore
+                const avgScore = (+updatedEmp.emotionSum + 0) / (updatedEmp.emotionCount + 0)
+
+                //* Update avgScore field
+                await tx.employee.update({
+                    where: { id: emp!.id },
+                    data: { avgScore }
+                })
+
+                //* Critical check AFTER update
+                const isCritical = avgScore <= CRITICAL_POINT
+                if (isCritical) {
+                    await tx.employee.update({
+                        where: { id: emp!.id },
+                        data: {
+                            status: "CRITICAL",
+                            lastCritical: new Date()
+                        }
+                    })
+
+                    const critEmp = await tx.criticalEmployee.create({
+                        data: {
+                            employee: {
+                                connect: { id: emp!.id }
+                            },
+                            status: "CRITICAL",
+                            emotionScore: avgScore,
+                        }
+                    })
+
+                    const emotions = await tx.emotionCheckIn.findMany({
+                        where: { employeeId: emp!.id },
+                        select: {
+                            textFeeling: true,
+                            emoji: true,
+                        },
+                        take: 7
+                    })
+
+                    const input = emotions.flatMap((e) => [e.emoji, e.textFeeling]).join(' ')
+
+                    const job = await AnalysisQueue.add("analysis-emotion", {
+                        input
+                    }, {
+                        attempts: 3,
+                        backoff: {
+                            type: 'exponential',
+                            delay: 1000
+                        }
+                    })
+
+                    const raw = await job.waitUntilFinished(AnalysisQueueEvents)
+                    console.log(raw)
+
+                    await tx.aIAnalysis.create({
+                        data: {
+                            input,
+                            output: "",
+                            critical: {
+                                connect: { id: critEmp.id }
+                            }
+                        }
+                    })
+                }
+
+                return isCritical
+            })
+
+            res.status(200).json({
+                message: "Successfully checked in.",
+                score,
+                isCritical
+            })
+        } catch (err: any) {
+            return next(createHttpErrors({
+                message: err.message,
+                status: 500,
+                code: errorCodes.server
+            }))
         }
-
-        await createEmotionCheckIn(data)
-
-        const avg = await getEmpAverageScore(emp!.id)
-
-        let updatedEmpData;
-        const isCritical = avg._avg.emotionScore !== null && Number(avg._avg.emotionScore) <= CRITICAL_POINT
-        if (isCritical) {
-            /**
-             * * emp's status -> cirtical, avgScore, lastCritical
-             * * criEmp -> insert
-             * * aiAnalyziz -> generate
-             */
-            updatedEmpData = {
-                status: "CRITICAL",
-                avgScore: avg._avg.emotionScore
-            }
-        } else {
-            updatedEmpData = {
-                avgScore: avg._avg.emotionScore
-            }
-        }
-
-        await updateEmployeeData(emp!.id, updatedEmpData)
-
-        res.status(200).json({
-            message: "Successfully checked in.",
-            score,
-            isCritical
-        })
     }
 ]

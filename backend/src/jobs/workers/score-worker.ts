@@ -20,10 +20,11 @@ const scoreWorker = new Worker("scoreQueue", async (job) => {
             Your task:
             - Assign a mood score between -1 and 1.
             - Use **gradual scoring**, not just -1, 0, or 1.
-            - Only assign -1 or 1 if the message is extremely clear and absolute (100% positive = 1, or 100% negative/suicidal = -1).
-            - For messages that are positive but not extreme, use values like 0.9, 0.8, 0.7, 0.6, 0.5.
-            - For messages that are negative but not extreme, use values like -0.9, -0.8, -0.7, -0.6, -0.5.
-            - For neutral, mixed, or uncertain moods, stay between -0.4 and 0.4.
+            - Only assign -1 or -0.9 or -0.8 or -0.7, or 1 or 0.9 or 0.8 or 0.7 if the message is extremely clear and absolute (100% positive = 1, or 100% negative/suicidal = -1).
+            - For messages that are positive but not extreme, use values like 0.6, 0.5 0.4.
+            - For messages that are negative but not extreme, use values like -0.6, -0.5, -0.4.
+            - For neutral, mixed, or uncertain moods, stay between -0.3 and 0.3
+            - If user emotion seems like anger issues, should assign between -0.5 to -0.6 based on the level of anger.
 
             Important:
             - Output must be a single plain number, e.g. -0.7, 0.3, 0.9.

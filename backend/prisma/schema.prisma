@@ -21,6 +21,8 @@ model Employee {
   phone           String?            @unique @db.VarChar(15)
   password        String
   email           String             @unique @db.VarChar(52)
+  emotionSum      Decimal            @default(0) @db.Decimal(3, 2)
+  emotionCount    Int                @default(0)
   avgScore        Decimal            @default(0) @db.Decimal(3, 2)
   role            Role               @default(EMPLOYEE)
   status          Status             @default(ACTIVE)
@@ -32,7 +34,7 @@ model Employee {
   department      Department         @relation(fields: [departmentId], references: [id], onDelete: Cascade)
   createdAt       DateTime           @default(now())
   updatedAt       DateTime           @updatedAt
-  emotionCheckIns EmotionCheckIn[]
+  checkIns        EmotionCheckIn[]
   criticalTimes   CriticalEmployee[]
 }
 
@@ -60,23 +62,24 @@ model EmotionCheckIn {
 }
 
 model CriticalEmployee {
-  id           Int        @id @default(autoincrement())
-  emotionScore Decimal    @default(0) @db.Decimal(3, 2)
+  id           Int          @id @default(autoincrement())
+  status       Status       @default(ACTIVE)
+  emotionScore Decimal      @default(0) @db.Decimal(3, 2)
   employeeId   Int
-  employee     Employee   @relation(fields: [employeeId], references: [id], onDelete: Cascade)
-  analysisId   Int
-  analysis     AIAnalysis @relation(fields: [analysisId], references: [id], onDelete: Cascade)
-  createdAt    DateTime   @default(now())
-  updatedAt    DateTime   @updatedAt
+  employee     Employee     @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+  analyses     AIAnalysis[]
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
 }
 
 model AIAnalysis {
-  id        Int                @id @default(autoincrement())
-  input     String
-  output    String
-  createdAt DateTime           @default(now())
-  updatedAt DateTime           @updatedAt
-  employee  CriticalEmployee[]
+  id         Int              @id @default(autoincrement())
+  input      String
+  output     String
+  criticalId Int
+  critical   CriticalEmployee @relation(fields: [criticalId], references: [id], onDelete: Cascade)
+  createdAt  DateTime         @default(now())
+  updatedAt  DateTime         @updatedAt
 }
 
 model Department {
