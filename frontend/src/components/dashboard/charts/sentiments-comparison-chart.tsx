@@ -1,10 +1,11 @@
 import { useTheme } from "@/components/shared/theme-provider";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import type { ChartOptions } from "chart.js";
-import { COMMON_DATAS, COMPARISON_DATA } from "@/lib/constants";
+import { COMMON_DATAS, COMPARISON_DATA, COMPARISON_FILTER } from "@/lib/constants";
 import moment from "moment";
 import { Line } from "react-chartjs-2";
 import CustomLegends from "../custom-legends";
+import CommonFilter from "../../shared/common-filter";
 
 export default function SentimentsComparisonChart() {
     const { theme } = useTheme()
@@ -23,7 +24,7 @@ export default function SentimentsComparisonChart() {
         })),
     }
 
-    const options : ChartOptions<"line"> = {
+    const options: ChartOptions<"line"> = {
         responsive: true,
         maintainAspectRatio: false,
         plugins: { legend: { display: false } },
@@ -37,7 +38,11 @@ export default function SentimentsComparisonChart() {
     return (
         <Card className="rounded-md w-full lg:w-2/3 flex flex-col items-center gap-2 lg:h-[400px]">
             <CardHeader className="flex flex-col md:flex-row items-center justify-center gap-3 md:gap-0 md:justify-between w-full">
-                <CardTitle className="text-xl">Sentiments Comparison Charts</CardTitle>
+                <CardTitle className="text-2xl">Sentiments Comparison Charts</CardTitle>
+                <CommonFilter
+                    filters={COMPARISON_FILTER}
+                    otherClasses="min-h-[44px] sm:min-w-[150px]"
+                />
             </CardHeader>
             <CardContent className="flex flex-col items-center justify-center gap-3 md:gap-0 md:justify-between w-full">
                 <CustomLegends type={'row'} />

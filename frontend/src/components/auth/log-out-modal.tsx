@@ -13,7 +13,7 @@ export default function LogoutModal() {
     const navigate = useNavigate()
 
     return (
-        <DialogContent className="sm:max-w-[425px]">
+        <DialogContent className="sm:max-w-[425px] bg-card">
             <DialogHeader>
                 <DialogTitle>Logout Confirmation.</DialogTitle>
                 <DialogDescription>

@@ -35,7 +35,7 @@ export default function OverViewChart() {
     return (
         <Card className="rounded-md h-full w-full lg:w-1/3 flex flex-col gap-5 lg:h-[400px]">
             <CardHeader>
-                <CardTitle className="text-xl">Mood Overview for Today</CardTitle>
+                <CardTitle className="text-2xl">Mood Overview for Today</CardTitle>
             </CardHeader>
             <CardContent className="flex items-center justify-center gap-12 md:gap-12 lg:gap-2 lg:justify-between">
                 <div className="w-[150px] h-[200px] lg:h-[285px] md:w-[180px] lg:w-[190px]">

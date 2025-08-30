@@ -1,15 +1,16 @@
+import ataLogo from '@/assets/half-ata-logo.png'
+import lightLogo from '@/assets/light_logo.png'
 import { NAVLINKS } from '@/lib/constants'
 import { useState } from 'react'
 import { NavLink, useNavigate } from 'react-router'
-import ataLogo from '@/assets/half-ata-logo.png'
-import lightLogo from '@/assets/light_logo.png'
+import LogoutModal from '../auth/log-out-modal'
+import { Button } from '../ui/button'
+import { Dialog, DialogTrigger } from '../ui/dialog'
 import AuthDropdown from './auth-drop-down'
+import LngBtn from './lng-btn'
 import { ModeToggle } from './mode-toggle'
 import NotiBtn from './noti-btn'
 import { useTheme } from './theme-provider'
-import { Button } from '../ui/button'
-import { Dialog, DialogTrigger } from '../ui/dialog'
-import LogoutModal from '../auth/log-out-modal'
 
 export default function Navbar() {
     const { theme } = useTheme()
@@ -42,6 +43,7 @@ export default function Navbar() {
                     {/* Desktop Right Side */}
                     <div className='hidden md:flex items-center gap-3'>
                         <NotiBtn />
+                        <LngBtn />
                         <ModeToggle />
                         <AuthDropdown />
                     </div>
@@ -67,6 +69,7 @@ export default function Navbar() {
                                 {renderNavLinks()}
                                 <div className='flex items-center gap-3 mt-5'>
                                     <NotiBtn />
+                                    <LngBtn />
                                     <ModeToggle />
                                     <DialogTrigger asChild>
                                         <Button variant='destructive' className='rounded-full cursor-pointer'>

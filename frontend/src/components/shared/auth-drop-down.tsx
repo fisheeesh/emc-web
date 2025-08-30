@@ -56,7 +56,7 @@ export default function AuthDropdown() {
                             </Link>
                         </DropdownMenuItem>
                         <DropdownMenuItem asChild className="cursor-pointer">
-                            <Link to='dashboard/sentiments' className="whitespace-nowrap">
+                            <Link to='dashboard/attendance' className="whitespace-nowrap">
                                 <FaRegCalendarCheck className="size-4 text-black mr-1 dark:text-white" aria-hidden="true" />
                                 Attendance Dashboard
                                 <DropdownMenuShortcut>⌘B</DropdownMenuShortcut>
