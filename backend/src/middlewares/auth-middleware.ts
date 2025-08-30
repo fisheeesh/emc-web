@@ -74,11 +74,6 @@ export const auth = async (req: CustomRequest, res: Response, next: NextFunction
 
         if (platform === "mobile") {
             //* return JSON tokens to mobile
-            // return res.status(200).json({
-            //     message: "Token refreshed",
-            //     accessToken: newAccessToken,
-            //     refreshToken: newRefreshToken
-            // });
             res.setHeader("x-access-token", newAccessToken);
             res.setHeader("x-refresh-token", newRefreshToken);
         } else {

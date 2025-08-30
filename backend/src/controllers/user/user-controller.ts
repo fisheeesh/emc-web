@@ -30,7 +30,10 @@ export const test = async (req: CustomRequest, res: Response, next: NextFunction
         info.content = "You have permission to access this route"
     }
 
-    res.status(200).json(info)
+    res.status(200).json({
+        info,
+        empId: employee!.id
+    })
 }
 
 export const emotionCheckIn = [
@@ -66,12 +69,11 @@ export const emotionCheckIn = [
             }
         })
 
-        //* Full response from model
         const raw = await job.waitUntilFinished(ScoreQueueEvents)
         //* Find last number in string
         const match = raw.match(/-?\d+(\.\d+)?$/);
-        //* Get the score and format it -> use decimal for type safty
-        const score = match ? new Decimal(match[0]) : 0;
+        //* Get the score and format it
+        const score = match ? parseFloat(match[0]) : null;
 
         try {
             //* Since this is atomic opeartion -> transaction
@@ -82,7 +84,7 @@ export const emotionCheckIn = [
                         employeeId: emp!.id,
                         emoji: emoji.trim(),
                         textFeeling: textFeeling.trim(),
-                        emotionScore: score
+                        emotionScore: +score!
                     }
                 })
 
@@ -90,13 +92,13 @@ export const emotionCheckIn = [
                 const updatedEmp = await tx.employee.update({
                     where: { id: emp!.id },
                     data: {
-                        emotionSum: { increment: score },
+                        emotionSum: { increment: +score! },
                         emotionCount: { increment: 1 },
                     }
                 })
 
-                //* Calculate avgScore with up-to-date data -> **Decimal** for type safty
-                const avgScore = new Decimal(updatedEmp.emotionSum).div(updatedEmp.email).toNumber()
+                //* Calculate avgScore with up-to-date data
+                const avgScore = +updatedEmp.emotionSum / +updatedEmp.emotionCount;
 
                 //* Update avgScore field -> fresh
                 await tx.employee.update({

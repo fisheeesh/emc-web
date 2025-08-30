@@ -482,7 +482,17 @@ export const login = [
 
 export const logout = async (req: Request, res: Response, next: NextFunction) => {
     //* To logout, there must be an anthenticated user
-    const refreshToken = req.cookies ? req.cookies.refreshToken : null
+    const platform = req.header("x-platform");
+
+    let refreshToken: string | null = null;
+
+    if (platform === "mobile") {
+        //* For mobile → tokens come from headers
+        refreshToken = req.header("x-refresh-token") || null;
+    } else {
+        //* For web → tokens come from cookies
+        refreshToken = req.cookies?.refreshToken || null;
+    }
 
     //* Check user is able to logout
     if (!refreshToken) return next(createHttpErrors({
@@ -527,17 +537,23 @@ export const logout = async (req: Request, res: Response, next: NextFunction) =>
 
     await updateEmployeeData(emp!.id, empData)
 
-    res.clearCookie('accessToken', {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'strict',
-        path: '/'
-    }).clearCookie('refreshToken', {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'strict',
-        path: '/'
-    }).status(200).json({
-        message: "Successfully logged out. See you soon.!"
-    })
+    if (platform === 'mobile') {
+        return res.status(200).json({
+            message: "Successfully logged out from mobile. See you soon.!"
+        });
+    } else {
+        res.clearCookie('accessToken', {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'strict',
+            path: '/'
+        }).clearCookie('refreshToken', {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'strict',
+            path: '/'
+        }).status(200).json({
+            message: "Successfully logged out from web. See you soon.!"
+        })
+    }
 }
