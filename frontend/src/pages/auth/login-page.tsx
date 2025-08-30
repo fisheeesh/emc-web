@@ -1,6 +1,6 @@
 import AuthForm from '@/components/auth/authForm'
 import { LogInSchema } from '@/lib/validators'
-import Branding from '@/components/branding'
+import Branding from '@/components/auth/branding'
 
 export default function LoginPage() {
     return (

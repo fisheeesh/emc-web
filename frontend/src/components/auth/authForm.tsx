@@ -1,10 +1,10 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { LOGIN, REGISTER } from "@/lib/constants";
+import { LOGIN, LOGIN_SUBTITLE, LOGIN_TITLE, REGISTER } from "@/lib/constants";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Eye, EyeOff } from "lucide-react";
 import { useState } from "react";
 import { useForm, type ControllerRenderProps, type DefaultValues, type Path, type SubmitHandler } from "react-hook-form";
-import { Link } from 'react-router';
+import { Link, useNavigate } from 'react-router';
 import type { z } from "zod";
 import Spinner from '../spinner';
 import { Button } from "../ui/button";
@@ -25,7 +25,7 @@ export default function AuthForm<T extends z.ZodType<any, any, any>>({
 }: AuthFormProps<T>) {
     type FormData = z.infer<T>
     const [showPassword, setShowPassword] = useState<Record<string, boolean>>({});
-
+    const navigate = useNavigate()
 
     const form = useForm({
         resolver: zodResolver(schema) as any,
@@ -34,6 +34,7 @@ export default function AuthForm<T extends z.ZodType<any, any, any>>({
 
     const handleSubmit: SubmitHandler<FormData> = async (values) => {
         console.log(values)
+        navigate("/")
     }
 
     const buttonText = formType === 'LOGIN' ? LOGIN : REGISTER
@@ -43,8 +44,8 @@ export default function AuthForm<T extends z.ZodType<any, any, any>>({
     return (
         <div className="flex flex-col justify-center w-full px-8 space-y-5 right-side md:w-1/3 max-w-md" {...props}>
             <div className="flex-col items-start hidden md:flex">
-                <h1 className="text-3xl font-semibold tracking-wide">Hello there!</h1>
-                <h5 className="tracking-wide text-md">Login to continue.</h5>
+                <h1 className="text-3xl font-semibold tracking-wide">{LOGIN_TITLE}</h1>
+                <h5 className="tracking-wide text-md">{LOGIN_SUBTITLE}</h5>
             </div>
             <Form {...form}>
                 <form onSubmit={form.handleSubmit(handleSubmit)}>
@@ -116,21 +117,6 @@ export default function AuthForm<T extends z.ZodType<any, any, any>>({
                             </Button>
                         </div>
                     </div>
-                    {/* {
-                                formType === 'LOGIN' ?
-                                    <div className="mt-4 text-center text-sm">
-                                        Don&apos;t have an account?{" "}
-                                        <Link to='/register' className="underline-offset-4 hover:underline font-bold">
-                                            Register
-                                        </Link>
-                                    </div> :
-                                    <div className="mt-4 text-center text-sm">
-                                        Alreay have an account?{" "}
-                                        <Link to="/login" className="underline-offset-4 hover:underline font-bold">
-                                            Login
-                                        </Link>
-                                    </div>
-                            } */}
                 </form>
             </Form>
         </div>
