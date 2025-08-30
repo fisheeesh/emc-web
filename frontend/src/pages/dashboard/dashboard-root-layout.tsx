@@ -1,9 +1,13 @@
+import Navbar from "@/components/nav-bar";
 import { Outlet } from "react-router";
 
 export default function DashboradRootLayout() {
     return (
-        <div className="">
-            <Outlet />
-        </div>
+        <section>
+            <Navbar />
+            <div className="pt-20 md:pt-24 max-w-[1440px] mx-auto px-4 pb-5">
+                <Outlet />
+            </div>
+        </section>
     )
 }
