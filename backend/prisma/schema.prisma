@@ -82,6 +82,14 @@ model AIAnalysis {
   updatedAt  DateTime         @updatedAt
 }
 
+model Notification {
+  id        Int        @id @default(autoincrement())
+  content   String     @db.VarChar(255)
+  status    NotiStatus @default(SENT)
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+}
+
 model Department {
   id        Int        @id @default(autoincrement())
   name      String     @unique @db.VarChar(52)
@@ -105,4 +113,9 @@ enum Status {
   CRITICAL
   WATCHLIST
   FREEZE
+}
+
+enum NotiStatus {
+  SENT
+  READ
 }
