@@ -8,7 +8,7 @@ import { ScoreQueue, ScoreQueueEvents } from "../../jobs/queues/score-queue"
 import { getEmployeeById } from "../../services/auth-services"
 import { authorize } from "../../utils/authorize"
 import { checkEmployeeIfNotExits, createHttpErrors } from "../../utils/check"
-import { Decimal } from "../../../generated/prisma/runtime/library"
+import { getAllEmpEmotionHistory } from "../../utils/user-services"
 
 const prisma = new PrismaClient()
 
@@ -145,3 +145,16 @@ export const emotionCheckIn = [
         }
     }
 ]
+
+export const getEmpCheckInHistory = async (req: CustomRequest, res: Response, next: NextFunction) => {
+    const empId = req.employeeId
+    const emp = await getEmployeeById(empId!)
+    checkEmployeeIfNotExits(emp)
+
+    const history = await getAllEmpEmotionHistory(emp!.id)
+
+    res.status(200).json({
+        message: `Here is your history. Emp - ${emp!.email}`,
+        history
+    })
+}
