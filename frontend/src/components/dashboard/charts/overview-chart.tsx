@@ -6,7 +6,7 @@ import {
     CardHeader,
     CardTitle,
 } from "@/components/ui/card"
-import CustomLegends from "./custom-legends";
+import CustomLegends from "../custom-legends";
 
 const overviewData = [80, 17, 2, 1]
 
