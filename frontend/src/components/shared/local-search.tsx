@@ -1,0 +1,34 @@
+import { useEffect, useState } from "react";
+import { useSearchParams } from "react-router";
+import { Input } from "../ui/input";
+import { TbUserSearch } from "react-icons/tb";
+
+export default function LocalSearch() {
+    const [searchParams, setSearchParams] = useSearchParams()
+    const search = searchParams.get('search')
+    const [query, setQuery] = useState(search || '')
+
+    useEffect(() => {
+        const debounceFunc = setTimeout(() => {
+            if (query) searchParams.set("search", query)
+            else searchParams.delete("search")
+
+            setSearchParams(searchParams)
+        }, 500)
+
+        return () => clearTimeout(debounceFunc)
+    }, [query, setSearchParams, searchParams])
+
+    return (
+        <div className="relative">
+            <Input
+                value={query}
+                type="search"
+                placeholder="Search by name..."
+                className="min-h-[44px] w-[300px] pl-10"
+                onChange={(e) => setQuery(e.target.value)}
+            />
+            <TbUserSearch className="absolute top-3 left-3 size-[18px]" />
+        </div>
+    )
+}
