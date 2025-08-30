@@ -6,7 +6,7 @@ import { useState } from "react";
 import { useForm, type ControllerRenderProps, type DefaultValues, type Path, type SubmitHandler } from "react-hook-form";
 import { Link, useNavigate } from 'react-router';
 import type { z } from "zod";
-import Spinner from '../spinner';
+import Spinner from '../shared/spinner';
 import { Button } from "../ui/button";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "../ui/form";
 import { Input } from "../ui/input";
@@ -34,7 +34,8 @@ export default function AuthForm<T extends z.ZodType<any, any, any>>({
 
     const handleSubmit: SubmitHandler<FormData> = async (values) => {
         console.log(values)
-        navigate("/")
+        await new Promise(resolve => setTimeout(resolve, 2000))
+        navigate("/", { replace: true })
     }
 
     const buttonText = formType === 'LOGIN' ? LOGIN : REGISTER

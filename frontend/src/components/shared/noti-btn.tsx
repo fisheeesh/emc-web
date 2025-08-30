@@ -1,12 +1,12 @@
 import { Bell } from "lucide-react";
-import { Button } from "./ui/button";
+import { Button } from "../ui/button";
 import {
     DropdownMenu,
     DropdownMenuContent,
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { Badge } from "./ui/badge";
+import { Badge } from "../ui/badge";
 
 const notiList = [
     {

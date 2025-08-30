@@ -1,7 +1,7 @@
-import fullLogo from '../assets/full-ata-logo.png';
-import haflLogo from '../assets/half-ata-logo.png';
-import lightLogo from '../assets/light_logo.png'
-import { useTheme } from '../theme-provider';
+import fullLogo from '../../assets/full-ata-logo.png';
+import haflLogo from '../../assets/half-ata-logo.png';
+import lightLogo from '../../assets/light_logo.png'
+import { useTheme } from '../shared/theme-provider'
 
 export default function Branding() {
     const { theme } = useTheme()

@@ -7,8 +7,10 @@ import {
     DialogHeader,
     DialogTitle
 } from "@/components/ui/dialog"
-import Spinner from "../spinner"
+import Spinner from "../shared/spinner"
+import { useNavigate } from "react-router"
 export default function LogoutModal() {
+    const navigate = useNavigate()
 
     return (
         <DialogContent className="sm:max-w-[425px]">
@@ -22,7 +24,7 @@ export default function LogoutModal() {
                 <DialogClose asChild>
                     <Button variant="outline" className="cursor-pointer">Cancel</Button>
                 </DialogClose>
-                <Button type="submit" variant='destructive' className="cursor-pointer">
+                <Button type="submit" onClick={() => navigate('/login', { replace: true })} variant='destructive' className="cursor-pointer">
                     <Spinner isLoading={false} label={'Loggint out...'}>
                         Confirm
                     </Spinner>

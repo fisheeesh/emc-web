@@ -1,15 +1,15 @@
 import { NAVLINKS } from '@/lib/constants'
 import { useState } from 'react'
 import { NavLink, useNavigate } from 'react-router'
-import ataLogo from '../assets/half-ata-logo.png'
-import lightLogo from '../assets/light_logo.png'
+import ataLogo from '@/assets/half-ata-logo.png'
+import lightLogo from '@/assets/light_logo.png'
 import AuthDropdown from './auth-drop-down'
 import { ModeToggle } from './mode-toggle'
 import NotiBtn from './noti-btn'
 import { useTheme } from './theme-provider'
-import { Button } from './ui/button'
-import { Dialog, DialogTrigger } from './ui/dialog'
-import LogoutModal from './auth/log-out-modal'
+import { Button } from '../ui/button'
+import { Dialog, DialogTrigger } from '../ui/dialog'
+import LogoutModal from '../auth/log-out-modal'
 
 export default function Navbar() {
     const { theme } = useTheme()

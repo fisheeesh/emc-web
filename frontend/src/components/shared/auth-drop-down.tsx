@@ -19,9 +19,9 @@ import { IoMdLogOut } from "react-icons/io";
 import { LuLayoutDashboard } from "react-icons/lu";
 import { MdOutlineSettings } from "react-icons/md";
 import { Link } from "react-router";
-import LogoutModal from "./auth/log-out-modal";
-import { Button } from "./ui/button";
-import { Dialog, DialogTrigger } from "./ui/dialog";
+import LogoutModal from "../auth/log-out-modal";
+import { Button } from "../ui/button";
+import { Dialog, DialogTrigger } from "../ui/dialog";
 import { useRef } from "react";
 
 export default function AuthDropdown() {

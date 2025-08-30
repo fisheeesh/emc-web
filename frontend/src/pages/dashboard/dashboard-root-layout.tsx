@@ -1,4 +1,4 @@
-import Navbar from "@/components/nav-bar";
+import Navbar from "@/components/shared/nav-bar";
 import { Outlet } from "react-router";
 
 export default function DashboradRootLayout() {
