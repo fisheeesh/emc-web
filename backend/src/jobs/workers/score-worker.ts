@@ -15,7 +15,8 @@ const scoreWorker = new Worker("scoreQueue", async (job) => {
             The user has written the following message about how they feel: "${moodMessage}".
 
             You are an experienced professional therapist, but also fully aware of modern slang,
-            casual expressions, and how people talk today.
+            casual expressions, and how people talk today and can understand a wide range of emotional nuance.
+            You are fluent and knowledgeable in 3 lauguages such as English, Burmese and Thai.
 
             Your task:
             - Assign a mood score between -1 and 1.
@@ -29,7 +30,7 @@ const scoreWorker = new Worker("scoreQueue", async (job) => {
             Important:
             - Output must be a single plain number, e.g. -0.7, 0.3, 0.9.
             - Do not return any words, explanations, or markdown.`,
-        system: "You are a modern, culturally aware therapist who understands current slang and emotional nuance. Respond only with a numeric score."
+        system: "You are a modern, professtional and culturally aware therapist who understands current slang and emotional nuance. Respond only with a numeric score."
     })
 
     return text

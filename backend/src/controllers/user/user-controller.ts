@@ -8,7 +8,7 @@ import { ScoreQueue, ScoreQueueEvents } from "../../jobs/queues/score-queue"
 import { getEmployeeById } from "../../services/auth-services"
 import { authorize } from "../../utils/authorize"
 import { checkEmployeeIfNotExits, createHttpErrors } from "../../utils/check"
-import { AnalysisQueue, AnalysisQueueEvents } from "../../jobs/queues/analysis-queue"
+import { Decimal } from "../../../generated/prisma/runtime/library"
 
 const prisma = new PrismaClient()
 
@@ -46,13 +46,16 @@ export const emotionCheckIn = [
             code: errorCodes.invalid
         }))
 
+        //* Recieve emp's today mood message
         const { moodMessage } = req.body
         const empId = req.employeeId
         const emp = await getEmployeeById(empId!)
         checkEmployeeIfNotExits(emp)
 
+        //* Split emoji and text for db schema format
         const [emoji, textFeeling] = moodMessage.split(',')
 
+        //* Let Ai to calculate score
         const job = await ScoreQueue.add("calculate-score", {
             moodMessage
         }, {
@@ -63,13 +66,15 @@ export const emotionCheckIn = [
             }
         })
 
-        //* the full response from model
+        //* Full response from model
         const raw = await job.waitUntilFinished(ScoreQueueEvents)
-        //* find last number in string
+        //* Find last number in string
         const match = raw.match(/-?\d+(\.\d+)?$/);
-        const score = match ? parseFloat(match[0]) : null;
+        //* Get the score and format it -> use decimal for type safty
+        const score = match ? new Decimal(match[0]) : 0;
 
         try {
+            //* Since this is atomic opeartion -> transaction
             const isCritical = await prisma.$transaction(async (tx) => {
                 //* Insert emotion check-in
                 await tx.emotionCheckIn.create({
@@ -77,23 +82,23 @@ export const emotionCheckIn = [
                         employeeId: emp!.id,
                         emoji: emoji.trim(),
                         textFeeling: textFeeling.trim(),
-                        emotionScore: +score!
+                        emotionScore: score
                     }
                 })
 
-                //* Update employee running totals
+                //* Update employee running totals **without avgScore** for precision
                 const updatedEmp = await tx.employee.update({
                     where: { id: emp!.id },
                     data: {
-                        emotionSum: { increment: +score! },
-                        emotionCount: { increment: 1 }
+                        emotionSum: { increment: score },
+                        emotionCount: { increment: 1 },
                     }
                 })
 
-                //* Calculate new avgScore
-                const avgScore = (+updatedEmp.emotionSum + 0) / (updatedEmp.emotionCount + 0)
+                //* Calculate avgScore with up-to-date data -> **Decimal** for type safty
+                const avgScore = new Decimal(updatedEmp.emotionSum).div(updatedEmp.email).toNumber()
 
-                //* Update avgScore field
+                //* Update avgScore field -> fresh
                 await tx.employee.update({
                     where: { id: emp!.id },
                     data: { avgScore }
@@ -101,7 +106,7 @@ export const emotionCheckIn = [
 
                 //* Critical check AFTER update
                 const isCritical = avgScore <= CRITICAL_POINT
-                if (isCritical) {
+                if (isCritical && updatedEmp.status !== "CRITICAL") {
                     await tx.employee.update({
                         where: { id: emp!.id },
                         data: {
@@ -110,47 +115,13 @@ export const emotionCheckIn = [
                         }
                     })
 
-                    const critEmp = await tx.criticalEmployee.create({
+                    await tx.criticalEmployee.create({
                         data: {
                             employee: {
                                 connect: { id: emp!.id }
                             },
                             status: "CRITICAL",
                             emotionScore: avgScore,
-                        }
-                    })
-
-                    const emotions = await tx.emotionCheckIn.findMany({
-                        where: { employeeId: emp!.id },
-                        select: {
-                            textFeeling: true,
-                            emoji: true,
-                        },
-                        take: 7
-                    })
-
-                    const input = emotions.flatMap((e) => [e.emoji, e.textFeeling]).join(' ')
-
-                    const job = await AnalysisQueue.add("analysis-emotion", {
-                        input
-                    }, {
-                        attempts: 3,
-                        backoff: {
-                            type: 'exponential',
-                            delay: 1000
-                        }
-                    })
-
-                    const raw = await job.waitUntilFinished(AnalysisQueueEvents)
-                    console.log(raw)
-
-                    await tx.aIAnalysis.create({
-                        data: {
-                            input,
-                            output: "",
-                            critical: {
-                                connect: { id: critEmp.id }
-                            }
                         }
                     })
                 }
