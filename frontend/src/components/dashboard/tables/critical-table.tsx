@@ -1,8 +1,11 @@
 import LocalSearch from "@/components/shared/local-search";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+import { Dialog, DialogTrigger } from "@/components/ui/dialog";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { CRITICAL_DATA } from "@/lib/constants";
+import DetailsModal from "../details-modal";
+import ActionModal from "../action-modal";
 
 export default function CriticalTable() {
     return (
@@ -44,12 +47,25 @@ export default function CriticalTable() {
                                         <span className="whitespace-nowrap">{emp.score}</span>
                                     </TableCell>
                                     <TableCell className="space-x-2 text-center">
-                                        <Button variant='outline' className="cursor-pointer">
-                                            Details
-                                        </Button>
-                                        <Button className="cursor-pointer bg-brand hover:bg-blue-600 text-white">
-                                            Action
-                                        </Button>
+                                        {/* Details Dialog */}
+                                        <Dialog>
+                                            <DialogTrigger asChild>
+                                                <Button variant='outline' className="cursor-pointer">
+                                                    Details
+                                                </Button>
+                                            </DialogTrigger>
+                                            <DetailsModal employee={emp} />
+                                        </Dialog>
+
+                                        {/* Action Dialog */}
+                                        <Dialog>
+                                            <DialogTrigger asChild>
+                                                <Button className="cursor-pointer bg-brand hover:bg-blue-600 text-white">
+                                                    Action
+                                                </Button>
+                                            </DialogTrigger>
+                                            <ActionModal employee={emp} />
+                                        </Dialog>
                                     </TableCell>
                                 </TableRow>
                             ))

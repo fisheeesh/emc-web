@@ -1,6 +1,7 @@
 import { Suspense } from 'react'
 import { createBrowserRouter, Navigate, RouterProvider } from 'react-router'
 import DashboradRootLayout from './pages/dashboard/dashboard-root-layout'
+import LoginPage from './pages/auth/login-page'
 
 export default function Router() {
     const router = createBrowserRouter([
@@ -37,10 +38,7 @@ export default function Router() {
         },
         {
             path: '/login',
-            lazy: async () => {
-                const { default: LoginPage } = await import('./pages/auth/login-page')
-                return { Component: LoginPage }
-            }
+            Component: LoginPage
         }
     ])
 

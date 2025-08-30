@@ -11,3 +11,11 @@ interface ComparisonData {
     critical: number
     [key: string]: string | number;
 }
+
+interface Employee {
+    id: number,
+    name: string,
+    department: string,
+    contact: string,
+    score: number
+}

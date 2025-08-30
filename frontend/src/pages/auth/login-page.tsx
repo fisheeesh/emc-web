@@ -4,7 +4,7 @@ import Branding from '@/components/auth/branding'
 
 export default function LoginPage() {
     return (
-        <section className="flex flex-col min-h-screen global md:flex-row bg-[#F1F5F9] dark:bg-slate-950 dark:text-white">
+        <section className="flex flex-col min-h-screen global md:flex-row">
             <Branding />
             <AuthForm
                 formType='LOGIN'
