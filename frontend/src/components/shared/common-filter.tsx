@@ -8,17 +8,18 @@ interface Filter {
 }
 
 interface Props {
-    filters: Filter[]
+    filters: Filter[],
+    filterValue: string,
     otherClasses?: string
     containerClasses?: string
 }
 
-export default function CommonFilter({ filters, otherClasses = "", containerClasses = "" }: Props) {
+export default function CommonFilter({ filters, filterValue = 'filter', otherClasses = "", containerClasses = "" }: Props) {
     const [searchParams, setSearchParams] = useSearchParams()
     const paramsFilter = searchParams.get('filter')
 
     const handleUpdateParams = (value: string) => {
-        searchParams.set('filter', value)
+        searchParams.set(filterValue, value)
 
         setSearchParams(searchParams)
     }
@@ -34,7 +35,7 @@ export default function CommonFilter({ filters, otherClasses = "", containerClas
                         <SelectValue placeholder="Select a filter" />
                     </div>
                 </SelectTrigger>
-                <SelectContent className="background-light900_dark200 z-50">
+                <SelectContent className="background-light900_dark200 z-50 font-en">
                     <SelectGroup>
                         {filters.map(item => (
                             <SelectItem key={item.value} value={item.value} className="cursor-pointer">
