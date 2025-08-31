@@ -12,7 +12,7 @@ export default function CriticalTable() {
         <Card className="rounded-md border-destructive border-2 flex flex-col gap-5">
             <CardHeader className="flex flex-col md:flex-row gap-3 md:gap-0 justify-between">
                 <div className="flex flex-col items-start gap-2 tracking-wide">
-                    <CardTitle className="text-2xl text-destructive">Critical Mood Table</CardTitle>
+                    <CardTitle className="text-xl md:text-2xl text-destructive">Critical Mood Table</CardTitle>
                     <CardDescription>Employees whose average sentiment score lower than particular points will be shown here.</CardDescription>
                 </div>
                 <LocalSearch />
@@ -44,7 +44,7 @@ export default function CriticalTable() {
                                         <span className="whitespace-nowrap">{emp.contact}</span>
                                     </TableCell>
                                     <TableCell className="text-center">
-                                        <span className="whitespace-nowrap">{emp.score}</span>
+                                        <span className="whitespace-nowrap font-en">{emp.score}</span>
                                     </TableCell>
                                     <TableCell className="space-x-2 text-center">
                                         {/* Details Dialog */}

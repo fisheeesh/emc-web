@@ -35,7 +35,7 @@ export default function OverViewChart() {
     return (
         <Card className="rounded-md h-full w-full lg:w-1/3 flex flex-col gap-5 lg:h-[400px]">
             <CardHeader>
-                <CardTitle className="text-2xl">Mood Overview for Today</CardTitle>
+                <CardTitle className="text-xl md:text-2xl">Mood Overview for Today</CardTitle>
             </CardHeader>
             <CardContent className="flex items-center justify-center gap-12 md:gap-12 lg:gap-2 lg:justify-between">
                 <div className="w-[150px] h-[200px] lg:h-[285px] md:w-[180px] lg:w-[190px]">
@@ -47,7 +47,7 @@ export default function OverViewChart() {
 
                     <div className="flex xl:flex lg:hidden flex-col gap-y-4">
                         {overviewData.map((data, index) => (
-                            <h1 key={index} className="text-sm lg:text-base">{data.toFixed(1)}%</h1>
+                            <h1 key={index} className="text-sm lg:text-base font-en">{data.toFixed(1)}%</h1>
                         ))}
                     </div>
                 </div>

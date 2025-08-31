@@ -30,15 +30,46 @@ export default function SentimentsComparisonChart() {
         plugins: { legend: { display: false } },
         interaction: { mode: 'index', intersect: false },
         scales: {
-            x: { grid: { drawTicks: false, color: `${theme === 'dark' ? '#334155' : '#E0E0E0'}` }, ticks: { padding: 10, align: 'center', font: { size: 11, weight: "bold" }, color: `${theme === 'dark' ? '#cbd5e1' : ''}` } },
-            y: { grid: { drawTicks: false, color: `${theme === 'dark' ? '#334155' : '#E0E0E0'}` }, ticks: { padding: 10, stepSize: 2, font: { size: 11, weight: "bold" }, color: `${theme === 'dark' ? '#cbd5e1' : ''}` } }
+            x: {
+                grid: {
+                    drawTicks: false,
+                    display: false
+                },
+                ticks: {
+                    padding: 10,
+                    align: 'center',
+                    font: { size: 11, weight: "bold" },
+                    color: `${theme === 'dark' ? '#cbd5e1' : ''}`
+                },
+                border: {
+                    display: false
+                }
+            },
+            y: {
+                grid: {
+                    drawTicks: false,
+                    color: `${theme === 'dark' ? '#334155' : '#E0E0E0'}`,
+                    display: true,
+                    lineWidth: 1,
+                    drawOnChartArea: true,
+                },
+                ticks: {
+                    padding: 10,
+                    stepSize: 2,
+                    font: { size: 11, weight: "bold" },
+                    color: `${theme === 'dark' ? '#cbd5e1' : ''}`
+                },
+                border: {
+                    display: false
+                }
+            }
         }
     }
 
     return (
         <Card className="rounded-md w-full lg:w-2/3 flex flex-col items-center gap-2 lg:h-[400px]">
             <CardHeader className="flex flex-col md:flex-row items-center justify-center gap-3 md:gap-0 md:justify-between w-full">
-                <CardTitle className="text-2xl">Sentiments Comparison Charts</CardTitle>
+                <CardTitle className="text-xl md:text-2xl">Sentiments Comparison Charts</CardTitle>
                 <CommonFilter
                     filters={COMPARISON_FILTER}
                     otherClasses="min-h-[44px] sm:min-w-[150px]"

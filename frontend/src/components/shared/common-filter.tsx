@@ -28,7 +28,7 @@ export default function CommonFilter({ filters, otherClasses = "", containerClas
             <Select onValueChange={handleUpdateParams} defaultValue={paramsFilter || filters[0].value}>
                 <SelectTrigger
                     aria-label="Filter options"
-                    className={cn('body-regular cursor-pointer w-full no-focus light-border background-light800_dark300 text-dark500_light700 border px-5 py-1.5 relative z-10', otherClasses)}
+                    className={cn('body-regular font-en cursor-pointer w-full no-focus light-border background-light800_dark300 text-dark500_light700 border px-5 py-1.5 relative z-10', otherClasses)}
                 >
                     <div className="line-clamp-1 flex-1 text-left">
                         <SelectValue placeholder="Select a filter" />

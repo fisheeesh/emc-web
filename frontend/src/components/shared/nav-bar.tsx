@@ -1,5 +1,3 @@
-import ataLogo from '@/assets/half-ata-logo.png'
-import lightLogo from '@/assets/light_logo.png'
 import { NAVLINKS } from '@/lib/constants'
 import { useState } from 'react'
 import { NavLink, useNavigate } from 'react-router'
@@ -11,6 +9,10 @@ import LngBtn from './lng-btn'
 import { ModeToggle } from './mode-toggle'
 import NotiBtn from './noti-btn'
 import { useTheme } from './theme-provider'
+import light from '@/assets/light.png'
+import dark from '@/assets/dark.png'
+import halfDark from '@/assets/half-ata-logo.png'
+import halfLight from '@/assets/light_logo.png'
 
 export default function Navbar() {
     const { theme } = useTheme()
@@ -36,8 +38,21 @@ export default function Navbar() {
             <nav className='fixed top-0 left-0 right-0 z-50 border-b bg-white/90 backdrop-blur-sm border-gray-100 shadow-sm dark:bg-slate-900 dark:border-0 dark:shadow-2xl'>
                 <div className="w-full flex justify-between items-center max-w-[1440px] px-4 mx-auto md:h-20 h-16">
                     {/* Logo & Links */}
-                    <div className="flex items-center gap-8">
-                        <img onClick={() => navigate('/')} src={theme == 'dark' ? lightLogo : ataLogo} alt="ata_logo" className='w-[70px] cursor-pointer' />
+                    <div className="flex items-center gap-2">
+                        <img
+                            onClick={() => navigate('/')}
+                            src={theme == 'dark' ? light : dark}
+                            alt="ata_logo"
+                            className='w-[200px] hidden md:block cursor-pointer'
+                        />
+                        <img
+                            onClick={() => navigate('/')}
+                            src={theme == 'dark' ? halfLight : halfDark}
+                            alt="ata_logo"
+                            className='w-[60px] cursor-pointer md:hidden'
+                        />
+                        <div className="w-[1px] mt-0.5 h-6 bg-gray-500"></div>
+                        <h1 className="font-mich tracking-wider text-[10px] md:text-xs">Emotion Check-in System</h1>
                     </div>
 
                     {/* Desktop Right Side */}

@@ -1,7 +1,7 @@
 export const LOGIN = "Log In"
 export const REGISTER = "Register"
-export const LOGIN_TITLE = "Hello there!"
-export const LOGIN_SUBTITLE = "Login to continue."
+export const LOGIN_TITLE = "Welcome aboard"
+export const LOGIN_SUBTITLE = "Nurture your team's emotional resilience."
 export const IMG_URL = import.meta.env.VITE_IMG_URL
 
 export const NAVLINKS = [

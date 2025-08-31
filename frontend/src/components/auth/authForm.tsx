@@ -34,7 +34,7 @@ export default function AuthForm<T extends z.ZodType<any, any, any>>({
 
     const handleSubmit: SubmitHandler<FormData> = async (values) => {
         console.log(values)
-        await new Promise(resolve => setTimeout(resolve, 2000))
+        await new Promise(resolve => setTimeout(resolve, 1000))
         navigate("/", { replace: true })
     }
 
@@ -43,10 +43,10 @@ export default function AuthForm<T extends z.ZodType<any, any, any>>({
     const isWorking = form.formState.isSubmitting
 
     return (
-        <div className="flex flex-col justify-center w-full px-8 space-y-5 right-side md:w-1/3 max-w-md" {...props}>
+        <div className="flex flex-col justify-center w-full px-8 space-y-5 right-side lg:w-1/3 max-w-md" {...props}>
             <div className="flex-col items-start hidden md:flex">
                 <h1 className="text-3xl font-semibold tracking-wide">{LOGIN_TITLE}</h1>
-                <h5 className="tracking-wide text-md">{LOGIN_SUBTITLE}</h5>
+                <h5 className="tracking-wide text-sm text-muted-foreground">{LOGIN_SUBTITLE}</h5>
             </div>
             <Form {...form}>
                 <form onSubmit={form.handleSubmit(handleSubmit)}>
