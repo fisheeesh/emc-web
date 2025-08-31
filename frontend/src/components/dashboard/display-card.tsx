@@ -10,7 +10,7 @@ interface Props {
 export default function DisplayCard({ data, type }: Props) {
 
     return (
-        <div className="bg-white dark:border dark:border-slate-700 dark:bg-slate-900 dark:text-slate-50 border border-white w-1/2 lg:w-full drop-shadow-lg py-5 px-6 lg:py-12 rounded-md flex justify-between items-center">
+        <div className="bg-card border w-1/2 lg:w-full py-5 px-6 lg:py-12 rounded-md flex justify-between items-center">
             <div>
                 <h1 className="text-2xl lg:text-4xl font-en">{data}</h1>
                 <p className={cn(type !== 'total' && 'text-green-500', 'text-sm lg:text-xl')}>{type === 'total' ? 'Total Employees' : 'Present'}</p>
