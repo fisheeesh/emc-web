@@ -4,11 +4,11 @@ import { Button } from "../ui/button";
 
 export default function ConfirmModal() {
     return (
-        <DialogContent className="sm:max-w-[425px] bg-card">
+        <DialogContent className="sm:max-w-[500px] bg-card">
             <DialogHeader>
                 <DialogTitle>Delete Confirmation.</DialogTitle>
                 <DialogDescription>
-                    Are you sure you want to delete user?
+                    Are you sure you want to delete user? This action cannot be undone.
                 </DialogDescription>
             </DialogHeader>
             <DialogFooter>

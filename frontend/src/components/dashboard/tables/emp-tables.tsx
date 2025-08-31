@@ -1,16 +1,13 @@
+import ConfirmModal from "@/components/modals/confirm-modal";
+import CreateEditEmpModal from "@/components/modals/create-edit-emp-modal";
 import CustomBadge from "@/components/shared/custom-badge";
 import LocalSearch from "@/components/shared/local-search";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { CRITICAL_DATA } from "@/lib/constants";
-import { FaRegEdit } from "react-icons/fa";
-import { IoMdMore } from "react-icons/io";
-import { FaRegTrashCan } from "react-icons/fa6";
 import { Dialog, DialogTrigger } from "@/components/ui/dialog";
-import DetailsModal from "@/components/modals/details-modal";
-import ConfirmModal from "@/components/modals/confirm-modal";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { CRITICAL_DATA, IMG_URL } from "@/lib/constants";
 
 export default function EmpTables() {
     return (
@@ -29,12 +26,13 @@ export default function EmpTables() {
                         <TableRow>
                             <TableHead className="whitespace-nowrap">Name</TableHead>
                             <TableHead className="whitespace-nowrap">Position</TableHead>
-                            <TableHead className="whitespace-nowrap">Contact</TableHead>
+                            <TableHead className="whitespace-nowrap">Email</TableHead>
                             <TableHead className="whitespace-nowrap">Role</TableHead>
                             <TableHead className="whitespace-nowrap">Job Type</TableHead>
                             <TableHead className="whitespace-nowrap">Overall</TableHead>
                             <TableHead className="whitespace-nowrap">Last Critical Time</TableHead>
                             <TableHead className="whitespace-nowrap">Joined At</TableHead>
+                            <TableHead className="whitespace-nowrap text-center">Actions</TableHead>
                         </TableRow>
                     </TableHeader>
 
@@ -42,8 +40,14 @@ export default function EmpTables() {
                         {
                             CRITICAL_DATA.map((emp) => (
                                 <TableRow key={emp.id} className="py-10">
-                                    <TableCell >
-                                        <span className="whitespace-nowrap">{emp.name}</span>
+                                    <TableCell>
+                                        <div className="flex items-center gap-2">
+                                            <Avatar className="size-9">
+                                                <AvatarImage src={IMG_URL} alt={"SY"} />
+                                                <AvatarFallback>{"SY"}</AvatarFallback>
+                                            </Avatar>
+                                            <span className="whitespace-nowrap">{emp.name}</span>
+                                        </div>
                                     </TableCell>
                                     <TableCell>
                                         <span className="whitespace-nowrap">UI/UX Designer</span>
@@ -64,43 +68,26 @@ export default function EmpTables() {
                                         <span className="whitespace-nowrap">Null</span>
                                     </TableCell>
                                     <TableCell>
-                                        <span className="whitespace-nowrap">August, 31, 2025</span>
+                                        <span className="whitespace-nowrap font-en">August, 31, 2025</span>
                                     </TableCell>
-                                    <TableCell>
-                                        <DropdownMenu>
-                                            <DropdownMenuTrigger asChild>
-                                                <Button size='icon' variant='outline' className="cursor-pointer">
-                                                    <IoMdMore />
+                                    <TableCell className="space-x-2 text-center">
+                                        <Dialog>
+                                            <DialogTrigger asChild>
+                                                <Button variant='outline' className="cursor-pointer">
+                                                    Edit
                                                 </Button>
-                                            </DropdownMenuTrigger>
-                                            <DropdownMenuContent align="end" forceMount>
-                                                <DropdownMenuGroup className="flex flex-col">
-                                                    <DropdownMenuItem asChild>
-                                                        <Dialog>
-                                                            <DialogTrigger asChild>
-                                                                <Button variant='outline' className="whitespace-nowrap cursor-pointer">
-                                                                    <FaRegEdit className="size-4 text-black dark:text-white mr-1" aria-hidden="true" />
-                                                                    Edit
-                                                                </Button>
-                                                            </DialogTrigger>
+                                            </DialogTrigger>
+                                            <CreateEditEmpModal />
+                                        </Dialog>
 
-                                                            <DetailsModal employee={emp} />
-                                                        </Dialog>
-                                                    </DropdownMenuItem>
-                                                    <DropdownMenuItem asChild>
-                                                        <Dialog>
-                                                            <DialogTrigger asChild>
-                                                                <Button variant='destructive' className="whitespace-nowrap mt-1 cursor-pointer">
-                                                                    <FaRegTrashCan className="size-4 text-black dark:text-white mr-1" aria-hidden="true" />
-                                                                    Delete
-                                                                </Button>
-                                                            </DialogTrigger>
-                                                            <ConfirmModal />
-                                                        </Dialog>
-                                                    </DropdownMenuItem>
-                                                </DropdownMenuGroup>
-                                            </DropdownMenuContent>
-                                        </DropdownMenu>
+                                        <Dialog>
+                                            <DialogTrigger asChild>
+                                                <Button className="cursor-pointer" variant='destructive'>
+                                                    Delete
+                                                </Button>
+                                            </DialogTrigger>
+                                            <ConfirmModal />
+                                        </Dialog>
                                     </TableCell>
                                 </TableRow>
                             ))
