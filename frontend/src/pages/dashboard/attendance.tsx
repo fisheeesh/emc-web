@@ -1,5 +1,6 @@
 import DailyAttendanceChart from "@/components/dashboard/charts/daily-attendance-chart";
 import DisplayCard from "@/components/dashboard/display-card"
+import AttendanceTable from "@/components/dashboard/tables/attendance-table";
 import useTitle from "@/hooks/useTitle"
 import { BarElement, CategoryScale, Chart as ChartJS, Legend, LinearScale, Tooltip } from "chart.js";
 
@@ -20,6 +21,9 @@ export default function AttendanceDashboardPage() {
                 <DailyAttendanceChart />
             </div>
 
+            <div className="w-full">
+                <AttendanceTable />
+            </div>
         </section>
     )
 }
