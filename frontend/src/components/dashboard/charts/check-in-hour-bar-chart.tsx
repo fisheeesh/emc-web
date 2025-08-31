@@ -1,0 +1,108 @@
+import { CardContent } from "@/components/ui/card";
+import { useTheme } from "@/components/shared/theme-provider";
+import { useState } from "react";
+import { Bar } from "react-chartjs-2";
+import { CHECK_IN_HOURS_DATA } from "@/lib/constants";
+import { Calendar } from "@/components/ui/calendar"
+import MonthYearSelector from "../month-year-selector";
+import type { ChartOptions } from "chart.js";
+
+const month = new Date(Date.now()).toLocaleString('en-US', { month: 'long' })
+const year = new Date(Date.now()).getFullYear()
+
+export default function CheckInHourBarChart({ filter }: { filter: string }) {
+    const { theme } = useTheme()
+    const [date, setDate] = useState<Date | undefined>(new Date())
+    const [activeMonth, setActiveMonth] = useState(month);
+    const [activeYear, setActiveYear] = useState(year);
+
+    const isActiveMonth = (month: string) => activeMonth === month;
+    // const isActiveYear = (year: string) => activeYear.toString() === year;
+    // const formattedDate = new Intl.DateTimeFormat('en-CA').format(date);
+
+    const labels = CHECK_IN_HOURS_DATA.map(att => att.time)
+    const chartData = {
+        labels,
+        datasets: [
+            {
+                label: "Attendance Rate",
+                data: CHECK_IN_HOURS_DATA?.map(checkIn => checkIn.value),
+                backgroundColor: "#3b82f6",
+                borderColor: "#3b82f6",
+                borderRadius: 10,
+                barThickness: 10
+            }
+        ]
+    }
+
+    const options: ChartOptions<"bar"> = {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: { display: false }
+        },
+        interaction: {
+            mode: "index",
+            intersect: false
+        },
+        scales: {
+            x: {
+                grid: { display: false },
+                ticks: {
+                    padding: 10,
+                    align: "center",
+                    autoSkip: false,
+                    font: { size: 11, weight: "bold" },
+                    color: theme === 'dark' ? '#cbd5e1' : ''
+                },
+                min: 0,
+                max: 29
+            },
+            y: {
+                grid: {
+                    display: true,
+                    drawTicks: false,
+                    color: theme === 'dark' ? '#334155' : '#E0E0E0'
+                },
+                border: { display: false },
+                ticks: {
+                    font: { size: 11, weight: "bold" },
+                    color: theme === 'dark' ? '#cbd5e1' : '',
+                    padding: 10
+                }
+            }
+        }
+    }
+
+    return (
+        <CardContent className="w-full flex  flex-col-reverse lg:flex-row justify-center items-center gap-2 h-[700px] lg:h-[500px]">
+            <div className="lg:w-3/4 w-full h-full overflow-x-scroll custom-scrollbar">
+                <div className="w-[1500px] h-full">
+                    <Bar
+                        data={chartData}
+                        options={options}
+                    />
+                </div>
+            </div>
+            <div className="lg:w-1/4 w-full px-5 h-fit lg:h-full mb-5 lg:mb-0">
+                {filter === 'daily' &&
+                    <Calendar
+                        mode="single"
+                        selected={date}
+                        onSelect={setDate}
+                        className="rounded-md border shadow-sm font-en w-full"
+                        captionLayout="dropdown"
+                    />
+                }
+                {filter === 'monthly' && <MonthYearSelector mode={'month'} setActive={setActiveMonth} isActive={isActiveMonth} />}
+                {filter === 'yearly' && (
+                    <MonthYearSelector
+                        mode="year"
+                        setActive={(el) => setActiveYear(Number(el))}
+                        isActive={(el) => activeYear === Number(el)}
+                    />
+                )}
+            </div>
+        </CardContent>
+    )
+}
