@@ -13,9 +13,9 @@ export default function WatchListTable() {
             <CardHeader className="flex flex-col md:flex-row gap-3 md:gap-0 justify-between">
                 <div className="flex flex-col items-start gap-2 tracking-wide">
                     <CardTitle className="text-xl md:text-2xl text-yellow-600">WatchList Employees</CardTitle>
-                    <CardDescription>Employees moved from critical status after intervention, now under ongoing observation for stability.</CardDescription>
+                    <CardDescription>Employees moved from critical status after intervention, now under ongoing observation for stability</CardDescription>
                 </div>
-                <LocalSearch />
+                <LocalSearch filterValue="watEmp" />
             </CardHeader>
 
             <CardContent>

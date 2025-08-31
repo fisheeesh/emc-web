@@ -48,6 +48,13 @@ export const COMPARISON_FILTER = [
     { name: "Last 30 days", value: "30" }
 ]
 
+export const EMOTION_FILTER = [
+    {name: 'Positive', value: 'positive'},
+    {name: 'Neutral', value: 'neutral'},
+    {name: 'Negative', value: 'negative'},
+    {name: 'Critical', value: 'critical'},
+]
+
 export const CRITICAL_DATA = [
     {
         id: 22323,
@@ -120,3 +127,108 @@ export const CRITICAL_DATA = [
         score: -0.8
     }
 ];
+
+export const CHECK_IN_HOURS_DATA = [
+    // {
+    //     time: '01:00',
+    //     value: 25
+    // },
+    // {
+    //     time: '02:00',
+    //     value: 10
+    // },
+    // {
+    //     time: '03:00',
+    //     value: 15
+    // },
+    // {
+    //     time: '04:00',
+    //     value: 2
+    // },
+    // {
+    //     time: '05:00',
+    //     value: 25
+    // },
+    // {
+    //     time: '06:00',
+    //     value: 3
+    // },
+    // {
+    //     time: '07:00',
+    //     value: 5
+    // },
+    {
+        time: '08:00',
+        value: 30
+    },
+    {
+        time: '09:00',
+        value: 55
+    },
+    {
+        time: '10:00',
+        value: 40
+    },
+    {
+        time: '11:00',
+        value: 25
+    },
+    {
+        time: '12:00',
+        value: 60
+    },
+    {
+        time: '13:00',
+        value: 20
+    },
+    {
+        time: '14:00',
+        value: 7
+    },
+    {
+        time: '15:00',
+        value: 7
+    },
+    {
+        time: '16:00',
+        value: 8
+    },
+    {
+        time: '17:00',
+        value: 5
+    },
+    {
+        time: '18:00',
+        value: 0
+    },
+    {
+        time: '19:00',
+        value: 9
+    },
+    // {
+    //     time: '20:00',
+    //     value: 1
+    // },
+    // {
+    //     time: '21:00',
+    //     value: 5
+    // },
+    // {
+    //     time: '22:00',
+    //     value: 2
+    // },
+    // {
+    //     time: '23:00',
+    //     value: 16
+    // },
+    // {
+    //     time: '24:00',
+    //     value: 12
+    // }
+]
+
+//? dummy month
+export const MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+
+//? dummy year
+export const YEARS = ['2021', '2022', '2023', '2024', '2025'];

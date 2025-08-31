@@ -1,5 +1,5 @@
 import { useTheme } from "@/components/shared/theme-provider";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import type { ChartOptions } from "chart.js";
 import { COMMON_DATAS, COMPARISON_DATA, COMPARISON_FILTER } from "@/lib/constants";
 import moment from "moment";
@@ -67,10 +67,14 @@ export default function SentimentsComparisonChart() {
     }
 
     return (
-        <Card className="rounded-md w-full lg:w-2/3 flex flex-col items-center gap-2 lg:h-[400px]">
-            <CardHeader className="flex flex-col md:flex-row items-center justify-center gap-3 md:gap-0 md:justify-between w-full">
-                <CardTitle className="text-xl md:text-2xl">Sentiments Comparison Charts</CardTitle>
+        <Card className="rounded-md w-full lg:w-2/3 flex flex-col items-center gap-2 lg:h-[420px]">
+            <CardHeader className="flex flex-col md:flex-row mb-2 items-center justify-center gap-3 md:gap-0 md:justify-between w-full">
+                <div>
+                    <CardTitle className="text-xl md:text-2xl">Sentiments Comparison Charts</CardTitle>
+                    <CardDescription>Seeing how sentiments vary day by day</CardDescription>
+                </div>
                 <CommonFilter
+                    filterValue="filter"
                     filters={COMPARISON_FILTER}
                     otherClasses="min-h-[44px] sm:min-w-[150px]"
                 />

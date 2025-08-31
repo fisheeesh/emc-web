@@ -1,5 +1,5 @@
 import { useTheme } from "@/components/shared/theme-provider";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Bar } from "react-chartjs-2";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
@@ -113,10 +113,13 @@ export default function DailyAttendanceChart() {
 
     return (
         <Card className="w-full lg:w-2/3 h-[450px] lg:h-[343px] rounded-md">
-            <CardHeader className="flex items-center justify-between flex-col md:flex-row gap-2">
-                <CardTitle className="text-xl md:text-2xl">
-                    Daily Attendance
-                </CardTitle>
+            <CardHeader className="flex justify-between flex-col md:flex-row gap-2">
+                <div>
+                    <CardTitle className="text-xl md:text-2xl">
+                        Daily Attendance
+                    </CardTitle>
+                    <CardDescription>Monitor attendance rates and trends from the last 10 days</CardDescription>
+                </div>
                 <RadioGroup
                     value={todayFilter}
                     onValueChange={(v: "numbers" | "percentages") => setTodayFilter(v)}

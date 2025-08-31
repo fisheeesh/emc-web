@@ -2,18 +2,19 @@ import LocalSearch from "@/components/shared/local-search";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { CRITICAL_DATA } from "@/lib/constants";
+import { CRITICAL_DATA, EMOTION_FILTER } from "@/lib/constants";
 import { Dialog, DialogTrigger } from "@radix-ui/react-dialog";
 import DetailsModal from "../details-modal";
 
-import { ChevronDownIcon } from "lucide-react"
-import { Calendar } from "@/components/ui/calendar"
+import { Calendar } from "@/components/ui/calendar";
 import {
     Popover,
     PopoverContent,
     PopoverTrigger,
-} from "@/components/ui/popover"
+} from "@/components/ui/popover";
+import { ChevronDownIcon } from "lucide-react";
 import { useState } from "react";
+import CommonFilter from "@/components/shared/common-filter";
 
 export default function AttendanceTable() {
     const [open, setOpen] = useState(false)
@@ -35,7 +36,12 @@ export default function AttendanceTable() {
                     <CardDescription>Select a date to view employee attendance records</CardDescription>
                 </div>
                 <div className="flex items-center gap-2">
-                    <LocalSearch />
+                    <LocalSearch filterValue="emp" />
+                    <CommonFilter
+                        filterValue="emotion"
+                        filters={EMOTION_FILTER}
+                        otherClasses="min-h-[44px] sm:min-w-[150px]"
+                    />
                     <Popover open={open} onOpenChange={setOpen}>
                         <PopoverTrigger asChild>
                             <Button
@@ -49,6 +55,7 @@ export default function AttendanceTable() {
                         </PopoverTrigger>
                         <PopoverContent className="w-auto overflow-hidden p-0" align="start">
                             <Calendar
+                                className="font-en"
                                 mode="single"
                                 selected={date}
                                 captionLayout="dropdown"

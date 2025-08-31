@@ -13,9 +13,9 @@ export default function CriticalTable() {
             <CardHeader className="flex flex-col md:flex-row gap-3 md:gap-0 justify-between">
                 <div className="flex flex-col items-start gap-2 tracking-wide">
                     <CardTitle className="text-xl md:text-2xl text-destructive">Critical Mood Table</CardTitle>
-                    <CardDescription>Employees whose average sentiment score lower than particular points will be shown here.</CardDescription>
+                    <CardDescription>Employees whose average sentiment score lower than particular points will be shown here</CardDescription>
                 </div>
-                <LocalSearch />
+                <LocalSearch filterValue="criEmp" />
             </CardHeader>
 
             <CardContent>
