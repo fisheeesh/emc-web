@@ -4,6 +4,8 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme {
+  --font-mich: 'Michroma', sans-serif;
+  --font-raleway: 'Raleway', sans-serif;
   --font-en: Rubik, sans-serif;
   --font-mm: 'Noto Sans Myanmar', sans-serif;
   --font-th: "Noto Sans Thai", sans-serif;
