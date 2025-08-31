@@ -14,7 +14,6 @@ export default function DailyAttendanceChart() {
 
     const isPercentages = todayFilter === "percentages";
 
-    // 📊 Sample mock data (like first version)
     const dailyAttendance: Record<string, number> = {
         "2025-08-20": 50,
         "2025-08-21": 45,
@@ -23,12 +22,9 @@ export default function DailyAttendanceChart() {
         "2025-08-24": 45,
         "2025-08-25": 45,
         "2025-08-26": 45,
-        "2025-08-27": 38,
-        "2025-08-28": 42,
-        "2025-08-29": 55,
     };
 
-    const percentagesData: number[] = [75.5, 83.2, 65.1, 70.0, 91.4];
+    const percentagesData: number[] = [75.5, 83.2, 65.1, 70.0, 91.4, 67.3, 45.2];
 
     useEffect(() => {
         const handleResize = () => {
@@ -54,7 +50,7 @@ export default function DailyAttendanceChart() {
                 backgroundColor: "#3b82f6",
                 borderColor: "#3b82f6",
                 borderWidth: 1,
-                borderRadius: 10,
+                borderRadius: 5,
                 barThickness: 35,
             },
         ],
@@ -82,7 +78,7 @@ export default function DailyAttendanceChart() {
             x: {
                 grid: { display: false },
                 ticks: {
-                    padding: 10,
+                    padding: 0,
                     align: "center",
                     autoSkip: false,
                     font: { size: 11, weight: "bold" },
@@ -112,7 +108,7 @@ export default function DailyAttendanceChart() {
     };
 
     return (
-        <Card className="w-full lg:w-2/3 h-[450px] lg:h-[343px] rounded-md">
+        <Card className="w-full lg:w-2/3 h-[400px] rounded-md">
             <CardHeader className="flex justify-between flex-col md:flex-row gap-2">
                 <div>
                     <CardTitle className="text-xl md:text-2xl">

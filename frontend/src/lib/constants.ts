@@ -50,10 +50,10 @@ export const COMPARISON_FILTER = [
 ]
 
 export const EMOTION_FILTER = [
-    {name: 'Positive', value: 'positive'},
-    {name: 'Neutral', value: 'neutral'},
-    {name: 'Negative', value: 'negative'},
-    {name: 'Critical', value: 'critical'},
+    { name: 'Positive', value: 'positive' },
+    { name: 'Neutral', value: 'neutral' },
+    { name: 'Negative', value: 'negative' },
+    { name: 'Critical', value: 'critical' },
 ]
 
 export const CRITICAL_DATA = [
@@ -130,34 +130,34 @@ export const CRITICAL_DATA = [
 ];
 
 export const CHECK_IN_HOURS_DATA = [
-    // {
-    //     time: '01:00',
-    //     value: 25
-    // },
-    // {
-    //     time: '02:00',
-    //     value: 10
-    // },
-    // {
-    //     time: '03:00',
-    //     value: 15
-    // },
-    // {
-    //     time: '04:00',
-    //     value: 2
-    // },
-    // {
-    //     time: '05:00',
-    //     value: 25
-    // },
-    // {
-    //     time: '06:00',
-    //     value: 3
-    // },
-    // {
-    //     time: '07:00',
-    //     value: 5
-    // },
+    {
+        time: '01:00',
+        value: 25
+    },
+    {
+        time: '02:00',
+        value: 10
+    },
+    {
+        time: '03:00',
+        value: 15
+    },
+    {
+        time: '04:00',
+        value: 2
+    },
+    {
+        time: '05:00',
+        value: 25
+    },
+    {
+        time: '06:00',
+        value: 3
+    },
+    {
+        time: '07:00',
+        value: 5
+    },
     {
         time: '08:00',
         value: 30
@@ -206,26 +206,26 @@ export const CHECK_IN_HOURS_DATA = [
         time: '19:00',
         value: 9
     },
-    // {
-    //     time: '20:00',
-    //     value: 1
-    // },
-    // {
-    //     time: '21:00',
-    //     value: 5
-    // },
-    // {
-    //     time: '22:00',
-    //     value: 2
-    // },
-    // {
-    //     time: '23:00',
-    //     value: 16
-    // },
-    // {
-    //     time: '24:00',
-    //     value: 12
-    // }
+    {
+        time: '20:00',
+        value: 1
+    },
+    {
+        time: '21:00',
+        value: 5
+    },
+    {
+        time: '22:00',
+        value: 2
+    },
+    {
+        time: '23:00',
+        value: 16
+    },
+    {
+        time: '24:00',
+        value: 12
+    }
 ]
 
 //? dummy month

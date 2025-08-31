@@ -10,7 +10,7 @@ import { Button } from "../ui/button";
 
 export default function DetailsModal({ employee }: { employee: Employee }) {
     return (
-        <DialogContent className="w-full mx-auto max-h-[80vh] overflow-y-auto sm:max-w-[1024px]">
+        <DialogContent className="w-full mx-auto max-h-[80vh] overflow-y-auto sm:max-w-[1024px] no-scrollbar">
             <DialogHeader>
                 <DialogTitle className="flex items-center gap-2 text-xl font-bold bg-gradient-to-r from-purple-400 via-pink-500 to-blue-500 bg-clip-text text-transparent">
                     <IoSparklesOutline className="text-xl text-pink-400" />

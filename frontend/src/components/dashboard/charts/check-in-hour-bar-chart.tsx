@@ -32,8 +32,8 @@ export default function CheckInHourBarChart() {
                 data: CHECK_IN_HOURS_DATA?.map(checkIn => checkIn.value),
                 backgroundColor: "#3b82f6",
                 borderColor: "#3b82f6",
-                borderRadius: 10,
-                barThickness: 10
+                borderRadius: 5,
+                barThickness: 15
             }
         ]
     }
@@ -52,14 +52,14 @@ export default function CheckInHourBarChart() {
             x: {
                 grid: { display: false },
                 ticks: {
-                    padding: 10,
+                    padding: 20,
                     align: "center",
                     autoSkip: false,
                     font: { size: 11, weight: "bold" },
                     color: theme === 'dark' ? '#cbd5e1' : ''
                 },
                 min: 0,
-                max: 29
+                max: 24
             },
             y: {
                 grid: {
@@ -114,7 +114,7 @@ export default function CheckInHourBarChart() {
                         />
                     </div>
                 </div>
-                <div className="lg:w-1/4 w-full px-5 h-fit lg:h-full mb-5 lg:mb-0 flex justify-center">
+                <div className="lg:w-1/4 w-full px-5 h-fit lg:h-full mb-5 lg:mb-0 flex justify-center lg:justify-normal">
                     {checkInFilter === 'daily' &&
                         <Calendar
                             mode="single"
