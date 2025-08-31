@@ -13,9 +13,9 @@ export default function Branding() {
             <div className="flex items-center space-x-3 md:hidden mb-7">
                 <img src={theme == 'dark' ? lightLogo : halfLogo} className="md:hidden block w-[100px]" alt="" />
                 <div className="w-[1px] mt-0.5 h-6 bg-gray-300"></div>
-                <h1 className="font-mich tracking-wider text-sm">{APP_NAME}</h1>
+                <h1 className="font-mich tracking-wider text-sm dark:bg-gradient-to-r dark:from-purple-400 dark:via-pink-500 dark:to-blue-500 dark:bg-clip-text dark:text-transparent">{APP_NAME}</h1>
             </div>
-            <h1 className="hidden font-mich tracking-wider text-white text-sm md:block">{APP_NAME}</h1>
+            <h1 className="hidden font-mich tracking-wider dark:bg-gradient-to-r dark:from-purple-400 dark:via-pink-500 dark:to-blue-500 dark:bg-clip-text dark:text-transparent text-sm md:block">{APP_NAME}</h1>
         </div>
     )
 }

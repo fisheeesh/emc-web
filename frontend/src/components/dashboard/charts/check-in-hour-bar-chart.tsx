@@ -1,4 +1,4 @@
-import { CardContent } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useTheme } from "@/components/shared/theme-provider";
 import { useState } from "react";
 import { Bar } from "react-chartjs-2";
@@ -6,11 +6,14 @@ import { CHECK_IN_HOURS_DATA } from "@/lib/constants";
 import { Calendar } from "@/components/ui/calendar"
 import MonthYearSelector from "../month-year-selector";
 import type { ChartOptions } from "chart.js";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Label } from "@/components/ui/label";
 
 const month = new Date(Date.now()).toLocaleString('en-US', { month: 'long' })
 const year = new Date(Date.now()).getFullYear()
 
-export default function CheckInHourBarChart({ filter }: { filter: string }) {
+export default function CheckInHourBarChart() {
+    const [checkInFilter, setCheckInFilter] = useState<"daily" | "monthly" | "yearly">("daily");
     const { theme } = useTheme()
     const [date, setDate] = useState<Date | undefined>(new Date())
     const [activeMonth, setActiveMonth] = useState(month);
@@ -75,34 +78,62 @@ export default function CheckInHourBarChart({ filter }: { filter: string }) {
     }
 
     return (
-        <CardContent className="w-full flex flex-col-reverse xl:flex-row justify-center items-center gap-2 h-[700px] xl:h-[500px]">
-            <div className="lg:w-3/4 w-full h-full overflow-x-scroll custom-scrollbar">
-                <div className="w-[1500px] h-full">
-                    <Bar
-                        data={chartData}
-                        options={options}
-                    />
+        <Card className="rounded-md flex flex-col gap-5">
+            <CardHeader className="flex items-center justify-between flex-col md:flex-row gap-2">
+                <div className="w-full lg:w-2/4">
+                    <CardTitle className="text-xl md:text-2xl">Check-in Hours</CardTitle>
+                    <CardDescription>Track the busiest check-in times across different periods</CardDescription>
                 </div>
-            </div>
-            <div className="lg:w-1/4 w-full px-5 h-fit lg:h-full mb-5 lg:mb-0 flex justify-center">
-                {filter === 'daily' &&
-                    <Calendar
-                        mode="single"
-                        selected={date}
-                        onSelect={setDate}
-                        className="rounded-md border shadow-sm font-en h-fit"
-                        captionLayout="dropdown"
-                    />
-                }
-                {filter === 'monthly' && <MonthYearSelector mode={'month'} setActive={setActiveMonth} isActive={isActiveMonth} />}
-                {filter === 'yearly' && (
-                    <MonthYearSelector
-                        mode="year"
-                        setActive={(el) => setActiveYear(Number(el))}
-                        isActive={(el) => activeYear === Number(el)}
-                    />
-                )}
-            </div>
-        </CardContent>
+                <div className="flex items-center gap-3 w-full lg:w-1/4 md:px-5">
+                    <RadioGroup
+                        value={checkInFilter}
+                        onValueChange={(v: "daily" | "monthly" | "yearly") => setCheckInFilter(v)}
+                        className="flex items-center gap-3"
+                    >
+                        <div className="flex items-center space-x-2">
+                            <RadioGroupItem value="daily" id="daily" />
+                            <Label htmlFor="daily">Daily</Label>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                            <RadioGroupItem value="monthly" id="monthly" />
+                            <Label htmlFor="monthly">Monthly</Label>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                            <RadioGroupItem value="yearly" id="yearly" />
+                            <Label htmlFor="yearly">Yearly</Label>
+                        </div>
+                    </RadioGroup>
+                </div>
+            </CardHeader>
+            <CardContent className="w-full flex flex-col-reverse xl:flex-row justify-center items-center gap-2 h-[700px] xl:h-[500px]">
+                <div className="lg:w-3/4 w-full h-full overflow-x-scroll custom-scrollbar">
+                    <div className="w-[1500px] h-full">
+                        <Bar
+                            data={chartData}
+                            options={options}
+                        />
+                    </div>
+                </div>
+                <div className="lg:w-1/4 w-full px-5 h-fit lg:h-full mb-5 lg:mb-0 flex justify-center">
+                    {checkInFilter === 'daily' &&
+                        <Calendar
+                            mode="single"
+                            selected={date}
+                            onSelect={setDate}
+                            className="rounded-md border shadow-sm font-en h-fit"
+                            captionLayout="dropdown"
+                        />
+                    }
+                    {checkInFilter === 'monthly' && <MonthYearSelector mode={'month'} setActive={setActiveMonth} isActive={isActiveMonth} />}
+                    {checkInFilter === 'yearly' && (
+                        <MonthYearSelector
+                            mode="year"
+                            setActive={(el) => setActiveYear(Number(el))}
+                            isActive={(el) => activeYear === Number(el)}
+                        />
+                    )}
+                </div>
+            </CardContent>
+        </Card>
     )
 }

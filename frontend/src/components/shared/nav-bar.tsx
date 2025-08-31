@@ -38,21 +38,19 @@ export default function Navbar() {
             <nav className='fixed top-0 left-0 right-0 z-50 border-b bg-white/90 backdrop-blur-sm border-gray-100 shadow-sm dark:bg-slate-900/90 dark:border-0 dark:shadow-2xl'>
                 <div className="w-full flex justify-between items-center max-w-[1440px] px-4 mx-auto md:h-20 h-16">
                     {/* Logo & Links */}
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center cursor-pointer gap-2" onClick={() => navigate('/')}>
                         <img
-                            onClick={() => navigate('/')}
                             src={theme == 'dark' ? light : dark}
                             alt="ata_logo"
-                            className='w-[180px] hidden md:block cursor-pointer'
+                            className='w-[180px] hidden md:block'
                         />
                         <img
-                            onClick={() => navigate('/')}
                             src={theme == 'dark' ? halfLight : halfDark}
                             alt="ata_logo"
-                            className='w-[60px] cursor-pointer md:hidden'
+                            className='w-[60px] md:hidden'
                         />
                         <div className="w-[1px] mt-0.5 h-6 bg-gray-300"></div>
-                        <h1 className="font-mich tracking-wider text-[10px] md:text-xs bg-gradient-to-r from-purple-400 via-pink-500 to-blue-500 bg-clip-text text-transparent">{APP_NAME}</h1>
+                        <h1 className="font-mich tracking-wider text-[10px] md:text-xs dark:bg-gradient-to-r dark:from-purple-400 dark:via-pink-500 dark:to-blue-500 dark:bg-clip-text dark:text-transparent">{APP_NAME}</h1>
                     </div>
 
                     {/* Desktop Right Side */}

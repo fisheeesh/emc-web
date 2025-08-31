@@ -9,7 +9,7 @@ ChartJS.register(ArcElement, Tooltip, Legend, CategoryScale, LinearScale, PointE
 
 export default function SentimentsDashboardPage() {
     useTitle("Sentiments Dashboard")
-    
+
     return (
         <section className="flex flex-col items-center justify-center w-full gap-3">
             <div className="flex flex-col lg:flex-row items-center justify-center w-full gap-3 lg:h-[420px]">
