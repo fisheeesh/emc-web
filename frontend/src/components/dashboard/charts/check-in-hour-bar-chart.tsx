@@ -75,7 +75,7 @@ export default function CheckInHourBarChart({ filter }: { filter: string }) {
     }
 
     return (
-        <CardContent className="w-full flex  flex-col-reverse lg:flex-row justify-center items-center gap-2 h-[700px] lg:h-[500px]">
+        <CardContent className="w-full flex flex-col-reverse xl:flex-row justify-center items-center gap-2 h-[700px] xl:h-[500px]">
             <div className="lg:w-3/4 w-full h-full overflow-x-scroll custom-scrollbar">
                 <div className="w-[1500px] h-full">
                     <Bar
@@ -84,13 +84,13 @@ export default function CheckInHourBarChart({ filter }: { filter: string }) {
                     />
                 </div>
             </div>
-            <div className="lg:w-1/4 w-full px-5 h-fit lg:h-full mb-5 lg:mb-0">
+            <div className="lg:w-1/4 w-full px-5 h-fit lg:h-full mb-5 lg:mb-0 flex justify-center">
                 {filter === 'daily' &&
                     <Calendar
                         mode="single"
                         selected={date}
                         onSelect={setDate}
-                        className="rounded-md border shadow-sm font-en w-full"
+                        className="rounded-md border shadow-sm font-en h-fit"
                         captionLayout="dropdown"
                     />
                 }

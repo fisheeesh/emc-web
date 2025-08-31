@@ -1,7 +1,7 @@
-import { NAVLINKS } from '@/lib/constants'
+import { APP_NAME, NAVLINKS } from '@/lib/constants'
 import { useState } from 'react'
 import { NavLink, useNavigate } from 'react-router'
-import LogoutModal from '../auth/log-out-modal'
+import LogoutModal from '../modals/log-out-modal'
 import { Button } from '../ui/button'
 import { Dialog, DialogTrigger } from '../ui/dialog'
 import AuthDropdown from './auth-drop-down'
@@ -51,8 +51,8 @@ export default function Navbar() {
                             alt="ata_logo"
                             className='w-[60px] cursor-pointer md:hidden'
                         />
-                        <div className="w-[1px] mt-0.5 h-6 bg-gray-500"></div>
-                        <h1 className="font-mich tracking-wider text-[10px] md:text-xs">Emotion Check-in System</h1>
+                        <div className="w-[1px] mt-0.5 h-6 bg-gray-300"></div>
+                        <h1 className="font-mich tracking-wider text-[10px] md:text-xs bg-gradient-to-r from-purple-400 via-pink-500 to-blue-500 bg-clip-text text-transparent">{APP_NAME}</h1>
                     </div>
 
                     {/* Desktop Right Side */}

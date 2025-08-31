@@ -4,8 +4,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Dialog, DialogTrigger } from "@/components/ui/dialog";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { CRITICAL_DATA } from "@/lib/constants";
-import DetailsModal from "../details-modal";
-import ActionModal from "../action-modal";
+import DetailsModal from "../../modals/details-modal";
+import ActionModal from "../../modals/action-modal";
 
 export default function CriticalTable() {
     return (

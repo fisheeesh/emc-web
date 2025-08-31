@@ -1,3 +1,4 @@
+import { APP_NAME } from '@/lib/constants';
 import fullLogo from '../../assets/full-ata-logo.png';
 import halfLogo from '../../assets/half-ata-logo.png';
 import lightLogo from '../../assets/light_logo.png'
@@ -12,9 +13,9 @@ export default function Branding() {
             <div className="flex items-center space-x-3 md:hidden mb-7">
                 <img src={theme == 'dark' ? lightLogo : halfLogo} className="md:hidden block w-[100px]" alt="" />
                 <div className="w-[1px] mt-0.5 h-6 bg-gray-300"></div>
-                <h1 className="font-mich tracking-wider text-sm">Emotion Check-in System</h1>
+                <h1 className="font-mich tracking-wider text-sm">{APP_NAME}</h1>
             </div>
-            <h1 className="hidden font-mich tracking-wider text-white text-sm md:block">Emotion Check-in System</h1>
+            <h1 className="hidden font-mich tracking-wider text-white text-sm md:block">{APP_NAME}</h1>
         </div>
     )
 }

@@ -8,7 +8,7 @@
   --font-raleway: 'Raleway', sans-serif;
   --font-en: Rubik, sans-serif;
   --font-mm: 'Noto Sans Myanmar', sans-serif;
-  --font-th: "Noto Sans Thai", sans-serif;
+  --font-th: "Noto Sans Thai", sans-serif; 
   --color-brand: #3085FE;
   --color-positive: #8DE192;
   --color-negative: #FB9F9F;
@@ -139,6 +139,11 @@
     @apply bg-background text-foreground;
   }
 }
+
+@utility primary-gradient {
+  @apply bg-gradient-to-r from-purple-400 via-pink-500 to-blue-500 bg-clip-text text-transparent
+}
+
 
 .hamburger {
   cursor: pointer;

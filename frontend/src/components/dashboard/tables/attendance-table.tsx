@@ -4,8 +4,10 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { CRITICAL_DATA, EMOTION_FILTER } from "@/lib/constants";
 import { Dialog, DialogTrigger } from "@radix-ui/react-dialog";
-import DetailsModal from "../details-modal";
 
+import EmpEmotionModal from "@/components/modals/emp-emotion-modal";
+import CommonFilter from "@/components/shared/common-filter";
+import CustomBadge from "@/components/shared/custom-badge";
 import { Calendar } from "@/components/ui/calendar";
 import {
     Popover,
@@ -14,7 +16,6 @@ import {
 } from "@/components/ui/popover";
 import { ChevronDownIcon } from "lucide-react";
 import { useState } from "react";
-import CommonFilter from "@/components/shared/common-filter";
 
 export default function AttendanceTable() {
     const [open, setOpen] = useState(false)
@@ -30,12 +31,12 @@ export default function AttendanceTable() {
 
     return (
         <Card className="rounded-md flex flex-col gap-5">
-            <CardHeader className="flex flex-col md:flex-row gap-3 md:gap-0 justify-between">
+            <CardHeader className="flex flex-col lg:flex-row gap-3 lg:gap-0 justify-between">
                 <div className="flex flex-col items-start gap-2 tracking-wide">
                     <CardTitle className="text-xl md:text-2xl">Attendance Overview</CardTitle>
                     <CardDescription>Select a date to view employee attendance records</CardDescription>
                 </div>
-                <div className="flex items-center gap-2">
+                <div className="flex flex-col md:flex-row md:items-center gap-2">
                     <LocalSearch filterValue="emp" />
                     <CommonFilter
                         filterValue="emotion"
@@ -76,7 +77,7 @@ export default function AttendanceTable() {
                             <TableHead className="whitespace-nowrap">Name</TableHead>
                             <TableHead className="whitespace-nowrap">Role</TableHead>
                             <TableHead className="whitespace-nowrap">Department</TableHead>
-                            <TableHead className="whitespace-nowrap">EmotionScore</TableHead>
+                            <TableHead className="whitespace-nowrap">Emotion</TableHead>
                             <TableHead className="whitespace-nowrap">Check-in</TableHead>
                             <TableHead className="whitespace-nowrap text-center">Actions</TableHead>
                         </TableRow>
@@ -96,7 +97,7 @@ export default function AttendanceTable() {
                                         <span className="whitespace-nowrap">{emp.department}</span>
                                     </TableCell>
                                     <TableCell>
-                                        <span className="whitespace-nowrap font-en">{emp.score}</span>
+                                        <CustomBadge score={emp.score} />
                                     </TableCell>
                                     <TableCell>
                                         <span className="whitespace-nowrap font-en">9:45 AM</span>
@@ -109,7 +110,7 @@ export default function AttendanceTable() {
                                                     Details
                                                 </Button>
                                             </DialogTrigger>
-                                            <DetailsModal employee={emp} />
+                                            <EmpEmotionModal />
                                         </Dialog>
                                     </TableCell>
                                 </TableRow>

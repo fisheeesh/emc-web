@@ -4,8 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Dialog, DialogTrigger } from "@/components/ui/dialog";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { CRITICAL_DATA } from "@/lib/constants";
-import DetailsModal from "../details-modal";
-import ActionModal from "../action-modal";
+import DetailsModal from "../../modals/details-modal";
 
 export default function WatchListTable() {
     return (
@@ -26,7 +25,7 @@ export default function WatchListTable() {
                             <TableHead className="whitespace-nowrap">Department</TableHead>
                             <TableHead className="whitespace-nowrap">Contact</TableHead>
                             <TableHead className="whitespace-nowrap text-center">EmotionScore</TableHead>
-                            <TableHead className="whitespace-nowrap text-center">Actions</TableHead>
+                            <TableHead className="whitespace-nowrap text-center">Taken Actions</TableHead>
                         </TableRow>
                     </TableHeader>
 
@@ -55,16 +54,6 @@ export default function WatchListTable() {
                                                 </Button>
                                             </DialogTrigger>
                                             <DetailsModal employee={emp} />
-                                        </Dialog>
-
-                                        {/* Action Dialog */}
-                                        <Dialog>
-                                            <DialogTrigger asChild>
-                                                <Button className="cursor-pointer bg-brand hover:bg-blue-600 text-white">
-                                                    Action
-                                                </Button>
-                                            </DialogTrigger>
-                                            <ActionModal employee={emp} />
                                         </Dialog>
                                     </TableCell>
                                 </TableRow>
