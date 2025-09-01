@@ -2,6 +2,7 @@ import { Suspense } from 'react'
 import { createBrowserRouter, Navigate, RouterProvider } from 'react-router'
 import DashboradRootLayout from './pages/dashboard/dashboard-root-layout'
 import LoginPage from './pages/auth/login-page'
+import NotFound from './pages/not-found/not-found'
 
 export default function Router() {
     const router = createBrowserRouter([
@@ -39,6 +40,10 @@ export default function Router() {
         {
             path: '/login',
             Component: LoginPage
+        },
+        {
+            path: '*',
+            Component: NotFound
         }
     ])
 
