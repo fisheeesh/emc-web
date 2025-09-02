@@ -1,5 +1,6 @@
 import ConfirmModal from "@/components/modals/confirm-modal";
 import CreateEditEmpModal from "@/components/modals/create-edit-emp-modal";
+import CommonFilter from "@/components/shared/common-filter";
 import CustomBadge from "@/components/shared/custom-badge";
 import LocalSearch from "@/components/shared/local-search";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -7,17 +8,25 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogTrigger } from "@/components/ui/dialog";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { CRITICAL_DATA, IMG_URL } from "@/lib/constants";
+import { CRITICAL_DATA, DEPARTMENTS_FILTER, IMG_URL } from "@/lib/constants";
 
 export default function EmpTables() {
     return (
         <Card className="rounded-md flex flex-col gap-5">
             <CardHeader className="flex flex-col md:flex-row gap-3 md:gap-0 justify-between">
                 <div className="flex flex-col items-start gap-2 tracking-wide">
-                    <CardTitle className="text-xl md:text-2xl bg-gradient-to-r from-purple-400 via-pink-500 to-blue-500 bg-clip-text text-transparent">Employee Lists under IT department</CardTitle>
+                    <CardTitle className="text-xl md:text-2xl bg-gradient-to-r from-purple-400 via-pink-500 to-blue-500 bg-clip-text text-transparent">Employee Lists under ATA - IT Company</CardTitle>
                     <CardDescription>Create, Update, and Delete employees</CardDescription>
                 </div>
-                <LocalSearch filterValue="criEmp" />
+                <div className="flex flex-col md:flex-row md:items-center gap-2">
+                    <LocalSearch filterValue="criEmp" />
+                    <CommonFilter
+                        filterValue="dep"
+                        addFister={false}
+                        filters={DEPARTMENTS_FILTER}
+                        otherClasses="min-h-[44px] sm:min-w-[150px]"
+                    />
+                </div>
             </CardHeader>
 
             <CardContent>
@@ -29,6 +38,7 @@ export default function EmpTables() {
                             <TableHead className="whitespace-nowrap">Email</TableHead>
                             <TableHead className="whitespace-nowrap">Role</TableHead>
                             <TableHead className="whitespace-nowrap">Job Type</TableHead>
+                            <TableHead className="whitespace-nowrap">Acc Type</TableHead>
                             <TableHead className="whitespace-nowrap">Overall</TableHead>
                             <TableHead className="whitespace-nowrap">Last Critical Time</TableHead>
                             <TableHead className="whitespace-nowrap">Joined At</TableHead>
@@ -60,6 +70,9 @@ export default function EmpTables() {
                                     </TableCell>
                                     <TableCell>
                                         <span className="whitespace-nowrap">Internship</span>
+                                    </TableCell>
+                                    <TableCell>
+                                        <span className="whitespace-nowrap">ACTIVE</span>
                                     </TableCell>
                                     <TableCell>
                                         <CustomBadge score={emp.score} />
