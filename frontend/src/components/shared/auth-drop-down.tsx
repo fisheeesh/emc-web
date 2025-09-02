@@ -63,9 +63,9 @@ export default function AuthDropdown() {
                             </Link>
                         </DropdownMenuItem>
                         <DropdownMenuItem asChild className="cursor-pointer">
-                            <Link to='dashboard/settings'>
+                            <Link to='dashboard/managements'>
                                 <MdOutlineSettings className="size-4 text-black mr-1 dark:text-white" aria-hidden="true" />
-                                Settings
+                                Managements
                                 <DropdownMenuShortcut>⌘S</DropdownMenuShortcut>
                             </Link>
                         </DropdownMenuItem>

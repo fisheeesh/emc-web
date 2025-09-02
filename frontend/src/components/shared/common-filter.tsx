@@ -11,10 +11,11 @@ interface Props {
     filters: Filter[],
     filterValue: string,
     otherClasses?: string
-    containerClasses?: string
+    containerClasses?: string,
+    addFister?: boolean
 }
 
-export default function CommonFilter({ filters, filterValue = 'filter', otherClasses = "", containerClasses = "" }: Props) {
+export default function CommonFilter({ filters, filterValue = 'filter', otherClasses = "", containerClasses = "", addFister = true }: Props) {
     const [searchParams, setSearchParams] = useSearchParams()
     const paramsFilter = searchParams.get('filter')
 
@@ -24,9 +25,11 @@ export default function CommonFilter({ filters, filterValue = 'filter', otherCla
         setSearchParams(searchParams)
     }
 
+    const defaultValue = addFister ? filters[0].value : undefined
+
     return (
         <div className={cn('relative z-10', containerClasses)}>
-            <Select onValueChange={handleUpdateParams} defaultValue={paramsFilter || filters[0].value}>
+            <Select onValueChange={handleUpdateParams} defaultValue={paramsFilter || defaultValue}>
                 <SelectTrigger
                     aria-label="Filter options"
                     className={cn('body-regular font-en cursor-pointer w-full no-focus light-border background-light800_dark300 text-dark500_light700 border px-5 py-1.5 relative z-10', otherClasses)}

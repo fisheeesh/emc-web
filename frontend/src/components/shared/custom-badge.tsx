@@ -11,7 +11,7 @@ export default function CustomBadge({ score }: { score: number }) {
 
     return (
         <Badge className={`rounded-full text-xs font-bold p-0.5 px-1 ${styles[score >= 0.4 ? 'positive' : score >= -0.3 ? 'neutral' : score > -0.8 ? 'negative' : 'critical']}`}>
-            {score >= 0.4 ? 'Positive' : score >= -0.3 ? 'Neutral' : score > -0.8 ? 'Negative' : 'Critical'}
+            {score >= 0.4 ? 'positive' : score >= -0.3 ? 'neutral' : score > -0.8 ? 'negative' : 'critical'}
         </Badge>
     )
 }

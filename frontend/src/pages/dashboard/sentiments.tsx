@@ -2,7 +2,7 @@ import OverViewChart from "@/components/dashboard/charts/overview-chart";
 import SentimentsComparisonChart from "@/components/dashboard/charts/sentiments-comparison-chart";
 import CriticalTable from "@/components/dashboard/tables/critical-table";
 import WatchListTable from "@/components/dashboard/tables/watchlist-table";
-import useTitle from "@/hooks/useTitle";
+import useTitle from "@/hooks/use-title";
 import { Chart as ChartJS, ArcElement, Tooltip, CategoryScale, LineElement, LinearScale, PointElement, Legend } from "chart.js";
 
 ChartJS.register(ArcElement, Tooltip, Legend, CategoryScale, LinearScale, PointElement, LineElement);
