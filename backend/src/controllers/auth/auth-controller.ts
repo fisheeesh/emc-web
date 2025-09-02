@@ -3,11 +3,16 @@ import { NextFunction, Request, Response } from "express"
 import { body, validationResult } from "express-validator"
 import jwt from 'jsonwebtoken'
 import moment from 'moment'
+import { DEPARTMENTS } from '../../config/constants'
 import { errorCodes } from "../../config/error-codes"
 import { createEmployee, createOTP, getEmployeeByEmail, getEmployeeById, getOTPRowByEmail, updateEmployeeData, updateOTP } from "../../services/auth-services"
+import { authorize } from '../../utils/authorize'
 import { checkEmployeeIfExits, checkEmployeeIfNotExits, checkOTPErrorIfSameDate, checkOTPRow, createHttpErrors } from "../../utils/check"
 import { generateHashedValue, generateToken } from "../../utils/generate"
-import { DEPARTMENTS } from '../../config/constants'
+
+interface CustomRequest extends Request {
+    employeeId?: number
+}
 
 export const register = [
     body("email", "Invalid email format.")
@@ -73,8 +78,8 @@ export const register = [
 
                 result = await createOTP(otpData)
             } else {
-                //* Check if OTP is allowed to request 5 times per day
-                if (otpRow.count === 5) {
+                //* Check if OTP is allowed to request 3 times per day
+                if (otpRow.count === 3) {
                     return next(createHttpErrors({
                         message: "OTP is allowed to request 3 times per day.",
                         status: 405,
@@ -102,7 +107,7 @@ export const register = [
 ]
 
 export const verifyOTP = [
-    body("email", "Invalid email format.")
+    body("email", "Invalid Email format.")
         .trim()
         .notEmpty()
         .isEmail().withMessage("Invalid email format.")
@@ -160,7 +165,7 @@ export const verifyOTP = [
         }
 
         //* Check if OTP is expired
-        const isExpired = moment().diff(otpRow!.updatedAt, 'minutes') > 2
+        const isExpired = moment().diff(otpRow!.updatedAt) > 2 * 60 * 1000;
 
         if (isExpired) return next(createHttpErrors({
             message: 'OTP is expired.',
@@ -284,14 +289,14 @@ export const confirmPassword = [
             }))
         }
 
-        const isExpired = moment().diff(otpRow!.updatedAt, 'minutes') > 10
+        const isExpired = moment().diff(otpRow!.updatedAt) > 10 * 60 * 1000;
 
         //* If token expired -> tell user to try again.
         if (isExpired) {
             return next(createHttpErrors({
                 message: 'Session expired. Please try again.',
                 status: 403,
-                code: errorCodes.otpExpired,
+                code: errorCodes.forbidden,
             }))
         }
 
@@ -380,10 +385,20 @@ export const login = [
         //* Check if existing employee or not
         checkEmployeeIfNotExits(employee)
 
-        //* If acc status is FREEZE -> contact admin
-        if (employee!.status === 'FREEZE') {
+        const can = authorize(false, employee!.role, "EMPLOYEE")
+
+        if (!can && platform !== 'mobile') {
             return next(createHttpErrors({
-                message: "Your account is temporarily locked. Please contact us.",
+                message: 'You do not have permission to access this resource.',
+                code: errorCodes.forbidden,
+                status: 403
+            }))
+        }
+
+        //* If acc status is FREEZE -> contact admin
+        if (employee!.accType === 'FREEZE') {
+            return next(createHttpErrors({
+                message: "Your account is temporarily locked. Please contact your supervisor.",
                 status: 401,
                 code: errorCodes.accountFreeze,
             }))
@@ -407,7 +422,7 @@ export const login = [
                 //* If password is wrong for 3 times -> freeze the account *might attack*
                 if (employee!.errorLoginCount >= 3) {
                     const employeeData = {
-                        status: 'FREEZE'
+                        accType: 'FREEZE'
                     }
 
                     await updateEmployeeData(employee!.id, employeeData)
@@ -556,4 +571,354 @@ export const logout = async (req: Request, res: Response, next: NextFunction) =>
             message: "Successfully logged out from web. See you soon.!"
         })
     }
+}
+
+export const forgotPassword = [
+    body("email", "Invalid email format.")
+        .notEmpty()
+        .trim()
+        .isEmail().withMessage("Invalid email format.")
+        .custom((value: string) => {
+            if (!value.endsWith("@ata.it.th")) {
+                throw new Error("Email must from @ata.it.th domain.")
+            }
+
+            return true
+        }),
+    async (req: Request, res: Response, next: NextFunction) => {
+        const errors = validationResult(req).array({ onlyFirstError: true })
+        if (errors.length > 0) return next(createHttpErrors({
+            message: errors[0].msg,
+            status: 400,
+            code: errorCodes.invalid
+        }))
+
+        const platform = req.header("x-platform")
+
+        const { email } = req.body
+        const emp = await getEmployeeByEmail(email)
+        checkEmployeeIfNotExits(emp)
+
+        const can = authorize(false, emp!.role, 'EMPLOYEE')
+
+        if (!can && platform !== 'mobile') {
+            return next(createHttpErrors({
+                message: 'You are not allowed to do this action. Please contact your supervisor.',
+                code: errorCodes.forbidden,
+                status: 403,
+            }))
+        }
+
+        if (emp!.accType === 'FREEZE') {
+            return next(createHttpErrors({
+                message: "Your account is temporarily locked. Please contact your supervisor.",
+                status: 401,
+                code: errorCodes.accountFreeze,
+            }))
+        }
+
+        //* By this time OTP must be in the database
+        const otpRow = await getOTPRowByEmail(emp!.email)
+
+        const otp = 123456
+        const hashedOTP = await generateHashedValue(otp.toString())
+        const token = generateToken()
+
+        const lastOTPRequest = otpRow?.updatedAt.toLocaleDateString()
+        const isSameDate = new Date().toLocaleDateString() === lastOTPRequest
+
+        checkOTPErrorIfSameDate(isSameDate, otpRow!.error)
+
+        let result;
+        if (!isSameDate) {
+            const otpData = {
+                otp: hashedOTP,
+                rememberToken: token,
+                count: 1,
+                error: 0
+            }
+
+            result = await updateOTP(otpRow!.id, otpData)
+        } else {
+            if (otpRow!.count >= 3) {
+                return next(createHttpErrors({
+                    message: "OTP is allowed to ask 3 times per day. Please try again tomorrow.",
+                    status: 401,
+                    code: errorCodes.overLimit
+                }))
+            } else {
+                const otpData = {
+                    count: { increment: 1 },
+                    otp: hashedOTP,
+                    rememberToken: token,
+                }
+
+                result = await updateOTP(otpRow!.id, otpData)
+            }
+        }
+
+        res.status(200).json({
+            message: `We are sending OTP to ${emp!.email}. Please check your email.`,
+            email: result.email,
+            token: result.rememberToken
+        })
+    }
+]
+
+export const veriftyOtpForgot = [
+    body("email", "Invalid email format.")
+        .notEmpty()
+        .trim()
+        .isEmail().withMessage("Invalid email format.")
+        .custom((value: string) => {
+            if (!value.endsWith("@ata.it.th")) {
+                throw new Error("Email must from @ata.it.th domain.")
+            }
+            return true
+        }),
+    body("otp", "Invalid OTP.")
+        .notEmpty()
+        .trim()
+        .matches(/^[\d]+$/)
+        .isLength({ min: 6, max: 6 }),
+    body("token", "Invalid token.")
+        .notEmpty()
+        .trim()
+        .escape(),
+    async (req: Request, res: Response, next: NextFunction) => {
+        const errors = validationResult(req).array({ onlyFirstError: true })
+        if (errors.length > 0) return next(createHttpErrors({
+            message: errors[0].msg,
+            status: 400,
+            code: errorCodes.invalid
+        }))
+
+        const { email, otp, token } = req.body
+        const emp = await getEmployeeByEmail(email)
+        checkEmployeeIfNotExits(emp)
+
+        const can = authorize(false, emp!.role, 'EMPLOYEE')
+
+        if (!can) return next(createHttpErrors({
+            message: 'You are not allowed to do this action. Please contact your supervisor.',
+            code: errorCodes.forbidden,
+            status: 403,
+        }))
+
+        if (emp!.accType === 'FREEZE') {
+            return next(createHttpErrors({
+                message: "Your account is temporarily locked. Please contact your supervisor.",
+                status: 401,
+                code: errorCodes.accountFreeze,
+            }))
+        }
+
+        const otpRow = await getOTPRowByEmail(email)
+
+        const isExpired = moment().diff(otpRow!.updatedAt) > 2 * 60 * 1000;
+
+        if (isExpired) {
+            return next(createHttpErrors({
+                message: "OTP is expired. Please try again.",
+                status: 401,
+                code: errorCodes.otpExpired
+            }))
+        }
+
+        if (token !== otpRow!.rememberToken) {
+            const otpData = {
+                error: 5
+            }
+
+            await updateOTP(otpRow!.id, otpData)
+
+            return next(createHttpErrors({
+                message: "Invalid Token.",
+                status: 400,
+                code: errorCodes.attack
+            }))
+        }
+
+        checkOTPErrorIfSameDate(false, otpRow!.error)
+
+        const lastOTPVerify = otpRow?.updatedAt.toLocaleDateString()
+        const isSameDate = new Date().toLocaleDateString() === lastOTPVerify
+
+        const isMatchOTP = await bcrypt.compare(otp, otpRow!.otp)
+
+        if (!isMatchOTP) {
+            if (!isSameDate) {
+                const otpData = {
+                    error: 1
+                }
+
+                await updateOTP(otpRow!.id, otpData)
+            } else {
+                const optData = {
+                    error: { increment: 1 }
+                }
+
+                await updateOTP(otpRow!.id, optData)
+            }
+
+            return next(createHttpErrors({
+                message: "Incorrect OTP.",
+                status: 400,
+                code: errorCodes.invalid
+            }))
+        }
+
+        const otpData = {
+            error: 0,
+            count: 1,
+            verifyToken: generateToken()
+        }
+
+        const result = await updateOTP(otpRow!.id, otpData)
+
+        res.status(200).json({
+            message: "OTP is successfully verified.",
+            email: result.email,
+            token: result.verifyToken
+        })
+    }
+]
+
+export const resetPassword = [
+    body("email", "Invalid email format.")
+        .trim()
+        .notEmpty()
+        .custom((value: string) => {
+            if (!value.endsWith("@ata.it.th")) {
+                throw new Error("Email must from @ata.it.th domain.")
+            }
+            return true
+        }),
+    body("token", "Invalid Token.")
+        .trim()
+        .notEmpty()
+        .escape(),
+    body("password", "Password must be at least 8 digits.")
+        .trim()
+        .notEmpty()
+        .isLength({ min: 8, max: 8 }).withMessage("Password must be 8 characters.")
+        .matches(/^\d+$/),
+    async (req: Request, res: Response, next: NextFunction) => {
+        const errors = validationResult(req).array({ onlyFirstError: true })
+        if (errors.length > 0) return next(createHttpErrors({
+            message: errors[0].msg,
+            status: 400,
+            code: errorCodes.invalid
+        }))
+
+        const { email, token, password } = req.body
+
+        const emp = await getEmployeeByEmail(email)
+        checkEmployeeIfNotExits(emp)
+
+        const can = authorize(false, emp!.role, 'EMPLOYEE')
+        if (!can) return next(createHttpErrors({
+            message: 'You are not allowed to do this action. Please contact your supervisor.',
+            code: errorCodes.forbidden,
+            status: 403,
+        }))
+
+        if (emp!.accType === 'FREEZE') {
+            return next(createHttpErrors({
+                message: "Your account is temporarily locked. Please contact your supervisor.",
+                status: 401,
+                code: errorCodes.accountFreeze,
+            }))
+        }
+
+        const otpRow = await getOTPRowByEmail(email)
+
+        if (otpRow!.error >= 5) return next(createHttpErrors({
+            message: "Your request is over-limit. Please try again.",
+            status: 400,
+            code: errorCodes.attack,
+        }))
+
+        const isExpired = moment().diff(otpRow!.updatedAt) > 10 * 60 * 1000;
+
+        if (isExpired) {
+            return next(createHttpErrors({
+                message: "Session Timeout. Please try again.",
+                status: 401,
+                code: errorCodes.otpExpired
+            }))
+        }
+
+        if (otpRow!.verifyToken !== token) {
+            const otpData = {
+                error: 5
+            }
+            await updateOTP(otpRow!.id, otpData)
+
+            return next(createHttpErrors({
+                message: "Invalid Token.",
+                status: 400,
+                code: errorCodes.attack
+            }))
+        }
+
+        const hashedPassword = await generateHashedValue(password)
+        const rndToken = "@TODO://"
+
+        const userData = {
+            password: hashedPassword,
+            rndToken
+        }
+
+        await updateEmployeeData(emp!.id, userData)
+
+        const accessTokenPayload = { id: emp!.id }
+        const refreshTokenPayload = { id: emp!.id, email: emp!.email }
+
+        const accessToken = jwt.sign(
+            accessTokenPayload,
+            process.env.ACCESS_TOKEN_SECRET!,
+            { expiresIn: '15m' }
+        )
+
+        const refreshToken = jwt.sign(
+            refreshTokenPayload,
+            process.env.REFRESH_TOKEN_SECRET!,
+            { expiresIn: '7d' }
+        )
+
+        const updatedData = {
+            rndToken: refreshToken
+        }
+
+        const updatedEmp = await updateEmployeeData(emp!.id, updatedData)
+
+        res.cookie("accessToken", accessToken, {
+            httpOnly: true,
+            sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'strict',
+            secure: process.env.NODE_ENV === 'production',
+            maxAge: 1000 * 60 * 15,
+            path: '/'
+        }).cookie("refreshToken", refreshToken, {
+            httpOnly: true,
+            sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'strict',
+            secure: process.env.NODE_ENV === 'production',
+            maxAge: 1000 * 60 * 60 * 24 * 30,
+            path: '/'
+        }).status(200).json({
+            message: "Successfully reset password.",
+            empId: updatedEmp.id
+        })
+    }
+]
+
+export const authCheck = async (req: CustomRequest, res: Response, next: NextFunction) => {
+    const empId = req.employeeId
+
+    const emp = await getEmployeeById(empId!)
+    checkEmployeeIfNotExits(emp)
+
+    res.status(200).json({
+        message: "You are authenticated employee.",
+    })
 }

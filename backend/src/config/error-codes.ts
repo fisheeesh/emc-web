@@ -1,5 +1,6 @@
 export const errorCodes = {
     server: "Error_Server",
+    forbidden: "Error_Forbidden",
     invalid: 'Error_Invalid',
     notFound: "Errro_NotFound",
     unauthenticated: 'Error_Unauthenticated',
