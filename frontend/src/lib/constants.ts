@@ -8,7 +8,15 @@ export const IMG_URL = import.meta.env.VITE_IMG_URL
 export const NAVLINKS = [
     { to: "dashboard/sentiments", name: "Sentiments Dashboard" },
     { to: "dashboard/attendance", name: "Attendance Dashboard" },
-    { to: "dashboard/settings", name: "Settings" },
+    { to: "dashboard/managements", name: "Mangements" },
+]
+
+export const DEPARTMENTS_FILTER = [
+    { name: "IT", value: "IT" },
+    { name: "HR", value: "HR" },
+    { name: "Sales", value: "Sales" },
+    { name: "Marketing", value: "Marketing" },
+    { name: "Finance", value: "Finance" },
 ]
 
 export const COMMON_DATAS: CommonData[] = [
@@ -228,8 +236,6 @@ export const CHECK_IN_HOURS_DATA = [
     }
 ]
 
-//? dummy month
 export const MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
 
-//? dummy year
 export const YEARS = ['2021', '2022', '2023', '2024', '2025'];

@@ -1,4 +1,4 @@
-import AuthForm from '@/components/auth/authForm'
+import AuthForm from '@/components/auth/auth-form'
 import { LogInSchema } from '@/lib/validators'
 import Branding from '@/components/auth/branding'
 
@@ -10,7 +10,7 @@ export default function LoginPage() {
                 formType='LOGIN'
                 schema={LogInSchema}
                 defaultValues={{
-                    email: 'syp@ata-it-th',
+                    email: 'syp@ata.it.th',
                     password: '12345678'
                 }}
             />
