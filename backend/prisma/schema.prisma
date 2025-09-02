@@ -1,9 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
   output   = "../generated/prisma"
@@ -21,26 +15,28 @@ model Employee {
   phone           String?            @unique @db.VarChar(15)
   password        String
   email           String             @unique @db.VarChar(52)
-  emotionSum      Decimal            @default(0) @db.Decimal(3, 2)
-  emotionCount    Int                @default(0)
-  avgScore        Decimal            @default(0) @db.Decimal(3, 2)
+  position        String?
+  accType         AccType            @default(ACTIVE)
+  jobType         JobType            @default(FULLTIME)
   role            Role               @default(EMPLOYEE)
-  status          Status             @default(ACTIVE)
-  lastCritical    DateTime?
+  status          Status             @default(NORMAL)
   errorLoginCount Int                @default(0) @db.SmallInt
   rndToken        String
   avatar          String?
   departmentId    Int
-  department      Department         @relation(fields: [departmentId], references: [id], onDelete: Cascade)
   createdAt       DateTime           @default(now())
   updatedAt       DateTime           @updatedAt
-  checkIns        EmotionCheckIn[]
+  lastCritical    DateTime?
+  avgScore        Decimal            @default(0) @db.Decimal(3, 2)
+  emotionCount    Int                @default(0)
+  emotionSum      Decimal            @default(0) @db.Decimal(3, 2)
   criticalTimes   CriticalEmployee[]
+  checkIns        EmotionCheckIn[]
+  department      Department         @relation(fields: [departmentId], references: [id], onDelete: Cascade)
 }
 
 model Otp {
   id            Int      @id @default(autoincrement())
-  email         String   @unique @db.VarChar(15)
   otp           String
   rememberToken String
   count         Int      @default(0) @db.SmallInt
@@ -48,6 +44,7 @@ model Otp {
   verifyToken   String?
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
+  email         String   @unique @db.VarChar(52)
 }
 
 model EmotionCheckIn {
@@ -56,30 +53,30 @@ model EmotionCheckIn {
   textFeeling  String
   emotionScore Decimal  @default(0) @db.Decimal(3, 2)
   employeeId   Int
-  employee     Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade)
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
+  employee     Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade)
 }
 
 model CriticalEmployee {
   id           Int          @id @default(autoincrement())
-  status       Status       @default(ACTIVE)
   emotionScore Decimal      @default(0) @db.Decimal(3, 2)
   employeeId   Int
-  employee     Employee     @relation(fields: [employeeId], references: [id], onDelete: Cascade)
-  analyses     AIAnalysis[]
   createdAt    DateTime     @default(now())
   updatedAt    DateTime     @updatedAt
+  status       Status       @default(NORMAL)
+  analyses     AIAnalysis[]
+  employee     Employee     @relation(fields: [employeeId], references: [id], onDelete: Cascade)
 }
 
 model AIAnalysis {
   id         Int              @id @default(autoincrement())
   input      String
   output     String
-  criticalId Int
-  critical   CriticalEmployee @relation(fields: [criticalId], references: [id], onDelete: Cascade)
   createdAt  DateTime         @default(now())
   updatedAt  DateTime         @updatedAt
+  criticalId Int
+  critical   CriticalEmployee @relation(fields: [criticalId], references: [id], onDelete: Cascade)
 }
 
 model Notification {
@@ -108,11 +105,22 @@ enum Role {
   SUPERADMIN
 }
 
-enum Status {
+enum AccType {
   ACTIVE
+  FREEZE
+}
+
+enum JobType {
+  FULLTIME
+  PARTTIME
+  CONTRACT
+  INTERNSHIP
+}
+
+enum Status {
+  NORMAL
   CRITICAL
   WATCHLIST
-  FREEZE
 }
 
 enum NotiStatus {
