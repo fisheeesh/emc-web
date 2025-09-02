@@ -18,10 +18,10 @@ export const loginLoader = async () => {
         const res = await authApi.get("auth-check")
 
         if (res.status !== 200) {
-            return redirect("/")
+            return null
         }
 
-        return null
+        return redirect("/")
     } catch (error) {
         console.log(error)
         return null
