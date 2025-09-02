@@ -4,12 +4,13 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Eye, EyeOff } from "lucide-react";
 import { useState } from "react";
 import { useForm, type ControllerRenderProps, type DefaultValues, type Path, type SubmitHandler } from "react-hook-form";
-import { Link, useNavigate } from 'react-router';
+import { Link, useActionData, useNavigation, useSubmit } from 'react-router';
 import type { z } from "zod";
 import Spinner from '../shared/spinner';
 import { Button } from "../ui/button";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "../ui/form";
+import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "../ui/form";
 import { Input } from "../ui/input";
+import useError from "@/hooks/use-error";
 
 interface AuthFormProps<T extends z.ZodType<any, any, any>> {
     formType: "LOGIN" | "REGISTER",
@@ -25,7 +26,10 @@ export default function AuthForm<T extends z.ZodType<any, any, any>>({
 }: AuthFormProps<T>) {
     type FormData = z.infer<T>
     const [showPassword, setShowPassword] = useState<Record<string, boolean>>({});
-    const navigate = useNavigate()
+    const navigation = useNavigation()
+    const submit = useSubmit()
+
+    const actionData = useActionData()
 
     const form = useForm({
         resolver: zodResolver(schema) as any,
@@ -33,14 +37,17 @@ export default function AuthForm<T extends z.ZodType<any, any, any>>({
     })
 
     const handleSubmit: SubmitHandler<FormData> = async (values) => {
-        console.log(values)
-        await new Promise(resolve => setTimeout(resolve, 1000))
-        navigate("/", { replace: true })
+        submit(values, {
+            method: "POST",
+            action: '/login'
+        })
     }
 
     const buttonText = formType === 'LOGIN' ? LOGIN : REGISTER
 
-    const isWorking = form.formState.isSubmitting
+    const isWorking = form.formState.isSubmitting || navigation.state === 'submitting'
+
+    useError(actionData, actionData?.message)
 
     return (
         <div className="flex flex-col justify-center w-full px-8 space-y-5 right-side lg:w-1/3 max-w-md" {...props}>
@@ -76,7 +83,7 @@ export default function AuthForm<T extends z.ZodType<any, any, any>>({
                                                 <div className="relative">
                                                     <Input
                                                         disabled={isWorking}
-                                                        className="w-full min-h-[48px]"
+                                                        className={`w-full min-h-[48px] ${field.name === 'password' && 'font-en'}`}
                                                         placeholder={field.name === 'email' ? 'Email Address' : 'Password'}
                                                         inputMode="numeric"
                                                         type={(field.name === 'password' || field.name === 'confirmPassword') && showPassword[field.name] ? 'text' : (field.name === 'password' || field.name === 'confirmPassword') ? 'password' : 'text'}
@@ -98,6 +105,7 @@ export default function AuthForm<T extends z.ZodType<any, any, any>>({
                                                     )}
                                                 </div>
                                             </FormControl>
+                                            {field.name === 'email' && <FormDescription>Email must be from @ata.it.th domain</FormDescription>}
                                             <FormMessage />
                                         </FormItem>
                                     )}
