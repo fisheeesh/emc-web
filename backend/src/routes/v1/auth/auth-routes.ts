@@ -1,5 +1,7 @@
 import express from "express"
-import { confirmPassword, login, logout, register, verifyOTP } from "../../../controllers/auth/auth-controller"
+import { authCheck, confirmPassword, forgotPassword, login, logout, register, resetPassword, veriftyOtpForgot, verifyOTP } from "../../../controllers/auth/auth-controller"
+import { auth } from "../../../middlewares/auth-middleware"
+import { authorize } from "../../../middlewares/authorize-middleware"
 
 const router = express.Router()
 
@@ -12,9 +14,12 @@ router.post("/confirm-password", confirmPassword)
 router.post("/login", login)
 router.post("/logout", logout)
 
+//* auth check
+router.get("/auth-check", auth, authorize(false, "EMPLOYEE"), authCheck)
+
 //* forgot password process
-// router.post("/forgot-password")
-// router.post("/verity-otp-forgot")
-// router.post("/reset-password")
+router.post("/forgot-password", forgotPassword)
+router.post("/verity-otp-forgot", veriftyOtpForgot)
+router.post("/reset-password", resetPassword)
 
 export default router

@@ -14,8 +14,8 @@ export const authorize = (permission: boolean, ...roles: string[]) => {
         const employee = await getEmployeeById(employeeId!)
         if (!employee) return next(createHttpErrors({
             message: 'This account has not been registered.',
-            code: errorCodes.unauthenticated,
-            status: 403
+            code: errorCodes.invalid,
+            status: 401
         }))
 
         const result = roles.includes(employee.role)
@@ -23,7 +23,7 @@ export const authorize = (permission: boolean, ...roles: string[]) => {
         if (permission && !result) {
             return next(createHttpErrors({
                 message: 'You do not have permission to access this resource.',
-                code: errorCodes.unauthenticated,
+                code: errorCodes.forbidden,
                 status: 403
             }))
         }
@@ -31,7 +31,7 @@ export const authorize = (permission: boolean, ...roles: string[]) => {
         if (!permission && result) {
             return next(createHttpErrors({
                 message: 'You do not have permission to access this resource.',
-                code: errorCodes.unauthenticated,
+                code: errorCodes.forbidden,
                 status: 403
             }))
         }
