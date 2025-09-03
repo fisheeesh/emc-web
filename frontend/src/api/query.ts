@@ -47,4 +47,20 @@ export const dailyAttendanceQuery = () => ({
     queryFn: fetchDailyAttendance,
 })
 
+const fetchAttendanceOverview = async ({ q = null, empStatus = null }: {
+    q?: string | null,
+    empStatus?: string | null
+}) => {
+    let query = q ? `&empName=${q}` : ''
+    if (empStatus) query += `&status=${empStatus}`
+    const res = await api.get(`admin/attendance-overview?${query}`)
+
+    return res.data
+}
+
+export const attendanceOverviewQuery = (q: string | null = null, empStatus: string | null = null) => ({
+    queryKey: ['attendance-overview', q, empStatus],
+    queryFn: () => fetchAttendanceOverview({ q, empStatus }),
+})
+
 export default queryClient

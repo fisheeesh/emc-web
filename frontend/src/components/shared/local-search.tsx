@@ -24,7 +24,7 @@ export default function LocalSearch({ filterValue = 'search' }: { filterValue: s
             <Input
                 value={query}
                 type="search"
-                placeholder="Search by name..."
+                placeholder="Search by first name..."
                 className="min-h-[44px] w-[300px] pl-10"
                 onChange={(e) => setQuery(e.target.value)}
             />

@@ -1,5 +1,5 @@
 import api, { authApi } from "@/api"
-import queryClient, { dailyAttendanceQuery, moodOverviewQuery, sentimentsComparisonQuery } from "@/api/query"
+import queryClient, { attendanceOverviewQuery, dailyAttendanceQuery, moodOverviewQuery, sentimentsComparisonQuery } from "@/api/query"
 import useAuthStore, { Status } from "@/store/auth-store"
 import { redirect } from "react-router"
 
@@ -24,7 +24,10 @@ export const senitmentsLoader = async () => {
 }
 
 export const attendanceLoader = async () => {
-    await queryClient.ensureQueryData(dailyAttendanceQuery())
+    await Promise.all([
+        queryClient.ensureQueryData(dailyAttendanceQuery()),
+        queryClient.ensureQueryData(attendanceOverviewQuery())
+    ])
 
     return null
 }
