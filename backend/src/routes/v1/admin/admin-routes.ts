@@ -7,6 +7,6 @@ const router = express.Router()
 router.get("/test", testAdmin)
 
 router.post("/maintenance", setMaintenance)
-router.get("/today-overview", getTodayMoodOverview)
+router.get("/mood-overview", getTodayMoodOverview)
 
 export default router

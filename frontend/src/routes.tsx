@@ -6,15 +6,16 @@ import NotFound from './pages/not-found/not-found'
 import ForgetPassword from './pages/auth/forgot-password/forgot-password'
 import VerifyOTP from './pages/auth/forgot-password/verify-otp'
 import ResetPassword from './pages/auth/forgot-password/reset-password'
-import { homeLoader, loginLoader, resetPasswordLoader, verifyOTPLoader } from './router/loaders'
+import { homeLoader, loginLoader, resetPasswordLoader, senitmentsLoader, verifyOTPLoader } from './router/loaders'
 import { forgotPasswordAction, loginAction, resetPasswordAction, verifyOTPAction } from './router/actions'
+import ErrorElement from './pages/not-found/error-element'
 
 export default function Router() {
     const router = createBrowserRouter([
         {
             path: "/",
             Component: DashboradRootLayout,
-            loader: homeLoader,
+            errorElement: <ErrorElement />,
             children: [
                 {
                     index: true,
@@ -29,21 +30,24 @@ export default function Router() {
                     lazy: async () => {
                         const { default: SentimentsDashboardPage } = await import('./pages/dashboard/sentiments')
                         return { Component: SentimentsDashboardPage }
-                    }
+                    },
+                    loader: senitmentsLoader
                 },
                 {
                     path: '/dashboard/attendance',
                     lazy: async () => {
                         const { default: AttendanceDashboardPage } = await import('./pages/dashboard/attendance')
                         return { Component: AttendanceDashboardPage }
-                    }
+                    },
+                    loader: homeLoader,
                 },
                 {
                     path: '/dashboard/managements',
                     lazy: async () => {
                         const { default: SettingsPage } = await import('./pages/dashboard/managements')
                         return { Component: SettingsPage }
-                    }
+                    },
+                    loader: homeLoader,
                 }
             ]
         },

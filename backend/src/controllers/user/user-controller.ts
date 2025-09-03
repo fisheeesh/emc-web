@@ -9,6 +9,8 @@ import { getEmployeeById } from "../../services/auth-services"
 import { authorize } from "../../utils/authorize"
 import { checkEmployeeIfNotExits, createHttpErrors } from "../../utils/check"
 import { getAllEmpEmotionHistory } from "../../services/emp-services"
+import { getOrSetCache } from "../../utils/cache"
+import { CacheQueue } from "../../jobs/queues/cache-queue"
 
 const prisma = new PrismaClient()
 
@@ -106,6 +108,17 @@ export const emotionCheckIn = [
                     data: { avgScore }
                 })
 
+
+                //* Watchlist check
+                if (updatedEmp.status === 'WATCHLIST' && avgScore >= CRITICAL_POINT) {
+                    await tx.employee.update({
+                        where: { id: emp!.id },
+                        data: {
+                            status: "NORMAL"
+                        }
+                    })
+                }
+
                 //* Critical check AFTER update
                 const isCritical = avgScore <= CRITICAL_POINT
                 if (isCritical && updatedEmp.status !== "CRITICAL") {
@@ -131,6 +144,14 @@ export const emotionCheckIn = [
                 return isCritical
             })
 
+            //* Invalidate cache
+            await CacheQueue.add("invalidate-check-in-histroy-cache", {
+                pattern: "history-*"
+            }, {
+                jobId: `invalidate-${Date.now()}`,
+                priority: 1
+            })
+
             res.status(200).json({
                 message: "Successfully checked in.",
                 score,
@@ -151,7 +172,9 @@ export const getEmpCheckInHistory = async (req: CustomRequest, res: Response, ne
     const emp = await getEmployeeById(empId!)
     checkEmployeeIfNotExits(emp)
 
-    const history = await getAllEmpEmotionHistory(emp!.id)
+    // const history = await getAllEmpEmotionHistory(emp!.id)
+    const cacheKey = `history-${emp!.id}`
+    const history = await getOrSetCache(cacheKey, async () => getAllEmpEmotionHistory(emp!.id))
 
     res.status(200).json({
         message: `Here is your history. Emp - ${emp!.email}`,
