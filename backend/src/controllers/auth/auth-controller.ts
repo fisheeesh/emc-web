@@ -3,7 +3,7 @@ import { NextFunction, Request, Response } from "express"
 import { body, validationResult } from "express-validator"
 import jwt from 'jsonwebtoken'
 import moment from 'moment'
-import { DEPARTMENTS } from '../../config/constants'
+import { DEPARTMENTS } from '../../config'
 import { errorCodes } from "../../config/error-codes"
 import { createEmployee, createOTP, getEmployeeByEmail, getEmployeeById, getOTPRowByEmail, updateEmployeeData, updateOTP } from "../../services/auth-services"
 import { authorize } from '../../utils/authorize'
@@ -546,7 +546,7 @@ export const logout = async (req: Request, res: Response, next: NextFunction) =>
     }))
 
     const empData = {
-        //* store refresh token for security -> will necessary in rotating token process
+        //* store refresh token for security
         rndToken: generateToken()
     }
 

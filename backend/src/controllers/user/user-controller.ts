@@ -2,7 +2,7 @@ import { NextFunction, Request, Response } from "express"
 import { body, validationResult } from "express-validator"
 import sanitizeHtml from 'sanitize-html'
 import { PrismaClient } from "../../../generated/prisma"
-import { CRITICAL_POINT } from "../../config/constants"
+import { CRITICAL_POINT } from "../../config"
 import { errorCodes } from "../../config/error-codes"
 import { ScoreQueue, ScoreQueueEvents } from "../../jobs/queues/score-queue"
 import { getEmployeeById } from "../../services/auth-services"
