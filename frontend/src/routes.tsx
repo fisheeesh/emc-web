@@ -6,7 +6,7 @@ import NotFound from './pages/not-found/not-found'
 import ForgetPassword from './pages/auth/forgot-password/forgot-password'
 import VerifyOTP from './pages/auth/forgot-password/verify-otp'
 import ResetPassword from './pages/auth/forgot-password/reset-password'
-import { homeLoader, loginLoader, resetPasswordLoader, senitmentsLoader, verifyOTPLoader } from './router/loaders'
+import { attendanceLoader, homeLoader, loginLoader, resetPasswordLoader, senitmentsLoader, verifyOTPLoader } from './router/loaders'
 import { forgotPasswordAction, loginAction, resetPasswordAction, verifyOTPAction } from './router/actions'
 import ErrorElement from './pages/not-found/error-element'
 import Loader from './components/shared/loader'
@@ -40,7 +40,7 @@ export default function Router() {
                         const { default: AttendanceDashboardPage } = await import('./pages/dashboard/attendance')
                         return { Component: AttendanceDashboardPage }
                     },
-                    // loader: homeLoader,
+                    loader: attendanceLoader
                 },
                 {
                     path: '/dashboard/managements',

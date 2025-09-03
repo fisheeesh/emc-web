@@ -15,7 +15,7 @@ const queryClient = new QueryClient({
 const fetchMoodOverview = async (q?: string | null) => {
     const query = q ? `?duration=${q}` : '?duration=today'
     const res = await api.get(`admin/mood-overview${query}`)
-    
+
     return res.data
 }
 
@@ -34,6 +34,17 @@ export const fetchSentimentsComparison = async (q?: string | null) => {
 export const sentimentsComparisonQuery = (q?: string | null) => ({
     queryKey: ['sentiments-comparison', q],
     queryFn: () => fetchSentimentsComparison(q),
+})
+
+const fetchDailyAttendance = async () => {
+    const res = await api.get('admin/daily-attendance')
+
+    return res.data
+}
+
+export const dailyAttendanceQuery = () => ({
+    queryKey: ['daily-attendance'],
+    queryFn: fetchDailyAttendance,
 })
 
 export default queryClient

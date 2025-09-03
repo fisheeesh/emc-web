@@ -19,3 +19,8 @@ interface Employee {
     contact: string,
     score: number
 }
+
+interface AttendanceData {
+    checkInDate: string,
+    value: number
+}
