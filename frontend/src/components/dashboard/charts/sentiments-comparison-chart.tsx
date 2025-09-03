@@ -37,17 +37,35 @@ export default function SentimentsComparisonChart({ data }: Props) {
             x: {
                 grid: {
                     drawTicks: false,
-                    display: false
+                    display: false,
                 },
                 ticks: {
                     padding: 10,
                     align: 'center',
                     font: { size: 11, weight: "bold" },
-                    color: `${theme === 'dark' ? '#cbd5e1' : ''}`
+                    color: `${theme === 'dark' ? '#cbd5e1' : ''}`,
+                    callback: function (val, index) {
+                        //* Always show all labels if <= 7 days
+                        if (labels.length <= 7) {
+                            return this.getLabelForValue(val as number);
+                        }
+
+                        //* Always show the last label (today)
+                        if (index === labels.length - 1) {
+                            return this.getLabelForValue(val as number);
+                        }
+
+                        //* Step backwards every 5 days
+                        const step = 5;
+                        const distanceFromEnd = labels.length - 1 - index;
+                        if (distanceFromEnd % step === 0) {
+                            return this.getLabelForValue(val as number);
+                        }
+
+                        return '';
+                    },
                 },
-                border: {
-                    display: false
-                }
+                border: { display: false },
             },
             y: {
                 grid: {
@@ -61,14 +79,12 @@ export default function SentimentsComparisonChart({ data }: Props) {
                     padding: 10,
                     stepSize: 2,
                     font: { size: 11, weight: "bold" },
-                    color: `${theme === 'dark' ? '#cbd5e1' : ''}`
+                    color: `${theme === 'dark' ? '#cbd5e1' : ''}`,
                 },
-                border: {
-                    display: false
-                }
-            }
-        }
-    }
+                border: { display: false },
+            },
+        },
+    };
 
     return (
         <Card className="rounded-md w-full lg:w-3/5 flex flex-col items-center gap-2 lg:h-[420px]">
@@ -78,7 +94,7 @@ export default function SentimentsComparisonChart({ data }: Props) {
                     <CardDescription>Seeing how sentiments vary day by day</CardDescription>
                 </div>
                 <CommonFilter
-                    filterValue="senitments"
+                    filterValue="sentiments"
                     filters={COMPARISON_FILTER}
                     otherClasses="min-h-[44px] sm:min-w-[150px]"
                 />
