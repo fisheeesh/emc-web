@@ -1,4 +1,5 @@
 import { PrismaClient } from "../../generated/prisma";
+import { emotionCheckIn } from "../controllers/user/user-controller";
 
 export const prisma = new PrismaClient().$extends({
     result: {
@@ -17,6 +18,12 @@ export const prisma = new PrismaClient().$extends({
                     return emotionCheckIn.createdAt.toLocaleDateString("en-US", {
                         year: "numeric", month: "long", day: "numeric", hour: "numeric", minute: "numeric", second: "numeric"
                     })
+                }
+            },
+            emotionScore: {
+                needs: { emotionScore: true },
+                compute(emotionCheckIn) {
+                    return Number(emotionCheckIn.emotionScore)
                 }
             }
         }
