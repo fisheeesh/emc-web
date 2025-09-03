@@ -1,25 +1,24 @@
 import { endOfDay, startOfDay, startOfMonth, subDays } from "date-fns";
 import { NextFunction, Request, Response } from "express";
 import { query } from "express-validator";
-import { PrismaClient } from "../../../generated/prisma";
+import { Prisma, PrismaClient } from "../../../generated/prisma";
 import { getEmployeeById } from "../../services/auth-services";
 import { getDailyAttendanceData, getSentimentsComparisonData, getTodayMoodPercentages } from "../../services/emotion-check-in-services";
 import { checkEmployeeIfNotExits } from "../../utils/check";
+import { prisma } from "../../config/prisma-client";
 
 interface CustomRequest extends Request {
     employeeId?: number
 }
 
-const prisma = new PrismaClient()
+const prismaClient = new PrismaClient()
 
 export const testAdmin = (req: Request, res: Response, next: NextFunction) => {
     res.status(200).json({
         message: "You have permission to access this route"
     })
 }
-/**
- * * posi -> 0.4 - 1.0, neu -> 0.3 - -0.3, neg -> -0.4 - -0.7, cri -> -0.8 - -1
- */
+
 export const getTodayMoodOverview = [
     query("duration", "Invalid Duration")
         .trim()
@@ -100,3 +99,76 @@ export const getDailyAttendance = async (req: CustomRequest, res: Response, next
         percentages
     })
 }
+
+export const getCheckInHours = async (req: CustomRequest, res: Response, next: NextFunction) => {
+    const empId = req.employeeId
+    const emp = await getEmployeeById(empId!)
+    checkEmployeeIfNotExits(emp)
+}
+
+export const getAttendanceOverView = [
+    query("empName", "Invalid Name.")
+        .trim()
+        .optional()
+        .escape(),
+    query("status", "Invalid Status")
+        .trim()
+        .optional()
+        .escape(),
+    query("date", "Invalid Date")
+        .trim()
+        .optional()
+        .escape(),
+    async (req: CustomRequest, res: Response, next: NextFunction) => {
+        const empId = req.employeeId
+        const { empName, status, date } = req.query
+
+        const emp = await getEmployeeById(empId!)
+        checkEmployeeIfNotExits(emp)
+
+        const result = await prisma.emotionCheckIn.findMany({
+            where: {
+                createdAt: {
+                    gte: startOfDay(new Date()),
+                    lte: endOfDay(new Date())
+                },
+                employee: {
+                    firstName: {
+                        contains: typeof empName === 'string' ? empName : '',
+                        mode: 'insensitive'
+                    },
+                    departmentId: emp!.departmentId,
+
+                }
+            },
+            select: {
+                id: true,
+                emoji: true,
+                textFeeling: true,
+                emotionScore: true,
+                status: true,
+                checkInTime: true,
+                employee: {
+                    select: {
+                        id: true,
+                        fullName: true,
+                        position: true,
+                        jobType: true
+                    }
+                }
+            },
+            orderBy: {
+                updatedAt: 'desc'
+            }
+        })
+
+        const filtered = typeof status === 'string'
+            ? result.filter(r => r.status.toLowerCase().includes(status.toLowerCase()))
+            : result
+
+        res.status(200).json({
+            message: "Here is Attendance OverView Data.",
+            data: filtered
+        })
+    }
+]

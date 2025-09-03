@@ -1,5 +1,5 @@
 import express from "express"
-import { getDailyAttendance, getSenitmentsComparison, getTodayMoodOverview, testAdmin } from "../../../controllers/admin/admin-controller"
+import { getAttendanceOverView, getDailyAttendance, getSenitmentsComparison, getTodayMoodOverview, testAdmin } from "../../../controllers/admin/admin-controller"
 import { setMaintenance } from "../../../controllers/admin/system-contorller"
 
 const router = express.Router()
@@ -12,5 +12,6 @@ router.post("/maintenance", setMaintenance)
 router.get("/mood-overview", getTodayMoodOverview)
 router.get("/sentiments-comparison", getSenitmentsComparison)
 router.get("/daily-attendance", getDailyAttendance)
+router.get("/attendance-overview", getAttendanceOverView)
 
 export default router
