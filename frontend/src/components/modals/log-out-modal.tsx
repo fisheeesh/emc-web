@@ -1,5 +1,4 @@
 import { authApi } from "@/api"
-import queryClient from "@/api/query"
 import { Button } from "@/components/ui/button"
 import {
     DialogClose,
@@ -27,7 +26,7 @@ export default function LogoutModal() {
             return res.data
         },
         onSuccess: () => {
-            queryClient.removeQueries()
+            // queryClient.removeQueries()
             navigate('/login', { replace: true })
         },
         onError: (error) => {
