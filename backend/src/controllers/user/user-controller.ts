@@ -8,7 +8,7 @@ import { ScoreQueue, ScoreQueueEvents } from "../../jobs/queues/score-queue"
 import { getEmployeeById } from "../../services/auth-services"
 import { authorize } from "../../utils/authorize"
 import { checkEmployeeIfNotExits, createHttpErrors } from "../../utils/check"
-import { getAllEmpEmotionHistory } from "../../utils/user-services"
+import { getAllEmpEmotionHistory } from "../../services/emp-services"
 
 const prisma = new PrismaClient()
 
