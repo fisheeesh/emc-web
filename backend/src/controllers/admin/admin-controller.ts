@@ -1,8 +1,8 @@
-import { endOfDay, startOfDay, startOfMonth } from "date-fns";
+import { endOfDay, startOfDay, startOfMonth, subDays } from "date-fns";
 import { NextFunction, Request, Response } from "express";
 import { query } from "express-validator";
 import { getEmployeeById } from "../../services/auth-services";
-import { getTodayMoodPercentages } from "../../services/emotion-check-in-services";
+import { getSentimentsComparisonData, getTodayMoodPercentages } from "../../services/emotion-check-in-services";
 import { getOrSetCache } from "../../utils/cache";
 import { checkEmployeeIfNotExits } from "../../utils/check";
 
@@ -47,7 +47,43 @@ export const getTodayMoodOverview = [
 
         res.status(200).json({
             message: "Here is Today Mood Overview Data.",
-            percentages
+            data: percentages
         })
+    }
+]
+
+export const getSenitmentsComparison = [
+    query("duration", "Invalid Duration")
+        .trim()
+        .escape()
+        .optional(),
+    async (req: CustomRequest, res: Response, next: NextFunction) => {
+        const empId = req.employeeId;
+        const { duration = "7" } = req.query;
+
+        const emp = await getEmployeeById(empId!);
+        checkEmployeeIfNotExits(emp);
+
+        const now = new Date();
+
+        const durationFilter =
+            duration === "7"
+                ? {
+                    gte: startOfDay(subDays(now, 6)),
+                    lte: endOfDay(now),
+                }
+                : {
+                    gte: startOfDay(subDays(now, 29)),
+                    lte: endOfDay(now),
+                };
+
+        // const result = await getSentimentsComparisonData(durationFilter, emp!.departmentId);
+        const cacheKey = `sentiments-comparisons-${JSON.stringify(durationFilter)}`
+        const result = await getOrSetCache(cacheKey, async () => getSentimentsComparisonData(durationFilter, emp!.departmentId))
+
+        return res.status(200).json({
+            message: "Here is Sentiments Comparison Data.",
+            data: result,
+        });
     }
 ]

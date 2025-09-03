@@ -1,12 +1,15 @@
 import express from "express"
-import { getTodayMoodOverview, testAdmin } from "../../../controllers/admin/admin-controller"
+import { getSenitmentsComparison, getTodayMoodOverview, testAdmin } from "../../../controllers/admin/admin-controller"
 import { setMaintenance } from "../../../controllers/admin/system-contorller"
 
 const router = express.Router()
 
+//* System routes
 router.get("/test", testAdmin)
-
 router.post("/maintenance", setMaintenance)
+
+//* Sentiments Dashboard routes
 router.get("/mood-overview", getTodayMoodOverview)
+router.get("/sentiments-comparison", getSenitmentsComparison)
 
 export default router
