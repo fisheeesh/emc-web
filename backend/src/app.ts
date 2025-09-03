@@ -12,7 +12,13 @@ import { createOrUpdateSettingStatus, getSettingStatus } from "./services/system
 
 export const app = express()
 
-var whitelist = ['http://localhost:5173', 'http://localhost:4000']
+var whitelist = [
+    'http://localhost:5173',
+    'http://127.0.0.1:5173',
+    'http://localhost:4000',
+    'http://127.0.0.1:4000',
+    "https://senior-pj-emotion.vercel.app"
+]
 var corsOptions = {
     origin: function (origin: any, callback: (err: Error | null, origin?: any) => void) {
         //* Allow requests with no origin (like mobile apps or curl requests)
@@ -31,7 +37,7 @@ app.use(morgan("dev"))
     .use(express.urlencoded({ extended: true }))
     .use(express.json())
     .use(cors(corsOptions))
-    .use(helmet())
+    .use(helmet({ crossOriginResourcePolicy: { policy: "cross-origin" }, }))
     .use(compression({}))
     .use(limiter)
     .use(cookieParser())

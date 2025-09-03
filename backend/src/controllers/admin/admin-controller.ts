@@ -42,7 +42,7 @@ export const getTodayMoodOverview = [
             }
 
         // const percentages = await getTodayMoodPercentages(emp!.departmentId, durationFilter)
-        const cacheKey = `mood-overview-${JSON.stringify(durationFilter)}`
+        const cacheKey = `sentiments-mood-overview-${JSON.stringify(durationFilter)}`
         const percentages = await getOrSetCache(cacheKey, async () => getTodayMoodPercentages(emp!.departmentId, durationFilter))
 
         res.status(200).json({
@@ -78,7 +78,7 @@ export const getSenitmentsComparison = [
                 };
 
         // const result = await getSentimentsComparisonData(durationFilter, emp!.departmentId);
-        const cacheKey = `sentiments-comparisons-${JSON.stringify(durationFilter)}`
+        const cacheKey = `sentiment-comparison-${JSON.stringify(durationFilter)}`
         const result = await getOrSetCache(cacheKey, async () => getSentimentsComparisonData(durationFilter, emp!.departmentId))
 
         return res.status(200).json({

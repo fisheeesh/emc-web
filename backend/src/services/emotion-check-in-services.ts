@@ -82,7 +82,7 @@ export const getSentimentsComparisonData = async (durationFilter: any, departmen
         //* Set sample output
         const dayMap: Record<
             string,
-            { position: number, neutral: number, negative: number, critical: number }
+            { positive: number, neutral: number, negative: number, critical: number }
         > = {}
 
         for (const entry of checkIns) {
@@ -91,7 +91,7 @@ export const getSentimentsComparisonData = async (durationFilter: any, departmen
             //* Store them by checkInDate
             if (!dayMap[checkInDate]) {
                 dayMap[checkInDate] = {
-                    position: 0,
+                    positive: 0,
                     neutral: 0,
                     negative: 0,
                     critical: 0
@@ -101,7 +101,7 @@ export const getSentimentsComparisonData = async (durationFilter: any, departmen
             const score = Number(entry.emotionScore)
 
             //* Increase count based on entry's emotionScore
-            if (score >= MOOD_THRESHOLDS.positive) dayMap[checkInDate].position++
+            if (score >= MOOD_THRESHOLDS.positive) dayMap[checkInDate].positive++
             else if (score >= MOOD_THRESHOLDS.neutralMin) dayMap[checkInDate].neutral++
             else if (score >= MOOD_THRESHOLDS.negativeMin) dayMap[checkInDate].negative++
             else dayMap[checkInDate].critical++
