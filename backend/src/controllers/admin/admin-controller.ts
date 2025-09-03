@@ -1,13 +1,10 @@
 import { endOfDay, startOfDay, startOfMonth } from "date-fns";
 import { NextFunction, Request, Response } from "express";
 import { query } from "express-validator";
-import { PrismaClient } from "../../../generated/prisma";
-import { MOOD_THRESHOLDS } from "../../config";
 import { getEmployeeById } from "../../services/auth-services";
-import { checkEmployeeIfNotExits } from "../../utils/check";
 import { getTodayMoodPercentages } from "../../services/emotion-check-in-services";
-
-const prisma = new PrismaClient()
+import { getOrSetCache } from "../../utils/cache";
+import { checkEmployeeIfNotExits } from "../../utils/check";
 
 interface CustomRequest extends Request {
     employeeId?: number
@@ -35,15 +32,18 @@ export const getTodayMoodOverview = [
 
         const now = new Date()
 
-        const durationFilter = duration === 'today' ? {
-            gte: startOfDay(now),
-            lte: endOfDay(now)
-        } : {
-            gte: startOfMonth(now),
-            lte: endOfDay(now)
-        }
+        const durationFilter = duration === 'today'
+            ? {
+                gte: startOfDay(now),
+                lte: endOfDay(now)
+            } : {
+                gte: startOfMonth(now),
+                lte: endOfDay(now)
+            }
 
-        const percentages = await getTodayMoodPercentages(emp!.departmentId, durationFilter)
+        // const percentages = await getTodayMoodPercentages(emp!.departmentId, durationFilter)
+        const cacheKey = `mood-overview-${JSON.stringify(durationFilter)}`
+        const percentages = await getOrSetCache(cacheKey, async () => getTodayMoodPercentages(emp!.departmentId, durationFilter))
 
         res.status(200).json({
             message: "Here is Today Mood Overview Data.",
