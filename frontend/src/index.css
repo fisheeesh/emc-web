@@ -8,7 +8,7 @@
   --font-raleway: 'Raleway', sans-serif;
   --font-en: Rubik, sans-serif;
   --font-mm: 'Noto Sans Myanmar', sans-serif;
-  --font-th: "Noto Sans Thai", sans-serif; 
+  --font-th: "Noto Sans Thai", sans-serif;
   --color-brand: #3085FE;
   --color-positive: #8DE192;
   --color-negative: #FB9F9F;
@@ -137,6 +137,35 @@
 
   body {
     @apply bg-background text-foreground;
+  }
+}
+
+@layer components {
+  .loader {
+    width: 45px;
+    aspect-ratio: 0.75;
+    --c: no-repeat linear-gradient(theme(colors.stone.800) 0 0);
+    background: var(--c) 0% 50%, var(--c) 50% 50%, var(--c) 100% 50%;
+    background-size: 20% 50%;
+    animation: loading 1s infinite linear;
+  }
+
+  @keyframes loading {
+    20% {
+      background-position: 0% 0%, 50% 50%, 100% 50%;
+    }
+
+    40% {
+      background-position: 0% 100%, 50% 0%, 100% 50%;
+    }
+
+    60% {
+      background-position: 0% 50%, 50% 100%, 100% 0%;
+    }
+
+    80% {
+      background-position: 0% 50%, 50% 50%, 100% 100%;
+    }
   }
 }
 

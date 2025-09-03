@@ -1,7 +1,14 @@
+import Loader from "@/components/shared/loader";
 import Navbar from "@/components/shared/nav-bar";
-import { Outlet } from "react-router";
+import { Outlet, useNavigation } from "react-router";
 
 export default function DashboradRootLayout() {
+    const navigation = useNavigation()
+
+    if (navigation.state !== 'idle') {
+        return <Loader />
+    }
+
     return (
         <section>
             <Navbar />

@@ -15,8 +15,10 @@ export const homeLoader = async () => {
 }
 
 export const senitmentsLoader = async () => {
-    await queryClient.ensureQueryData(moodOverviewQuery())
-    await queryClient.ensureQueryData(sentimentsComparisonQuery())
+    await Promise.all([
+        queryClient.ensureQueryData(moodOverviewQuery()),
+        queryClient.ensureQueryData(sentimentsComparisonQuery())
+    ])
 
     return null
 }

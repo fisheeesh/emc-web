@@ -9,6 +9,7 @@ import ResetPassword from './pages/auth/forgot-password/reset-password'
 import { homeLoader, loginLoader, resetPasswordLoader, senitmentsLoader, verifyOTPLoader } from './router/loaders'
 import { forgotPasswordAction, loginAction, resetPasswordAction, verifyOTPAction } from './router/actions'
 import ErrorElement from './pages/not-found/error-element'
+import Loader from './components/shared/loader'
 
 export default function Router() {
     const router = createBrowserRouter([
@@ -39,7 +40,7 @@ export default function Router() {
                         const { default: AttendanceDashboardPage } = await import('./pages/dashboard/attendance')
                         return { Component: AttendanceDashboardPage }
                     },
-                    loader: homeLoader,
+                    // loader: homeLoader,
                 },
                 {
                     path: '/dashboard/managements',
@@ -91,7 +92,7 @@ export default function Router() {
     ])
 
     return (
-        <Suspense fallback={<p>Loading...</p>}>
+        <Suspense fallback={<Loader />}>
             <RouterProvider router={router} />
         </Suspense>
     )

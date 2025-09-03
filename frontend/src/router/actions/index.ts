@@ -18,7 +18,7 @@ export const loginAction = async ({ request }: ActionFunctionArgs) => {
 
         //* Get redirect parameter from current page URL, not form submission URL
         const urlParams = new URLSearchParams(window.location.search)
-        const redirectTo = urlParams.get("redirect") || "/"
+        const redirectTo = urlParams.get("redirect") || "/dashboard/sentiments"
         return redirect(redirectTo)
 
     } catch (error) {

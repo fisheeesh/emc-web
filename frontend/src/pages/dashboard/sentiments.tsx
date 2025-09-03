@@ -18,17 +18,17 @@ export default function SentimentsDashboardPage() {
     const duration = searchParams.get('duration') || 'today'
     const sentimentsFilter = searchParams.get("sentiments") || '7'
 
-    const { data: overviewData } = useSuspenseQuery(moodOverviewQuery(duration))
-    const { data: sentimentsComparison } = useSuspenseQuery(sentimentsComparisonQuery(sentimentsFilter))
+    const { data: overviewData, isLoading: overViewLoading } = useSuspenseQuery(moodOverviewQuery(duration))
+    const { data: sentimentsComparison, isLoading: sentimentsLoading } = useSuspenseQuery(sentimentsComparisonQuery(sentimentsFilter))
 
     return (
         <section className="flex flex-col items-center justify-center w-full gap-3">
             <div className="flex flex-col lg:flex-row items-center justify-center w-full gap-3 lg:h-[420px]">
                 {/* Overview Chart */}
-                <OverViewChart percentages={overviewData.data ?? []} duration={duration} />
+                {overViewLoading ? <>Loading...</> : <OverViewChart percentages={overviewData.data ?? []} duration={duration} />}
 
                 {/* Sentiments Comparison Chart */}
-                <SentimentsComparisonChart data={sentimentsComparison.data ?? []} />
+                {sentimentsLoading ? <>Loading...</> : <SentimentsComparisonChart data={sentimentsComparison.data ?? []} />}
 
             </div>
             <div className="w-full">
