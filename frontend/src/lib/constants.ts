@@ -52,6 +52,11 @@ export const COMPARISON_DATA: ComparisonData[] = [
     { checkInDate: "2023-01-10", positive: 9, neutral: 5, negative: 2, critical: 1 },
 ]
 
+export const OVERVIEW_FILTER = [
+    { name: 'Today', value: 'today' },
+    { name: 'This Month', value: 'month' },
+]
+
 export const COMPARISON_FILTER = [
     { name: "Last 7 days", value: "7" },
     { name: "Last 30 days", value: "30" }

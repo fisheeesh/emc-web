@@ -67,8 +67,8 @@ export default function SentimentsComparisonChart() {
     }
 
     return (
-        <Card className="rounded-md w-full lg:w-2/3 flex flex-col items-center gap-2 lg:h-[420px]">
-            <CardHeader className="flex flex-col md:flex-row mb-2 items-center justify-center gap-3 md:gap-0 md:justify-between w-full">
+        <Card className="rounded-md w-full lg:w-3/5 flex flex-col items-center gap-2 lg:h-[420px]">
+            <CardHeader className="flex flex-col md:flex-row mb-2 justify-center gap-3 md:gap-0 md:justify-between w-full">
                 <div>
                     <CardTitle className="text-xl md:text-2xl">Sentiments Comparison Charts</CardTitle>
                     <CardDescription>Seeing how sentiments vary day by day</CardDescription>

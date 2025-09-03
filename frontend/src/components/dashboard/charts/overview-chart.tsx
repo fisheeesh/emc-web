@@ -1,17 +1,21 @@
-import { COMMON_DATAS } from "@/lib/constants"
-import { Doughnut } from "react-chartjs-2";
+import CommonFilter from "@/components/shared/common-filter";
 import {
     Card,
     CardContent,
     CardDescription,
     CardHeader,
     CardTitle,
-} from "@/components/ui/card"
+} from "@/components/ui/card";
+import { COMMON_DATAS, OVERVIEW_FILTER } from "@/lib/constants";
+import { Doughnut } from "react-chartjs-2";
 import CustomLegends from "../custom-legends";
 
-const overviewData = [80, 17, 2, 1]
+interface Props {
+    percentages: number[],
+    duration: string | null
+}
 
-export default function OverViewChart() {
+export default function OverViewChart({ percentages, duration }: Props) {
     const labels = COMMON_DATAS.map((data) => data.label)
 
     const chartData = {
@@ -19,7 +23,7 @@ export default function OverViewChart() {
         datasets: [
             {
                 label: 'Sentiments',
-                data: overviewData.map(data => data.toFixed(1)),
+                data: percentages.map(data => data),
                 backgroundColor: COMMON_DATAS.map(data => data.color),
                 borderRadius: 5,
                 borderWidth: 0,
@@ -34,13 +38,20 @@ export default function OverViewChart() {
         plugins: { legend: { display: false } }
     }
     return (
-        <Card className="rounded-md h-full w-full lg:w-1/3 flex flex-col gap-5 lg:h-[420px]">
-            <CardHeader>
-                <CardTitle className="text-xl md:text-2xl">Mood Overview</CardTitle>
-                <CardDescription>Showing how employees are feeling today</CardDescription>
+        <Card className="rounded-md h-full w-full lg:w-2/5 flex flex-col gap-5 lg:h-[420px]">
+            <CardHeader className="flex flex-col md:flex-row mb-2 justify-center gap-3 md:justify-between w-full">
+                <div>
+                    <CardTitle className="text-xl md:text-2xl">Mood Overview</CardTitle>
+                    <CardDescription className="line-clamp-1">Sshowing how employees are feeling {duration === 'today' ? 'today' : 'this month'}</CardDescription>
+                </div>
+                <CommonFilter
+                    filterValue="duration"
+                    filters={OVERVIEW_FILTER}
+                    otherClasses="min-h-[44px] sm:min-w-[90px]"
+                />
             </CardHeader>
-            <CardContent className="flex items-center justify-center gap-12 md:gap-12 lg:gap-2 lg:justify-between">
-                <div className="w-[150px] h-[200px] lg:h-[285px] md:w-[180px] lg:w-[190px]">
+            <CardContent className="flex items-center justify-center gap-12 lg:gap-2 lg:justify-between px-10">
+                <div className="w-[150px] h-[200px] md:h-[220px] lg:h-[285px] xl:h-[285px] md:w-[180px] lg:w-[200px]">
                     <Doughnut data={chartData} options={options} />
                 </div>
 
@@ -48,8 +59,8 @@ export default function OverViewChart() {
                     <CustomLegends type={'col'} />
 
                     <div className="flex xl:flex lg:hidden flex-col gap-y-4">
-                        {overviewData.map((data, index) => (
-                            <h1 key={index} className="text-sm lg:text-base font-en">{data.toFixed(1)}%</h1>
+                        {percentages.map((data, index) => (
+                            <h1 key={index} className="text-sm lg:text-base font-en">{data}%</h1>
                         ))}
                     </div>
                 </div>

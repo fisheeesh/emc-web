@@ -1,16 +1,23 @@
 import api, { authApi } from "@/api"
+import queryClient, { moodOverviewQuery } from "@/api/query"
 import useAuthStore, { Status } from "@/store/auth-store"
 import { redirect } from "react-router"
 
 export const homeLoader = async () => {
     try {
-        const res = api.get("admin/test")
+        const res = await api.get("admin/test")
 
-        return res
+        return res.data
 
     } catch (error) {
         console.log(error)
     }
+}
+
+export const senitmentsLoader = async () => {
+    await queryClient.ensureQueryData(moodOverviewQuery())
+
+    return null
 }
 
 export const loginLoader = async () => {
