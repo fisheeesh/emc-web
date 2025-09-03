@@ -7,24 +7,17 @@ import { useState, useEffect } from "react";
 import moment from "moment";
 import type { ChartOptions } from "chart.js";
 
-export default function DailyAttendanceChart() {
+interface Props {
+    dataNum: AttendanceData[],
+    dataPerc: AttendanceData[]
+}
+
+export default function DailyAttendanceChart({ dataNum, dataPerc }: Props) {
     const { theme } = useTheme();
     const [todayFilter, setTodayFilter] = useState<"numbers" | "percentages">("numbers");
     const [labelRotation, setLabelRotation] = useState(window.innerWidth >= 768 ? 0 : 90);
 
     const isPercentages = todayFilter === "percentages";
-
-    const dailyAttendance: Record<string, number> = {
-        "2025-08-20": 50,
-        "2025-08-21": 45,
-        "2025-08-22": 45,
-        "2025-08-23": 45,
-        "2025-08-24": 45,
-        "2025-08-25": 45,
-        "2025-08-26": 45,
-    };
-
-    const percentagesData: number[] = [75.5, 83.2, 65.1, 70.0, 91.4, 67.3, 45.2];
 
     useEffect(() => {
         const handleResize = () => {
@@ -35,8 +28,8 @@ export default function DailyAttendanceChart() {
         return () => window.removeEventListener("resize", handleResize);
     }, []);
 
-    const labels = Object.keys(dailyAttendance).map((date) =>
-        moment(date).format("MMM DD")
+    const labels = dataNum.map((data) =>
+        moment(data.checkInDate).format("MMM DD")
     );
 
     const chartData = {
@@ -45,8 +38,8 @@ export default function DailyAttendanceChart() {
             {
                 label: "Attendance Rate",
                 data: isPercentages
-                    ? percentagesData.map((p) => p.toFixed(1))
-                    : Object.values(dailyAttendance),
+                    ? dataPerc.map(data => data.value)
+                    : dataNum.map(data => data.value),
                 backgroundColor: "#3b82f6",
                 borderColor: "#3b82f6",
                 borderWidth: 1,
@@ -98,7 +91,7 @@ export default function DailyAttendanceChart() {
                     font: { size: 11, weight: "bold" },
                     color: theme === "dark" ? "#cbd5e1" : "",
                     padding: 10,
-                    stepSize: isPercentages ? 20 : 10,
+                    stepSize: isPercentages ? 20 : 5,
                     // eslint-disable-next-line @typescript-eslint/no-explicit-any
                     callback: (value: any) =>
                         isPercentages ? value + "%" : value,
