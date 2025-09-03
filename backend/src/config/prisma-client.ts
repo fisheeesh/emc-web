@@ -1,5 +1,4 @@
 import { PrismaClient } from "../../generated/prisma";
-import { emotionCheckIn } from "../controllers/user/user-controller";
 
 export const prisma = new PrismaClient().$extends({
     result: {
@@ -12,12 +11,28 @@ export const prisma = new PrismaClient().$extends({
             }
         },
         emotionCheckIn: {
-            createdAt: {
-                needs: { createdAt: true },
+            updatedAt: {
+                needs: { updatedAt: true },
                 compute(emotionCheckIn) {
-                    return emotionCheckIn.createdAt.toLocaleDateString("en-US", {
+                    return emotionCheckIn.updatedAt.toLocaleDateString("en-US", {
                         year: "numeric", month: "long", day: "numeric", hour: "numeric", minute: "numeric", second: "numeric"
                     })
+                }
+            },
+            checkInTime: {
+                needs: { updatedAt: true },
+                compute(emotionCheckIn) {
+                    return emotionCheckIn.updatedAt.toLocaleTimeString("en-US", {
+                        hour: "numeric",
+                        minute: "2-digit",
+                        hour12: true,
+                    });
+                },
+            },
+            status: {
+                needs: { emotionScore: true },
+                compute(emotionCheckIn) {
+                    return +emotionCheckIn.emotionScore >= 0.4 ? 'positive' : +emotionCheckIn.emotionScore >= -0.3 ? 'neutral' : +emotionCheckIn.emotionScore > -0.8 ? 'negative' : 'critical'
                 }
             },
             emotionScore: {
@@ -26,6 +41,6 @@ export const prisma = new PrismaClient().$extends({
                     return Number(emotionCheckIn.emotionScore)
                 }
             }
-        }
+        },
     }
 })
