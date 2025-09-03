@@ -1,21 +1,25 @@
 import { useTheme } from "@/components/shared/theme-provider";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import type { ChartOptions } from "chart.js";
-import { COMMON_DATAS, COMPARISON_DATA, COMPARISON_FILTER } from "@/lib/constants";
+import { COMMON_DATAS, COMPARISON_FILTER } from "@/lib/constants";
 import moment from "moment";
 import { Line } from "react-chartjs-2";
 import CustomLegends from "../custom-legends";
 import CommonFilter from "../../shared/common-filter";
 
-export default function SentimentsComparisonChart() {
+interface Props {
+    data: ComparisonData[]
+}
+
+export default function SentimentsComparisonChart({ data }: Props) {
     const { theme } = useTheme()
-    const labels = COMPARISON_DATA?.map((item) => moment(item.checkInDate).format('MMM DD'))
+    const labels = data?.map((item) => moment(item.checkInDate).format('MMM DD'))
 
     const chartData = {
         labels,
         datasets: COMMON_DATAS.map((dataset: CommonData) => ({
             label: dataset.label,
-            data: COMPARISON_DATA?.map((item: ComparisonData) => item[dataset.label.toLowerCase()] ?? 0),
+            data: data?.map((item: ComparisonData) => item[dataset.label.toLowerCase()] ?? 0),
             borderColor: dataset.color,
             backgroundColor: dataset.color,
             borderWidth: 2,
@@ -74,7 +78,7 @@ export default function SentimentsComparisonChart() {
                     <CardDescription>Seeing how sentiments vary day by day</CardDescription>
                 </div>
                 <CommonFilter
-                    filterValue="filter"
+                    filterValue="senitments"
                     filters={COMPARISON_FILTER}
                     otherClasses="min-h-[44px] sm:min-w-[150px]"
                 />

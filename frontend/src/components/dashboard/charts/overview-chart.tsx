@@ -22,7 +22,7 @@ export default function OverViewChart({ percentages, duration }: Props) {
         labels,
         datasets: [
             {
-                label: 'Sentiments',
+                label: 'Overview',
                 data: percentages.map(data => data),
                 backgroundColor: COMMON_DATAS.map(data => data.color),
                 borderRadius: 5,

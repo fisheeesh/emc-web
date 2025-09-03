@@ -49,7 +49,7 @@ export default function LogoutModal() {
                     <Button variant="outline" className="cursor-pointer">Cancel</Button>
                 </DialogClose>
                 <Button type="submit" onClick={() => mutate()} variant='destructive' className="cursor-pointer">
-                    <Spinner isLoading={isLoading} label={'Loggint out...'}>
+                    <Spinner isLoading={isLoading} label={'Logging out...'}>
                         Confirm
                     </Spinner>
                 </Button>

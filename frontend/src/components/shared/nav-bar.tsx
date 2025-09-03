@@ -1,3 +1,7 @@
+import dark from '@/assets/dark.png'
+import halfDark from '@/assets/half-ata-logo.png'
+import light from '@/assets/light.png'
+import halfLight from '@/assets/light_logo.png'
 import { APP_NAME, NAVLINKS } from '@/lib/constants'
 import { useState } from 'react'
 import { NavLink, useNavigate } from 'react-router'
@@ -9,10 +13,6 @@ import LngBtn from './lng-btn'
 import { ModeToggle } from './mode-toggle'
 import NotiBtn from './noti-btn'
 import { useTheme } from './theme-provider'
-import light from '@/assets/light.png'
-import dark from '@/assets/dark.png'
-import halfDark from '@/assets/half-ata-logo.png'
-import halfLight from '@/assets/light_logo.png'
 
 export default function Navbar() {
     const { theme } = useTheme()
