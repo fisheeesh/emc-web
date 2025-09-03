@@ -1,17 +1,15 @@
 import { DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogClose, DialogDescription } from '@/components/ui/dialog';
 import { Button } from '../ui/button';
 
-const empName = "John Smith";
-const empScore = 7;
-const currentTime = new Date().toLocaleTimeString('en-US', {
-    hour: '2-digit',
-    minute: '2-digit',
-    hour12: true
-});
-const emotion = "😊";
-const feelingText = "I have many ongoing projects and I couldn't sleep at night.";
+interface Props {
+    empName: string,
+    emoji: string,
+    textFeeling: string,
+    checkInTime: string,
+    score: number
+}
 
-export default function EmpEmotionModal() {
+export default function EmpEmotionModal({ empName, emoji, textFeeling, checkInTime, score }: Props) {
 
     return (
         <DialogContent className="max-w-sm mx-auto">
@@ -26,21 +24,21 @@ export default function EmpEmotionModal() {
                 {/* Time Section */}
                 <div>
                     <p className="text-sm mb-2">Time</p>
-                    <p className="text-3xl font-bold font-en">{currentTime}</p>
+                    <p className="text-3xl font-bold font-en">{checkInTime}</p>
                 </div>
 
                 {/* Emotion */}
-                <div className="text-6xl">{emotion}</div>
+                <div className="text-6xl">{emoji}</div>
 
                 {/* Score */}
                 <div>
-                    <p className=" font-medium font-en">Score: {empScore}</p>
+                    <p className=" font-medium font-en">Score: {score}</p>
                 </div>
 
                 {/* Feeling Text */}
                 <div>
                     <p className="text-sm leading-relaxed px-4">
-                        {feelingText}
+                        {textFeeling}
                     </p>
                 </div>
             </div>

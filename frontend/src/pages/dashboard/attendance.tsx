@@ -1,4 +1,4 @@
-import { dailyAttendanceQuery } from "@/api/query";
+import { attendanceOverviewQuery, dailyAttendanceQuery } from "@/api/query";
 import CheckInHourBarChart from "@/components/dashboard/charts/check-in-hour-bar-chart";
 import DailyAttendanceChart from "@/components/dashboard/charts/daily-attendance-chart";
 import DisplayCard from "@/components/dashboard/display-card";
@@ -6,13 +6,20 @@ import AttendanceTable from "@/components/dashboard/tables/attendance-table";
 import useTitle from "@/hooks/use-title";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { BarElement, CategoryScale, Chart as ChartJS, Legend, LinearScale, Tooltip } from "chart.js";
+import { useSearchParams } from "react-router";
 
 ChartJS.register(BarElement, CategoryScale, LinearScale, Tooltip, Legend);
 
 export default function AttendanceDashboardPage() {
     useTitle("Attendance Dashboard")
 
+    const [searchParams] = useSearchParams()
+
+    const empName = searchParams.get('empName')
+    const empStatus = searchParams.get('empStatus') || "positive"
+
     const { data: attendanceData } = useSuspenseQuery(dailyAttendanceQuery())
+    const { data: attendanceOverviewData } = useSuspenseQuery(attendanceOverviewQuery(empName, empStatus))
 
     return (
         <section className="flex flex-col justify-center items-center w-full gap-3">
@@ -31,7 +38,7 @@ export default function AttendanceDashboardPage() {
             </div>
 
             <div className="w-full">
-                <AttendanceTable />
+                <AttendanceTable data={attendanceOverviewData.data} />
             </div>
         </section>
     )

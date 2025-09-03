@@ -24,3 +24,20 @@ interface AttendanceData {
     checkInDate: string,
     value: number
 }
+
+interface Employee {
+    id: number,
+    position: string,
+    jobType: string,
+    fullName: string
+}
+
+interface AttendanceOverviewData {
+    id: number,
+    emoji: string,
+    textFeeling: string,
+    emotionScore: number,
+    checkInTime: string,
+    status: "positive" | "neutral" | "negative" | "critical",
+    employee: Employee
+}

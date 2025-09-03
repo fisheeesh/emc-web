@@ -2,7 +2,7 @@ import LocalSearch from "@/components/shared/local-search";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { CRITICAL_DATA, EMOTION_FILTER } from "@/lib/constants";
+import { EMOTION_FILTER } from "@/lib/constants";
 import { Dialog, DialogTrigger } from "@radix-ui/react-dialog";
 
 import EmpEmotionModal from "@/components/modals/emp-emotion-modal";
@@ -17,7 +17,11 @@ import {
 import { ChevronDownIcon } from "lucide-react";
 import { useState } from "react";
 
-export default function AttendanceTable() {
+interface Props {
+    data: AttendanceOverviewData[]
+}
+
+export default function AttendanceTable({ data }: Props) {
     const [open, setOpen] = useState(false)
     const [date, setDate] = useState<Date | undefined>(new Date())
 
@@ -37,9 +41,9 @@ export default function AttendanceTable() {
                     <CardDescription>Select a date to view employee attendance records</CardDescription>
                 </div>
                 <div className="flex flex-col md:flex-row md:items-center gap-2">
-                    <LocalSearch filterValue="emp" />
+                    <LocalSearch filterValue="empName" />
                     <CommonFilter
-                        filterValue="emotion"
+                        filterValue="empStatus"
                         filters={EMOTION_FILTER}
                         otherClasses="min-h-[44px] sm:min-w-[150px]"
                     />
@@ -76,7 +80,7 @@ export default function AttendanceTable() {
                         <TableRow>
                             <TableHead className="whitespace-nowrap">Name</TableHead>
                             <TableHead className="whitespace-nowrap">Role</TableHead>
-                            <TableHead className="whitespace-nowrap">Department</TableHead>
+                            <TableHead className="whitespace-nowrap">Job Type</TableHead>
                             <TableHead className="whitespace-nowrap">Emotion</TableHead>
                             <TableHead className="whitespace-nowrap">Check-in</TableHead>
                             <TableHead className="whitespace-nowrap text-center">Actions</TableHead>
@@ -85,22 +89,22 @@ export default function AttendanceTable() {
 
                     <TableBody>
                         {
-                            CRITICAL_DATA.map((emp) => (
-                                <TableRow key={emp.id}>
+                            data.map((att) => (
+                                <TableRow key={att.id}>
                                     <TableCell className="">
-                                        <span className="whitespace-nowrap">{emp.name}</span>
+                                        <span className="whitespace-nowrap">{att.employee.fullName}</span>
                                     </TableCell>
                                     <TableCell className="">
-                                        <span className="whitespace-nowrap">Software Engineer</span>
+                                        <span className="whitespace-nowrap">{att.employee.position}</span>
                                     </TableCell>
                                     <TableCell>
-                                        <span className="whitespace-nowrap">{emp.department}</span>
+                                        <span className="whitespace-nowrap">{att.employee.jobType}</span>
                                     </TableCell>
                                     <TableCell>
-                                        <CustomBadge score={emp.score} />
+                                        <CustomBadge status={att.status} />
                                     </TableCell>
                                     <TableCell>
-                                        <span className="whitespace-nowrap font-en">9:45 AM</span>
+                                        <span className="whitespace-nowrap font-en">{att.checkInTime}</span>
                                     </TableCell>
                                     <TableCell className="space-x-2 text-center">
                                         {/* Details Dialog */}
@@ -110,7 +114,7 @@ export default function AttendanceTable() {
                                                     Details
                                                 </Button>
                                             </DialogTrigger>
-                                            <EmpEmotionModal />
+                                            <EmpEmotionModal empName={att.employee.fullName} emoji={att.emoji} textFeeling={att.textFeeling} checkInTime={att.checkInTime} score={att.emotionScore} />
                                         </Dialog>
                                     </TableCell>
                                 </TableRow>
