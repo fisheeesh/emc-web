@@ -145,8 +145,8 @@ export const emotionCheckIn = [
             })
 
             //* Invalidate cache
-            await CacheQueue.add("invalidate-check-in-histroy-cache", {
-                pattern: "history-*"
+            await CacheQueue.add("invalidate-emotion-cache", {
+                pattern: "emotion-*"
             }, {
                 jobId: `invalidate-${Date.now()}`,
                 priority: 1
@@ -173,7 +173,7 @@ export const getEmpCheckInHistory = async (req: CustomRequest, res: Response, ne
     checkEmployeeIfNotExits(emp)
 
     // const history = await getAllEmpEmotionHistory(emp!.id)
-    const cacheKey = `history-${emp!.id}`
+    const cacheKey = `emotion-history-${emp!.id}`
     const history = await getOrSetCache(cacheKey, async () => getAllEmpEmotionHistory(emp!.id))
 
     res.status(200).json({
