@@ -1,4 +1,4 @@
-import { format } from "date-fns";
+import { eachDayOfInterval, endOfDay, format, startOfDay, subDays } from "date-fns";
 import { PrismaClient } from "../../generated/prisma";
 import { MOOD_THRESHOLDS } from "../config";
 
@@ -65,12 +65,15 @@ export const getTodayMoodPercentages = async (departmentId: number, durationFilt
     }
 }
 
-export const getSentimentsComparisonData = async (durationFilter: any, departmentId: number) => {
+export const getSentimentsComparisonData = async (departmentId: number, start: Date, end: Date) => {
     try {
         //* Get all check-ins based on date-range in emp's depart
         const checkIns = await prisma.emotionCheckIn.findMany({
             where: {
-                createdAt: durationFilter,
+                createdAt: {
+                    gte: start,
+                    lte: end
+                },
                 employee: { departmentId }
             },
             select: {
@@ -107,16 +110,102 @@ export const getSentimentsComparisonData = async (durationFilter: any, departmen
             else dayMap[checkInDate].critical++
         }
 
-        //* Format the desired output based on date ascending
-        const result = Object.entries(dayMap)
-            .sort(([d1], [d2]) => new Date(d1).getTime() - new Date(d2).getTime())
-            .map(([checkInDate, counts]) => ({
-                checkInDate,
-                ...counts
-            }))
+        const days = eachDayOfInterval({ start, end })
+
+        const result = days.map(day => {
+            const key = format(day, "yyyy-MM-dd")
+            return {
+                checkInDate: key,
+                positive: dayMap[key]?.positive ?? 0,
+                neutral: dayMap[key]?.neutral ?? 0,
+                negative: dayMap[key]?.negative ?? 0,
+                critical: dayMap[key]?.critical ?? 0
+            }
+        })
 
         return result
     } catch (error) {
         return error
+    }
+}
+
+interface DailyAttendanceData {
+    totalEmp: number,
+    totalPresent: number,
+    result: any,
+    percentages: any
+}
+
+// [{checkInDate: "", value: 23}, ...]
+export const getDailyAttendanceData = async (departmentId: number, start: Date, end: Date): Promise<DailyAttendanceData> => {
+    try {
+        const totalEmp = await prisma.employee.count({
+            where: { departmentId }
+        })
+
+        const totalPresent = await prisma.emotionCheckIn.count({
+            where: {
+                createdAt: {
+                    gte: startOfDay(new Date()),
+                    lte: endOfDay(new Date())
+                }
+            }
+        })
+
+        const checkIns = await prisma.emotionCheckIn.findMany({
+            where: {
+                createdAt: {
+                    gte: start,
+                    lte: end
+                },
+                employee: {
+                    departmentId
+                }
+            },
+            select: {
+                createdAt: true
+            }
+        })
+
+        const dayMap: Record<
+            string, { value: number }
+        > = {}
+
+        for (const entry of checkIns) {
+            const checkInDate = format(entry.createdAt, "yyyy-MM-dd");
+            if (!dayMap[checkInDate]) dayMap[checkInDate] = { value: 1 }
+            else dayMap[checkInDate].value++
+        }
+
+        const days = eachDayOfInterval({ start, end })
+
+        const result = days.map(day => {
+            const key = format(day, "yyyy-MM-dd")
+            return {
+                checkInDate: key,
+                value: dayMap[key]?.value ?? 0
+            }
+        })
+
+        const percentages = result.map(data => {
+            return {
+                ...data,
+                value: +((data.value / Math.max(totalEmp, 1))).toFixed(2)
+            }
+        })
+
+        return {
+            totalEmp,
+            totalPresent,
+            result,
+            percentages
+        }
+    } catch (error) {
+        return {
+            totalEmp: 0,
+            totalPresent: 0,
+            result: [],
+            percentages: []
+        }
     }
 }
