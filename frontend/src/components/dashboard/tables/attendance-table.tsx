@@ -8,31 +8,14 @@ import { Dialog, DialogTrigger } from "@radix-ui/react-dialog";
 import EmpEmotionModal from "@/components/modals/emp-emotion-modal";
 import CommonFilter from "@/components/shared/common-filter";
 import CustomBadge from "@/components/shared/custom-badge";
-import { Calendar } from "@/components/ui/calendar";
+import CustomCalendar from "@/components/shared/custom-calendar";
 import Empty from "@/components/ui/empty";
-import {
-    Popover,
-    PopoverContent,
-    PopoverTrigger,
-} from "@/components/ui/popover";
-import { ChevronDownIcon } from "lucide-react";
-import { useState } from "react";
 
 interface Props {
     data: AttendanceOverviewData[]
 }
 
 export default function AttendanceTable({ data }: Props) {
-    const [open, setOpen] = useState(false)
-    const [date, setDate] = useState<Date | undefined>(new Date())
-
-    const formatDate = (date: Date) => {
-        return date.toLocaleDateString("en-US", {
-            year: "numeric",
-            month: "long",
-            day: "numeric",
-        });
-    };
 
     return (
         <Card className="rounded-md flex flex-col gap-5">
@@ -48,30 +31,7 @@ export default function AttendanceTable({ data }: Props) {
                         filters={EMOTION_FILTER}
                         otherClasses="min-h-[44px] sm:min-w-[150px]"
                     />
-                    <Popover open={open} onOpenChange={setOpen}>
-                        <PopoverTrigger asChild>
-                            <Button
-                                variant="outline"
-                                id="date"
-                                className="justify-between font-normal min-h-[44px] font-en"
-                            >
-                                {date ? formatDate(date) : "Select date"}
-                                <ChevronDownIcon />
-                            </Button>
-                        </PopoverTrigger>
-                        <PopoverContent className="w-auto overflow-hidden p-0" align="start">
-                            <Calendar
-                                className="font-en"
-                                mode="single"
-                                selected={date}
-                                captionLayout="dropdown"
-                                onSelect={(date) => {
-                                    setDate(date)
-                                    setOpen(false)
-                                }}
-                            />
-                        </PopoverContent>
-                    </Popover>
+                    <CustomCalendar filterValue="attDate" />
                 </div>
             </CardHeader>
 

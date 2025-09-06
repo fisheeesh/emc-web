@@ -1,0 +1,63 @@
+import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover";
+import { ChevronDownIcon } from "lucide-react";
+import { Calendar } from "@/components/ui/calendar";
+import { Button } from "@/components/ui/button";
+import { useState } from "react";
+import { useSearchParams } from "react-router";
+
+interface Props {
+    popover?: boolean
+    filterValue: string
+}
+
+export default function CustomCalendar({ popover = true, filterValue }: Props) {
+    const [searchParams, setSearchParams] = useSearchParams()
+    const [open, setOpen] = useState(false)
+    const attDateParam = searchParams.get(filterValue);
+    const [date, setDate] = useState<Date | undefined>(attDateParam ? new Date(attDateParam) : new Date());
+
+    const formatDate = (date: Date) => {
+        return date.toLocaleDateString("en-US", {
+            year: "numeric",
+            month: "long",
+            day: "numeric",
+        });
+    };
+
+    const onSelectDate = (date: Date | undefined, close: boolean) => {
+        setDate(date)
+        if (close) setOpen(false)
+        searchParams.set(filterValue, date!.toISOString())
+        setSearchParams(searchParams)
+    }
+
+    return popover
+        ? <Popover open={open} onOpenChange={setOpen}>
+            <PopoverTrigger asChild>
+                <Button
+                    variant="outline"
+                    id="date"
+                    className="justify-between font-normal min-h-[44px] font-en"
+                >
+                    {date ? formatDate(date) : "Select date"}
+                    <ChevronDownIcon />
+                </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-auto overflow-hidden p-0" align="start">
+                <Calendar
+                    className="font-en"
+                    mode="single"
+                    selected={date}
+                    captionLayout="dropdown"
+                    onSelect={(date) => onSelectDate(date, true)}
+                />
+            </PopoverContent>
+        </Popover>
+        : <Calendar
+            mode="single"
+            selected={date}
+            onSelect={(date) => onSelectDate(date, false)}
+            className="rounded-md border shadow-sm font-en h-fit"
+            captionLayout="dropdown"
+        />
+}

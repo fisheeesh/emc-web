@@ -17,9 +17,10 @@ export default function AttendanceDashboardPage() {
 
     const empName = searchParams.get('empName')
     const empStatus = searchParams.get('empStatus') || "all"
+    const date = searchParams.get('attDate')
 
     const { data: attendanceData } = useSuspenseQuery(dailyAttendanceQuery())
-    const { data: attendanceOverviewData } = useSuspenseQuery(attendanceOverviewQuery(empName, empStatus))
+    const { data: attendanceOverviewData } = useSuspenseQuery(attendanceOverviewQuery(empName, empStatus, date))
     const { data: checkInHoursData } = useSuspenseQuery(checkInHoursQuery())
 
     return (

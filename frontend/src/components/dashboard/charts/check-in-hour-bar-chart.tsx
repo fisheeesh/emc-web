@@ -2,11 +2,11 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { useTheme } from "@/components/shared/theme-provider";
 import { useState } from "react";
 import { Bar } from "react-chartjs-2";
-import { Calendar } from "@/components/ui/calendar"
 import MonthYearSelector from "../month-year-selector";
 import type { ChartOptions } from "chart.js";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
+import CustomCalendar from "@/components/shared/custom-calendar";
 
 const month = new Date(Date.now()).toLocaleString('en-US', { month: 'long' })
 const year = new Date(Date.now()).getFullYear()
@@ -14,7 +14,6 @@ const year = new Date(Date.now()).getFullYear()
 export default function CheckInHourBarChart({ data }: { data: CheckInHoursData[] }) {
     const [checkInFilter, setCheckInFilter] = useState<"daily" | "monthly" | "yearly">("daily");
     const { theme } = useTheme()
-    const [date, setDate] = useState<Date | undefined>(new Date())
     const [activeMonth, setActiveMonth] = useState(month);
     const [activeYear, setActiveYear] = useState(year);
 
@@ -115,13 +114,7 @@ export default function CheckInHourBarChart({ data }: { data: CheckInHoursData[]
                 </div>
                 <div className="lg:w-1/4 w-full px-5 h-fit lg:h-full mb-5 lg:mb-0 flex justify-center lg:justify-normal">
                     {checkInFilter === 'daily' &&
-                        <Calendar
-                            mode="single"
-                            selected={date}
-                            onSelect={setDate}
-                            className="rounded-md border shadow-sm font-en h-fit"
-                            captionLayout="dropdown"
-                        />
+                        <CustomCalendar popover={false} filterValue="cIDate" />
                     }
                     {checkInFilter === 'monthly' && <MonthYearSelector mode={'month'} setActive={setActiveMonth} isActive={isActiveMonth} />}
                     {checkInFilter === 'yearly' && (
