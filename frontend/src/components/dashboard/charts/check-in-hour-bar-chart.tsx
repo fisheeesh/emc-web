@@ -104,7 +104,7 @@ export default function CheckInHourBarChart({ data }: { data: CheckInHoursData[]
                 </div>
             </CardHeader>
             <CardContent className="w-full flex flex-col-reverse xl:flex-row justify-center items-center gap-2 h-[700px] xl:h-[500px]">
-                <div className="lg:w-3/4 w-full h-full overflow-x-scroll custom-scrollbar">
+                <div className="xl:w-3/4 w-full h-full overflow-x-scroll custom-scrollbar">
                     <div className="w-[1500px] h-full">
                         <Bar
                             data={chartData}
@@ -112,7 +112,7 @@ export default function CheckInHourBarChart({ data }: { data: CheckInHoursData[]
                         />
                     </div>
                 </div>
-                <div className="lg:w-1/4 w-full px-5 h-fit lg:h-full mb-5 lg:mb-0 flex justify-center lg:justify-normal">
+                <div className="xl:w-1/4 w-full xl:px-5 h-fit xl:h-full mb-5 lg:mb-0">
                     {checkInFilter === 'daily' &&
                         <CustomCalendar popover={false} filterValue="cIDate" />
                     }
