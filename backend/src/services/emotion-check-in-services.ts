@@ -1,6 +1,7 @@
 import { eachDayOfInterval, endOfDay, format, startOfDay, subDays } from "date-fns";
 import { PrismaClient } from "../../generated/prisma";
 import { MOOD_THRESHOLDS } from "../config";
+import { getThaiDayBounds } from "../utils/helplers";
 
 const prisma = new PrismaClient()
 
@@ -136,18 +137,18 @@ interface DailyAttendanceData {
     percentages: any
 }
 
-// [{checkInDate: "", value: 23}, ...]
 export const getDailyAttendanceData = async (departmentId: number, start: Date, end: Date): Promise<DailyAttendanceData> => {
     try {
         const totalEmp = await prisma.employee.count({
             where: { departmentId }
         })
 
+        const { startUtc, endUtc } = getThaiDayBounds();
         const totalPresent = await prisma.emotionCheckIn.count({
             where: {
                 createdAt: {
-                    gte: startOfDay(new Date()),
-                    lte: endOfDay(new Date())
+                    gte: startUtc,
+                    lte: endUtc
                 }
             }
         })
@@ -190,7 +191,7 @@ export const getDailyAttendanceData = async (departmentId: number, start: Date, 
         const percentages = result.map(data => {
             return {
                 ...data,
-                value: +((data.value / Math.max(totalEmp, 1))).toFixed(2)
+                value: +((data.value / Math.max(totalEmp, 1) * 100)).toFixed(2)
             }
         })
 
