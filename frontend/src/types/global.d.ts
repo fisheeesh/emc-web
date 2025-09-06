@@ -12,14 +12,6 @@ interface ComparisonData {
     [key: string]: string | number;
 }
 
-interface Employee {
-    id: number,
-    name: string,
-    department: string,
-    contact: string,
-    score: number
-}
-
 interface AttendanceData {
     checkInDate: string,
     value: number

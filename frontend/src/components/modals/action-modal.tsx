@@ -12,7 +12,17 @@ import { Textarea } from "../ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
 import { Calendar, Phone, Mail, MessageSquare, UserCheck, AlertTriangle } from "lucide-react";
 
-export default function ActionModal({ employee }: { employee: Employee }) {
+interface Props {
+    employee: {
+        id: number,
+        name: string,
+        department: string,
+        contact: string,
+        score: number
+    }
+}
+
+export default function ActionModal({ employee }: Props) {
     return (
         <DialogContent className="w-full mx-auto max-h-[90vh] overflow-y-auto sm:max-w-[1024px]">
             <DialogHeader>

@@ -8,7 +8,17 @@ import {
 import { IoSparklesOutline } from "react-icons/io5";
 import { Button } from "../ui/button";
 
-export default function DetailsModal({ employee }: { employee: Employee }) {
+interface Props {
+    employee: {
+        id: number,
+        name: string,
+        department: string,
+        contact: string,
+        score: number
+    }
+}
+
+export default function DetailsModal({ employee }: Props) {
     return (
         <DialogContent className="w-full mx-auto max-h-[80vh] overflow-y-auto sm:max-w-[1024px] no-scrollbar">
             <DialogHeader>
