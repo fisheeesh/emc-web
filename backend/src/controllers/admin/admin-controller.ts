@@ -2,11 +2,9 @@ import { endOfDay, startOfDay, startOfMonth, subDays } from "date-fns";
 import { NextFunction, Request, Response } from "express";
 import { query } from "express-validator";
 import { PrismaClient } from "../../../generated/prisma";
-import { prisma } from "../../config/prisma-client";
 import { getEmployeeById } from "../../services/auth-services";
-import { getDailyAttendanceData, getSentimentsComparisonData, getTodayMoodPercentages } from "../../services/emotion-check-in-services";
+import { getAttendanceOverviewData, getCheckInHoursData, getDailyAttendanceData, getSentimentsComparisonData, getTodayMoodPercentages } from "../../services/emotion-check-in-services";
 import { checkEmployeeIfNotExits } from "../../utils/check";
-import { getThaiDayBounds, roundToHour } from "../../utils/helplers";
 
 interface CustomRequest extends Request {
     employeeId?: number
@@ -106,35 +104,7 @@ export const getCheckInHours = async (req: CustomRequest, res: Response, next: N
     const emp = await getEmployeeById(empId!)
     checkEmployeeIfNotExits(emp)
 
-    const { startUtc, endUtc } = getThaiDayBounds();
-
-    const checkIns = await prismaClient.emotionCheckIn.findMany({
-        where: {
-            createdAt: {
-                gte: startUtc,
-                lte: endUtc,
-            },
-            employee: { departmentId: emp!.departmentId }
-        },
-        select: {
-            createdAt: true
-        }
-    })
-
-    const hoursOrder: string[] = Array.from({ length: 24 }, (_, i) => {
-        return `${String(i).padStart(2, '0')}:00`
-    })
-    const counts = new Map(hoursOrder.map(h => [h, 0]))
-
-    for (const { createdAt } of checkIns) {
-        const bucket = roundToHour(createdAt)
-        counts.set(bucket, (counts.get(bucket) || 0) + 1)
-    }
-
-    const data = hoursOrder.map(checkInHour => ({
-        checkInHour,
-        value: counts.get(checkInHour) || 0
-    }))
+    const data = await getCheckInHoursData(emp!.departmentId)
 
     res.status(200).json({
         message: "Here is check in hours.",
@@ -162,51 +132,11 @@ export const getAttendanceOverView = [
         const emp = await getEmployeeById(empId!)
         checkEmployeeIfNotExits(emp)
 
-        const { startUtc, endUtc } = getThaiDayBounds();
-
-        const result = await prisma.emotionCheckIn.findMany({
-            where: {
-                createdAt: {
-                    gte: startUtc,
-                    lte: endUtc
-                },
-                employee: {
-                    firstName: {
-                        contains: typeof empName === 'string' ? empName : '',
-                        mode: 'insensitive'
-                    },
-                    departmentId: emp!.departmentId,
-                }
-            },
-            select: {
-                id: true,
-                emoji: true,
-                textFeeling: true,
-                emotionScore: true,
-                status: true,
-                checkInTime: true,
-                employee: {
-                    select: {
-                        id: true,
-                        fullName: true,
-                        position: true,
-                        jobType: true
-                    }
-                }
-            },
-            orderBy: {
-                updatedAt: 'desc'
-            }
-        })
-
-
-        const filtered = typeof status === 'string' && status !== 'all'
-            ? result.filter(r => r.status.toLowerCase().includes(status.toLowerCase()))
-            : result
+        const result = await getAttendanceOverviewData(emp!.departmentId, empName as string, status as string)
 
         res.status(200).json({
             message: "Here is Attendance OverView Data.",
-            data: filtered
+            data: result
         })
     }
 ]

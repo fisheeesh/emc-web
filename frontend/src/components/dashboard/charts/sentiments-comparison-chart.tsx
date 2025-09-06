@@ -1,11 +1,10 @@
 import { useTheme } from "@/components/shared/theme-provider";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import type { ChartOptions } from "chart.js";
 import { COMMON_DATAS, COMPARISON_FILTER } from "@/lib/constants";
-import moment from "moment";
+import type { ChartOptions } from "chart.js";
 import { Line } from "react-chartjs-2";
-import CustomLegends from "../custom-legends";
 import CommonFilter from "../../shared/common-filter";
+import CustomLegends from "../custom-legends";
 
 interface Props {
     data: ComparisonData[]
@@ -13,7 +12,7 @@ interface Props {
 
 export default function SentimentsComparisonChart({ data }: Props) {
     const { theme } = useTheme()
-    const labels = data?.map((item) => moment(item.checkInDate).format('MMM DD'))
+    const labels = data?.map((item) => item.checkInDate)
 
     const chartData = {
         labels,

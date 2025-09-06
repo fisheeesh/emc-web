@@ -4,7 +4,6 @@ import { Bar } from "react-chartjs-2";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { useState, useEffect } from "react";
-import moment from "moment";
 import type { ChartOptions } from "chart.js";
 
 interface Props {
@@ -28,9 +27,7 @@ export default function DailyAttendanceChart({ dataNum, dataPerc }: Props) {
         return () => window.removeEventListener("resize", handleResize);
     }, []);
 
-    const labels = dataNum.map((data) =>
-        moment(data.checkInDate).format("MMM DD")
-    );
+    const labels = dataNum.map((data) => data.checkInDate);
 
     const chartData = {
         labels,
