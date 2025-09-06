@@ -87,15 +87,16 @@ export const attendanceOverviewQuery = (q: string | null = null, empStatus: stri
     queryFn: () => fetchAttendanceOverview({ q, empStatus, date }),
 })
 
-const fetchCheckInHours = async () => {
-    const res = await api.get('admin/check-in-hours')
+const fetchCheckInHours = async (date?: string | null) => {
+    const query = date ? `?date=${date}` : ''
+    const res = await api.get(`admin/check-in-hours${query}`)
 
     return res.data
 }
 
-export const checkInHoursQuery = () => ({
-    queryKey: ['check-in-hours'],
-    queryFn: fetchCheckInHours
+export const checkInHoursQuery = (date?: string | null) => ({
+    queryKey: ['check-in-hours', date],
+    queryFn: () => fetchCheckInHours(date),
 })
 
 export default queryClient

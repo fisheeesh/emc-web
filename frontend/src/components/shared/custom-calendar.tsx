@@ -13,8 +13,8 @@ interface Props {
 export default function CustomCalendar({ popover = true, filterValue }: Props) {
     const [searchParams, setSearchParams] = useSearchParams()
     const [open, setOpen] = useState(false)
-    const attDateParam = searchParams.get(filterValue);
-    const [date, setDate] = useState<Date | undefined>(attDateParam ? new Date(attDateParam) : new Date());
+    const param = searchParams.get(filterValue);
+    const [date, setDate] = useState<Date | undefined>(param ? new Date(param) : new Date());
 
     const formatDate = (date: Date) => {
         return date.toLocaleDateString("en-US", {

@@ -2,11 +2,11 @@ import { endOfDay, startOfDay, startOfMonth, subDays } from "date-fns";
 import { NextFunction, Request, Response } from "express";
 import { query } from "express-validator";
 import { PrismaClient } from "../../../generated/prisma";
+import { prisma } from "../../config/prisma-client";
 import { getEmployeeById } from "../../services/auth-services";
 import { getAttendanceOverviewData, getCheckInHoursData, getDailyAttendanceData, getSentimentsComparisonData, getTodayMoodPercentages } from "../../services/emotion-check-in-services";
 import { getAllDepartmentsData } from "../../services/system-service";
 import { checkEmployeeIfNotExits } from "../../utils/check";
-import { prisma } from "../../config/prisma-client";
 
 interface CustomRequest extends Request {
     employeeId?: number
@@ -101,18 +101,25 @@ export const getDailyAttendance = async (req: CustomRequest, res: Response, next
     })
 }
 
-export const getCheckInHours = async (req: CustomRequest, res: Response, next: NextFunction) => {
-    const empId = req.employeeId
-    const emp = await getEmployeeById(empId!)
-    checkEmployeeIfNotExits(emp)
+export const getCheckInHours = [
+    query("date", "Invalid Date")
+        .trim()
+        .optional()
+        .escape(),
+    async (req: CustomRequest, res: Response, next: NextFunction) => {
+        const { date } = req.query
+        const empId = req.employeeId
+        const emp = await getEmployeeById(empId!)
+        checkEmployeeIfNotExits(emp)
 
-    const data = await getCheckInHoursData(emp!.departmentId)
+        const data = await getCheckInHoursData(emp!.departmentId, date as string)
 
-    res.status(200).json({
-        message: "Here is check in hours.",
-        data
-    })
-}
+        res.status(200).json({
+            message: "Here is check in hours.",
+            data
+        })
+    }
+]
 
 export const getAttendanceOverView = [
     query("empName", "Invalid Name.")
