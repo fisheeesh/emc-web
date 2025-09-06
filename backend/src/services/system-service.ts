@@ -15,3 +15,14 @@ export const createOrUpdateSettingStatus = async (key: string, value: string) =>
         create: { key, value }
     })
 }
+
+export const getAllDepartmentsData = async () => {
+    const deps = await prisma.department.findMany()
+
+    const result = deps.map(dep => ({
+        name: dep.name,
+        value: dep.id
+    }))
+
+    return result
+}

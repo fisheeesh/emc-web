@@ -4,7 +4,9 @@ import { query } from "express-validator";
 import { PrismaClient } from "../../../generated/prisma";
 import { getEmployeeById } from "../../services/auth-services";
 import { getAttendanceOverviewData, getCheckInHoursData, getDailyAttendanceData, getSentimentsComparisonData, getTodayMoodPercentages } from "../../services/emotion-check-in-services";
+import { getAllDepartmentsData } from "../../services/system-service";
 import { checkEmployeeIfNotExits } from "../../utils/check";
+import { prisma } from "../../config/prisma-client";
 
 interface CustomRequest extends Request {
     employeeId?: number
@@ -132,7 +134,7 @@ export const getAttendanceOverView = [
         const emp = await getEmployeeById(empId!)
         checkEmployeeIfNotExits(emp)
 
-        const result = await getAttendanceOverviewData(emp!.departmentId, empName as string, status as string)
+        const result = await getAttendanceOverviewData(emp!.departmentId, empName as string, status as string, date as string)
 
         res.status(200).json({
             message: "Here is Attendance OverView Data.",
@@ -140,3 +142,40 @@ export const getAttendanceOverView = [
         })
     }
 ]
+
+export const getAllDepartments = async (req: CustomRequest, res: Response, next: NextFunction) => {
+    const empId = req.employeeId
+    const emp = await getEmployeeById(empId!)
+    checkEmployeeIfNotExits(emp)
+
+    const result = await getAllDepartmentsData()
+
+    res.status(200).json({
+        message: "Here is All Departments Data.",
+        data: result
+    })
+}
+
+export const getAdminUserData = async (req: CustomRequest, res: Response, next: NextFunction) => {
+    const empId = req.employeeId
+    const emp = await getEmployeeById(empId!)
+    checkEmployeeIfNotExits(emp)
+
+    const result = await prisma.employee.findFirst({
+        where: {
+            id: empId
+        },
+        select: {
+            id: true,
+            fullName: true,
+            email: true,
+            role: true,
+            avatar: true
+        }
+    })
+
+    res.status(200).json({
+        message: "Here is Admin User Data.",
+        data: result
+    })
+}

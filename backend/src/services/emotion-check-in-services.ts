@@ -268,13 +268,13 @@ export const getCheckInHoursData = async (departmentId: number) => {
     }
 }
 
-export const getAttendanceOverviewData = async (departmentId: number, empName: string, status: string) => {
+export const getAttendanceOverviewData = async (departmentId: number, empName: string, status: string, date: string) => {
     try {
         const result = await prisma.emotionCheckIn.findMany({
             where: {
                 createdAt: {
-                    gte: startOfDay(new Date()),
-                    lte: endOfDay(new Date())
+                    gte: startOfDay(date ? new Date(date) : new Date()),
+                    lte: endOfDay(date ? new Date(date) : new Date())
                 },
                 employee: {
                     firstName: {
