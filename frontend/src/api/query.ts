@@ -12,6 +12,28 @@ const queryClient = new QueryClient({
     }
 })
 
+const fetchAdminUserData = async () => {
+    const res = await api.get("admin/admin-user")
+
+    return res.data
+}
+
+export const adminUserDataQuery = () => ({
+    queryKey: ['admin-user'],
+    queryFn: fetchAdminUserData
+})
+
+const fetchDepartments = async () => {
+    const res = await api.get("admin/all-departments")
+
+    return res.data
+}
+
+export const departmentsQuery = () => ({
+    queryKey: ['departments'],
+    queryFn: fetchDepartments
+})
+
 const fetchMoodOverview = async (q?: string | null) => {
     const query = q ? `?duration=${q}` : '?duration=today'
     const res = await api.get(`admin/mood-overview${query}`)
@@ -47,20 +69,22 @@ export const dailyAttendanceQuery = () => ({
     queryFn: fetchDailyAttendance,
 })
 
-const fetchAttendanceOverview = async ({ q = null, empStatus = null }: {
+const fetchAttendanceOverview = async ({ q = null, empStatus = null, date = null }: {
     q?: string | null,
-    empStatus?: string | null
+    empStatus?: string | null,
+    date?: string | null
 }) => {
     let query = q ? `&empName=${q}` : ''
     if (empStatus) query += `&status=${empStatus}`
+    if (date) query += `&date=${date}`
     const res = await api.get(`admin/attendance-overview?${query}`)
 
     return res.data
 }
 
-export const attendanceOverviewQuery = (q: string | null = null, empStatus: string | null = null) => ({
-    queryKey: ['attendance-overview', q, empStatus],
-    queryFn: () => fetchAttendanceOverview({ q, empStatus }),
+export const attendanceOverviewQuery = (q: string | null = null, empStatus: string | null = null, date: string | null = null) => ({
+    queryKey: ['attendance-overview', q, empStatus, date],
+    queryFn: () => fetchAttendanceOverview({ q, empStatus, date }),
 })
 
 const fetchCheckInHours = async () => {
