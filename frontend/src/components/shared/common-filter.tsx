@@ -2,11 +2,6 @@ import { cn } from "@/lib/utils"
 import { useSearchParams } from "react-router"
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "../ui/select"
 
-interface Filter {
-    name: string
-    value: string
-}
-
 interface Props {
     filters: Filter[],
     filterValue: string,

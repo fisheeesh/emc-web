@@ -3,6 +3,19 @@ interface CommonData {
     color: string
 }
 
+interface AdminUser {
+    id: number,
+    fullName: string,
+    email: string,
+    avatar: string,
+    role: string
+}
+
+interface Filter {
+    name: string
+    value: string
+}
+
 interface ComparisonData {
     checkInDate: string
     positive: number

@@ -13,8 +13,14 @@ import LngBtn from './lng-btn'
 import { ModeToggle } from './mode-toggle'
 import NotiBtn from './noti-btn'
 import { useTheme } from './theme-provider'
+import CommonFilter from './common-filter'
 
-export default function Navbar() {
+interface Props {
+    departments: Filter[]
+    adminUser: AdminUser
+}
+
+export default function Navbar({ departments, adminUser }: Props) {
     const { theme } = useTheme()
     const [isMobMenuOpen, setIsMobMenuOpen] = useState(false)
     const navigate = useNavigate()
@@ -55,10 +61,15 @@ export default function Navbar() {
 
                     {/* Desktop Right Side */}
                     <div className='hidden md:flex items-center gap-3'>
+                        <CommonFilter
+                            filters={departments}
+                            filterValue='dep'
+                            otherClasses="min-h-[36px] sm:min-w-[100px]"
+                        />
                         <NotiBtn />
                         <LngBtn />
                         <ModeToggle />
-                        <AuthDropdown />
+                        <AuthDropdown user={adminUser} />
                     </div>
 
                     {/* Mobile Hamburger Menu */}
@@ -81,6 +92,11 @@ export default function Navbar() {
                             <div className="max-w-[1400px] mx-auto px-4 space-y-4">
                                 {renderNavLinks()}
                                 <div className='flex items-center gap-3 mt-5'>
+                                    <CommonFilter
+                                        filters={departments}
+                                        filterValue='dep'
+                                        otherClasses="min-h-[36px] sm:min-w-[100px]"
+                                    />
                                     <NotiBtn />
                                     <LngBtn />
                                     <ModeToggle />
