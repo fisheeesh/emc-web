@@ -16,3 +16,5 @@ export const MOOD_THRESHOLDS = {
     negativeMin: -0.7,
     criticalMin: -1.0,
 };
+
+export const TIMEZONE = 'Asia/Bangkok';

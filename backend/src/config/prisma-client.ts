@@ -23,6 +23,7 @@ export const prisma = new PrismaClient().$extends({
                 needs: { updatedAt: true },
                 compute(emotionCheckIn) {
                     return emotionCheckIn.updatedAt.toLocaleTimeString("en-US", {
+                        timeZone: "Asia/Bangkok",
                         hour: "numeric",
                         minute: "2-digit",
                         hour12: true,
