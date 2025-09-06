@@ -75,7 +75,7 @@ export default function EmpTables() {
                                         <span className="whitespace-nowrap">ACTIVE</span>
                                     </TableCell>
                                     <TableCell>
-                                        <CustomBadge score={emp.score} />
+                                        <CustomBadge status="positive" />
                                     </TableCell>
                                     <TableCell>
                                         <span className="whitespace-nowrap">Null</span>

@@ -1,15 +1,15 @@
 import { Suspense } from 'react'
 import { createBrowserRouter, Navigate, RouterProvider } from 'react-router'
-import DashboradRootLayout from './pages/dashboard/dashboard-root-layout'
-import LoginPage from './pages/auth/login-page'
-import NotFound from './pages/not-found/not-found'
-import ForgetPassword from './pages/auth/forgot-password/forgot-password'
-import VerifyOTP from './pages/auth/forgot-password/verify-otp'
-import ResetPassword from './pages/auth/forgot-password/reset-password'
-import { attendanceLoader, homeLoader, loginLoader, resetPasswordLoader, senitmentsLoader, verifyOTPLoader } from './router/loaders'
-import { forgotPasswordAction, loginAction, resetPasswordAction, verifyOTPAction } from './router/actions'
-import ErrorElement from './pages/not-found/error-element'
 import Loader from './components/shared/loader'
+import ForgetPassword from './pages/auth/forgot-password/forgot-password'
+import ResetPassword from './pages/auth/forgot-password/reset-password'
+import VerifyOTP from './pages/auth/forgot-password/verify-otp'
+import LoginPage from './pages/auth/login-page'
+import DashboradRootLayout from './pages/dashboard/dashboard-root-layout'
+import ErrorElement from './pages/not-found/error-element'
+import NotFound from './pages/not-found/not-found'
+import { forgotPasswordAction, loginAction, resetPasswordAction, verifyOTPAction } from './router/actions'
+import { attendanceLoader, loginLoader, resetPasswordLoader, senitmentsLoader, verifyOTPLoader } from './router/loaders'
 
 export default function Router() {
     const router = createBrowserRouter([
@@ -48,7 +48,6 @@ export default function Router() {
                         const { default: SettingsPage } = await import('./pages/dashboard/managements')
                         return { Component: SettingsPage }
                     },
-                    loader: homeLoader,
                 }
             ]
         },

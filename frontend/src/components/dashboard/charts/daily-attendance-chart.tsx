@@ -71,7 +71,7 @@ export default function DailyAttendanceChart({ dataNum, dataPerc }: Props) {
             x: {
                 grid: { display: false },
                 ticks: {
-                    padding: 0,
+                    padding: 5,
                     align: "center",
                     autoSkip: false,
                     font: { size: 11, weight: "bold" },
@@ -124,7 +124,7 @@ export default function DailyAttendanceChart({ dataNum, dataPerc }: Props) {
                     </div>
                 </RadioGroup>
             </CardHeader>
-            <CardContent className=" w-full h-full">
+            <CardContent className="w-full h-full">
                 <Bar data={chartData} options={options} />
             </CardContent>
         </Card>

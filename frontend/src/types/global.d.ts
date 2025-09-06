@@ -25,6 +25,11 @@ interface AttendanceData {
     value: number
 }
 
+interface CheckInHoursData {
+    checkInHour: string,
+    value: number
+}
+
 interface Employee {
     id: number,
     position: string,

@@ -63,6 +63,7 @@ export const COMPARISON_FILTER = [
 ]
 
 export const EMOTION_FILTER = [
+    { name: 'All', value: 'all' },
     { name: 'Positive', value: 'positive' },
     { name: 'Neutral', value: 'neutral' },
     { name: 'Negative', value: 'negative' },

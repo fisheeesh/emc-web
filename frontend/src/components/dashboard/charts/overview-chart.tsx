@@ -4,8 +4,9 @@ import {
     CardContent,
     CardDescription,
     CardHeader,
-    CardTitle,
+    CardTitle
 } from "@/components/ui/card";
+import Empty from "@/components/ui/empty";
 import { COMMON_DATAS, OVERVIEW_FILTER } from "@/lib/constants";
 import { Doughnut } from "react-chartjs-2";
 import CustomLegends from "../custom-legends";
@@ -17,6 +18,8 @@ interface Props {
 
 export default function OverViewChart({ percentages, duration }: Props) {
     const labels = COMMON_DATAS.map((data) => data.label)
+
+    const isEmpty = percentages.every(el => el === 0)
 
     const chartData = {
         labels,
@@ -50,21 +53,27 @@ export default function OverViewChart({ percentages, duration }: Props) {
                     otherClasses="min-h-[44px] sm:min-w-[90px]"
                 />
             </CardHeader>
-            <CardContent className="flex items-center justify-center gap-12 lg:gap-2 lg:justify-between px-10">
-                <div className="w-[150px] h-[200px] md:h-[220px] lg:h-[285px] xl:h-[285px] md:w-[180px] lg:w-[200px]">
-                    <Doughnut data={chartData} options={options} />
-                </div>
+            {
+                !isEmpty ?
+                    <CardContent className="flex items-center justify-center gap-12 lg:gap-2 lg:justify-between px-10">
+                        <div className="w-[150px] h-[200px] md:h-[220px] lg:h-[285px] xl:h-[285px] md:w-[180px] lg:w-[200px]">
+                            <Doughnut data={chartData} options={options} />
+                        </div>
 
-                <div className="flex items-center gap-8">
-                    <CustomLegends type={'col'} />
+                        <div className="flex items-center gap-8">
+                            <CustomLegends type={'col'} />
 
-                    <div className="flex xl:flex lg:hidden flex-col gap-y-4">
-                        {percentages.map((data, index) => (
-                            <h1 key={index} className="text-sm lg:text-base font-en">{data}%</h1>
-                        ))}
-                    </div>
-                </div>
-            </CardContent>
+                            <div className="flex xl:flex lg:hidden flex-col gap-y-4">
+                                {percentages.map((data, index) => (
+                                    <h1 key={index} className="text-sm lg:text-base font-en">{data}%</h1>
+                                ))}
+                            </div>
+                        </div>
+                    </CardContent>
+                    : <CardContent className="flex items-center flex-col justify-center">
+                        <Empty label="Oops! No employees have checked in yet." />
+                    </CardContent>
+            }
         </Card>
     )
 }
