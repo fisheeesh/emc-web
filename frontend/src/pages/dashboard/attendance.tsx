@@ -1,4 +1,4 @@
-import { attendanceOverviewQuery, dailyAttendanceQuery } from "@/api/query";
+import { attendanceOverviewQuery, checkInHoursQuery, dailyAttendanceQuery } from "@/api/query";
 import CheckInHourBarChart from "@/components/dashboard/charts/check-in-hour-bar-chart";
 import DailyAttendanceChart from "@/components/dashboard/charts/daily-attendance-chart";
 import DisplayCard from "@/components/dashboard/display-card";
@@ -16,10 +16,11 @@ export default function AttendanceDashboardPage() {
     const [searchParams] = useSearchParams()
 
     const empName = searchParams.get('empName')
-    const empStatus = searchParams.get('empStatus') || "positive"
+    const empStatus = searchParams.get('empStatus') || "all"
 
     const { data: attendanceData } = useSuspenseQuery(dailyAttendanceQuery())
     const { data: attendanceOverviewData } = useSuspenseQuery(attendanceOverviewQuery(empName, empStatus))
+    const { data: checkInHoursData } = useSuspenseQuery(checkInHoursQuery())
 
     return (
         <section className="flex flex-col justify-center items-center w-full gap-3">
@@ -34,7 +35,7 @@ export default function AttendanceDashboardPage() {
             </div>
 
             <div className="w-full">
-                <CheckInHourBarChart />
+                <CheckInHourBarChart data={checkInHoursData.data} />
             </div>
 
             <div className="w-full">

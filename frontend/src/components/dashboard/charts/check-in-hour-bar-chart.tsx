@@ -2,7 +2,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { useTheme } from "@/components/shared/theme-provider";
 import { useState } from "react";
 import { Bar } from "react-chartjs-2";
-import { CHECK_IN_HOURS_DATA } from "@/lib/constants";
 import { Calendar } from "@/components/ui/calendar"
 import MonthYearSelector from "../month-year-selector";
 import type { ChartOptions } from "chart.js";
@@ -12,7 +11,7 @@ import { Label } from "@/components/ui/label";
 const month = new Date(Date.now()).toLocaleString('en-US', { month: 'long' })
 const year = new Date(Date.now()).getFullYear()
 
-export default function CheckInHourBarChart() {
+export default function CheckInHourBarChart({ data }: { data: CheckInHoursData[] }) {
     const [checkInFilter, setCheckInFilter] = useState<"daily" | "monthly" | "yearly">("daily");
     const { theme } = useTheme()
     const [date, setDate] = useState<Date | undefined>(new Date())
@@ -23,13 +22,13 @@ export default function CheckInHourBarChart() {
     // const isActiveYear = (year: string) => activeYear.toString() === year;
     // const formattedDate = new Intl.DateTimeFormat('en-CA').format(date);
 
-    const labels = CHECK_IN_HOURS_DATA.map(att => att.time)
+    const labels = data.map(att => att.checkInHour)
     const chartData = {
         labels,
         datasets: [
             {
                 label: "Attendance Rate",
-                data: CHECK_IN_HOURS_DATA?.map(checkIn => checkIn.value),
+                data: data?.map(checkIn => checkIn.value),
                 backgroundColor: "#3b82f6",
                 borderColor: "#3b82f6",
                 borderRadius: 5,
