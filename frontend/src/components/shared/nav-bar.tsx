@@ -61,11 +61,11 @@ export default function Navbar({ departments, adminUser }: Props) {
 
                     {/* Desktop Right Side */}
                     <div className='hidden md:flex items-center gap-3'>
-                        <CommonFilter
+                        {adminUser.role === 'SUPERADMIN' && <CommonFilter
                             filters={departments}
                             filterValue='dep'
                             otherClasses="min-h-[36px] sm:min-w-[100px]"
-                        />
+                        />}
                         <NotiBtn />
                         <LngBtn />
                         <ModeToggle />
@@ -92,11 +92,11 @@ export default function Navbar({ departments, adminUser }: Props) {
                             <div className="max-w-[1400px] mx-auto px-4 space-y-4">
                                 {renderNavLinks()}
                                 <div className='flex items-center gap-3 mt-5'>
-                                    <CommonFilter
+                                    {adminUser.role === 'SUPERADMIN' && <CommonFilter
                                         filters={departments}
                                         filterValue='dep'
                                         otherClasses="min-h-[36px] sm:min-w-[100px]"
-                                    />
+                                    />}
                                     <NotiBtn />
                                     <LngBtn />
                                     <ModeToggle />

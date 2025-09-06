@@ -2,7 +2,7 @@ import { endOfDay, startOfDay, startOfMonth, subDays } from "date-fns";
 import { NextFunction, Request, Response } from "express";
 import { query } from "express-validator";
 import { PrismaClient } from "../../../generated/prisma";
-import { prisma } from "../../config/prisma-client";
+import { getAdminUserData } from "../../services/admin-services";
 import { getEmployeeById } from "../../services/auth-services";
 import { getAttendanceOverviewData, getCheckInHoursData, getDailyAttendanceData, getSentimentsComparisonData, getTodayMoodPercentages } from "../../services/emotion-check-in-services";
 import { getAllDepartmentsData } from "../../services/system-service";
@@ -163,23 +163,12 @@ export const getAllDepartments = async (req: CustomRequest, res: Response, next:
     })
 }
 
-export const getAdminUserData = async (req: CustomRequest, res: Response, next: NextFunction) => {
+export const getAdminUser = async (req: CustomRequest, res: Response, next: NextFunction) => {
     const empId = req.employeeId
     const emp = await getEmployeeById(empId!)
     checkEmployeeIfNotExits(emp)
 
-    const result = await prisma.employee.findFirst({
-        where: {
-            id: empId
-        },
-        select: {
-            id: true,
-            fullName: true,
-            email: true,
-            role: true,
-            avatar: true
-        }
-    })
+    const result = await getAdminUserData(emp!.id)
 
     res.status(200).json({
         message: "Here is Admin User Data.",
