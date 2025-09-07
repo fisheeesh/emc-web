@@ -9,6 +9,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Dialog, DialogTrigger } from "@/components/ui/dialog";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { CRITICAL_DATA, DEPARTMENTS_FILTER, IMG_URL } from "@/lib/constants";
+import { IoPersonAdd } from "react-icons/io5";
 
 export default function EmpTables() {
     return (
@@ -26,6 +27,14 @@ export default function EmpTables() {
                         filters={DEPARTMENTS_FILTER}
                         otherClasses="min-h-[44px] sm:min-w-[150px]"
                     />
+                    <Dialog>
+                        <DialogTrigger asChild>
+                            <Button className="bg-gradient-to-r from-purple-400 via-pink-500 to-blue-500 font-semibold hover:from-pink-500 hover:via-purple-500 hover:to-blue-400 transition-colors duration-300 min-h-[44px] text-white flex items-center gap-2 cursor-pointer">
+                                <IoPersonAdd /> Create a new employee
+                            </Button>
+                        </DialogTrigger>
+                        <CreateEditEmpModal />
+                    </Dialog>
                 </div>
             </CardHeader>
 

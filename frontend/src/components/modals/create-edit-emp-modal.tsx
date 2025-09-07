@@ -323,7 +323,7 @@ export default function CreateEditEmpModal() {
 
                     <div className="flex items-center justify-end gap-2 pt-2">
                         <DialogClose asChild>
-                            <Button variant="outline" type="button">
+                            <Button variant="outline" type="button" className="cursor-pointer">
                                 Cancel
                             </Button>
                         </DialogClose>

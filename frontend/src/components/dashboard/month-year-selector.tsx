@@ -6,15 +6,10 @@ interface Props {
     filterValue: "ciMonth" | "ciYear"
 }
 
-const now = new Date()
-const currentYear = `${now.getFullYear()}-01-01`;
-const currntMonth = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-01`;
-
 export default function MonthYearSelector({ filters, filterValue }: Props) {
     const [searchParams, setSearchParams] = useSearchParams()
-    const start = filterValue === 'ciYear' ? currentYear : currntMonth
     const param = searchParams.get(filterValue);
-    const [active, setActive] = useState(param || start);
+    const [active, setActive] = useState(param);
 
     const isActive = (value: string) => {
         return active === value

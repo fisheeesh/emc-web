@@ -2,7 +2,7 @@ import express from "express"
 import authRoutes from "./auth/auth-routes"
 import userRoutes from "./user/user-routes"
 import adminRoutes from "./admin/admin-routes"
-import superAdminRoutes from './super-admin/super-admin'
+import superAdminRoutes from './super-admin/super-admin-routes'
 import { auth } from "../../middlewares/auth-middleware"
 import { authorize } from "../../middlewares/authorize-middleware"
 import { maintenance } from "../../middlewares/maintenance-middleware"
