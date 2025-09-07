@@ -32,7 +32,7 @@ model Employee {
   emotionSum      Decimal            @default(0) @db.Decimal(3, 2)
   criticalTimes   CriticalEmployee[]
   checkIns        EmotionCheckIn[]
-  department      Department         @relation(fields: [departmentId], references: [id], onDelete: Cascade)
+  department      Department         @relation(fields: [departmentId], references: [id])
 }
 
 model Otp {
