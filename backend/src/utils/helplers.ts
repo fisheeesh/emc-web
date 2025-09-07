@@ -1,5 +1,32 @@
 import { toZonedTime } from 'date-fns-tz';
 import { TIMEZONE } from '../config';
+import path from "path"
+import { unlink } from "node:fs/promises";
+
+export const removeFiles = async (originalFile: string, optimizeFile?: string | null) => {
+    try {
+        const originalFilePath = path.join(
+            __dirname,
+            "../../../",
+            "/uploads/images",
+            originalFile
+        )
+        await unlink(originalFilePath)
+
+        if (optimizeFile) {
+            const optimizeFilePath = path.join(
+                __dirname,
+                "../../../",
+                "/uploads/optimizes",
+                optimizeFile
+            )
+            await unlink(optimizeFilePath)
+        }
+
+    } catch (error) {
+        console.log(error)
+    }
+}
 
 export function roundToHour(date: Date): string {
     //* UTC -> Thai

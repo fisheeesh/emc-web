@@ -58,3 +58,12 @@ export const checkOTPRow = (otpRow: any) => {
         throw error
     }
 }
+
+export const checkUploadFile = (file: any) => {
+    if (!file) {
+        const error: any = new Error('Invalid image format.')
+        error.status = 409
+        error.code = errorCodes.invalid
+        throw error
+    }
+}

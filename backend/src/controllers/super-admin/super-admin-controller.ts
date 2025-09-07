@@ -1,38 +1,15 @@
 import { NextFunction, Request, Response } from "express"
 import { body, validationResult } from "express-validator"
-import { checkEmployeeIfNotExits, createHttpErrors } from "../../utils/check"
+import { checkEmployeeIfNotExits, checkUploadFile, createHttpErrors } from "../../utils/check"
 import { errorCodes } from "../../config/error-codes"
-import { getEmployeeById } from "../../services/auth-services"
-import path from "path"
-import { unlink } from "node:fs/promises";
+import { createEmployee, getEmployeeById } from "../../services/auth-services"
+import { DEPARTMENTS } from "../../config"
+import { ImageQueue } from "../../jobs/queues/image-queue"
+import { generateHashedValue, generateToken } from "../../utils/generate"
+import { removeFiles } from "../../utils/helplers"
 
 interface CustomRequest extends Request {
     employeeId?: number
-}
-
-const removeFiles = async (originalFile: string, optimizeFile?: string | null) => {
-    try {
-        const originalFilePath = path.join(
-            __dirname,
-            "../../../",
-            "/uploads/images",
-            originalFile
-        )
-        await unlink(originalFilePath)
-
-        if (optimizeFile) {
-            const optimizeFilePath = path.join(
-                __dirname,
-                "../../../",
-                "/uploads/optimizes",
-                optimizeFile
-            )
-            await unlink(optimizeFilePath)
-        }
-
-    } catch (error) {
-        console.log(error)
-    }
 }
 
 export const createNextEmployee = [
@@ -68,6 +45,16 @@ export const createNextEmployee = [
         .trim()
         .notEmpty()
         .escape(),
+    body("department", "Invalid department.")
+        .trim()
+        .notEmpty()
+        .custom(value => {
+            if (!DEPARTMENTS.includes(value)) {
+                throw new Error("Invalid department.")
+            }
+            return true
+        })
+        .escape(),
     async (req: CustomRequest, res: Response, next: NextFunction) => {
         const errors = validationResult(req).array({ onlyFirstError: true })
         if (errors.length > 0) {
@@ -81,14 +68,49 @@ export const createNextEmployee = [
             }))
         }
 
-        const { firstName, lastName, phone, email, password, position } = req.body
+        const { firstName, lastName, phone, email, password, position, department } = req.body
 
         const empId = req.employeeId
         const emp = await getEmployeeById(empId!)
+
         checkEmployeeIfNotExits(emp)
+        checkUploadFile(req.file)
+
+        const splitFileName = req.file?.filename.split(".")[0]
+        await ImageQueue.add("optimize-image", {
+            filePath: req.file?.path,
+            fileName: `${splitFileName}.webp`,
+            width: 835,
+            height: 577,
+            quality: 100
+        }, {
+            attempts: 3,
+            backoff: {
+                type: "exponential",
+                delay: 1000
+            }
+        })
+
+        const hashedPassword = await generateHashedValue(password)
+        const token = generateToken()
+
+        const data: any = {
+            firstName,
+            lastName,
+            email,
+            password: hashedPassword,
+            phone,
+            position,
+            department,
+            rndToken: token,
+            avatar: req.file?.filename
+        }
+
+        const newEmp = await createEmployee(data)
 
         res.status(201).json({
             message: "Successfully create next employee.",
+            empId: newEmp.id
         })
     }
 ]

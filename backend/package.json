@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "jest",
-    "dev": "npm-run-all --parallel dev:node score analysis",
+    "dev": "npm-run-all --parallel dev:node score analysis image",
     "dev:node": "nodemon src/index.ts",
     "score": "nodemon src/jobs/workers/score-worker.ts",
     "analysis": "nodemon src/jobs/workers/analysis-worker.ts",
