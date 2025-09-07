@@ -7,7 +7,7 @@ export const removeFiles = async (originalFile: string, optimizeFile?: string | 
     try {
         const originalFilePath = path.join(
             __dirname,
-            "../../../",
+            "../../",
             "/uploads/images",
             originalFile
         )
@@ -16,7 +16,7 @@ export const removeFiles = async (originalFile: string, optimizeFile?: string | 
         if (optimizeFile) {
             const optimizeFilePath = path.join(
                 __dirname,
-                "../../../",
+                "../../",
                 "/uploads/optimizes",
                 optimizeFile
             )
