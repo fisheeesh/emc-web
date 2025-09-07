@@ -5,6 +5,7 @@ export const DEPARTMENTS = [
     "IT",
     "Finance",
     "Operations",
+    "Customer Service"
 ]
 
 export const CRITICAL_POINT = -0.8

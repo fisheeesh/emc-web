@@ -8,6 +8,26 @@ export const prisma = new PrismaClient().$extends({
                 compute(employee) {
                     return `${employee.firstName} ${employee.lastName}`
                 }
+            },
+            avatar: {
+                needs: { avatar: true, },
+                compute(employee) {
+                    return `/optimizes/${employee.avatar?.split(".")[0]}.webp`
+                }
+            },
+            status: {
+                needs: { avgScore: true },
+                compute(employee) {
+                    return +employee.avgScore >= 0.4 ? 'positive' : +employee.avgScore >= -0.3 ? 'neutral' : +employee.avgScore > -0.8 ? 'negative' : 'critical'
+                }
+            },
+            createdAt: {
+                needs: { createdAt: true },
+                compute(employee) {
+                    return employee.createdAt.toLocaleDateString("en-US", {
+                        year: "numeric", month: "long", day: "numeric"
+                    })
+                }
             }
         },
         emotionCheckIn: {
