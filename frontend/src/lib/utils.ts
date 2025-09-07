@@ -5,6 +5,10 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
 
+export const getInitialName = (fullName: string) => {
+  return `${fullName?.split(" ")[0]?.charAt(0).toUpperCase()}${fullName?.split(" ")[1]?.charAt(0).toUpperCase()}`
+}
+
 export const MONTHS = Array.from({ length: 12 }, (_, i) => {
   const year = new Date().getFullYear();
   const month = i + 1; //* 1–12

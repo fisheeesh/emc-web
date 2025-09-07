@@ -7,10 +7,10 @@ interface Props {
     filterValue: string,
     otherClasses?: string
     containerClasses?: string,
-    addFister?: boolean
+    addFirst?: boolean
 }
 
-export default function CommonFilter({ filters, filterValue = 'filter', otherClasses = "", containerClasses = "", addFister = true }: Props) {
+export default function CommonFilter({ filters, filterValue = 'filter', otherClasses = "", containerClasses = "", addFirst = true }: Props) {
     const [searchParams, setSearchParams] = useSearchParams()
     const paramsFilter = searchParams.get(filterValue)
 
@@ -20,7 +20,7 @@ export default function CommonFilter({ filters, filterValue = 'filter', otherCla
         setSearchParams(searchParams)
     }
 
-    const defaultValue = addFister ? filters[0].value : undefined
+    const defaultValue = addFirst ? filters[0].value : undefined
 
     return (
         <div className={cn('relative z-10', containerClasses)}>

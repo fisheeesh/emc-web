@@ -62,6 +62,19 @@ export const COMPARISON_FILTER = [
     { name: "Last 30 days", value: "30" }
 ]
 
+export const ROLES_FILTER = [
+    { name: "Super Admin", value: "SUPERADMIN" },
+    { name: "Admin", value: "ADMIN" },
+    { name: "Employee", value: "EMPLOYEE" }
+]
+
+export const JOBS_FILTER = [
+    { name: "Full-time", value: "FULLTIME" },
+    { name: "Part-time", value: "PARTTIME" },
+    { name: "Contract", value: "CONTRACT" },
+    { name: "Internship", value: "INTERNSHIP" }
+]
+
 export const EMOTION_FILTER = [
     { name: 'All', value: 'all' },
     { name: 'Positive', value: 'positive' },

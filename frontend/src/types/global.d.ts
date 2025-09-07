@@ -37,9 +37,23 @@ interface CheckInHoursData {
 
 interface Employee {
     id: number,
+    fullName: string,
+    firstName: string,
+    lastName: string,
+    phone: string,
+    email: string,
+    accType: string,
+    role: string,
+    avatar: string,
+    createdAt: string,
+    lastCritical: string,
+    status: string,
+    department: {
+        id: number,
+        name: string
+    }
     position: string,
     jobType: string,
-    fullName: string
 }
 
 interface AttendanceOverviewData {

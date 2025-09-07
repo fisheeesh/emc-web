@@ -63,7 +63,8 @@ export default function Navbar({ departments, adminUser }: Props) {
                     <div className='hidden md:flex items-center gap-3'>
                         {adminUser.role === 'SUPERADMIN' && <CommonFilter
                             filters={departments}
-                            filterValue='dep'
+                            addFirst={false}
+                            filterValue='gDep'
                             otherClasses="min-h-[36px] sm:min-w-[100px]"
                         />}
                         <NotiBtn />
@@ -94,7 +95,8 @@ export default function Navbar({ departments, adminUser }: Props) {
                                 <div className='flex items-center gap-3 mt-5'>
                                     {adminUser.role === 'SUPERADMIN' && <CommonFilter
                                         filters={departments}
-                                        filterValue='dep'
+                                        addFirst={false}
+                                        filterValue='gDep'
                                         otherClasses="min-h-[36px] sm:min-w-[100px]"
                                     />}
                                     <NotiBtn />
