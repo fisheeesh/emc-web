@@ -52,7 +52,7 @@ export const checkOTPErrorIfSameDate = (isSameDate: boolean, errorCount: number)
 
 export const checkOTPRow = (otpRow: any) => {
     if (!otpRow) {
-        const error: any = new Error('Phone number is incorrect.')
+        const error: any = new Error('Email address is incorrect.')
         error.status = 400
         error.code = errorCodes.invalid
         throw error
