@@ -1,4 +1,4 @@
-import { endOfDay, startOfDay, startOfMonth, subDays } from "date-fns";
+import { endOfDay, endOfMonth, endOfYear, startOfDay, startOfMonth, startOfYear, subDays } from "date-fns";
 import { NextFunction, Request, Response } from "express";
 import { query } from "express-validator";
 import { PrismaClient } from "../../../generated/prisma";
@@ -102,17 +102,36 @@ export const getDailyAttendance = async (req: CustomRequest, res: Response, next
 }
 
 export const getCheckInHours = [
-    query("date", "Invalid Date")
+    query("duration", "Invalid Date.")
+        .trim()
+        .optional()
+        .escape(),
+    query("type", "Invalid Type.")
         .trim()
         .optional()
         .escape(),
     async (req: CustomRequest, res: Response, next: NextFunction) => {
-        const { date } = req.query
+        const { duration, type } = req.query
         const empId = req.employeeId
         const emp = await getEmployeeById(empId!)
         checkEmployeeIfNotExits(emp)
 
-        const data = await getCheckInHoursData(emp!.departmentId, date as string)
+        const durationFilter =
+            type === 'day' ? {
+                gte: startOfDay(new Date(duration as string)),
+                lte: endOfDay(new Date(duration as string))
+            } : type === 'month' ? {
+                gte: startOfMonth(new Date(duration as string)),
+                lte: endOfMonth(new Date(duration as string))
+            } : type === 'year' ? {
+                gte: startOfYear(new Date(duration as string)),
+                lte: endOfYear(new Date(duration as string))
+            } : {
+                gte: startOfDay(new Date()),
+                lte: endOfDay(new Date())
+            }
+
+        const data = await getCheckInHoursData(emp!.departmentId, durationFilter)
 
         res.status(200).json({
             message: "Here is check in hours.",

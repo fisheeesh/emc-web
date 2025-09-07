@@ -27,6 +27,8 @@ export default function CustomCalendar({ popover = true, filterValue }: Props) {
     const onSelectDate = (date: Date | undefined, close: boolean) => {
         setDate(date)
         if (close) setOpen(false)
+        if (!popover && searchParams.get("ciYear")) searchParams.delete("ciYear")
+        if (!popover && searchParams.get("ciMonth")) searchParams.delete("ciMonth")
         searchParams.set(filterValue, date!.toISOString())
         setSearchParams(searchParams)
     }

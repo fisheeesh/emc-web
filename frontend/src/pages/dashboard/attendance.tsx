@@ -18,11 +18,13 @@ export default function AttendanceDashboardPage() {
     const empName = searchParams.get('empName')
     const empStatus = searchParams.get('empStatus') || "all"
     const attDate = searchParams.get('attDate')
-    const cIDate = searchParams.get('cIDate')
+    const ciDate = searchParams.get('ciDate')
+    const ciMonth = searchParams.get('ciMonth')
+    const ciYear = searchParams.get('ciYear')
 
     const { data: attendanceData } = useSuspenseQuery(dailyAttendanceQuery())
     const { data: attendanceOverviewData } = useSuspenseQuery(attendanceOverviewQuery(empName, empStatus, attDate))
-    const { data: checkInHoursData } = useSuspenseQuery(checkInHoursQuery(cIDate))
+    const { data: checkInHoursData } = useSuspenseQuery(checkInHoursQuery(ciDate, ciMonth, ciYear))
 
     return (
         <section className="flex flex-col justify-center items-center w-full gap-3">

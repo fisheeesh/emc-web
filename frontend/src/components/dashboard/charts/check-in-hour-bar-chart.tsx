@@ -1,25 +1,17 @@
+import CustomCalendar from "@/components/shared/custom-calendar";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { useTheme } from "@/components/shared/theme-provider";
+import { Label } from "@/components/ui/label";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import type { ChartOptions } from "chart.js";
 import { useState } from "react";
 import { Bar } from "react-chartjs-2";
 import MonthYearSelector from "../month-year-selector";
-import type { ChartOptions } from "chart.js";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Label } from "@/components/ui/label";
-import CustomCalendar from "@/components/shared/custom-calendar";
-
-const month = new Date(Date.now()).toLocaleString('en-US', { month: 'long' })
-const year = new Date(Date.now()).getFullYear()
+import { MONTHS, YEARS } from "@/lib/utils";
+import { useTheme } from "@/components/shared/theme-provider";
 
 export default function CheckInHourBarChart({ data }: { data: CheckInHoursData[] }) {
-    const [checkInFilter, setCheckInFilter] = useState<"daily" | "monthly" | "yearly">("daily");
     const { theme } = useTheme()
-    const [activeMonth, setActiveMonth] = useState(month);
-    const [activeYear, setActiveYear] = useState(year);
-
-    const isActiveMonth = (month: string) => activeMonth === month;
-    // const isActiveYear = (year: string) => activeYear.toString() === year;
-    // const formattedDate = new Intl.DateTimeFormat('en-CA').format(date);
+    const [checkInFilter, setCheckInFilter] = useState<"daily" | "monthly" | "yearly">("daily");
 
     const labels = data.map(att => att.checkInHour)
     const chartData = {
@@ -114,16 +106,19 @@ export default function CheckInHourBarChart({ data }: { data: CheckInHoursData[]
                 </div>
                 <div className="xl:w-1/4 w-full xl:px-5 h-fit xl:h-full mb-5 lg:mb-0">
                     {checkInFilter === 'daily' &&
-                        <CustomCalendar popover={false} filterValue="cIDate" />
+                        <CustomCalendar popover={false} filterValue="ciDate" />
                     }
-                    {checkInFilter === 'monthly' && <MonthYearSelector mode={'month'} setActive={setActiveMonth} isActive={isActiveMonth} />}
-                    {checkInFilter === 'yearly' && (
+                    {checkInFilter === 'monthly' &&
                         <MonthYearSelector
-                            mode="year"
-                            setActive={(el) => setActiveYear(Number(el))}
-                            isActive={(el) => activeYear === Number(el)}
+                            filters={MONTHS}
+                            filterValue="ciMonth"
+                        />}
+                    {checkInFilter === 'yearly' &&
+                        <MonthYearSelector
+                            filters={YEARS}
+                            filterValue="ciYear"
                         />
-                    )}
+                    }
                 </div>
             </CardContent>
         </Card>

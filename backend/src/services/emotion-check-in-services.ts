@@ -226,15 +226,12 @@ export const getDailyAttendanceData = async (departmentId: number, start: Date, 
     }
 }
 
-export const getCheckInHoursData = async (departmentId: number, date: string) => {
+export const getCheckInHoursData = async (departmentId: number, durationFilter: any) => {
     try {
         //* Get all check-in made by today
         const checkIns = await prismaClient.emotionCheckIn.findMany({
             where: {
-                createdAt: {
-                    gte: startOfDay(date ? new Date(date) : new Date()),
-                    lte: endOfDay(date ? new Date(date) : new Date())
-                },
+                createdAt: durationFilter,
                 employee: { departmentId }
             },
             select: {
