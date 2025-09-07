@@ -241,7 +241,3 @@ export const CHECK_IN_HOURS_DATA = [
         value: 12
     }
 ]
-
-export const MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
-
-export const YEARS = ['2021', '2022', '2023', '2024', '2025'];
