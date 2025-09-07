@@ -29,4 +29,25 @@ export const authApi = axios.create({
     withCredentials: true
 })
 
+export const superApi = axios.create({
+    baseURL: import.meta.env.VITE_API_URL,
+    headers: {
+        "Content-Type": "application/json"
+    },
+    withCredentials: true
+})
+
+superApi.interceptors.response.use(
+    response => response,
+    error => {
+        if (error.response?.status === 403) {
+            window.location.href = "/"
+        }
+        if (error.response?.status === 401) {
+            window.location.href = `/login?redirect=${encodeURIComponent(window.location.pathname)}`
+        }
+        return Promise.reject(error)
+    }
+)
+
 export default api

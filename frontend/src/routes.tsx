@@ -10,6 +10,7 @@ import ErrorElement from './pages/not-found/error-element'
 import NotFound from './pages/not-found/not-found'
 import { forgotPasswordAction, loginAction, resetPasswordAction, verifyOTPAction } from './router/actions'
 import { attendanceLoader, loginLoader, resetPasswordLoader, senitmentsLoader, verifyOTPLoader } from './router/loaders'
+import { managementsLoader } from './router/loaders/super-admin-loaders'
 
 export default function Router() {
     const router = createBrowserRouter([
@@ -48,6 +49,7 @@ export default function Router() {
                         const { default: SettingsPage } = await import('./pages/dashboard/managements')
                         return { Component: SettingsPage }
                     },
+                    loader: managementsLoader
                 }
             ]
         },
