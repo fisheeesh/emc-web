@@ -28,8 +28,8 @@ export default function AttendanceDashboardPage() {
     const dep = user?.role === 'SUPERADMIN' ? gDep : user?.departmentId.toString()
 
     const { data: attendanceData } = useSuspenseQuery(dailyAttendanceQuery(dep))
-    const { data: attendanceOverviewData } = useSuspenseQuery(attendanceOverviewQuery(empName, empStatus, attDate))
-    const { data: checkInHoursData } = useSuspenseQuery(checkInHoursQuery(ciDate, ciMonth, ciYear))
+    const { data: attendanceOverviewData } = useSuspenseQuery(attendanceOverviewQuery(empName, empStatus, attDate, dep))
+    const { data: checkInHoursData } = useSuspenseQuery(checkInHoursQuery(ciDate, ciMonth, ciYear, dep))
 
     return (
         <section className="flex flex-col justify-center items-center w-full gap-3">

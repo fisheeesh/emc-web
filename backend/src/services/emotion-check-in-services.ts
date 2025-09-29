@@ -234,13 +234,13 @@ export const getDailyAttendanceData = async (uDepartmentId: number, qDepartmentI
     }
 }
 
-export const getCheckInHoursData = async (departmentId: number, durationFilter: any) => {
+export const getCheckInHoursData = async (uDepartmentId: number, qDepartmentId: string, role: string, durationFilter: any) => {
     try {
         //* Get all check-in made by today
         const checkIns = await prismaClient.emotionCheckIn.findMany({
             where: {
                 createdAt: durationFilter,
-                employee: { departmentId }
+                ...departmentFilter(role, uDepartmentId, qDepartmentId)
             },
             select: {
                 createdAt: true
@@ -273,7 +273,7 @@ export const getCheckInHoursData = async (departmentId: number, durationFilter: 
     }
 }
 
-export const getAttendanceOverviewData = async (departmentId: number, empName: string, status: string, date: string) => {
+export const getAttendanceOverviewData = async (uDepartmentId: number, qDepartmentId: string, role: string, empName: string, status: string, date: string) => {
     try {
         const result = await prisma.emotionCheckIn.findMany({
             where: {
@@ -286,8 +286,12 @@ export const getAttendanceOverviewData = async (departmentId: number, empName: s
                         contains: typeof empName === 'string' ? empName : '',
                         mode: 'insensitive'
                     },
-                    departmentId,
-                }
+                    departmentId: role !== 'SUPERADMIN'
+                        ? uDepartmentId
+                        : qDepartmentId && qDepartmentId !== 'all'
+                            ? Number(qDepartmentId)
+                            : undefined
+                },
             },
             select: {
                 id: true,

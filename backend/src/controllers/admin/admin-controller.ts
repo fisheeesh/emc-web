@@ -118,6 +118,10 @@ export const getDailyAttendance = [
 ]
 
 export const getCheckInHours = [
+    query("dep", "Invalid Department.")
+        .trim()
+        .escape()
+        .optional(),
     query("duration", "Invalid Date.")
         .trim()
         .optional()
@@ -127,7 +131,7 @@ export const getCheckInHours = [
         .optional()
         .escape(),
     async (req: CustomRequest, res: Response, next: NextFunction) => {
-        const { duration, type } = req.query
+        const { duration, type, dep } = req.query
         const empId = req.employeeId
         const emp = await getEmployeeById(empId!)
         checkEmployeeIfNotExits(emp)
@@ -147,7 +151,7 @@ export const getCheckInHours = [
                 lte: endOfDay(new Date())
             }
 
-        const data = await getCheckInHoursData(emp!.departmentId, durationFilter)
+        const data = await getCheckInHoursData(emp!.departmentId, dep as string, emp!.role, durationFilter)
 
         res.status(200).json({
             message: "Here is check in hours.",
@@ -157,6 +161,10 @@ export const getCheckInHours = [
 ]
 
 export const getAttendanceOverView = [
+    query("dep", "Invalid Department.")
+        .trim()
+        .escape()
+        .optional(),
     query("empName", "Invalid Name.")
         .trim()
         .optional()
@@ -171,12 +179,12 @@ export const getAttendanceOverView = [
         .escape(),
     async (req: CustomRequest, res: Response, next: NextFunction) => {
         const empId = req.employeeId
-        const { empName, status, date } = req.query
+        const { empName, status, date, dep } = req.query
 
         const emp = await getEmployeeById(empId!)
         checkEmployeeIfNotExits(emp)
 
-        const result = await getAttendanceOverviewData(emp!.departmentId, empName as string, status as string, date as string)
+        const result = await getAttendanceOverviewData(emp!.departmentId, dep as string, emp!.role, empName as string, status as string, date as string)
 
         res.status(200).json({
             message: "Here is Attendance OverView Data.",

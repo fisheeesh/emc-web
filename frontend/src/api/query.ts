@@ -73,42 +73,52 @@ export const dailyAttendanceQuery = (dep?: string | null) => ({
     queryFn: () => fetchDailyAttendance(dep),
 })
 
-const fetchAttendanceOverview = async ({ q = null, empStatus = null, date = null }: {
+const fetchAttendanceOverview = async ({ q = null, empStatus = null, date = null, dep = null }: {
     q?: string | null,
     empStatus?: string | null,
-    date?: string | null
+    date?: string | null,
+    dep?: string | null,
 }) => {
     let query = q ? `&empName=${q}` : ''
     if (empStatus) query += `&status=${empStatus}`
     if (date) query += `&date=${date}`
+    if (dep) query += `&dep=${dep}`
     const res = await api.get(`admin/attendance-overview?${query}`)
 
     return res.data
 }
 
-export const attendanceOverviewQuery = (q: string | null = null, empStatus: string | null = null, date: string | null = null) => ({
-    queryKey: ['attendance-overview', q, empStatus, date],
-    queryFn: () => fetchAttendanceOverview({ q, empStatus, date }),
+export const attendanceOverviewQuery = (q: string | null = null, empStatus: string | null = null, date: string | null = null, dep: string | null = null) => ({
+    queryKey: ['attendance-overview', q, empStatus, date, dep],
+    queryFn: () => fetchAttendanceOverview({ q, empStatus, date, dep }),
 })
 
-const fetchCheckInHours = async ({ date, month, year }: {
+const fetchCheckInHours = async ({ date, month, year, dep }: {
     date?: string | null,
     month?: string | null,
     year?: string | null,
+    dep?: string | null,
 }) => {
-    const query = date ?
-        `?duration=${date}&type=day`
-        : month ? `?duration=${month}&type=month`
-            : year ? `?duration=${year}&type=year` : ''
+    // let query = "?"
+    // if(date) query += date ?
+    //     `?duration=${date}&type=day`
+    //     : month ? `?duration=${month}&type=month`
+    //         : year ? `?duration=${year}&type=year` : ''
+
+    let query = "?"
+    if (date) query += `&duration=${date}&type=day`
+    else if (month) query += `&duration=${month}&type=month`
+    else if (year) query += `&duration=${year}&type=year`
+    if (dep) query += `&dep=${dep}`
 
     const res = await api.get(`admin/check-in-hours${query}`)
 
     return res.data
 }
 
-export const checkInHoursQuery = (date: string | null = null, month: string | null = null, year: string | null = null) => ({
-    queryKey: ['check-in-hours', date, month, year],
-    queryFn: () => fetchCheckInHours({ date, month, year }),
+export const checkInHoursQuery = (date: string | null = null, month: string | null = null, year: string | null = null, dep: string | null = null) => ({
+    queryKey: ['check-in-hours', date, month, year, dep],
+    queryFn: () => fetchCheckInHours({ date, month, year, dep }),
 })
 
 export default queryClient
