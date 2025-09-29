@@ -146,14 +146,19 @@ interface DailyAttendanceData {
     percentages: any
 }
 
-export const getDailyAttendanceData = async (departmentId: number, start: Date, end: Date): Promise<DailyAttendanceData> => {
+export const getDailyAttendanceData = async (uDepartmentId: number, qDepartmentId: string, role: string, start: Date, end: Date): Promise<DailyAttendanceData> => {
     try {
         //* Get all emp from the department
         const totalEmp = await prismaClient.employee.count({
-            where: { departmentId }
+            where: {
+                departmentId:
+                    role !== 'SUPERADMIN'
+                        ? uDepartmentId
+                        : qDepartmentId && qDepartmentId !== 'all'
+                            ? Number(qDepartmentId)
+                            : undefined
+            }
         })
-
-        const { startUtc, endUtc } = getThaiDayBounds();
 
         //* Get all check-in emps in the department
         const totalPresent = await prismaClient.emotionCheckIn.count({
@@ -162,9 +167,7 @@ export const getDailyAttendanceData = async (departmentId: number, start: Date, 
                     gte: startOfDay(new Date()),
                     lte: endOfDay(new Date())
                 },
-                employee: {
-                    departmentId
-                }
+                ...departmentFilter(role, uDepartmentId, qDepartmentId)
             }
         })
 
@@ -175,9 +178,7 @@ export const getDailyAttendanceData = async (departmentId: number, start: Date, 
                     gte: start,
                     lte: end
                 },
-                employee: {
-                    departmentId
-                }
+                ...departmentFilter(role, uDepartmentId, qDepartmentId)
             },
             select: {
                 createdAt: true

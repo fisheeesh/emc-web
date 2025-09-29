@@ -62,15 +62,15 @@ export const sentimentsComparisonQuery = (q?: string | null, dep?: string | null
     queryFn: () => fetchSentimentsComparison(q, dep),
 })
 
-const fetchDailyAttendance = async () => {
-    const res = await api.get('admin/daily-attendance')
+const fetchDailyAttendance = async (dep?: string | null) => {
+    const res = await api.get(`admin/daily-attendance?dep=${dep}`)
 
     return res.data
 }
 
-export const dailyAttendanceQuery = () => ({
-    queryKey: ['daily-attendance'],
-    queryFn: fetchDailyAttendance,
+export const dailyAttendanceQuery = (dep?: string | null) => ({
+    queryKey: ['daily-attendance', dep ?? undefined],
+    queryFn: () => fetchDailyAttendance(dep),
 })
 
 const fetchAttendanceOverview = async ({ q = null, empStatus = null, date = null }: {

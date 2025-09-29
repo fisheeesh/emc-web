@@ -4,6 +4,7 @@ import DailyAttendanceChart from "@/components/dashboard/charts/daily-attendance
 import DisplayCard from "@/components/dashboard/display-card";
 import AttendanceTable from "@/components/dashboard/tables/attendance-table";
 import useTitle from "@/hooks/use-title";
+import useUserStore from "@/store/user-store";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { BarElement, CategoryScale, Chart as ChartJS, Legend, LinearScale, Tooltip } from "chart.js";
 import { useSearchParams } from "react-router";
@@ -13,8 +14,10 @@ ChartJS.register(BarElement, CategoryScale, LinearScale, Tooltip, Legend);
 export default function AttendanceDashboardPage() {
     useTitle("Attendance Dashboard")
 
+    const { user } = useUserStore()
     const [searchParams] = useSearchParams()
 
+    const gDep = searchParams.get('gDep') || 'all'
     const empName = searchParams.get('empName')
     const empStatus = searchParams.get('empStatus') || "all"
     const attDate = searchParams.get('attDate')
@@ -22,7 +25,9 @@ export default function AttendanceDashboardPage() {
     const ciMonth = searchParams.get('ciMonth')
     const ciYear = searchParams.get('ciYear')
 
-    const { data: attendanceData } = useSuspenseQuery(dailyAttendanceQuery())
+    const dep = user?.role === 'SUPERADMIN' ? gDep : user?.departmentId.toString()
+
+    const { data: attendanceData } = useSuspenseQuery(dailyAttendanceQuery(dep))
     const { data: attendanceOverviewData } = useSuspenseQuery(attendanceOverviewQuery(empName, empStatus, attDate))
     const { data: checkInHoursData } = useSuspenseQuery(checkInHoursQuery(ciDate, ciMonth, ciYear))
 

@@ -90,24 +90,32 @@ export const getSenitmentsComparison = [
     }
 ]
 
-export const getDailyAttendance = async (req: CustomRequest, res: Response, next: NextFunction) => {
-    const empId = req.employeeId
-    const emp = await getEmployeeById(empId!)
-    checkEmployeeIfNotExits(emp)
+export const getDailyAttendance = [
+    query("dep", "Invalid Department.")
+        .trim()
+        .escape()
+        .optional(),
+    async (req: CustomRequest, res: Response, next: NextFunction) => {
+        const empId = req.employeeId
+        const emp = await getEmployeeById(empId!)
+        checkEmployeeIfNotExits(emp)
 
-    const start = startOfDay(subDays(new Date(), 9))
-    const end = endOfDay(new Date())
+        const { dep } = req.query
 
-    const { totalEmp, totalPresent, result, percentages } = await getDailyAttendanceData(emp!.departmentId, start, end)
+        const start = startOfDay(subDays(new Date(), 9))
+        const end = endOfDay(new Date())
 
-    res.status(200).json({
-        message: "Here is daily attendance.",
-        totalEmp,
-        totalPresent,
-        data: result,
-        percentages
-    })
-}
+        const { totalEmp, totalPresent, result, percentages } = await getDailyAttendanceData(emp!.departmentId, dep as string, emp!.role, start, end)
+
+        res.status(200).json({
+            message: "Here is daily attendance.",
+            totalEmp,
+            totalPresent,
+            data: result,
+            percentages
+        })
+    }
+]
 
 export const getCheckInHours = [
     query("duration", "Invalid Date.")
