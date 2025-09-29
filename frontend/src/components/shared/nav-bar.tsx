@@ -14,14 +14,13 @@ import { ModeToggle } from './mode-toggle'
 import NotiBtn from './noti-btn'
 import { useTheme } from './theme-provider'
 import CommonFilter from './common-filter'
+import useFilterStore from '@/store/filter-store'
+import useUserStore from '@/store/user-store'
 
-interface Props {
-    departments: Filter[]
-    adminUser: AdminUser
-}
-
-export default function Navbar({ departments, adminUser }: Props) {
+export default function Navbar() {
     const { theme } = useTheme()
+    const { filters } = useFilterStore()
+    const { user } = useUserStore()
     const [isMobMenuOpen, setIsMobMenuOpen] = useState(false)
     const navigate = useNavigate()
 
@@ -61,16 +60,15 @@ export default function Navbar({ departments, adminUser }: Props) {
 
                     {/* Desktop Right Side */}
                     <div className='hidden md:flex items-center gap-3'>
-                        {adminUser.role === 'SUPERADMIN' && <CommonFilter
-                            filters={departments}
-                            addFirst={false}
+                        {user?.role === 'SUPERADMIN' && <CommonFilter
+                            filters={filters.departments}
                             filterValue='gDep'
                             otherClasses="min-h-[36px] sm:min-w-[100px]"
                         />}
                         <NotiBtn />
                         <LngBtn />
                         <ModeToggle />
-                        <AuthDropdown user={adminUser} />
+                        <AuthDropdown />
                     </div>
 
                     {/* Mobile Hamburger Menu */}
@@ -93,9 +91,8 @@ export default function Navbar({ departments, adminUser }: Props) {
                             <div className="max-w-[1400px] mx-auto px-4 space-y-4">
                                 {renderNavLinks()}
                                 <div className='flex items-center gap-3 mt-5'>
-                                    {adminUser.role === 'SUPERADMIN' && <CommonFilter
-                                        filters={departments}
-                                        addFirst={false}
+                                    {user?.role === 'SUPERADMIN' && <CommonFilter
+                                        filters={filters.departments}
                                         filterValue='gDep'
                                         otherClasses="min-h-[36px] sm:min-w-[100px]"
                                     />}

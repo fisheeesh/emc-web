@@ -23,11 +23,13 @@ import LogoutModal from "../modals/log-out-modal";
 import { Button } from "../ui/button";
 import { Dialog, DialogTrigger } from "../ui/dialog";
 import { useRef } from "react";
+import useUserStore from "@/store/user-store";
 
-export default function AuthDropdown({ user }: { user: AdminUser }) {
+export default function AuthDropdown() {
+    const { user } = useUserStore()
     const dialogTriggerRef = useRef<HTMLButtonElement>(null)
 
-    const initialName = `${user.fullName.split(" ")[0]?.charAt(0).toUpperCase()}${user.fullName.split(" ")[1]?.charAt(0).toUpperCase()}`
+    const initialName = `${user?.fullName.split(" ")[0]?.charAt(0).toUpperCase()}${user?.fullName.split(" ")[1]?.charAt(0).toUpperCase()}`
 
     return (
         <Dialog>
@@ -35,7 +37,7 @@ export default function AuthDropdown({ user }: { user: AdminUser }) {
                 <DropdownMenuTrigger asChild>
                     <Button variant="secondary" className="size-8 rounded-full cursor-pointer">
                         <Avatar className="size-9">
-                            <AvatarImage src={IMG_URL} alt={user.fullName} />
+                            <AvatarImage src={IMG_URL + user?.avatar} alt={user?.fullName} />
                             <AvatarFallback>{initialName}</AvatarFallback>
                         </Avatar>
                     </Button>
@@ -43,8 +45,8 @@ export default function AuthDropdown({ user }: { user: AdminUser }) {
                 <DropdownMenuContent className="w-70" align="end" forceMount>
                     <DropdownMenuLabel className="font-normal mb-1">
                         <div className="flex flex-col space-y-1">
-                            <p className="text-sm font-medium leading-none truncate">{user.fullName}</p>
-                            <p className="text-xs leading-none text-muted-foreground truncate">{user.email}</p>
+                            <p className="text-sm font-medium leading-none truncate">{user?.fullName}</p>
+                            <p className="text-xs leading-none text-muted-foreground truncate">{user?.email}</p>
                         </div>
                     </DropdownMenuLabel>
                     <DropdownMenuGroup>
