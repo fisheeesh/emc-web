@@ -1,5 +1,5 @@
 import express from "express"
-import { getAdminUser, getAllDepartments, getAttendanceOverView, getCheckInHours, getDailyAttendance, getSenitmentsComparison, getTodayMoodOverview, testAdmin } from "../../../controllers/admin/admin-controller"
+import { getAdminUser, getAllDepartments, getAttendanceOverView, getCheckInHours, getDailyAttendance, getSenitmentsComparison, getMoodOverview, testAdmin } from "../../../controllers/admin/admin-controller"
 import { setMaintenance } from "../../../controllers/admin/system-contorller"
 
 const router = express.Router()
@@ -9,7 +9,7 @@ router.get("/test", testAdmin)
 router.post("/maintenance", setMaintenance)
 
 //* Sentiments Dashboard routes
-router.get("/mood-overview", getTodayMoodOverview)
+router.get("/mood-overview", getMoodOverview)
 router.get("/sentiments-comparison", getSenitmentsComparison)
 router.get("/daily-attendance", getDailyAttendance)
 router.get("/check-in-hours", getCheckInHours)

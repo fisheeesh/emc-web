@@ -7,7 +7,8 @@ interface User {
     fullName: string,
     email: string,
     avatar: string,
-    role: string
+    role: string,
+    departmentId: number
 }
 
 interface State {

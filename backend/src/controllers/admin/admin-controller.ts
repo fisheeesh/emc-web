@@ -4,7 +4,7 @@ import { query } from "express-validator";
 import { PrismaClient } from "../../../generated/prisma";
 import { getAdminUserData } from "../../services/admin-services";
 import { getEmployeeById } from "../../services/auth-services";
-import { getAttendanceOverviewData, getCheckInHoursData, getDailyAttendanceData, getSentimentsComparisonData, getTodayMoodPercentages } from "../../services/emotion-check-in-services";
+import { getAttendanceOverviewData, getCheckInHoursData, getDailyAttendanceData, getMoodPercentages, getSentimentsComparisonData } from "../../services/emotion-check-in-services";
 import { getAllDepartmentsData } from "../../services/system-service";
 import { checkEmployeeIfNotExits } from "../../utils/check";
 
@@ -20,14 +20,18 @@ export const testAdmin = (req: Request, res: Response, next: NextFunction) => {
     })
 }
 
-export const getTodayMoodOverview = [
+export const getMoodOverview = [
+    query("dep", "Invalid Department.")
+        .trim()
+        .escape()
+        .optional(),
     query("duration", "Invalid Duration")
         .trim()
         .escape()
         .optional(),
     async (req: CustomRequest, res: Response, next: NextFunction) => {
         const empId = req.employeeId
-        const { duration = 'today' } = req.query
+        const { duration = 'today', dep } = req.query
 
         const emp = await getEmployeeById(empId!)
         checkEmployeeIfNotExits(emp)
@@ -43,7 +47,7 @@ export const getTodayMoodOverview = [
                 lte: endOfDay(now)
             }
 
-        const percentages = await getTodayMoodPercentages(emp!.departmentId, durationFilter)
+        const percentages = await getMoodPercentages(emp!.departmentId, dep as string, emp!.role, durationFilter)
         // const cacheKey = `emotion-mood-overview-${JSON.stringify(durationFilter)}`
         // const percentages = await getOrSetCache(cacheKey, async () => getTodayMoodPercentages(emp!.departmentId, durationFilter))
 
@@ -55,13 +59,17 @@ export const getTodayMoodOverview = [
 ]
 
 export const getSenitmentsComparison = [
+    query("dep", "Invalid Department.")
+        .trim()
+        .escape()
+        .optional(),
     query("duration", "Invalid Duration")
         .trim()
         .escape()
         .optional(),
     async (req: CustomRequest, res: Response, next: NextFunction) => {
         const empId = req.employeeId;
-        const { duration = "7" } = req.query;
+        const { duration = "7", dep } = req.query;
 
         const emp = await getEmployeeById(empId!);
         checkEmployeeIfNotExits(emp);
@@ -71,7 +79,7 @@ export const getSenitmentsComparison = [
         const start = startOfDay(subDays(now, duration === '7' ? 6 : 29))
         const end = endOfDay(now)
 
-        const result = await getSentimentsComparisonData(emp!.departmentId, start, end);
+        const result = await getSentimentsComparisonData(emp!.departmentId, dep as string, emp!.role, start, end);
         // const cacheKey = `emotion-comparison-${JSON.stringify(durationFilter)}`
         // const result = await getOrSetCache(cacheKey, async () => getSentimentsComparisonData(durationFilter, emp!.departmentId))
 

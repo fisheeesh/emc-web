@@ -20,7 +20,7 @@ export default function CommonFilter({ filters, filterValue = 'filter', otherCla
         setSearchParams(searchParams)
     }
 
-    const defaultValue = addFirst ? filters[0].value : undefined
+    const defaultValue = addFirst ? filters[0]?.value : undefined
 
     return (
         <div className={cn('relative z-10', containerClasses)}>

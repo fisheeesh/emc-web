@@ -34,28 +34,32 @@ export const departmentsQuery = () => ({
     queryFn: fetchDepartments
 })
 
-const fetchMoodOverview = async (q?: string | null) => {
-    const query = q ? `?duration=${q}` : '?duration=today'
+const fetchMoodOverview = async (q?: string | null, dep?: string | null) => {
+    let query = "?"
+    if (q) query += `duration=${q}`
+    if (dep) query += `&dep=${dep}`
     const res = await api.get(`admin/mood-overview${query}`)
 
     return res.data
 }
 
-export const moodOverviewQuery = (q?: string | null) => ({
-    queryKey: ['mood-overview', q],
-    queryFn: () => fetchMoodOverview(q)
+export const moodOverviewQuery = (q?: string | null, dep?: string | null) => ({
+    queryKey: ['mood-overview', q ?? undefined, dep ?? undefined],
+    queryFn: () => fetchMoodOverview(q, dep),
 })
 
-export const fetchSentimentsComparison = async (q?: string | null) => {
-    const query = q ? `?duration=${q}` : '?duration=7'
+export const fetchSentimentsComparison = async (q?: string | null, dep?: string | null) => {
+    let query = "?"
+    if (q) query += `duration=${q}`
+    if (dep) query += `&dep=${dep}`
     const res = await api.get(`admin/sentiments-comparison${query}`)
 
     return res.data
 }
 
-export const sentimentsComparisonQuery = (q?: string | null) => ({
-    queryKey: ['sentiments-comparison', q],
-    queryFn: () => fetchSentimentsComparison(q),
+export const sentimentsComparisonQuery = (q?: string | null, dep?: string | null) => ({
+    queryKey: ['sentiments-comparison', q ?? undefined, dep ?? undefined],
+    queryFn: () => fetchSentimentsComparison(q, dep),
 })
 
 const fetchDailyAttendance = async () => {

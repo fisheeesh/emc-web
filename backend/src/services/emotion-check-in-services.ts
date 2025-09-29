@@ -1,7 +1,7 @@
 import { eachDayOfInterval, endOfDay, format, startOfDay } from "date-fns";
-import { PrismaClient } from "../../generated/prisma";
+import { Prisma, PrismaClient } from "../../generated/prisma";
 import { MOOD_THRESHOLDS } from "../config";
-import { getThaiDayBounds, roundToHour } from "../utils/helplers";
+import { departmentFilter, getThaiDayBounds, roundToHour } from "../utils/helplers";
 import { prisma } from "../config/prisma-client";
 
 const prismaClient = new PrismaClient()
@@ -21,14 +21,14 @@ export const createEmotionCheckIn = async (emotion: any) => {
     })
 }
 
-export const getTodayMoodPercentages = async (departmentId: number, durationFilter: any) => {
+export const getMoodPercentages = async (uDepartmentId: number, qDepartmentId: string, role: string, durationFilter: any) => {
     try {
         //* Get all check-ins for employees in the same dep
         const todayCheckIns = await prismaClient.emotionCheckIn.groupBy({
             by: ['employeeId'],
             where: {
+                ...departmentFilter(role, uDepartmentId, qDepartmentId),
                 createdAt: durationFilter,
-                employee: { departmentId }
             },
             _avg: {
                 emotionScore: true
@@ -37,7 +37,14 @@ export const getTodayMoodPercentages = async (departmentId: number, durationFilt
 
         //* Count total employees in the department
         const totalEmp = await prismaClient.employee.count({
-            where: { departmentId }
+            where: {
+                departmentId:
+                    role !== 'SUPERADMIN'
+                        ? uDepartmentId
+                        : qDepartmentId && qDepartmentId !== 'all'
+                            ? Number(qDepartmentId)
+                            : undefined
+            }
         })
 
         let posi = 0, neu = 0, nega = 0, crit = 0;
@@ -67,7 +74,7 @@ export const getTodayMoodPercentages = async (departmentId: number, durationFilt
     }
 }
 
-export const getSentimentsComparisonData = async (departmentId: number, start: Date, end: Date) => {
+export const getSentimentsComparisonData = async (uDepartmentId: number, qDepartmentId: string, role: string, start: Date, end: Date) => {
     try {
         //* Get all check-ins based on date-range in emp's depart
         const checkIns = await prismaClient.emotionCheckIn.findMany({
@@ -76,7 +83,7 @@ export const getSentimentsComparisonData = async (departmentId: number, start: D
                     gte: start,
                     lte: end
                 },
-                employee: { departmentId }
+                ...departmentFilter(role, uDepartmentId, qDepartmentId)
             },
             select: {
                 emotionScore: true,

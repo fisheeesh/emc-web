@@ -5,7 +5,7 @@ interface CommonData {
 
 interface Filter {
     name: string
-    value: string | number
+    value: string
 }
 
 interface ComparisonData {

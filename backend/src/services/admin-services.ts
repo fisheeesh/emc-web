@@ -11,7 +11,8 @@ export const getAdminUserData = async (id: number) => {
             fullName: true,
             email: true,
             role: true,
-            avatar: true
+            avatar: true,
+            departmentId: true
         }
     })
 }

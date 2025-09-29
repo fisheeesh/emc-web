@@ -16,18 +16,21 @@ ChartJS.register(ArcElement, Tooltip, Legend, CategoryScale, LinearScale, PointE
 export default function SentimentsDashboardPage() {
     useTitle("Sentiments Dashboard")
 
-    const { setUser } = useUserStore()
+    const { user, setUser } = useUserStore()
     const { setFilters } = useFilterStore()
     const [searchParams] = useSearchParams()
 
+    const gDep = searchParams.get('gDep') || 'all'
     const duration = searchParams.get('duration') || 'today'
     const sentimentsFilter = searchParams.get("sentiments") || '7'
+
+    const dep = user?.role === 'SUPERADMIN' ? gDep : user?.departmentId.toString()
 
     const { data: departmentsData } = useSuspenseQuery(departmentsQuery())
     const { data: adminUserData } = useSuspenseQuery(adminUserDataQuery())
 
-    const { data: overviewData } = useSuspenseQuery(moodOverviewQuery(duration))
-    const { data: sentimentsComparison } = useSuspenseQuery(sentimentsComparisonQuery(sentimentsFilter))
+    const { data: overviewData } = useSuspenseQuery(moodOverviewQuery(duration, dep))
+    const { data: sentimentsComparison } = useSuspenseQuery(sentimentsComparisonQuery(sentimentsFilter, dep))
 
     useEffect(() => {
         if (departmentsData) {
@@ -42,7 +45,8 @@ export default function SentimentsDashboardPage() {
                 fullName: adminUserData.data.fullName,
                 email: adminUserData.data.email,
                 avatar: adminUserData.data.avatar,
-                role: adminUserData.data.role
+                role: adminUserData.data.role,
+                departmentId: adminUserData.data.departmentId
             })
         }
     }, [departmentsData, adminUserData, setUser, setFilters])

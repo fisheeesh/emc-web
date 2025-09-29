@@ -3,6 +3,14 @@ import { TIMEZONE } from '../config';
 import path from "path"
 import { unlink } from "node:fs/promises";
 
+export const departmentFilter = (role: string, uDepartmentId: number, qDepartmentId?: string) => {
+    return role !== 'SUPERADMIN'
+        ? { employee: { departmentId: uDepartmentId } }
+        : qDepartmentId && qDepartmentId !== 'all'
+            ? { employee: { departmentId: Number(qDepartmentId) } }
+            : {};
+}
+
 export const removeFiles = async (originalFile: string, optimizeFile?: string | null) => {
     try {
         const originalFilePath = path.join(
