@@ -23,10 +23,13 @@ export const getAllDepartmentsData = async () => {
         }
     })
 
-    const result = deps.map(dep => ({
-        name: dep.name,
-        value: dep.id
-    }))
+    const result = [
+        { name: 'All Departments', value: 0 },
+        ...deps.map(dep => ({
+            name: dep.name,
+            value: dep.id
+        }))
+    ]
 
     return result
 }

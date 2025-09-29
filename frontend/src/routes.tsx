@@ -30,7 +30,7 @@ export default function Router() {
                 {
                     path: '/dashboard/sentiments',
                     lazy: async () => {
-                        const { default: SentimentsDashboardPage } = await import('./pages/dashboard/sentiments')
+                        const { default: SentimentsDashboardPage } = await import('./pages/dashboard/sentiments-page')
                         return { Component: SentimentsDashboardPage }
                     },
                     loader: senitmentsLoader
@@ -38,7 +38,7 @@ export default function Router() {
                 {
                     path: '/dashboard/attendance',
                     lazy: async () => {
-                        const { default: AttendanceDashboardPage } = await import('./pages/dashboard/attendance')
+                        const { default: AttendanceDashboardPage } = await import('./pages/dashboard/attendance-page')
                         return { Component: AttendanceDashboardPage }
                     },
                     loader: attendanceLoader
@@ -46,7 +46,7 @@ export default function Router() {
                 {
                     path: '/dashboard/managements',
                     lazy: async () => {
-                        const { default: SettingsPage } = await import('./pages/dashboard/managements')
+                        const { default: SettingsPage } = await import('./pages/dashboard/managements-page')
                         return { Component: SettingsPage }
                     },
                     loader: managementsLoader
