@@ -75,7 +75,7 @@ export const ROLES_FILTER = [
 ]
 
 export const ACC_FILTER = [
-    { name: "All Acc Types", value: "all" },
+    { name: "All Acc. Types", value: "all" },
     { name: "Active", value: "ACTIVE" },
     { name: "FREEZE", value: "FREEZE" }
 ]

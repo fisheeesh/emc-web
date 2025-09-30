@@ -21,11 +21,11 @@ export default function WatchListTable() {
                 <Table>
                     <TableHeader>
                         <TableRow>
-                            <TableHead className="whitespace-nowrap">Name</TableHead>
-                            <TableHead className="whitespace-nowrap">Department</TableHead>
-                            <TableHead className="whitespace-nowrap">Contact</TableHead>
-                            <TableHead className="whitespace-nowrap text-center">EmotionScore</TableHead>
-                            <TableHead className="whitespace-nowrap text-center">Taken Actions</TableHead>
+                            <TableHead className="whitespace-nowrap font-semibold">Name</TableHead>
+                            <TableHead className="whitespace-nowrap font-semibold">Department</TableHead>
+                            <TableHead className="whitespace-nowrap font-semibold">Contact</TableHead>
+                            <TableHead className="whitespace-nowrap text-center font-semibold">EmotionScore</TableHead>
+                            <TableHead className="whitespace-nowrap text-center font-semibold">Taken Actions</TableHead>
                         </TableRow>
                     </TableHeader>
 
@@ -33,7 +33,7 @@ export default function WatchListTable() {
                         {
                             CRITICAL_DATA.map((emp) => (
                                 <TableRow key={emp.id}>
-                                    <TableCell className="">
+                                    <TableCell className="py-6">
                                         <span className="whitespace-nowrap">{emp.name}</span>
                                     </TableCell>
                                     <TableCell>

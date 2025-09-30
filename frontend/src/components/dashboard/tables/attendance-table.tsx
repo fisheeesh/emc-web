@@ -46,12 +46,12 @@ export default function AttendanceTable({ data }: Props) {
                         <Table>
                             <TableHeader>
                                 <TableRow>
-                                    <TableHead className="whitespace-nowrap">Name</TableHead>
-                                    <TableHead className="whitespace-nowrap">Position</TableHead>
-                                    <TableHead className="whitespace-nowrap">Job Type</TableHead>
-                                    <TableHead className="whitespace-nowrap">Emotion</TableHead>
-                                    <TableHead className="whitespace-nowrap">Check-in Time</TableHead>
-                                    <TableHead className="whitespace-nowrap text-center">Actions</TableHead>
+                                    <TableHead className="whitespace-nowrap font-semibold">Name</TableHead>
+                                    <TableHead className="whitespace-nowrap font-semibold">Position</TableHead>
+                                    <TableHead className="whitespace-nowrap font-semibold">Job Type</TableHead>
+                                    <TableHead className="whitespace-nowrap font-semibold">Emotion</TableHead>
+                                    <TableHead className="whitespace-nowrap font-semibold">Check-in Time</TableHead>
+                                    <TableHead className="whitespace-nowrap text-center font-semibold">Actions</TableHead>
                                 </TableRow>
                             </TableHeader>
 

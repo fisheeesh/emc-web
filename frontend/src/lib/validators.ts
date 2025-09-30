@@ -36,9 +36,8 @@ export const ConfirmPasswordSchema = z.object({
     path: ["confirmPassword"]
 })
 
-const EMP_POSITIONS = ["Intern", "Junior Developer", "Developer", "Senior Developer", "Team Lead"] as const;
-const EMP_ROLES = ["Employee", "Manager", "HR", "Admin", "Super Admin"] as const;
-const EMP_JOB_TYPES = ["Full-time", "Part-time", "Contract", "Internship"] as const;
+const EMP_ROLES = ["EMPLOYEE", "ADMIN", "SUPERADMIN"] as const;
+const EMP_JOB_TYPES = ["FULLTIME", "PARTTIME", "CONTRACT", "INTERNSHIP"] as const;
 
 export const createEmpSchema = z.object({
     email: z.string()
@@ -50,10 +49,14 @@ export const createEmpSchema = z.object({
         .regex(/^\d+$/, "Password must be numbers"),
     firstName: z.string().min(1, "First name is required"),
     lastName: z.string().min(1, "First name is required"),
-    image: z.any().optional(),
-    department: z.string({ message: "Department is required" }),
-    position: z.enum(EMP_POSITIONS, { message: "Position is required" }),
+    phone: z.string().regex(/^\d{9,11}$/, "Phone number must be 9 to 11 digits"),
+    department: z.string().min(1, { message: "Department is required" }),
+    position: z.string().min(1, { message: "Position is required" }),
     role: z.enum(EMP_ROLES, { message: "Role is required" }),
     jobType: z.enum(EMP_JOB_TYPES, { message: "Job type is required" }),
-    accType: z.enum(EMP_JOB_TYPES, { message: "Account type is required" }),
+    image: z.any().optional(),
+});
+
+export const updateEmpSchema = createEmpSchema.omit({ email: true, password: true }).extend({
+    accType: z.enum(["ACTIVE", "FREEZE"], { message: "Account type is required" })
 });

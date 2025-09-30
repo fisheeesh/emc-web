@@ -112,11 +112,11 @@ export default function DailyAttendanceChart({ dataNum, dataPerc }: Props) {
                     className="flex items-center gap-3"
                 >
                     <div className="flex items-center space-x-2">
-                        <RadioGroupItem value="numbers" id="numbers" />
+                        <RadioGroupItem value="numbers" id="numbers" className="cursor-pointer" />
                         <Label htmlFor="numbers">Numbers</Label>
                     </div>
                     <div className="flex items-center space-x-2">
-                        <RadioGroupItem value="percentages" id="percentages" />
+                        <RadioGroupItem value="percentages" id="percentages" className="cursor-pointer" />
                         <Label htmlFor="percentages">Percentages</Label>
                     </div>
                 </RadioGroup>

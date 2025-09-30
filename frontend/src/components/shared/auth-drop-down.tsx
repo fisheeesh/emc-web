@@ -54,23 +54,23 @@ export default function AuthDropdown() {
                             <Link to='dashboard/sentiments' className="whitespace-nowrap">
                                 <LuLayoutDashboard className="size-4 text-black mr-1 dark:text-white" aria-hidden="true" />
                                 Sentiments Dashboard
-                                <DropdownMenuShortcut>⇧⌘D</DropdownMenuShortcut>
+                                <DropdownMenuShortcut>⇧⌘S</DropdownMenuShortcut>
                             </Link>
                         </DropdownMenuItem>
                         <DropdownMenuItem asChild className="cursor-pointer">
                             <Link to='dashboard/attendance' className="whitespace-nowrap">
                                 <FaRegCalendarCheck className="size-4 text-black mr-1 dark:text-white" aria-hidden="true" />
                                 Attendance Dashboard
-                                <DropdownMenuShortcut>⌘B</DropdownMenuShortcut>
+                                <DropdownMenuShortcut>⇧⌘A</DropdownMenuShortcut>
                             </Link>
                         </DropdownMenuItem>
-                        <DropdownMenuItem asChild className="cursor-pointer">
+                        {user?.role === 'SUPERADMIN' && <DropdownMenuItem asChild className="cursor-pointer">
                             <Link to='dashboard/managements'>
                                 <MdOutlineSettings className="size-4 text-black mr-1 dark:text-white" aria-hidden="true" />
-                                Managements
-                                <DropdownMenuShortcut>⌘S</DropdownMenuShortcut>
+                                General Managements
+                                <DropdownMenuShortcut>⌘M</DropdownMenuShortcut>
                             </Link>
-                        </DropdownMenuItem>
+                        </DropdownMenuItem>}
                     </DropdownMenuGroup>
                     <DropdownMenuSeparator />
                     <DropdownMenuItem
