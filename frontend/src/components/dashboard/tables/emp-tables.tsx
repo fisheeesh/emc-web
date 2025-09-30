@@ -7,16 +7,23 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogTrigger } from "@/components/ui/dialog";
+import Empty from "@/components/ui/empty";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { DEPARTMENTS_FILTER, EMOTION_FILTER, IMG_URL, JOBS_FILTER, ROLES_FILTER } from "@/lib/constants";
+import { ACC_FILTER, EMOTION_FILTER, IMG_URL, JOBS_FILTER, ROLES_FILTER, TSFILTER } from "@/lib/constants";
 import { getInitialName } from "@/lib/utils";
 import { IoPersonAdd } from "react-icons/io5";
 
 interface Props {
     data: Employee[]
+    status: "error" | 'success' | 'pending',
+    error: Error | null,
+    isFetching?: boolean,
+    isFetchingNextPage: boolean,
+    fetchNextPage: () => void,
+    hasNextPage: boolean
 }
 
-export default function EmpTables({ data }: Props) {
+export default function EmpTables({ data, status, error, isFetchingNextPage, fetchNextPage, hasNextPage }: Props) {
 
     return (
         <Card className="rounded-md flex flex-col gap-5">
@@ -38,30 +45,31 @@ export default function EmpTables({ data }: Props) {
                     </div>
                 </div>
                 <div className="flex flex-col lg:flex-row gap-2">
-                    <LocalSearch filterValue="empName" />
-                    <CommonFilter
-                        filterValue="dep"
-                        addFirst={false}
-                        filters={DEPARTMENTS_FILTER}
-                        otherClasses="min-h-[44px] w-fit sm:min-w-[150px]"
-                    />
+                    <LocalSearch filterValue="kw" />
                     <CommonFilter
                         filterValue="role"
-                        addFirst={false}
                         filters={ROLES_FILTER}
-                        otherClasses="min-h-[44px] w-fit sm:min-w-[150px]"
+                        otherClasses="min-h-[44px] sm:min-w-[150px]"
                     />
                     <CommonFilter
-                        filterValue="job"
-                        addFirst={false}
+                        filterValue="jobType"
                         filters={JOBS_FILTER}
-                        otherClasses="min-h-[44px] w-fit sm:min-w-[150px]"
+                        otherClasses="min-h-[44px] sm:min-w-[150px]"
+                    />
+                    <CommonFilter
+                        filterValue="accType"
+                        filters={ACC_FILTER}
+                        otherClasses="min-h-[44px] sm:min-w-[150px]"
                     />
                     <CommonFilter
                         filterValue="status"
-                        addFirst={false}
                         filters={EMOTION_FILTER}
-                        otherClasses="min-h-[44px] w-fit sm:min-w-[150px]"
+                        otherClasses="min-h-[44px] sm:min-w-[150px]"
+                    />
+                    <CommonFilter
+                        filterValue="ts"
+                        filters={TSFILTER}
+                        otherClasses="min-h-[44px] sm:min-w-[150px]"
                     />
                 </div>
             </CardHeader>
@@ -83,67 +91,103 @@ export default function EmpTables({ data }: Props) {
                         </TableRow>
                     </TableHeader>
 
-                    <TableBody>
-                        {
-                            data.map((emp) => (
-                                <TableRow key={emp.id} className="py-10">
-                                    <TableCell>
-                                        <div className="flex items-center gap-2">
-                                            <Avatar className="size-9">
-                                                <AvatarImage src={IMG_URL + emp.avatar} alt={emp.fullName} />
-                                                <AvatarFallback>{getInitialName(emp.fullName)}</AvatarFallback>
-                                            </Avatar>
-                                            <span className="whitespace-nowrap">{emp.fullName}</span>
-                                        </div>
-                                    </TableCell>
-                                    <TableCell>
-                                        <span className="whitespace-nowrap">{emp.position}</span>
-                                    </TableCell>
-                                    <TableCell>
-                                        <span className="whitespace-nowrap">{emp.email}</span>
-                                    </TableCell>
-                                    <TableCell>
-                                        <span className="whitespace-nowrap">{emp.department.name}</span>
-                                    </TableCell>
-                                    <TableCell>
-                                        <span className="whitespace-nowrap">{emp.role}</span>
-                                    </TableCell>
-                                    <TableCell>
-                                        <span className="whitespace-nowrap">{emp.jobType}</span>
-                                    </TableCell>
-                                    <TableCell>
-                                        <CustomBadge status={emp.status as "positive" | "neutral" | "negative" | "critical"} />
-                                    </TableCell>
-                                    <TableCell>
-                                        <span className="whitespace-nowrap">{emp.lastCritical ?? "NULL"}</span>
-                                    </TableCell>
-                                    <TableCell>
-                                        <span className="whitespace-nowrap font-en">{emp.createdAt}</span>
-                                    </TableCell>
-                                    <TableCell className="space-x-2 text-center">
-                                        <Dialog>
-                                            <DialogTrigger asChild>
-                                                <Button variant='outline' className="cursor-pointer">
-                                                    Edit
-                                                </Button>
-                                            </DialogTrigger>
-                                            <CreateEditEmpModal />
-                                        </Dialog>
-
-                                        <Dialog>
-                                            <DialogTrigger asChild>
-                                                <Button className="cursor-pointer" variant='destructive'>
-                                                    Delete
-                                                </Button>
-                                            </DialogTrigger>
-                                            <ConfirmModal />
-                                        </Dialog>
+                    {
+                        status === 'pending' ?
+                            <TableBody>
+                                <TableRow>
+                                    <TableCell colSpan={10} className="text-center py-10">
+                                        Loading...
                                     </TableCell>
                                 </TableRow>
-                            ))
-                        }
-                    </TableBody>
+                            </TableBody>
+                            : status === 'error'
+                                ? <TableBody>
+                                    <TableRow>
+                                        <TableCell colSpan={10} className="text-center py-10">
+                                            Error: {error?.message}
+                                        </TableCell>
+                                    </TableRow>
+                                </TableBody>
+                                : <TableBody>
+                                    {
+                                        data.map((emp) => (
+                                            <TableRow key={emp.id} className="py-10">
+                                                <TableCell>
+                                                    <div className="flex items-center gap-2">
+                                                        <Avatar className="size-9">
+                                                            <AvatarImage src={IMG_URL + emp.avatar} alt={emp.fullName} />
+                                                            <AvatarFallback>{getInitialName(emp.fullName)}</AvatarFallback>
+                                                        </Avatar>
+                                                        <span className="whitespace-nowrap">{emp.fullName}</span>
+                                                    </div>
+                                                </TableCell>
+                                                <TableCell className="py-6">
+                                                    <span className="whitespace-nowrap">{emp.position}</span>
+                                                </TableCell>
+                                                <TableCell>
+                                                    <span className="whitespace-nowrap">{emp.email}</span>
+                                                </TableCell>
+                                                <TableCell>
+                                                    <span className="whitespace-nowrap">{emp.department.name}</span>
+                                                </TableCell>
+                                                <TableCell>
+                                                    <span className="whitespace-nowrap">{emp.role}</span>
+                                                </TableCell>
+                                                <TableCell>
+                                                    <span className="whitespace-nowrap">{emp.jobType}</span>
+                                                </TableCell>
+                                                <TableCell>
+                                                    <CustomBadge status={emp.status as "positive" | "neutral" | "negative" | "critical"} />
+                                                </TableCell>
+                                                <TableCell>
+                                                    <span className="whitespace-nowrap">{emp.lastCritical ?? "NULL"}</span>
+                                                </TableCell>
+                                                <TableCell>
+                                                    <span className="whitespace-nowrap font-en">{emp.createdAt}</span>
+                                                </TableCell>
+                                                <TableCell className="space-x-2 text-center">
+                                                    <Dialog>
+                                                        <DialogTrigger asChild>
+                                                            <Button variant='outline' className="cursor-pointer">
+                                                                Edit
+                                                            </Button>
+                                                        </DialogTrigger>
+                                                        <CreateEditEmpModal />
+                                                    </Dialog>
+
+                                                    <Dialog>
+                                                        <DialogTrigger asChild>
+                                                            <Button className="cursor-pointer" variant='destructive'>
+                                                                Delete
+                                                            </Button>
+                                                        </DialogTrigger>
+                                                        <ConfirmModal />
+                                                    </Dialog>
+                                                </TableCell>
+                                            </TableRow>
+                                        ))
+                                    }
+                                </TableBody>
+                    }
                 </Table>
+                <div className="my-4 flex flex-col items-center justify-center">
+                    {data.length > 0 && <Button
+                        className="cursor-pointer"
+                        onClick={() => fetchNextPage()}
+                        disabled={!hasNextPage || isFetchingNextPage}
+                        variant={!hasNextPage ? "ghost" : "secondary"}
+                    >
+                        {isFetchingNextPage
+                            ? "Loading more..."
+                            : hasNextPage
+                                ? "Load More"
+                                : "Nothing more to load"}
+                    </Button>}
+                </div>
+
+                {data.length === 0 && status === 'success' && <div className="my-4 flex flex-col items-center justify-center">
+                    <Empty label="No records found" classesName="w-[300px] h-[200px] " />
+                </div>}
             </CardContent>
         </Card>
     )

@@ -14,7 +14,7 @@ export default function CustomCalendar({ popover = true, filterValue }: Props) {
     const [searchParams, setSearchParams] = useSearchParams();
     const [open, setOpen] = useState(false);
     const param = searchParams.get(filterValue);
-    const [date, setDate] = useState<Date | undefined>(param ? new Date(param) : undefined);
+    const [date, setDate] = useState<Date | undefined>(param ? new Date(param) : new Date());
 
     const formatDate = (d: Date) =>
         d.toLocaleDateString("en-US", {

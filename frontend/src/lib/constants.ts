@@ -62,13 +62,26 @@ export const COMPARISON_FILTER = [
     { name: "Last 30 days", value: "30" }
 ]
 
+export const TSFILTER = [
+    { name: "Recent", value: "desc" },
+    { name: "Earliest", value: "asc" }
+]
+
 export const ROLES_FILTER = [
+    { name: "All Roles", value: "all" },
     { name: "Super Admin", value: "SUPERADMIN" },
     { name: "Admin", value: "ADMIN" },
     { name: "Employee", value: "EMPLOYEE" }
 ]
 
+export const ACC_FILTER = [
+    { name: "All Acc Types", value: "all" },
+    { name: "Active", value: "ACTIVE" },
+    { name: "FREEZE", value: "FREEZE" }
+]
+
 export const JOBS_FILTER = [
+    { name: "All Job Types", value: "all" },
     { name: "Full-time", value: "FULLTIME" },
     { name: "Part-time", value: "PARTTIME" },
     { name: "Contract", value: "CONTRACT" },
@@ -76,7 +89,7 @@ export const JOBS_FILTER = [
 ]
 
 export const EMOTION_FILTER = [
-    { name: 'All', value: 'all' },
+    { name: 'All Emotions', value: 'all' },
     { name: 'Positive', value: 'positive' },
     { name: 'Neutral', value: 'neutral' },
     { name: 'Negative', value: 'negative' },

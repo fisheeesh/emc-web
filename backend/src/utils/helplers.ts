@@ -11,6 +11,21 @@ export const departmentFilter = (role: string, uDepartmentId: number, qDepartmen
             : {};
 }
 
+export const getEmotionRange = (status: string) => {
+    switch (status) {
+        case "positive":
+            return { gte: 0.4 };
+        case "neutral":
+            return { gte: -0.3, lte: 0.39 };
+        case "negative":
+            return { gte: -0.79, lte: -0.31 };
+        case "critical":
+            return { lte: -0.8 };
+        default:
+            return undefined;
+    }
+};
+
 export const removeFiles = async (originalFile: string, optimizeFile?: string | null) => {
     try {
         const originalFilePath = path.join(
@@ -47,26 +62,4 @@ export function roundToHour(date: Date): string {
     if (h > 23) h = 23;
 
     return `${String(h).padStart(2, '0')}:00`;
-}
-
-export function getThaiDayBounds() {
-    //* Current time in Thai tz
-    const now = new Date();
-    const fmt = new Intl.DateTimeFormat("en-US", {
-        timeZone: TIMEZONE,
-        year: "numeric",
-        month: "2-digit",
-        day: "2-digit",
-    });
-
-    //* Parse Thai local date (YYYY-MM-DD)
-    const parts = fmt.formatToParts(now);
-    const y = parts.find(p => p.type === "year")?.value;
-    const m = parts.find(p => p.type === "month")?.value;
-    const d = parts.find(p => p.type === "day")?.value;
-
-    const startThai = new Date(`${y}-${m}-${d}T00:00:00`);
-    const endThai = new Date(`${y}-${m}-${d}T23:59:59.999`);
-
-    return { startUtc: startThai, endUtc: endThai };
 }

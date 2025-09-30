@@ -1,4 +1,5 @@
 import { prisma } from "../config/prisma-client"
+import { getEmotionRange } from "../utils/helplers"
 
 export const updateEmpDataById = async (id: number, empData: any) => {
     const data: any = {
@@ -51,4 +52,15 @@ export const deleteEmployeeById = async (id: number) => {
     return await prisma.employee.delete({
         where: { id }
     })
+}
+
+export const getEmployeesInfiniteData = async (options: any, status: string) => {
+    if (typeof status === 'string' && status !== 'all') {
+        const emotionRange = getEmotionRange(status.toLowerCase());
+        if (emotionRange) {
+            options.where.avgScore = emotionRange;
+        }
+    }
+
+    return await prisma.employee.findMany(options)
 }

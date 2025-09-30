@@ -5,10 +5,11 @@ import { errorCodes } from "../../config/error-codes"
 import { prisma } from "../../config/prisma-client"
 import { ImageQueue } from "../../jobs/queues/image-queue"
 import { createEmployee, getEmployeeById } from "../../services/auth-services"
-import { deleteEmployeeById, updateEmpDataById } from "../../services/emp-services"
+import { deleteEmployeeById, getEmployeesInfiniteData, updateEmpDataById } from "../../services/emp-services"
 import { checkEmployeeIfNotExits, checkUploadFile, createHttpErrors } from "../../utils/check"
 import { generateHashedValue, generateToken } from "../../utils/generate"
 import { removeFiles } from "../../utils/helplers"
+import { AccType, JobType, Prisma, Role } from "../../../generated/prisma"
 
 interface CustomRequest extends Request {
     employeeId?: number
@@ -118,19 +119,16 @@ export const createNewEmployee = [
     }
 ]
 
-export const getAllEmployees = [
-    query("empName", "Invalid Name.")
-        .trim()
-        .escape()
-        .optional(),
-    query("department", "Invalid Department.")
-        .trim()
-        .escape()
-        .optional(),
-    query("status", "Invalid Status.")
-        .trim()
-        .escape()
-        .optional(),
+export const getAllEmployeesInfinite = [
+    query("limit", "Limit must be LogId.").isInt({ gt: 6 }).optional(),
+    query("cursor", "Cursor must be unsigned integer.").isInt({ gt: 0 }).optional(),
+    query("kw", "Invalid Keyword.").trim().escape().optional(),
+    query("dep", "Invalid Department.").trim().escape().optional(),
+    query("role", "Invalid Role.").trim().escape().optional(),
+    query("jobType", "Invalid Job Type.").trim().escape().optional(),
+    query("accType", "Invalid Account Type.").trim().escape().optional(),
+    query("status", "Invalid Status.").trim().escape().optional(),
+    query("ts", "Invalid Timestamp.").trim().escape().optional(),
     async (req: CustomRequest, res: Response, next: NextFunction) => {
         const errors = validationResult(req).array({ onlyFirstError: true })
         if (errors.length > 0) {
@@ -145,9 +143,51 @@ export const getAllEmployees = [
         const emp = await getEmployeeById(empId!)
         checkEmployeeIfNotExits(emp)
 
-        const { empName, department, status } = req.query
+        const { limit = 7, cursor: lastCursor, kw, dep, role, jobType, accType, status, ts = 'desc' } = req.query
 
-        const result = await prisma.employee.findMany({
+        const kwFilter: Prisma.EmployeeWhereInput = kw ? {
+            OR: [
+                { firstName: { contains: kw as string, mode: 'insensitive' } },
+                { lastName: { contains: kw as string, mode: 'insensitive' } },
+                { email: { contains: kw as string, mode: 'insensitive' } },
+                { position: { contains: kw as string, mode: 'insensitive' } },
+            ] as Prisma.EmployeeWhereInput[]
+        } : {}
+
+        const roleFilter: Prisma.EmployeeWhereInput =
+            role && role !== "all" &&
+                Object.values(Role).includes(role as Role)
+                ? { role: role as Role }
+                : {};
+
+        const depFilter: Prisma.EmployeeWhereInput =
+            dep && dep !== 'all' ? {
+                departmentId: +dep
+            } : {}
+
+        const jobFilter: Prisma.EmployeeWhereInput =
+            jobType && jobType !== 'all' &&
+                Object.values(JobType).includes(jobType as JobType)
+                ? { jobType: jobType as JobType }
+                : {}
+
+        const accTypeFilter: Prisma.EmployeeWhereInput =
+            accType && accType !== 'all' &&
+                Object.values(AccType).includes(accType as AccType)
+                ? { accType: accType as AccType }
+                : {}
+
+        const options = {
+            take: +limit + 1,
+            skip: lastCursor ? 1 : 0,
+            cursor: lastCursor ? { id: +lastCursor } : undefined,
+            where: {
+                ...depFilter,
+                ...roleFilter,
+                ...jobFilter,
+                ...accTypeFilter,
+                ...kwFilter,
+            },
             select: {
                 id: true,
                 firstName: true,
@@ -166,13 +206,25 @@ export const getAllEmployees = [
                 status: true
             },
             orderBy: {
-                createdAt: "desc"
+                createdAt: ts
             }
-        })
+        }
+
+        const employees = await getEmployeesInfiniteData(options, status as string)
+        const hasNextPage = employees.length > +limit
+
+        if (hasNextPage) {
+            employees.pop()
+        }
+
+        const nextCursor = hasNextPage ? employees[employees.length - 1].id : null
 
         res.status(200).json({
-            message: "Here is All employess in a company",
-            data: result
+            message: "Here is all employees data with infinite scroll.",
+            hasNextPage,
+            nextCursor,
+            prevCursor: lastCursor || undefined,
+            data: employees
         })
     }
 ]

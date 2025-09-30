@@ -35,7 +35,7 @@ export const prisma = new PrismaClient().$extends({
                 needs: { updatedAt: true },
                 compute(emotionCheckIn) {
                     return emotionCheckIn.updatedAt.toLocaleDateString("en-US", {
-                        year: "numeric", month: "long", day: "numeric", hour: "numeric", minute: "numeric", second: "numeric"
+                        year: "numeric", month: "long", day: "numeric", hour: "numeric", minute: "numeric"
                     })
                 }
             },
@@ -43,11 +43,8 @@ export const prisma = new PrismaClient().$extends({
                 needs: { updatedAt: true },
                 compute(emotionCheckIn) {
                     return emotionCheckIn.updatedAt.toLocaleTimeString("en-US", {
-                        timeZone: "Asia/Bangkok",
-                        hour: "numeric",
-                        minute: "2-digit",
-                        hour12: true,
-                    });
+                        year: "numeric", month: "long", day: "numeric", hour: "numeric", minute: "numeric"
+                    })
                 },
             },
             status: {
