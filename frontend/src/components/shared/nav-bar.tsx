@@ -59,7 +59,7 @@ export default function Navbar() {
                     </div>
 
                     {/* Desktop Right Side */}
-                    <div className='hidden md:flex items-center gap-3'>
+                    <div className='hidden min-[810px]:flex items-center gap-3'>
                         {user?.role === 'SUPERADMIN' && <CommonFilter
                             filters={filters.departments}
                             filterValue='gDep'
@@ -72,7 +72,7 @@ export default function Navbar() {
                     </div>
 
                     {/* Mobile Hamburger Menu */}
-                    <div className="md:hidden flex items-center mt-2">
+                    <div className="min-[810px]:hidden flex items-center mt-2">
                         <button
                             onClick={() => setIsMobMenuOpen(!isMobMenuOpen)}
                             className={`hamburger ${isMobMenuOpen ? 'open' : ''}`}
@@ -87,7 +87,7 @@ export default function Navbar() {
 
                 {isMobMenuOpen && (
                     <Dialog>
-                        <div className="md:hidden bg-slate-50 dark:bg-slate-900 border-t dark:border-slate-700 border-gray-100 py-4">
+                        <div className="min-[810px]:hidden bg-slate-50 dark:bg-slate-900 border-t dark:border-slate-700 border-gray-100 py-4">
                             <div className="max-w-[1400px] mx-auto px-4 space-y-4">
                                 {renderNavLinks()}
                                 <div className='flex items-center gap-3 mt-5'>
