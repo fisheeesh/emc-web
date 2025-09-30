@@ -12,6 +12,19 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { ACC_FILTER, EMOTION_FILTER, IMG_URL, JOBS_FILTER, ROLES_FILTER, TSFILTER } from "@/lib/constants";
 import { getInitialName } from "@/lib/utils";
 import { IoPersonAdd } from "react-icons/io5";
+import { GrMoreVertical } from "react-icons/gr";
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuGroup,
+    DropdownMenuItem,
+    DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { LiaUserEditSolid } from "react-icons/lia";
+import { RiDeleteBin5Line } from "react-icons/ri";
+import { FaStreetView } from "react-icons/fa";
+import { createEmpSchema, updateEmpSchema } from "@/lib/validators";
+import { useState } from "react";
 
 interface Props {
     data: Employee[]
@@ -24,6 +37,8 @@ interface Props {
 }
 
 export default function EmpTables({ data, status, error, isFetchingNextPage, fetchNextPage, hasNextPage }: Props) {
+    const [createOpen, setCreateOpen] = useState(false);
+    const [editingEmp, setEditingEmp] = useState<Employee | null>(null);
 
     return (
         <Card className="rounded-md flex flex-col gap-5">
@@ -34,13 +49,29 @@ export default function EmpTables({ data, status, error, isFetchingNextPage, fet
                         <CardDescription>Create, Update, and Delete employees</CardDescription>
                     </div>
                     <div className="flex flex-col xl:flex-row xl:items-center gap-2">
-                        <Dialog>
+                        <Dialog open={createOpen} onOpenChange={setCreateOpen}>
                             <DialogTrigger asChild>
                                 <Button className="bg-gradient-to-r from-purple-400 via-pink-500 to-blue-500 font-semibold hover:from-pink-500 hover:via-purple-500 hover:to-blue-400 transition-colors duration-300 w-fit min-h-[44px] text-white flex items-center gap-2 cursor-pointer">
                                     <IoPersonAdd /> Create a new employee
                                 </Button>
                             </DialogTrigger>
-                            <CreateEditEmpModal />
+                            {createOpen && <CreateEditEmpModal
+                                formType="CREATE"
+                                schema={createEmpSchema}
+                                defaultValues={{
+                                    firstName: "",
+                                    lastName: "",
+                                    email: "",
+                                    password: "",
+                                    phone: "",
+                                    department: "",
+                                    position: "",
+                                    role: "EMPLOYEE",
+                                    jobType: "FULLTIME",
+                                    image: undefined,
+                                }}
+                                onClose={() => setCreateOpen(false)}
+                            />}
                         </Dialog>
                     </div>
                 </div>
@@ -78,16 +109,17 @@ export default function EmpTables({ data, status, error, isFetchingNextPage, fet
                 <Table>
                     <TableHeader>
                         <TableRow>
-                            <TableHead className="whitespace-nowrap">Name</TableHead>
-                            <TableHead className="whitespace-nowrap">Position</TableHead>
-                            <TableHead className="whitespace-nowrap">Email</TableHead>
-                            <TableHead className="whitespace-nowrap">Department</TableHead>
-                            <TableHead className="whitespace-nowrap">Role</TableHead>
-                            <TableHead className="whitespace-nowrap">Job Type</TableHead>
-                            <TableHead className="whitespace-nowrap">Overall</TableHead>
-                            <TableHead className="whitespace-nowrap">Last Critical Time</TableHead>
-                            <TableHead className="whitespace-nowrap">Joined At</TableHead>
-                            <TableHead className="whitespace-nowrap text-center">Actions</TableHead>
+                            <TableHead className="whitespace-nowrap font-semibold">Name</TableHead>
+                            <TableHead className="whitespace-nowrap font-semibold">Position</TableHead>
+                            <TableHead className="whitespace-nowrap font-semibold">Email</TableHead>
+                            <TableHead className="whitespace-nowrap font-semibold">Department</TableHead>
+                            <TableHead className="whitespace-nowrap font-semibold">Role</TableHead>
+                            <TableHead className="whitespace-nowrap font-semibold">Job Type</TableHead>
+                            <TableHead className="whitespace-nowrap font-semibold">Acc. Type</TableHead>
+                            <TableHead className="whitespace-nowrap font-semibold">Overall</TableHead>
+                            <TableHead className="whitespace-nowrap font-semibold">Last Critical Time</TableHead>
+                            <TableHead className="whitespace-nowrap font-semibold">Joined At</TableHead>
+                            <TableHead className="whitespace-nowrap text-center font-semibold">Actions</TableHead>
                         </TableRow>
                     </TableHeader>
 
@@ -137,6 +169,9 @@ export default function EmpTables({ data, status, error, isFetchingNextPage, fet
                                                     <span className="whitespace-nowrap">{emp.jobType}</span>
                                                 </TableCell>
                                                 <TableCell>
+                                                    <span className="whitespace-nowrap">{emp.accType}</span>
+                                                </TableCell>
+                                                <TableCell>
                                                     <CustomBadge status={emp.status as "positive" | "neutral" | "negative" | "critical"} />
                                                 </TableCell>
                                                 <TableCell>
@@ -145,28 +180,74 @@ export default function EmpTables({ data, status, error, isFetchingNextPage, fet
                                                 <TableCell>
                                                     <span className="whitespace-nowrap font-en">{emp.createdAt}</span>
                                                 </TableCell>
-                                                <TableCell className="space-x-2 text-center">
-                                                    <Dialog>
-                                                        <DialogTrigger asChild>
-                                                            <Button variant='outline' className="cursor-pointer">
-                                                                Edit
+                                                <TableCell>
+                                                    <DropdownMenu>
+                                                        <DropdownMenuTrigger asChild>
+                                                            <Button size='icon' variant='ghost' className="cursor-pointer">
+                                                                <GrMoreVertical className="size-4" />
                                                             </Button>
-                                                        </DialogTrigger>
-                                                        <CreateEditEmpModal />
-                                                    </Dialog>
-
-                                                    <Dialog>
-                                                        <DialogTrigger asChild>
-                                                            <Button className="cursor-pointer" variant='destructive'>
-                                                                Delete
-                                                            </Button>
-                                                        </DialogTrigger>
-                                                        <ConfirmModal />
-                                                    </Dialog>
+                                                        </DropdownMenuTrigger>
+                                                        <DropdownMenuContent className="w-30" align="end" forceMount>
+                                                            <DropdownMenuGroup>
+                                                                <DropdownMenuItem asChild className="cursor-pointer">
+                                                                    <Dialog>
+                                                                        <DialogTrigger asChild>
+                                                                            <Button size='icon' variant='ghost' className="w-full cursor-pointer flex justify-start gap-2 px-1.5">
+                                                                                <FaStreetView />
+                                                                                View Details
+                                                                            </Button>
+                                                                        </DialogTrigger>
+                                                                        {/* <CreateEditEmpModal /> */}
+                                                                    </Dialog>
+                                                                </DropdownMenuItem>
+                                                                <DropdownMenuItem asChild className="cursor-pointer">
+                                                                    <Button
+                                                                        size='icon'
+                                                                        variant='ghost'
+                                                                        className="w-full cursor-pointer flex justify-start gap-2 px-1.5"
+                                                                        onClick={() => setEditingEmp(emp)}
+                                                                    >
+                                                                        <LiaUserEditSolid />
+                                                                        Edit
+                                                                    </Button>
+                                                                </DropdownMenuItem>
+                                                                <DropdownMenuItem asChild className="cursor-pointer">
+                                                                    <Dialog>
+                                                                        <DialogTrigger asChild>
+                                                                            <Button size='icon' variant='ghost' className="w-full cursor-pointer flex justify-start gap-2 px-1.5">
+                                                                                <RiDeleteBin5Line />
+                                                                                Delete
+                                                                            </Button>
+                                                                        </DialogTrigger>
+                                                                        <ConfirmModal />
+                                                                    </Dialog>
+                                                                </DropdownMenuItem>
+                                                            </DropdownMenuGroup>
+                                                        </DropdownMenuContent>
+                                                    </DropdownMenu>
                                                 </TableCell>
                                             </TableRow>
                                         ))
                                     }
+                                    <Dialog open={!!editingEmp} onOpenChange={(o) => !o && setEditingEmp(null)}>
+                                        {editingEmp && <CreateEditEmpModal
+                                            formType="EDIT"
+                                            userId={editingEmp.id}
+                                            schema={updateEmpSchema}
+                                            defaultValues={{
+                                                firstName: editingEmp.firstName,
+                                                lastName: editingEmp.lastName,
+                                                phone: editingEmp.phone,
+                                                department: "",
+                                                position: editingEmp.position,
+                                                role: editingEmp.role as "EMPLOYEE" | "ADMIN" | "SUPERADMIN",
+                                                jobType: editingEmp.jobType as "FULLTIME" | "PARTTIME" | "CONTRACT" | "INTERNSHIP",
+                                                accType: editingEmp.accType as "ACTIVE" | "FREEZE",
+                                                image: undefined,
+                                            }}
+                                            onClose={() => setEditingEmp(null)}
+                                        />}
+                                    </Dialog>
                                 </TableBody>
                     }
                 </Table>

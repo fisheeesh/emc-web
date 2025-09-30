@@ -1,334 +1,202 @@
-import { DialogClose, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
 import { Button } from "../ui/button";
 import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from "../ui/form";
 import { Input } from "../ui/input";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm, type SubmitHandler } from "react-hook-form";
+import { useForm, type ControllerRenderProps, type DefaultValues, type Path, type SubmitHandler } from "react-hook-form";
 import z from "zod";
-import { UserCheck } from "lucide-react";
-import { useRef } from "react";
-import { createEmpSchema } from "@/lib/validators";
+import { useRef, useState } from "react";
+import { FaUserPen, FaUserPlus } from "react-icons/fa6"
+import Spinner from "../shared/spinner";
+import { Eye, EyeOff } from "lucide-react";
 
-const EMP_POSITIONS = ["Intern", "Junior Developer", "Developer", "Senior Developer", "Team Lead"] as const;
-const EMP_ROLES = ["Employee", "Manager", "HR", "Admin", "Super Admin"] as const;
-const EMP_JOB_TYPES = ["Full-time", "Part-time", "Contract", "Internship"] as const;
+interface CreateEditUserModalProps<T extends z.ZodType<any, any, any>> {
+    formType: "CREATE" | "EDIT",
+    userId?: number,
+    schema: T,
+    defaultValues: z.infer<T>,
+    onClose?: () => void;
+}
 
-export default function CreateEditEmpModal() {
+export default function CreateEditEmpModal<T extends z.ZodType<any, any, any>>({
+    formType,
+    userId,
+    schema,
+    defaultValues,
+    onClose,
+    ...props
+}: CreateEditUserModalProps<T>) {
     const fileInputRef = useRef<HTMLInputElement>(null)
+    type FormData = z.infer<T>
 
+    const [showPassword, setShowPassword] = useState(false);
 
     const form = useForm({
-        defaultValues: {
-            email: "",
-            password: "",
-            firstName: "",
-            lastName: "",
-            image: null,
-            department: "",
-            position: "Intern",
-            role: "Employee",
-            jobType: "Contract",
-        },
-        resolver: zodResolver(createEmpSchema),
-    });
-
-    const onHandleSubmit: SubmitHandler<z.infer<typeof createEmpSchema>> = async (values) => {
-        console.log(values)
-    }
+        resolver: zodResolver(schema) as any,
+        defaultValues: defaultValues as DefaultValues<FormData>,
+    })
 
     const getFileName = () => {
         const file = fileInputRef.current?.files?.[0]
         return file ? file.name : "No file chosen"
     }
 
+    const onHandleSubmit: SubmitHandler<FormData> = async (values) => {
+        if (formType === 'CREATE') {
+            console.log(values)
+        } else {
+            console.log(values)
+        }
+    }
+
+    const buttonText = formType === 'CREATE' ? 'Create New Employee' : 'Save Changes'
+
     const isWorking = form.formState.isSubmitting
 
     return (
-        <DialogContent className="w-full mx-auto max-h-[90vh] overflow-y-auto sm:max-w-[800px] no-scrollbar">
+        <DialogContent className="w-full mx-auto max-h-[90vh] overflow-y-auto sm:max-w-[800px] no-scrollbar" {...props}>
             <DialogHeader>
                 <DialogTitle className="text-xl font-bold flex items-center gap-2">
-                    <UserCheck className="text-blue-600" />
-                    Take Action for Emp
+                    {formType === 'CREATE' ? <FaUserPlus /> : <FaUserPen />}
+                    {formType === 'CREATE' ? 'Create a new Employee' : "Edit Employee Information"}
                 </DialogTitle>
                 <DialogDescription>
-                    Choose appropriate actions to support this employee's wellbeing
+                    {formType === 'CREATE' ? 'Fill in the details to add a new employee.' : "Update the employee information and save changes."}
                 </DialogDescription>
             </DialogHeader>
 
             <Form {...form}>
                 <form
-                    className="space-y-4"
+                    className="space-y-6"
                     onSubmit={form.handleSubmit(onHandleSubmit)}
                 >
-                    <div className="flex flex-col lg:flex-row items-center gap-2">
-                        <div className="w-full lg:w-1/2">
-                            <FormField
-                                control={form.control}
-                                name="email"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>Email</FormLabel>
-                                        <FormControl>
-                                            <Input type="email" placeholder="name@company.com" {...field} className="min-h-[44px]" />
-                                        </FormControl>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
-                        </div>
-                        <div className="w-full lg:w-1/2">
-                            <FormField
-                                control={form.control}
-                                name="password"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>Password</FormLabel>
-                                        <FormControl>
-                                            <Input type="password" placeholder="name@company.com" {...field} className="min-h-[44px]" />
-                                        </FormControl>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
-                        </div>
-                    </div>
-
-                    <div className="flex flex-col lg:flex-row items-center gap-4">
-                        <div className="w-full lg:w-1/2">
-                            <FormField
-                                control={form.control}
-                                name="firstName"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>First Name</FormLabel>
-                                        <FormControl>
-                                            <Input type="text" placeholder="John Doe" {...field} className="min-h-[44px]" />
-                                        </FormControl>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
-                        </div>
-                        <div className="w-full lg:w-1/2">
-                            <FormField
-                                control={form.control}
-                                name="lastName"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>Last Name</FormLabel>
-                                        <FormControl>
-                                            <Input type="text" placeholder="John Doe" {...field} className="min-h-[44px]" />
-                                        </FormControl>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
-                        </div>
-                    </div>
-
-                    <div className="flex flex-col lg:flex-row items-center gap-4 w-full">
-                        <div className="w-full lg:w-1/2">
-                            <FormField
-                                control={form.control}
-                                name="position"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>Position</FormLabel>
-                                        <Select
-                                            onValueChange={field.onChange}
-                                            defaultValue={field.value}
-                                            value={field.value}
-                                        >
-                                            <FormControl className="w-full">
-                                                <SelectTrigger className="w-full min-h-[44px]">
-                                                    <SelectValue placeholder="Select position" />
-                                                </SelectTrigger>
-                                            </FormControl>
-                                            <SelectContent>
-                                                {EMP_POSITIONS.map((p) => (
-                                                    <SelectItem key={p} value={p}>
-                                                        {p}
-                                                    </SelectItem>
-                                                ))}
-                                            </SelectContent>
-                                        </Select>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
-                        </div>
-
-                        <div className="w-full lg:w-1/2">
-                            <FormField
-                                control={form.control}
-                                name="department"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>Department</FormLabel>
-                                        <Select
-                                            onValueChange={field.onChange}
-                                            defaultValue={field.value}
-                                            value={field.value}
-                                        >
-                                            <FormControl className="w-full">
-                                                <SelectTrigger className="w-full min-h-[44px]">
-                                                    <SelectValue placeholder="Select department" />
-                                                </SelectTrigger>
-                                            </FormControl>
-                                            <SelectContent>
-                                                {EMP_POSITIONS.map((p) => (
-                                                    <SelectItem key={p} value={p}>
-                                                        {p}
-                                                    </SelectItem>
-                                                ))}
-                                            </SelectContent>
-                                        </Select>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
-                        </div>
-                    </div>
-
-                    <div className="flex flex-col lg:flex-row items-center gap-4">
-                        <div className="w-full lg:w-1/2">
-                            <FormField
-                                control={form.control}
-                                name="role"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>Role</FormLabel>
-                                        <Select
-                                            onValueChange={field.onChange}
-                                            defaultValue={field.value}
-                                            value={field.value}
-                                        >
-                                            <FormControl className="w-full">
-                                                <SelectTrigger className="w-full min-h-[44px]">
-                                                    <SelectValue placeholder="Select role" />
-                                                </SelectTrigger>
-                                            </FormControl>
-                                            <SelectContent>
-                                                {EMP_ROLES.map((r) => (
-                                                    <SelectItem key={r} value={r}>
-                                                        {r}
-                                                    </SelectItem>
-                                                ))}
-                                            </SelectContent>
-                                        </Select>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
-                        </div>
-
-                        <div className="w-full lg:w-1/2">
-                            <FormField
-                                control={form.control}
-                                name="jobType"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>Job Type</FormLabel>
-                                        <Select
-                                            onValueChange={field.onChange}
-                                            defaultValue={field.value}
-                                            value={field.value}
-                                        >
-                                            <FormControl className="w-full">
-                                                <SelectTrigger className="w-full min-h-[44px]">
-                                                    <SelectValue placeholder="Select job type" />
-                                                </SelectTrigger>
-                                            </FormControl>
-                                            <SelectContent>
-                                                {EMP_JOB_TYPES.map((j) => (
-                                                    <SelectItem key={j} value={j}>
-                                                        {j}
-                                                    </SelectItem>
-                                                ))}
-                                            </SelectContent>
-                                        </Select>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
-                        </div>
-                    </div>
-
-                    <div className="flex flex-col lg:flex-row items-center gap-4">
-                        <div className="w-full lg:w-1/2">
-                            <FormField
-                                control={form.control}
-                                name="accType"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>Account Status</FormLabel>
-                                        <Select
-                                            onValueChange={field.onChange}
-                                            defaultValue={field.value}
-                                            value={field.value}
-                                        >
-                                            <FormControl className="w-full">
-                                                <SelectTrigger className="w-full min-h-[44px]">
-                                                    <SelectValue placeholder="Select job type" />
-                                                </SelectTrigger>
-                                            </FormControl>
-                                            <SelectContent>
-                                                {EMP_JOB_TYPES.map((j) => (
-                                                    <SelectItem key={j} value={j}>
-                                                        {j}
-                                                    </SelectItem>
-                                                ))}
-                                            </SelectContent>
-                                        </Select>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
-                        </div>
-                        <div className="w-full lg:w-1/2">
-                            <FormField
-                                control={form.control}
-                                name="image"
-                                render={() => (
-                                    <FormItem>
-                                        <FormLabel>Avatar Image</FormLabel>
-                                        <FormControl>
-                                            <div className="w-full">
-                                                <label className="inline-block text-white font-medium px-4 py-1.5 rounded-md cursor-pointer transition bg-brand hover:bg-own-hover">
-                                                    Choose File
-                                                    <Input
-                                                        ref={fileInputRef}
-                                                        disabled={isWorking}
-                                                        accept="image/*"
-                                                        type="file"
-                                                        className="hidden"
-                                                        onChange={() => {
-                                                            //* Force re-render to update the file name display
-                                                            form.setValue('image', getFileName())
-                                                        }}
-                                                    />
-                                                </label>
-                                                <span className="ml-3 text-sm">
-                                                    {getFileName()}
-                                                </span>
+                    <div className="grid md:grid-cols-2 gap-4">
+                        {
+                            Object.keys(defaultValues).map(field => (
+                                <FormField
+                                    key={field}
+                                    control={form.control}
+                                    name={field as Path<FormData>}
+                                    render={({ field }: { field: ControllerRenderProps<FormData, Path<FormData>> }) => (
+                                        <FormItem className="grid gap-3">
+                                            <div className="flex items-center gap-1 justify-between">
+                                                <FormLabel>
+                                                    {field.name.charAt(0).toUpperCase() + field.name.slice(1)}
+                                                    <span className="text-red-600"> *</span>
+                                                </FormLabel>
                                             </div>
-                                        </FormControl>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
-                        </div>
+                                            <FormControl>
+                                                {
+                                                    field.name === "status" ? (
+                                                        <Select
+                                                            onValueChange={field.onChange}
+                                                            defaultValue={field.value}
+                                                        >
+                                                            <SelectTrigger className="min-h-[44px] w-full">
+                                                                <SelectValue placeholder="Select status" />
+                                                            </SelectTrigger>
+                                                            <SelectContent>
+                                                                <SelectItem value="ACTIVE">Active</SelectItem>
+                                                                <SelectItem value="FREEZE">Freeze</SelectItem>
+                                                            </SelectContent>
+                                                        </Select>
+                                                    ) :
+                                                        field.name === "role" ? (
+                                                            <Select
+                                                                onValueChange={field.onChange}
+                                                                defaultValue={field.value}
+                                                            >
+                                                                <SelectTrigger className="min-h-[44px] w-full">
+                                                                    <SelectValue placeholder="Select role" />
+                                                                </SelectTrigger>
+                                                                <SelectContent>
+                                                                    <SelectItem value="EMPLOYEE">Employee</SelectItem>
+                                                                    <SelectItem value="ADMIN">Admin</SelectItem>
+                                                                    <SelectItem value="SUPERADMIN">Super Admin</SelectItem>
+                                                                </SelectContent>
+                                                            </Select>
+                                                        ) :
+                                                            field.name === "jobType" ? (
+                                                                <Select
+                                                                    onValueChange={field.onChange}
+                                                                    defaultValue={field.value}
+                                                                >
+                                                                    <SelectTrigger className="min-h-[44px] w-full">
+                                                                        <SelectValue placeholder="Select role" />
+                                                                    </SelectTrigger>
+                                                                    <SelectContent>
+                                                                        <SelectItem value="FULLTIME">Full-Time</SelectItem>
+                                                                        <SelectItem value="PARTTIME">Part-Time</SelectItem>
+                                                                        <SelectItem value="CONTRACT">Contract</SelectItem>
+                                                                        <SelectItem value="INTERNSHIP">Internship</SelectItem>
+                                                                    </SelectContent>
+                                                                </Select>
+                                                            ) :
+                                                                field.name === "image" ? (
+                                                                    <div className="w-full">
+                                                                        <label className="inline-block text-white font-medium px-4 py-1.5 rounded-md cursor-pointer transition bg-brand hover:bg-own-hover">
+                                                                            Choose File
+                                                                            <Input
+                                                                                ref={fileInputRef}
+                                                                                disabled={isWorking}
+                                                                                accept="image/*"
+                                                                                type="file"
+                                                                                className="hidden"
+                                                                                onChange={() => {
+                                                                                    //* Set the actual File object as the value for the image field
+                                                                                    const file = fileInputRef.current?.files?.[0] ?? null;
+                                                                                    form.setValue('image' as Path<FormData>, file as any);
+                                                                                }}
+                                                                            />
+                                                                        </label>
+                                                                        <span className="ml-3 text-sm">
+                                                                            {getFileName()}
+                                                                        </span>
+                                                                    </div>
+                                                                ) : (
+                                                                    <div className="relative">
+                                                                        <Input
+                                                                            className={`min-h-[44px] ${field.name === 'password' || field.name === 'phone' ? 'font-en' : ''}`}
+                                                                            placeholder={`Enter ${field.name}`}
+                                                                            disabled={isWorking}
+                                                                            type={field.name === 'password' ? showPassword ? 'text' : 'password' : 'text'}
+                                                                            {...field}
+                                                                        />
+                                                                        {(field.name === 'password' || field.name === 'confirmPassword') && (
+                                                                            <button
+                                                                                type="button"
+                                                                                onClick={() =>
+                                                                                    setShowPassword(prev => !prev)
+                                                                                }
+                                                                                className="absolute cursor-pointer right-3 top-3.5 text-muted-foreground"
+                                                                            >
+                                                                                {showPassword ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
+                                                                            </button>
+                                                                        )}
+                                                                    </div>
+                                                                )}
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                            ))
+                        }
                     </div>
-
-                    <div className="flex items-center justify-end gap-2 pt-2">
-                        <DialogClose asChild>
-                            <Button variant="outline" type="button" className="cursor-pointer">
-                                Cancel
-                            </Button>
-                        </DialogClose>
-                        <Button type="submit" className="bg-brand hover:bg-blue-600 cursor-pointer text-white">
-                            Submit
+                    <div className="flex justify-end">
+                        <Button
+                            type="submit"
+                            className="bg-gradient-to-r from-purple-400 via-pink-500 to-blue-500 font-semibold hover:from-pink-500 hover:via-purple-500 hover:to-blue-400 transition-colors duration-300 w-fit text-white flex items-center gap-2 cursor-pointer"
+                            disabled={isWorking}
+                        >
+                            <Spinner
+                                isLoading={isWorking}
+                                label={buttonText === 'Create New Employee' ? 'Creating...' : 'Editing...'}>
+                                {buttonText}
+                            </Spinner>
                         </Button>
                     </div>
                 </form>
