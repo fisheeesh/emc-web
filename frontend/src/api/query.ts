@@ -73,24 +73,26 @@ export const dailyAttendanceQuery = (dep?: string | null) => ({
     queryFn: () => fetchDailyAttendance(dep),
 })
 
-const fetchAttendanceOverview = async ({ q = null, empStatus = null, date = null, dep = null }: {
+const fetchAttendanceOverview = async ({ q = null, empStatus = null, date = null, dep = null, ts = null }: {
     q?: string | null,
     empStatus?: string | null,
     date?: string | null,
     dep?: string | null,
+    ts?: string | null
 }) => {
-    let query = q ? `&empName=${q}` : ''
+    let query = q ? `&kw=${q}` : ''
     if (empStatus) query += `&status=${empStatus}`
     if (date) query += `&date=${date}`
     if (dep) query += `&dep=${dep}`
+    if (ts) query += `&ts=${ts}`
     const res = await api.get(`admin/attendance-overview?${query}`)
 
     return res.data
 }
 
-export const attendanceOverviewQuery = (q: string | null = null, empStatus: string | null = null, date: string | null = null, dep: string | null = null) => ({
-    queryKey: ['attendance-overview', q, empStatus, date, dep],
-    queryFn: () => fetchAttendanceOverview({ q, empStatus, date, dep }),
+export const attendanceOverviewQuery = (q: string | null = null, empStatus: string | null = null, date: string | null = null, dep: string | null = null, ts: string | null = null) => ({
+    queryKey: ['attendance-overview', q, empStatus, date, dep, ts],
+    queryFn: () => fetchAttendanceOverview({ q, empStatus, date, dep, ts }),
 })
 
 const fetchCheckInHours = async ({ date, month, year, dep }: {

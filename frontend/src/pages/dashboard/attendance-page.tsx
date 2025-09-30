@@ -18,7 +18,8 @@ export default function AttendanceDashboardPage() {
     const [searchParams] = useSearchParams()
 
     const gDep = searchParams.get('gDep') || 'all'
-    const empName = searchParams.get('empName')
+    const kw = searchParams.get('kw')
+    const ts = searchParams.get('ts')
     const empStatus = searchParams.get('empStatus') || "all"
     const attDate = searchParams.get('attDate')
     const ciDate = searchParams.get('ciDate')
@@ -28,7 +29,7 @@ export default function AttendanceDashboardPage() {
     const dep = user?.role === 'SUPERADMIN' ? gDep : user?.departmentId.toString()
 
     const { data: attendanceData } = useSuspenseQuery(dailyAttendanceQuery(dep))
-    const { data: attendanceOverviewData } = useSuspenseQuery(attendanceOverviewQuery(empName, empStatus, attDate, dep))
+    const { data: attendanceOverviewData } = useSuspenseQuery(attendanceOverviewQuery(kw, empStatus, attDate, dep, ts))
     const { data: checkInHoursData } = useSuspenseQuery(checkInHoursQuery(ciDate, ciMonth, ciYear, dep))
 
     return (

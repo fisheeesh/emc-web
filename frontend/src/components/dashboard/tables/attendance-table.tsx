@@ -2,7 +2,7 @@ import LocalSearch from "@/components/shared/local-search";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { EMOTION_FILTER } from "@/lib/constants";
+import { EMOTION_FILTER, TSFILTER } from "@/lib/constants";
 import { Dialog, DialogTrigger } from "@radix-ui/react-dialog";
 
 import EmpEmotionModal from "@/components/modals/emp-emotion-modal";
@@ -19,16 +19,21 @@ export default function AttendanceTable({ data }: Props) {
 
     return (
         <Card className="rounded-md flex flex-col gap-5">
-            <CardHeader className="flex flex-col lg:flex-row gap-3 lg:gap-0 justify-between">
+            <CardHeader className="flex flex-col gap-3 ">
                 <div className="flex flex-col items-start gap-2 tracking-wide">
                     <CardTitle className="text-xl md:text-2xl">Attendance Overview</CardTitle>
                     <CardDescription className="line-clamp-1">Select a date to view employee attendance records</CardDescription>
                 </div>
-                <div className="flex flex-col md:flex-row md:items-center gap-2">
-                    <LocalSearch filterValue="empName" />
+                <div className="flex flex-col md:flex-row w-full md:items-center gap-2">
+                    <LocalSearch filterValue="kw" />
                     <CommonFilter
                         filterValue="empStatus"
                         filters={EMOTION_FILTER}
+                        otherClasses="min-h-[44px] sm:min-w-[150px]"
+                    />
+                    <CommonFilter
+                        filterValue="ts"
+                        filters={TSFILTER}
                         otherClasses="min-h-[44px] sm:min-w-[150px]"
                     />
                     <CustomCalendar filterValue="attDate" />
@@ -42,7 +47,7 @@ export default function AttendanceTable({ data }: Props) {
                             <TableHeader>
                                 <TableRow>
                                     <TableHead className="whitespace-nowrap">Name</TableHead>
-                                    <TableHead className="whitespace-nowrap">Role</TableHead>
+                                    <TableHead className="whitespace-nowrap">Position</TableHead>
                                     <TableHead className="whitespace-nowrap">Job Type</TableHead>
                                     <TableHead className="whitespace-nowrap">Emotion</TableHead>
                                     <TableHead className="whitespace-nowrap">Check-in Time</TableHead>
@@ -54,7 +59,7 @@ export default function AttendanceTable({ data }: Props) {
                                 {
                                     data.map((att) => (
                                         <TableRow key={att.id}>
-                                            <TableCell className="">
+                                            <TableCell className="py-6">
                                                 <span className="whitespace-nowrap">{att.employee.fullName}</span>
                                             </TableCell>
                                             <TableCell className="">

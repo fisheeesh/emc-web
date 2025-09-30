@@ -1,7 +1,7 @@
 import { eachDayOfInterval, endOfDay, format, startOfDay } from "date-fns";
 import { Prisma, PrismaClient } from "../../generated/prisma";
 import { MOOD_THRESHOLDS } from "../config";
-import { departmentFilter, roundToHour } from "../utils/helplers";
+import { departmentFilter, getEmotionRange, roundToHour } from "../utils/helplers";
 import { prisma } from "../config/prisma-client";
 
 const prismaClient = new PrismaClient()
@@ -273,26 +273,45 @@ export const getCheckInHoursData = async (uDepartmentId: number, qDepartmentId: 
     }
 }
 
-export const getAttendanceOverviewData = async (uDepartmentId: number, qDepartmentId: string, role: string, empName: string, status: string, date: string) => {
+export const getAttendanceOverviewData = async (uDepartmentId: number, qDepartmentId: string, role: string, kw: string, status: string, date: string, ts: string) => {
     try {
-        const result = await prisma.emotionCheckIn.findMany({
-            where: {
-                createdAt: {
-                    gte: startOfDay(date ? new Date(date) : new Date()),
-                    lte: endOfDay(date ? new Date(date) : new Date())
-                },
-                employee: {
-                    firstName: {
-                        contains: typeof empName === 'string' ? empName : '',
-                        mode: 'insensitive'
-                    },
-                    departmentId: role !== 'SUPERADMIN'
-                        ? uDepartmentId
-                        : qDepartmentId && qDepartmentId !== 'all'
-                            ? Number(qDepartmentId)
-                            : undefined
-                },
-            },
+        const start = startOfDay(date ? new Date(date) : new Date());
+        const end = endOfDay(date ? new Date(date) : new Date());
+
+        const where: any = {
+            createdAt: { gte: start, lte: end },
+        };
+
+        const employeeWhere: any = {};
+
+        const deptId =
+            role !== "SUPERADMIN"
+                ? uDepartmentId
+                : qDepartmentId && qDepartmentId !== "all"
+                    ? Number(qDepartmentId)
+                    : undefined;
+
+        if (typeof deptId !== "undefined") {
+            employeeWhere.departmentId = deptId;
+        }
+
+        const kwTrimmed = (kw || "").trim();
+        if (kwTrimmed.length > 0) {
+            employeeWhere.OR = [
+                { firstName: { contains: kwTrimmed, mode: "insensitive" } },
+                { lastName: { contains: kwTrimmed, mode: "insensitive" } },
+                { position: { contains: kwTrimmed, mode: "insensitive" } },
+            ];
+        }
+
+        if (Object.keys(employeeWhere).length > 0) {
+            where.employee = Object.keys(employeeWhere).length === 1 && "departmentId" in employeeWhere
+                ? employeeWhere
+                : { AND: [employeeWhere] };
+        }
+
+        const options: any = {
+            where,
             select: {
                 id: true,
                 emoji: true,
@@ -310,16 +329,18 @@ export const getAttendanceOverviewData = async (uDepartmentId: number, qDepartme
                 }
             },
             orderBy: {
-                updatedAt: 'desc'
+                updatedAt: ts
             }
-        })
+        }
 
+        if (typeof status === 'string' && status !== 'all') {
+            const emotionRange = getEmotionRange(status.toLowerCase());
+            if (emotionRange) {
+                options.where.emotionScore = emotionRange;
+            }
+        }
 
-        const filtered = typeof status === 'string' && status !== 'all'
-            ? result.filter(r => r.status.toLowerCase().includes(status.toLowerCase()))
-            : result
-
-        return filtered
+        return await prisma.emotionCheckIn.findMany(options)
     } catch (error) {
         console.log(error)
     }

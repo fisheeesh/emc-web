@@ -1,7 +1,6 @@
 import { endOfDay, endOfMonth, endOfYear, startOfDay, startOfMonth, startOfYear, subDays } from "date-fns";
 import { NextFunction, Request, Response } from "express";
 import { query } from "express-validator";
-import { PrismaClient } from "../../../generated/prisma";
 import { getAdminUserData } from "../../services/admin-services";
 import { getEmployeeById } from "../../services/auth-services";
 import { getAttendanceOverviewData, getCheckInHoursData, getDailyAttendanceData, getMoodPercentages, getSentimentsComparisonData } from "../../services/emotion-check-in-services";
@@ -12,8 +11,6 @@ interface CustomRequest extends Request {
     employeeId?: number
 }
 
-const prismaClient = new PrismaClient()
-
 export const testAdmin = (req: Request, res: Response, next: NextFunction) => {
     res.status(200).json({
         message: "You have permission to access this route"
@@ -21,14 +18,8 @@ export const testAdmin = (req: Request, res: Response, next: NextFunction) => {
 }
 
 export const getMoodOverview = [
-    query("dep", "Invalid Department.")
-        .trim()
-        .escape()
-        .optional(),
-    query("duration", "Invalid Duration")
-        .trim()
-        .escape()
-        .optional(),
+    query("dep", "Invalid Department.").trim().escape().optional(),
+    query("duration", "Invalid Duration").trim().escape().optional(),
     async (req: CustomRequest, res: Response, next: NextFunction) => {
         const empId = req.employeeId
         const { duration = 'today', dep } = req.query
@@ -59,14 +50,8 @@ export const getMoodOverview = [
 ]
 
 export const getSenitmentsComparison = [
-    query("dep", "Invalid Department.")
-        .trim()
-        .escape()
-        .optional(),
-    query("duration", "Invalid Duration")
-        .trim()
-        .escape()
-        .optional(),
+    query("dep", "Invalid Department.").trim().escape().optional(),
+    query("duration", "Invalid Duration").trim().escape().optional(),
     async (req: CustomRequest, res: Response, next: NextFunction) => {
         const empId = req.employeeId;
         const { duration = "7", dep } = req.query;
@@ -91,10 +76,7 @@ export const getSenitmentsComparison = [
 ]
 
 export const getDailyAttendance = [
-    query("dep", "Invalid Department.")
-        .trim()
-        .escape()
-        .optional(),
+    query("dep", "Invalid Department.").trim().escape().optional(),
     async (req: CustomRequest, res: Response, next: NextFunction) => {
         const empId = req.employeeId
         const emp = await getEmployeeById(empId!)
@@ -118,18 +100,9 @@ export const getDailyAttendance = [
 ]
 
 export const getCheckInHours = [
-    query("dep", "Invalid Department.")
-        .trim()
-        .escape()
-        .optional(),
-    query("duration", "Invalid Date.")
-        .trim()
-        .optional()
-        .escape(),
-    query("type", "Invalid Type.")
-        .trim()
-        .optional()
-        .escape(),
+    query("dep", "Invalid Department.").trim().escape().optional(),
+    query("duration", "Invalid Date.").trim().optional().escape(),
+    query("type", "Invalid Type.").trim().optional().escape(),
     async (req: CustomRequest, res: Response, next: NextFunction) => {
         const { duration, type, dep } = req.query
         const empId = req.employeeId
@@ -161,30 +134,19 @@ export const getCheckInHours = [
 ]
 
 export const getAttendanceOverView = [
-    query("dep", "Invalid Department.")
-        .trim()
-        .escape()
-        .optional(),
-    query("empName", "Invalid Name.")
-        .trim()
-        .optional()
-        .escape(),
-    query("status", "Invalid Status")
-        .trim()
-        .optional()
-        .escape(),
-    query("date", "Invalid Date")
-        .trim()
-        .optional()
-        .escape(),
+    query("dep", "Invalid Department.").trim().escape().optional(),
+    query("kw", "Invalid Keyword.").trim().optional().escape(),
+    query("status", "Invalid Status").trim().optional().escape(),
+    query("date", "Invalid Date").trim().optional().escape(),
+    query("ts", "Invalid Timestamp").trim().optional().escape(),
     async (req: CustomRequest, res: Response, next: NextFunction) => {
         const empId = req.employeeId
-        const { empName, status, date, dep } = req.query
+        const { kw, status, date, dep, ts = 'desc' } = req.query
 
         const emp = await getEmployeeById(empId!)
         checkEmployeeIfNotExits(emp)
 
-        const result = await getAttendanceOverviewData(emp!.departmentId, dep as string, emp!.role, empName as string, status as string, date as string)
+        const result = await getAttendanceOverviewData(emp!.departmentId, dep as string, emp!.role, kw as string, status as string, date as string, ts as string)
 
         res.status(200).json({
             message: "Here is Attendance OverView Data.",
