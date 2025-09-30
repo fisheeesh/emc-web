@@ -1,7 +1,7 @@
 import { eachDayOfInterval, endOfDay, format, startOfDay } from "date-fns";
 import { Prisma, PrismaClient } from "../../generated/prisma";
 import { MOOD_THRESHOLDS } from "../config";
-import { departmentFilter, getThaiDayBounds, roundToHour } from "../utils/helplers";
+import { departmentFilter, roundToHour } from "../utils/helplers";
 import { prisma } from "../config/prisma-client";
 
 const prismaClient = new PrismaClient()
