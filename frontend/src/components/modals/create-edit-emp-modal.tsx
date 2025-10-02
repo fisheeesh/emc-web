@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
@@ -12,6 +11,8 @@ import { useRef, useState } from "react";
 import { FaUserPen, FaUserPlus } from "react-icons/fa6"
 import Spinner from "../shared/spinner";
 import { Eye, EyeOff } from "lucide-react";
+import useEditEmp from "@/hooks/use-edit-emp";
+import useCreateEmp from "@/hooks/use-create-emp";
 
 interface CreateEditUserModalProps<T extends z.ZodType<any, any, any>> {
     formType: "CREATE" | "EDIT",
@@ -32,6 +33,9 @@ export default function CreateEditEmpModal<T extends z.ZodType<any, any, any>>({
     const fileInputRef = useRef<HTMLInputElement>(null)
     type FormData = z.infer<T>
 
+    const { createEmp, creatingEmp } = useCreateEmp();
+    const { editEmp, editingEmp } = useEditEmp()
+
     const [showPassword, setShowPassword] = useState(false);
 
     const form = useForm({
@@ -45,16 +49,47 @@ export default function CreateEditEmpModal<T extends z.ZodType<any, any, any>>({
     }
 
     const onHandleSubmit: SubmitHandler<FormData> = async (values) => {
+        const formData = new FormData()
+
+        formData.append("firstName", values.firstName)
+        formData.append("lastName", values.lastName)
+        formData.append("phone", values.phone)
+        formData.append("position", values.position)
+        formData.append("role", values.role)
+        formData.append('jobType', values.jobType)
+        formData.append("department", values.department)
+
+        //* Check if a file was selected
+        if (fileInputRef.current?.files?.[0]) {
+            formData.append("avatar", fileInputRef.current.files[0])
+        }
+
         if (formType === 'CREATE') {
-            console.log(values)
+            formData.append("email", values.email)
+            formData.append("password", values.password)
+
+            createEmp(formData, {
+                onSettled: () => {
+                    form.reset()
+                    onClose?.()
+                }
+            })
         } else {
-            console.log(values)
+            formData.append("id", String(userId))
+            formData.append("accType", values.accType)
+
+            editEmp(formData, {
+                onSettled: () => {
+                    form.reset()
+                    onClose?.()
+                }
+            })
         }
     }
 
     const buttonText = formType === 'CREATE' ? 'Create New Employee' : 'Save Changes'
 
-    const isWorking = form.formState.isSubmitting
+    const isWorking = form.formState.isSubmitting || creatingEmp || editingEmp
 
     return (
         <DialogContent className="w-full mx-auto max-h-[90vh] overflow-y-auto sm:max-w-[800px] no-scrollbar" {...props}>
@@ -90,7 +125,7 @@ export default function CreateEditEmpModal<T extends z.ZodType<any, any, any>>({
                                             </div>
                                             <FormControl>
                                                 {
-                                                    field.name === "status" ? (
+                                                    field.name === "accType" ? (
                                                         <Select
                                                             onValueChange={field.onChange}
                                                             defaultValue={field.value}
@@ -135,7 +170,7 @@ export default function CreateEditEmpModal<T extends z.ZodType<any, any, any>>({
                                                                     </SelectContent>
                                                                 </Select>
                                                             ) :
-                                                                field.name === "image" ? (
+                                                                field.name === "avatar" ? (
                                                                     <div className="w-full">
                                                                         <label className="inline-block text-white font-medium px-4 py-1.5 rounded-md cursor-pointer transition bg-brand hover:bg-own-hover">
                                                                             Choose File
@@ -159,7 +194,7 @@ export default function CreateEditEmpModal<T extends z.ZodType<any, any, any>>({
                                                                 ) : (
                                                                     <div className="relative">
                                                                         <Input
-                                                                            className={`min-h-[44px] ${field.name === 'password' || field.name === 'phone' ? 'font-en' : ''}`}
+                                                                            className={`min-h-[44px] placeholder:font-raleway ${field.name === 'password' || field.name === 'phone' ? 'font-en' : ''}`}
                                                                             placeholder={`Enter ${field.name}`}
                                                                             disabled={isWorking}
                                                                             type={field.name === 'password' ? showPassword ? 'text' : 'password' : 'text'}

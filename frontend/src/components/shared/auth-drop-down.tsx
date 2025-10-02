@@ -14,6 +14,8 @@ import {
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { IMG_URL } from "@/lib/constants";
+import useUserStore from "@/store/user-store";
+import { useRef } from "react";
 import { FaRegCalendarCheck } from "react-icons/fa";
 import { IoMdLogOut } from "react-icons/io";
 import { LuLayoutDashboard } from "react-icons/lu";
@@ -22,8 +24,6 @@ import { Link } from "react-router";
 import LogoutModal from "../modals/log-out-modal";
 import { Button } from "../ui/button";
 import { Dialog, DialogTrigger } from "../ui/dialog";
-import { useRef } from "react";
-import useUserStore from "@/store/user-store";
 
 export default function AuthDropdown() {
     const { user } = useUserStore()

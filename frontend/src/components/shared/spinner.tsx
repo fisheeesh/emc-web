@@ -1,4 +1,4 @@
-import { Loader } from "lucide-react"
+import { LiaSpinnerSolid } from "react-icons/lia";
 
 interface SpinnerProps {
     isLoading: boolean,
@@ -11,7 +11,7 @@ export default function Spinner({ isLoading, label, children }: SpinnerProps) {
         <>
             {
                 isLoading ? <>
-                    <Loader className='size-4 animate-spin' />
+                    <LiaSpinnerSolid className='size-4 animate-spin' />
                     <span>{label}</span>
                 </> : children
             }
