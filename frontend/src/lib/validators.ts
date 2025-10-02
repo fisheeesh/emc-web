@@ -42,7 +42,7 @@ const EMP_JOB_TYPES = ["FULLTIME", "PARTTIME", "CONTRACT", "INTERNSHIP"] as cons
 export const createEmpSchema = z.object({
     email: z.string()
         .min(1, { message: "Email is required" })
-        .regex(/^[a-zA-Z0-9._%+-]+@ata-it-th$/, { message: "Email must be from @ata.it.th domain" }),
+        .regex(/^[a-zA-Z0-9._%+-]+@ata.it.th$/, { message: "Email must be from @ata.it.th domain" }),
     password: z.string()
         .min(1, { message: "Password is required" })
         .min(8, { message: "Password must be at least 8 digit" })
@@ -54,7 +54,7 @@ export const createEmpSchema = z.object({
     position: z.string().min(1, { message: "Position is required" }),
     role: z.enum(EMP_ROLES, { message: "Role is required" }),
     jobType: z.enum(EMP_JOB_TYPES, { message: "Job type is required" }),
-    image: z.any().optional(),
+    avatar: z.any().optional(),
 });
 
 export const updateEmpSchema = createEmpSchema.omit({ email: true, password: true }).extend({
