@@ -29,7 +29,7 @@ export default function AttendanceDashboardPage() {
     const dep = user?.role === 'SUPERADMIN' ? gDep : user?.departmentId.toString()
 
     const { data: attendanceData } = useSuspenseQuery(dailyAttendanceQuery(dep))
-    const { data: attendanceOverviewData } = useSuspenseQuery(attendanceOverviewQuery(kw, empStatus, attDate, dep, ts))
+    const { data: attendanceOverviewData, isRefetching } = useSuspenseQuery(attendanceOverviewQuery(kw, empStatus, attDate, dep, ts))
     const { data: checkInHoursData } = useSuspenseQuery(checkInHoursQuery(ciDate, ciMonth, ciYear, dep))
 
     return (
@@ -49,7 +49,7 @@ export default function AttendanceDashboardPage() {
             </div>
 
             <div className="w-full">
-                <AttendanceTable data={attendanceOverviewData.data} />
+                <AttendanceTable data={attendanceOverviewData.data} isFetching={isRefetching} />
             </div>
         </section>
     )
