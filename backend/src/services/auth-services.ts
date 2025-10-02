@@ -1,4 +1,5 @@
 import { PrismaClient } from "../../generated/prisma";
+import jwt from 'jsonwebtoken'
 
 const prisma = new PrismaClient()
 
@@ -11,6 +12,40 @@ export const getEmployeeByEmail = async (email: string) => {
 export const getEmployeeById = async (id: number) => {
     return await prisma.employee.findUnique({
         where: { id }
+    })
+}
+
+export const createEmployeeWithOTP = async (empData: any, otpData: any) => {
+    return await prisma.$transaction(async (tx) => {
+        const data = {
+            ...empData,
+            department: {
+                connectOrCreate: {
+                    where: { name: empData.department },
+                    create: { name: empData.department }
+                }
+            }
+        }
+        const newEmp = await tx.employee.create({ data })
+
+        await tx.otp.create({
+            data: otpData
+        })
+
+        const refreshTokenPayload = { id: newEmp.id, email: newEmp.email, role: newEmp.role }
+
+        const refreshToken = jwt.sign(
+            refreshTokenPayload,
+            process.env.REFRESH_TOKEN_SECRET!,
+            { expiresIn: "30d" }
+        )
+
+        await tx.employee.update({
+            where: { id: newEmp.id },
+            data: { rndToken: refreshToken }
+        })
+
+        return newEmp
     })
 }
 

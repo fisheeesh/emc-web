@@ -49,8 +49,16 @@ export const getAllEmpEmotionHistory = async (employeeId: number) => {
 }
 
 export const deleteEmployeeById = async (id: number) => {
-    return await prisma.employee.delete({
-        where: { id }
+    return await prisma.$transaction(async (tx) => {
+        const deletedUser = await tx.employee.delete({
+            where: { id }
+        })
+
+        await tx.otp.deleteMany({
+            where: { email: deletedUser.email }
+        })
+
+        return deletedUser
     })
 }
 

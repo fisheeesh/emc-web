@@ -315,7 +315,7 @@ export const confirmPassword = [
 
         //* Create tokens and add some payloads to it
         const accessTokenPayload = { id: newEmp!.id }
-        const refreshTokenPayload = { id: newEmp!.id, email: newEmp!.email }
+        const refreshTokenPayload = { id: newEmp!.id, email: newEmp!.email, role: newEmp!.role }
 
         const accessToken = jwt.sign(
             accessTokenPayload,
@@ -445,7 +445,7 @@ export const login = [
 
         //* Password match -> create tokens and add some payloads to it
         const accessTokenPayload = { id: employee!.id }
-        const refreshTokenPayload = { id: employee!.id, email: employee!.email }
+        const refreshTokenPayload = { id: employee!.id, email: employee!.email, role: employee!.role }
 
         const accessToken = jwt.sign(
             accessTokenPayload,
@@ -519,7 +519,7 @@ export const logout = async (req: Request, res: Response, next: NextFunction) =>
     let decoded;
     try {
         //* Check user is able to logout
-        decoded = jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET!) as { id: number, email: string }
+        decoded = jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET!) as { id: number, email: string, role: string }
     } catch (error) {
         return next(createHttpErrors({
             message: 'You are not an authenticated user.',
@@ -873,7 +873,7 @@ export const resetPassword = [
         await updateEmployeeData(emp!.id, userData)
 
         const accessTokenPayload = { id: emp!.id }
-        const refreshTokenPayload = { id: emp!.id, email: emp!.email }
+        const refreshTokenPayload = { id: emp!.id, email: emp!.email, role: emp!.role }
 
         const accessToken = jwt.sign(
             accessTokenPayload,

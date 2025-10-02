@@ -34,7 +34,7 @@ export const auth = async (req: CustomRequest, res: Response, next: NextFunction
     const generateNewTokens = async () => {
         let decoded;
         try {
-            decoded = jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET!) as { id: number, email: string }
+            decoded = jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET!) as { id: number, email: string, role: string }
         } catch (error) {
             return next(createHttpErrors({
                 message: 'You are not an authenticated user.',
@@ -51,14 +51,14 @@ export const auth = async (req: CustomRequest, res: Response, next: NextFunction
 
         const employee = await getEmployeeById(decoded.id)
 
-        if (!employee || employee.email !== decoded.email || employee.rndToken !== refreshToken) return next(createHttpErrors({
+        if (!employee || employee.email !== decoded.email || employee.rndToken !== refreshToken || employee.role !== decoded.role) return next(createHttpErrors({
             message: "You are not authenticated employee.",
             status: 401,
             code: errorCodes.unauthenticated
         }))
 
         const accessTokenPayload = { id: employee.id }
-        const refreshTokenPayload = { id: employee.id, email: employee.email }
+        const refreshTokenPayload = { id: employee.id, email: employee.email, role: employee.role }
 
         const newAccessToken = jwt.sign(
             accessTokenPayload,

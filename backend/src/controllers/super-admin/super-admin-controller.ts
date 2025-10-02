@@ -4,9 +4,9 @@ import { AccType, JobType, Prisma, Role } from "../../../generated/prisma"
 import { DEPARTMENTS } from "../../config"
 import { errorCodes } from "../../config/error-codes"
 import { ImageQueue } from "../../jobs/queues/image-queue"
-import { createEmployee, getEmployeeById } from "../../services/auth-services"
+import { createEmployeeWithOTP, getEmployeeByEmail, getEmployeeById } from "../../services/auth-services"
 import { deleteEmployeeById, getEmployeesInfiniteData, updateEmpDataById } from "../../services/emp-services"
-import { checkEmployeeIfNotExits, checkUploadFile, createHttpErrors } from "../../utils/check"
+import { checkEmployeeIfExits, checkEmployeeIfNotExits, checkUploadFile, createHttpErrors } from "../../utils/check"
 import { generateHashedValue, generateToken } from "../../utils/generate"
 import { removeFiles } from "../../utils/helplers"
 
@@ -28,8 +28,20 @@ export const createNewEmployee = [
         }),
     body("password", "Password must be at least 8 digits.").trim().notEmpty().matches(/^[\d]+$/).isLength({ min: 8, max: 8 }),
     body("position", "Position is required.").trim().notEmpty().escape(),
-    body("role", "Role is required.").trim().notEmpty().escape(),
-    body("jobType", "Job Type is required.").trim().notEmpty().escape(),
+    body("role", "Role is required.").trim().notEmpty().escape()
+        .custom(value => {
+            if (!Object.values(Role).includes(value as Role)) {
+                throw new Error("Invalid Role.")
+            }
+            return true
+        }),
+    body("jobType", "Job Type is required.").trim().notEmpty().escape()
+        .custom(value => {
+            if (!Object.values(JobType).includes(value as JobType)) {
+                throw new Error("Invalid Job Type.")
+            }
+            return true
+        }),
     body("department", "Department is required.").trim().notEmpty().escape(),
     async (req: CustomRequest, res: Response, next: NextFunction) => {
         const errors = validationResult(req).array({ onlyFirstError: true })
@@ -44,13 +56,16 @@ export const createNewEmployee = [
             }))
         }
 
-        const { firstName, lastName, phone, email, password, position, department } = req.body
+        const { firstName, lastName, phone, email, password, position, department, role, jobType } = req.body
 
         const empId = req.employeeId
         const emp = await getEmployeeById(empId!)
 
         checkEmployeeIfNotExits(emp)
         checkUploadFile(req.file)
+
+        const existEmp = await getEmployeeByEmail(email)
+        checkEmployeeIfExits(existEmp)
 
         const splitFileName = req.file?.filename?.split(".")[0]
         await ImageQueue.add("optimize-image", {
@@ -67,22 +82,33 @@ export const createNewEmployee = [
             }
         })
 
+        const otp = 123456
+        const hashedOTP = await generateHashedValue(otp.toString())
         const hashedPassword = await generateHashedValue(password)
         const token = generateToken()
 
-        const data: any = {
+        const empData: any = {
             firstName,
             lastName,
             email,
             password: hashedPassword,
             phone,
             position,
+            role,
+            jobType,
             department,
             rndToken: token,
             avatar: req.file?.filename
         }
 
-        const newEmp = await createEmployee(data)
+        const otpData = {
+            email,
+            otp: hashedOTP,
+            rememberToken: generateToken(),
+            count: 1
+        }
+
+        const newEmp = await createEmployeeWithOTP(empData, otpData)
 
         res.status(201).json({
             message: "Successfully create next employee.",
@@ -203,22 +229,32 @@ export const getAllEmployeesInfinite = [
 
 export const updateEmployeeData = [
     body("id", "EmpId is required.").isInt({ gt: 0 }),
-    body("firstName", "First Name is required.").trim().escape().optional(),
-    body("lastName", "Last Name is required.").trim().escape().optional(),
-    body("phone", "Invalid phone number.").trim().matches(/^[\d]+$/).isLength({ min: 5, max: 12 }).optional(),
-    body("position", "Position is required.").trim().escape().optional(),
-    body("role", "Invalid Role.").trim().escape().optional(),
-    body("accType", "Invalid Account Type.").trim().escape().optional(),
-    body("jobType", "Invalid Job Type.").trim().escape().optional(),
-    body("department", "Invalid department.").trim()
+    body("firstName", "First Name is required.").trim().notEmpty().escape(),
+    body("lastName", "Last Name is required.").trim().notEmpty().escape(),
+    body("phone", "Invalid phone number.").trim().notEmpty().matches(/^[\d]+$/).isLength({ min: 5, max: 12 }),
+    body("position", "Position is required.").trim().notEmpty().escape(),
+    body("role", "Role is required.").trim().notEmpty().escape()
         .custom(value => {
-            if (!DEPARTMENTS.includes(value)) {
-                throw new Error("Invalid department.")
+            if (!Object.values(Role).includes(value as Role)) {
+                throw new Error("Invalid Role.")
             }
             return true
-        })
-        .escape()
-        .optional(),
+        }),
+    body("jobType", "Job Type is required.").trim().notEmpty().escape()
+        .custom(value => {
+            if (!Object.values(JobType).includes(value as JobType)) {
+                throw new Error("Invalid Job Type.")
+            }
+            return true
+        }),
+    body("accType", "Account Type is required.").trim().notEmpty().escape()
+        .custom(value => {
+            if (!Object.values(AccType).includes(value as AccType)) {
+                throw new Error("Invalid Job Type.")
+            }
+            return true
+        }),
+    body("department", "Department is required.").trim().notEmpty().escape(),
     async (req: CustomRequest, res: Response, next: NextFunction) => {
         const errors = validationResult(req).array({ onlyFirstError: true })
         if (errors.length > 0) {
@@ -231,9 +267,8 @@ export const updateEmployeeData = [
                 code: errorCodes.invalid
             }))
         }
-
-        const employee = req.employee
-        const { id, firstName, lastName, phone, position, role, accType, jobType, department } = req.body
+        
+        const { id, firstName, lastName, phone, position, role, jobType, accType, department } = req.body
 
         const emp = await getEmployeeById(+id)
 
@@ -248,25 +283,14 @@ export const updateEmployeeData = [
             }))
         }
 
-        if (employee.role !== 'SUPERADMIN') {
-            if (req.file) {
-                await removeFiles(req.file.filename, null)
-            }
-            return next(createHttpErrors({
-                message: "You do not have permission to manipulate this resource.",
-                status: 403,
-                code: errorCodes.forbidden
-            }))
-        }
-
         const data: any = {
             firstName,
             lastName,
             phone,
             position,
             role,
-            accType,
             jobType,
+            accType,
             department,
             avatar: req.file
         }
@@ -305,7 +329,7 @@ export const updateEmployeeData = [
 ]
 
 export const deleteEmployee = [
-    body("id", "EmpId is required.").isInt({ gt: 0 }),
+    body("id", "Employee Id is required.").isInt({ gt: 0 }),
     async (req: CustomRequest, res: Response, next: NextFunction) => {
         const errors = validationResult(req).array({ onlyFirstError: true })
         if (errors.length > 0) {
@@ -317,7 +341,6 @@ export const deleteEmployee = [
         }
 
         const { id } = req.body
-        const employee = req.employee
 
         const emp = await getEmployeeById(+id)
 
@@ -326,14 +349,6 @@ export const deleteEmployee = [
                 message: "Employee not found.",
                 status: 404,
                 code: errorCodes.notFound
-            }))
-        }
-
-        if (employee.role !== 'SUPERADMIN') {
-            return next(createHttpErrors({
-                message: "You do not have permission to manipulate this resource.",
-                status: 403,
-                code: errorCodes.forbidden
             }))
         }
 
