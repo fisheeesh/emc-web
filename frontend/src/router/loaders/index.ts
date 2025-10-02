@@ -28,7 +28,7 @@ export const senitmentsLoader = async () => {
 export const attendanceLoader = async () => {
     await Promise.all([
         queryClient.ensureQueryData(dailyAttendanceQuery()),
-        queryClient.ensureQueryData(attendanceOverviewQuery()),
+        queryClient.ensureInfiniteQueryData(attendanceOverviewQuery()),
         queryClient.ensureQueryData(checkInHoursQuery())
     ])
 

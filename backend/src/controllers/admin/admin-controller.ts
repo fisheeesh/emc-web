@@ -3,9 +3,10 @@ import { NextFunction, Request, Response } from "express";
 import { query } from "express-validator";
 import { getAdminUserData } from "../../services/admin-services";
 import { getEmployeeById } from "../../services/auth-services";
-import { getAttendanceOverviewData, getCheckInHoursData, getDailyAttendanceData, getMoodPercentages, getSentimentsComparisonData } from "../../services/emotion-check-in-services";
+import { getAttendanceOverviewInfiniteData, getCheckInHoursData, getDailyAttendanceData, getMoodPercentages, getSentimentsComparisonData } from "../../services/emotion-check-in-services";
 import { getAllDepartmentsData } from "../../services/system-service";
 import { checkEmployeeIfNotExits } from "../../utils/check";
+import { getEmotionRange } from "../../utils/helplers";
 
 interface CustomRequest extends Request {
     employeeId?: number
@@ -134,6 +135,8 @@ export const getCheckInHours = [
 ]
 
 export const getAttendanceOverView = [
+    query("limit", "Limit must be LogId.").isInt({ gt: 6 }).optional(),
+    query("cursor", "Cursor must be unsigned integer.").isInt({ gt: 0 }).optional(),
     query("dep", "Invalid Department.").trim().escape().optional(),
     query("kw", "Invalid Keyword.").trim().optional().escape(),
     query("status", "Invalid Status").trim().optional().escape(),
@@ -141,16 +144,92 @@ export const getAttendanceOverView = [
     query("ts", "Invalid Timestamp").trim().optional().escape(),
     async (req: CustomRequest, res: Response, next: NextFunction) => {
         const empId = req.employeeId
-        const { kw, status, date, dep, ts = 'desc' } = req.query
+        const { limit = 7, cursor: lastCursor, kw, status, date, dep, ts = 'desc' } = req.query
 
         const emp = await getEmployeeById(empId!)
         checkEmployeeIfNotExits(emp)
 
-        const result = await getAttendanceOverviewData(emp!.departmentId, dep as string, emp!.role, kw as string, status as string, date as string, ts as string)
+        const start = startOfDay(date ? new Date(date as string) : new Date());
+        const end = endOfDay(date ? new Date(date as string) : new Date());
+
+        const where: any = {
+            createdAt: { gte: start, lte: end },
+        };
+
+        const employeeWhere: any = {};
+
+        const deptId =
+            emp!.role !== "SUPERADMIN"
+                ? emp!.departmentId
+                : dep && dep !== "all"
+                    ? Number(dep)
+                    : undefined;
+
+        if (typeof deptId !== "undefined") {
+            employeeWhere.departmentId = deptId;
+        }
+
+        const kwTrimmed = (kw || "").toString().trim();
+        if (kwTrimmed.length > 0) {
+            employeeWhere.OR = [
+                { firstName: { contains: kwTrimmed, mode: "insensitive" } },
+                { lastName: { contains: kwTrimmed, mode: "insensitive" } },
+                { position: { contains: kwTrimmed, mode: "insensitive" } },
+            ];
+        }
+
+        if (Object.keys(employeeWhere).length > 0) {
+            where.employee = Object.keys(employeeWhere).length === 1 && "departmentId" in employeeWhere
+                ? employeeWhere
+                : { AND: [employeeWhere] };
+        }
+
+        const options: any = {
+            take: +limit + 1,
+            skip: lastCursor ? 1 : 0,
+            cursor: lastCursor ? { id: +lastCursor } : undefined,
+            where,
+            select: {
+                id: true,
+                emoji: true,
+                textFeeling: true,
+                emotionScore: true,
+                status: true,
+                checkInTime: true,
+                employee: {
+                    select: {
+                        id: true,
+                        fullName: true,
+                        position: true,
+                        jobType: true
+                    }
+                }
+            },
+            orderBy: {
+                updatedAt: ts
+            }
+        }
+
+        if (typeof status === 'string' && status !== 'all') {
+            const emotionRange = getEmotionRange(status.toLowerCase());
+            if (emotionRange) {
+                options.where.emotionScore = emotionRange;
+            }
+        }
+
+        const attendances = await getAttendanceOverviewInfiniteData(options)
+        const hasNextPage = attendances!.length > +limit
+
+        if (hasNextPage) attendances!.pop()
+
+        const nextCursor = hasNextPage ? attendances![attendances!.length - 1].id : null
 
         res.status(200).json({
             message: "Here is Attendance OverView Data.",
-            data: result
+            hasNextPage,
+            nextCursor,
+            prevCursor: lastCursor || undefined,
+            data: attendances
         })
     }
 ]

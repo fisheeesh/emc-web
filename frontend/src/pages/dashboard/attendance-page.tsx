@@ -5,7 +5,7 @@ import DisplayCard from "@/components/dashboard/display-card";
 import AttendanceTable from "@/components/dashboard/tables/attendance-table";
 import useTitle from "@/hooks/use-title";
 import useUserStore from "@/store/user-store";
-import { useSuspenseQuery } from "@tanstack/react-query";
+import { useInfiniteQuery, useSuspenseQuery } from "@tanstack/react-query";
 import { BarElement, CategoryScale, Chart as ChartJS, Legend, LinearScale, Tooltip } from "chart.js";
 import { useSearchParams } from "react-router";
 
@@ -29,8 +29,18 @@ export default function AttendanceDashboardPage() {
     const dep = user?.role === 'SUPERADMIN' ? gDep : user?.departmentId.toString()
 
     const { data: attendanceData } = useSuspenseQuery(dailyAttendanceQuery(dep))
-    const { data: attendanceOverviewData, isRefetching } = useSuspenseQuery(attendanceOverviewQuery(kw, empStatus, attDate, dep, ts))
+    const {
+        status: attStatus,
+        data: attData,
+        error: attError,
+        isFetching: isAttFetching,
+        isFetchingNextPage: isAttFetchingNextPage,
+        fetchNextPage: fetchAttNextPage,
+        hasNextPage: hasAttNextPage,
+    } = useInfiniteQuery(attendanceOverviewQuery(kw, empStatus, attDate, dep, ts))
     const { data: checkInHoursData } = useSuspenseQuery(checkInHoursQuery(ciDate, ciMonth, ciYear, dep))
+
+    const allAtts = attData?.pages.flatMap(page => page.data) ?? []
 
     return (
         <section className="flex flex-col justify-center items-center w-full gap-3">
@@ -49,7 +59,15 @@ export default function AttendanceDashboardPage() {
             </div>
 
             <div className="w-full">
-                <AttendanceTable data={attendanceOverviewData.data} isFetching={isRefetching} />
+                <AttendanceTable
+                    data={allAtts}
+                    status={attStatus}
+                    error={attError}
+                    isFetching={isAttFetching}
+                    isFetchingNextPage={isAttFetchingNextPage}
+                    fetchNextPage={fetchAttNextPage}
+                    hasNextPage={hasAttNextPage}
+                />
             </div>
         </section>
     )

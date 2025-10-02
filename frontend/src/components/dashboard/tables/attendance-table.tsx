@@ -14,10 +14,15 @@ import TableSkeleton from "@/components/shared/table-skeleton";
 
 interface Props {
     data: AttendanceOverviewData[]
-    isFetching: boolean,
+    status: "error" | 'success' | 'pending',
+    error: Error | null,
+    isFetching?: boolean,
+    isFetchingNextPage: boolean,
+    fetchNextPage: () => void,
+    hasNextPage: boolean
 }
 
-export default function AttendanceTable({ data, isFetching }: Props) {
+export default function AttendanceTable({ data, status, error, isFetchingNextPage, fetchNextPage, hasNextPage }: Props) {
 
     return (
         <Card className="rounded-md flex flex-col gap-5">
@@ -54,52 +59,72 @@ export default function AttendanceTable({ data, isFetching }: Props) {
                         </TableRow>
                     </TableHeader>
 
-                    {isFetching !== false && <TableSkeleton cols={6} />}
-
                     {
-                        data.length > 0 && isFetching === false &&
-                        <TableBody>
-                            {
-                                data.map((att) => (
-                                    <TableRow key={att.id}>
-                                        <TableCell className="py-6">
-                                            <span className="whitespace-nowrap">{att.employee.fullName}</span>
-                                        </TableCell>
-                                        <TableCell className="">
-                                            <span className="whitespace-nowrap">{att.employee.position}</span>
-                                        </TableCell>
-                                        <TableCell>
-                                            <span className="whitespace-nowrap">{att.employee.jobType}</span>
-                                        </TableCell>
-                                        <TableCell>
-                                            <CustomBadge status={att.status} />
-                                        </TableCell>
-                                        <TableCell>
-                                            <span className="whitespace-nowrap font-en">{att.checkInTime}</span>
-                                        </TableCell>
-                                        <TableCell className="space-x-2 text-center">
-                                            {/* Details Dialog */}
-                                            <Dialog>
-                                                <DialogTrigger asChild>
-                                                    <Button variant='outline' className="cursor-pointer">
-                                                        Details
-                                                    </Button>
-                                                </DialogTrigger>
-                                                <EmpEmotionModal empName={att.employee.fullName} emoji={att.emoji} textFeeling={att.textFeeling} checkInTime={att.checkInTime} score={att.emotionScore} />
-                                            </Dialog>
+                        status === 'pending' ?
+                            <TableSkeleton cols={6} />
+                            : status === 'error'
+                                ? <TableBody>
+                                    <TableRow>
+                                        <TableCell colSpan={6} className="text-center py-10">
+                                            Error: {error?.message}
                                         </TableCell>
                                     </TableRow>
-                                ))
-                            }
-                        </TableBody>
+                                </TableBody>
+                                : <TableBody>
+                                    {
+                                        data.map((att) => (
+                                            <TableRow key={att.id}>
+                                                <TableCell className="py-6">
+                                                    <span className="whitespace-nowrap">{att.employee.fullName}</span>
+                                                </TableCell>
+                                                <TableCell className="">
+                                                    <span className="whitespace-nowrap">{att.employee.position}</span>
+                                                </TableCell>
+                                                <TableCell>
+                                                    <span className="whitespace-nowrap">{att.employee.jobType}</span>
+                                                </TableCell>
+                                                <TableCell>
+                                                    <CustomBadge status={att.status} />
+                                                </TableCell>
+                                                <TableCell>
+                                                    <span className="whitespace-nowrap font-en">{att.checkInTime}</span>
+                                                </TableCell>
+                                                <TableCell className="space-x-2 text-center">
+                                                    {/* Details Dialog */}
+                                                    <Dialog>
+                                                        <DialogTrigger asChild>
+                                                            <Button variant='outline' className="cursor-pointer">
+                                                                Details
+                                                            </Button>
+                                                        </DialogTrigger>
+                                                        <EmpEmotionModal empName={att.employee.fullName} emoji={att.emoji} textFeeling={att.textFeeling} checkInTime={att.checkInTime} score={att.emotionScore} />
+                                                    </Dialog>
+                                                </TableCell>
+                                            </TableRow>
+                                        ))
+                                    }
+                                </TableBody>
                     }
                 </Table>
+                <div className="my-4 flex flex-col items-center justify-center">
+                    {data.length > 0 && <Button
+                        className="cursor-pointer"
+                        onClick={() => fetchNextPage()}
+                        disabled={!hasNextPage || isFetchingNextPage}
+                        variant={!hasNextPage ? "ghost" : "secondary"}
+                    >
+                        {isFetchingNextPage
+                            ? "Loading more..."
+                            : hasNextPage
+                                ? "Load More"
+                                : "Nothing more to load"}
+                    </Button>}
+                </div>
+
+                {data.length === 0 && status === 'success' && <div className="my-4 flex flex-col items-center justify-center">
+                    <Empty label="No records found" classesName="w-[300px] h-[200px] " />
+                </div>}
             </CardContent>
-            {
-                data.length === 0 && isFetching === false && <CardContent className="flex items-center flex-col justify-center">
-                    <Empty label="No records found" classesName="w-[300px] h-[200px]" />
-                </CardContent>
-            }
         </Card>
     )
 }

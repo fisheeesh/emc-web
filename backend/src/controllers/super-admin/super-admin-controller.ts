@@ -267,7 +267,7 @@ export const updateEmployeeData = [
                 code: errorCodes.invalid
             }))
         }
-        
+
         const { id, firstName, lastName, phone, position, role, jobType, accType, department } = req.body
 
         const emp = await getEmployeeById(+id)

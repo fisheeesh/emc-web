@@ -273,73 +273,8 @@ export const getCheckInHoursData = async (uDepartmentId: number, qDepartmentId: 
     }
 }
 
-export const getAttendanceOverviewData = async (uDepartmentId: number, qDepartmentId: string, role: string, kw: string, status: string, date: string, ts: string) => {
+export const getAttendanceOverviewInfiniteData = async (options: any) => {
     try {
-        const start = startOfDay(date ? new Date(date) : new Date());
-        const end = endOfDay(date ? new Date(date) : new Date());
-
-        const where: any = {
-            createdAt: { gte: start, lte: end },
-        };
-
-        const employeeWhere: any = {};
-
-        const deptId =
-            role !== "SUPERADMIN"
-                ? uDepartmentId
-                : qDepartmentId && qDepartmentId !== "all"
-                    ? Number(qDepartmentId)
-                    : undefined;
-
-        if (typeof deptId !== "undefined") {
-            employeeWhere.departmentId = deptId;
-        }
-
-        const kwTrimmed = (kw || "").trim();
-        if (kwTrimmed.length > 0) {
-            employeeWhere.OR = [
-                { firstName: { contains: kwTrimmed, mode: "insensitive" } },
-                { lastName: { contains: kwTrimmed, mode: "insensitive" } },
-                { position: { contains: kwTrimmed, mode: "insensitive" } },
-            ];
-        }
-
-        if (Object.keys(employeeWhere).length > 0) {
-            where.employee = Object.keys(employeeWhere).length === 1 && "departmentId" in employeeWhere
-                ? employeeWhere
-                : { AND: [employeeWhere] };
-        }
-
-        const options: any = {
-            where,
-            select: {
-                id: true,
-                emoji: true,
-                textFeeling: true,
-                emotionScore: true,
-                status: true,
-                checkInTime: true,
-                employee: {
-                    select: {
-                        id: true,
-                        fullName: true,
-                        position: true,
-                        jobType: true
-                    }
-                }
-            },
-            orderBy: {
-                updatedAt: ts
-            }
-        }
-
-        if (typeof status === 'string' && status !== 'all') {
-            const emotionRange = getEmotionRange(status.toLowerCase());
-            if (emotionRange) {
-                options.where.emotionScore = emotionRange;
-            }
-        }
-
         return await prisma.emotionCheckIn.findMany(options)
     } catch (error) {
         console.log(error)
