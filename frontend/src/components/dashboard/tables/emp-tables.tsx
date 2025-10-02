@@ -3,16 +3,11 @@ import CreateEditEmpModal from "@/components/modals/create-edit-emp-modal";
 import CommonFilter from "@/components/shared/common-filter";
 import CustomBadge from "@/components/shared/custom-badge";
 import LocalSearch from "@/components/shared/local-search";
+import TableSkeleton from "@/components/shared/table-skeleton";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogTrigger } from "@/components/ui/dialog";
-import Empty from "@/components/ui/empty";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { ACC_FILTER, EMOTION_FILTER, IMG_URL, JOBS_FILTER, ROLES_FILTER, TSFILTER } from "@/lib/constants";
-import { getInitialName } from "@/lib/utils";
-import { IoPersonAdd } from "react-icons/io5";
-import { GrMoreVertical } from "react-icons/gr";
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -20,11 +15,18 @@ import {
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { LiaUserEditSolid } from "react-icons/lia";
-import { RiDeleteBin5Line } from "react-icons/ri";
-import { FaStreetView } from "react-icons/fa";
+import Empty from "@/components/ui/empty";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import useDeleteEmp from "@/hooks/use-delete-emp";
+import { ACC_FILTER, EMOTION_FILTER, IMG_URL, JOBS_FILTER, ROLES_FILTER, TSFILTER } from "@/lib/constants";
+import { getInitialName } from "@/lib/utils";
 import { createEmpSchema, updateEmpSchema } from "@/lib/validators";
 import { useState } from "react";
+import { BsEye } from "react-icons/bs";
+import { GrMoreVertical } from "react-icons/gr";
+import { IoPersonAdd } from "react-icons/io5";
+import { LuUserPen } from "react-icons/lu";
+import { RiDeleteBin5Line } from "react-icons/ri";
 
 interface Props {
     data: Employee[]
@@ -39,6 +41,7 @@ interface Props {
 export default function EmpTables({ data, status, error, isFetchingNextPage, fetchNextPage, hasNextPage }: Props) {
     const [createOpen, setCreateOpen] = useState(false);
     const [editingEmp, setEditingEmp] = useState<Employee | null>(null);
+    const { deleteEmp, deletingEmp } = useDeleteEmp()
 
     return (
         <Card className="rounded-md flex flex-col gap-5">
@@ -68,7 +71,7 @@ export default function EmpTables({ data, status, error, isFetchingNextPage, fet
                                     position: "",
                                     role: "EMPLOYEE",
                                     jobType: "FULLTIME",
-                                    image: undefined,
+                                    avatar: undefined,
                                 }}
                                 onClose={() => setCreateOpen(false)}
                             />}
@@ -125,13 +128,7 @@ export default function EmpTables({ data, status, error, isFetchingNextPage, fet
 
                     {
                         status === 'pending' ?
-                            <TableBody>
-                                <TableRow>
-                                    <TableCell colSpan={10} className="text-center py-10">
-                                        Loading...
-                                    </TableCell>
-                                </TableRow>
-                            </TableBody>
+                            <TableSkeleton cols={11} />
                             : status === 'error'
                                 ? <TableBody>
                                     <TableRow>
@@ -193,7 +190,7 @@ export default function EmpTables({ data, status, error, isFetchingNextPage, fet
                                                                     <Dialog>
                                                                         <DialogTrigger asChild>
                                                                             <Button size='icon' variant='ghost' className="w-full cursor-pointer flex justify-start gap-2 px-1.5">
-                                                                                <FaStreetView />
+                                                                                <BsEye />
                                                                                 View Details
                                                                             </Button>
                                                                         </DialogTrigger>
@@ -207,7 +204,7 @@ export default function EmpTables({ data, status, error, isFetchingNextPage, fet
                                                                         className="w-full cursor-pointer flex justify-start gap-2 px-1.5"
                                                                         onClick={() => setEditingEmp(emp)}
                                                                     >
-                                                                        <LiaUserEditSolid />
+                                                                        <LuUserPen className="text-black dark:text-white" />
                                                                         Edit
                                                                     </Button>
                                                                 </DropdownMenuItem>
@@ -219,7 +216,13 @@ export default function EmpTables({ data, status, error, isFetchingNextPage, fet
                                                                                 Delete
                                                                             </Button>
                                                                         </DialogTrigger>
-                                                                        <ConfirmModal />
+                                                                        <ConfirmModal
+                                                                            title="Delete Employee Confirmation."
+                                                                            description={`Are you sure you want to delete this employee? This action cannot be undone.`}
+                                                                            isLoading={deletingEmp}
+                                                                            loadingLabel="Deleting..."
+                                                                            onConfirm={() => deleteEmp(emp.id)}
+                                                                        />
                                                                     </Dialog>
                                                                 </DropdownMenuItem>
                                                             </DropdownMenuGroup>
@@ -238,12 +241,12 @@ export default function EmpTables({ data, status, error, isFetchingNextPage, fet
                                                 firstName: editingEmp.firstName,
                                                 lastName: editingEmp.lastName,
                                                 phone: editingEmp.phone,
-                                                department: "",
+                                                department: editingEmp.department.name,
                                                 position: editingEmp.position,
                                                 role: editingEmp.role as "EMPLOYEE" | "ADMIN" | "SUPERADMIN",
                                                 jobType: editingEmp.jobType as "FULLTIME" | "PARTTIME" | "CONTRACT" | "INTERNSHIP",
                                                 accType: editingEmp.accType as "ACTIVE" | "FREEZE",
-                                                image: undefined,
+                                                avatar: undefined,
                                             }}
                                             onClose={() => setEditingEmp(null)}
                                         />}

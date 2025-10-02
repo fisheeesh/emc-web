@@ -68,7 +68,7 @@ export function ResetPasswordForm({
                                                         placeholder="Create a new password"
                                                         {...field}
                                                         inputMode="numeric"
-                                                        className="w-full min-h-[48px] font-en"
+                                                        className="w-full min-h-[48px] font-en placeholder:font-raleway"
                                                     />
                                                     <button
                                                         type="button"

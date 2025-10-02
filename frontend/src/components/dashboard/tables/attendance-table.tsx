@@ -10,12 +10,14 @@ import CommonFilter from "@/components/shared/common-filter";
 import CustomBadge from "@/components/shared/custom-badge";
 import CustomCalendar from "@/components/shared/custom-calendar";
 import Empty from "@/components/ui/empty";
+import TableSkeleton from "@/components/shared/table-skeleton";
 
 interface Props {
     data: AttendanceOverviewData[]
+    isFetching: boolean,
 }
 
-export default function AttendanceTable({ data }: Props) {
+export default function AttendanceTable({ data, isFetching }: Props) {
 
     return (
         <Card className="rounded-md flex flex-col gap-5">
@@ -39,61 +41,64 @@ export default function AttendanceTable({ data }: Props) {
                     <CustomCalendar filterValue="attDate" />
                 </div>
             </CardHeader>
+            <CardContent>
+                <Table>
+                    <TableHeader>
+                        <TableRow>
+                            <TableHead className="whitespace-nowrap font-semibold">Name</TableHead>
+                            <TableHead className="whitespace-nowrap font-semibold">Position</TableHead>
+                            <TableHead className="whitespace-nowrap font-semibold">Job Type</TableHead>
+                            <TableHead className="whitespace-nowrap font-semibold">Emotion</TableHead>
+                            <TableHead className="whitespace-nowrap font-semibold">Check-in Time</TableHead>
+                            <TableHead className="whitespace-nowrap text-center font-semibold">Actions</TableHead>
+                        </TableRow>
+                    </TableHeader>
 
+                    {isFetching !== false && <TableSkeleton cols={6} />}
+
+                    {
+                        data.length > 0 && isFetching === false &&
+                        <TableBody>
+                            {
+                                data.map((att) => (
+                                    <TableRow key={att.id}>
+                                        <TableCell className="py-6">
+                                            <span className="whitespace-nowrap">{att.employee.fullName}</span>
+                                        </TableCell>
+                                        <TableCell className="">
+                                            <span className="whitespace-nowrap">{att.employee.position}</span>
+                                        </TableCell>
+                                        <TableCell>
+                                            <span className="whitespace-nowrap">{att.employee.jobType}</span>
+                                        </TableCell>
+                                        <TableCell>
+                                            <CustomBadge status={att.status} />
+                                        </TableCell>
+                                        <TableCell>
+                                            <span className="whitespace-nowrap font-en">{att.checkInTime}</span>
+                                        </TableCell>
+                                        <TableCell className="space-x-2 text-center">
+                                            {/* Details Dialog */}
+                                            <Dialog>
+                                                <DialogTrigger asChild>
+                                                    <Button variant='outline' className="cursor-pointer">
+                                                        Details
+                                                    </Button>
+                                                </DialogTrigger>
+                                                <EmpEmotionModal empName={att.employee.fullName} emoji={att.emoji} textFeeling={att.textFeeling} checkInTime={att.checkInTime} score={att.emotionScore} />
+                                            </Dialog>
+                                        </TableCell>
+                                    </TableRow>
+                                ))
+                            }
+                        </TableBody>
+                    }
+                </Table>
+            </CardContent>
             {
-                data.length > 0 ?
-                    <CardContent>
-                        <Table>
-                            <TableHeader>
-                                <TableRow>
-                                    <TableHead className="whitespace-nowrap font-semibold">Name</TableHead>
-                                    <TableHead className="whitespace-nowrap font-semibold">Position</TableHead>
-                                    <TableHead className="whitespace-nowrap font-semibold">Job Type</TableHead>
-                                    <TableHead className="whitespace-nowrap font-semibold">Emotion</TableHead>
-                                    <TableHead className="whitespace-nowrap font-semibold">Check-in Time</TableHead>
-                                    <TableHead className="whitespace-nowrap text-center font-semibold">Actions</TableHead>
-                                </TableRow>
-                            </TableHeader>
-
-                            <TableBody>
-                                {
-                                    data.map((att) => (
-                                        <TableRow key={att.id}>
-                                            <TableCell className="py-6">
-                                                <span className="whitespace-nowrap">{att.employee.fullName}</span>
-                                            </TableCell>
-                                            <TableCell className="">
-                                                <span className="whitespace-nowrap">{att.employee.position}</span>
-                                            </TableCell>
-                                            <TableCell>
-                                                <span className="whitespace-nowrap">{att.employee.jobType}</span>
-                                            </TableCell>
-                                            <TableCell>
-                                                <CustomBadge status={att.status} />
-                                            </TableCell>
-                                            <TableCell>
-                                                <span className="whitespace-nowrap font-en">{att.checkInTime}</span>
-                                            </TableCell>
-                                            <TableCell className="space-x-2 text-center">
-                                                {/* Details Dialog */}
-                                                <Dialog>
-                                                    <DialogTrigger asChild>
-                                                        <Button variant='outline' className="cursor-pointer">
-                                                            Details
-                                                        </Button>
-                                                    </DialogTrigger>
-                                                    <EmpEmotionModal empName={att.employee.fullName} emoji={att.emoji} textFeeling={att.textFeeling} checkInTime={att.checkInTime} score={att.emotionScore} />
-                                                </Dialog>
-                                            </TableCell>
-                                        </TableRow>
-                                    ))
-                                }
-                            </TableBody>
-                        </Table>
-                    </CardContent>
-                    : <CardContent className="flex items-center flex-col justify-center">
-                        <Empty label="No records found" classesName="w-[300px] h-[200px]" />
-                    </CardContent>
+                data.length === 0 && isFetching === false && <CardContent className="flex items-center flex-col justify-center">
+                    <Empty label="No records found" classesName="w-[300px] h-[200px]" />
+                </CardContent>
             }
         </Card>
     )

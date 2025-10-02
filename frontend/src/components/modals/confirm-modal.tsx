@@ -2,21 +2,29 @@ import { DialogContent, DialogTitle, DialogDescription, DialogClose, DialogHeade
 import Spinner from "../shared/spinner";
 import { Button } from "../ui/button";
 
-export default function ConfirmModal() {
+interface Props {
+    title: string,
+    description: string,
+    isLoading: boolean,
+    loadingLabel: string,
+    onConfirm: () => void
+}
+
+export default function ConfirmModal({ title, description, isLoading, loadingLabel, onConfirm }: Props) {
     return (
         <DialogContent className="sm:max-w-[500px] bg-card">
             <DialogHeader>
-                <DialogTitle>Delete Confirmation.</DialogTitle>
+                <DialogTitle>{title}</DialogTitle>
                 <DialogDescription>
-                    Are you sure you want to delete user? This action cannot be undone.
+                    {description}
                 </DialogDescription>
             </DialogHeader>
             <DialogFooter>
                 <DialogClose asChild>
                     <Button variant="outline" className="cursor-pointer">Cancel</Button>
                 </DialogClose>
-                <Button type="submit" variant='destructive' className="cursor-pointer">
-                    <Spinner isLoading={false} label={'Deleting...'}>
+                <Button onClick={onConfirm} type="submit" variant='destructive' className="cursor-pointer">
+                    <Spinner isLoading={isLoading} label={loadingLabel} >
                         Confirm
                     </Spinner>
                 </Button>
