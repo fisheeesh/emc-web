@@ -1,3 +1,4 @@
+
 export const APP_NAME = "Emotion Check-in System"
 export const LOGIN = "Log In"
 export const REGISTER = "Register"

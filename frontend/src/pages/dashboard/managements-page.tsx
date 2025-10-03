@@ -1,4 +1,6 @@
 import { empInfiniteQuery } from "@/api/super-admin-query"
+import { ChartAreaInteractive } from "@/components/dashboard/charts/chart-interactive"
+import { SectionCards } from "@/components/dashboard/section-cards"
 import EmpTables from "@/components/dashboard/tables/emp-tables"
 import useTitle from "@/hooks/use-title"
 import { useInfiniteQuery } from "@tanstack/react-query"
@@ -30,6 +32,10 @@ export default function ManagementsPage() {
 
     return (
         <section className="flex flex-col items-center justify-center w-full gap-3">
+            <SectionCards />
+            <div className="w-full">
+                <ChartAreaInteractive />
+            </div>
             <div className="w-full">
                 <EmpTables
                     data={allEmps}

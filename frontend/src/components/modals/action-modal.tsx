@@ -5,12 +5,26 @@ import {
     DialogHeader,
     DialogTitle
 } from "@/components/ui/dialog";
+import { AlertTriangle, Calendar, Mail, MessageSquare, Phone, UserCheck } from "lucide-react";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 import { Label } from "../ui/label";
-import { Textarea } from "../ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
-import { Calendar, Phone, Mail, MessageSquare, UserCheck, AlertTriangle } from "lucide-react";
+import { Textarea } from "../ui/textarea";
+import { useState } from "react";
+import { cn } from "@/lib/utils";
+
+type QuickAction = {
+    name: string;
+    value: string;
+    icon: React.ReactNode;
+}
+const QUICK_ACTIONS: QuickAction[] = [
+    { name: "Schedule one-on-one Call", value: " Schedule 1-on-1 Call", icon: <Phone size={18} /> },
+    { name: "Send Check-in Email", value: " Send Check-in Email", icon: <Mail size={18} /> },
+    { name: "Book HR Meeting", value: " Book HR Meeting", icon: <Calendar size={18} /> },
+    { name: "Send Supportive Message", value: "Send Supportive Message", icon: <MessageSquare size={18} /> },
+]
 
 interface Props {
     employee: {
@@ -23,8 +37,10 @@ interface Props {
 }
 
 export default function ActionModal({ employee }: Props) {
+    const [selected, setSelected] = useState("")
+
     return (
-        <DialogContent className="w-full mx-auto max-h-[90vh] overflow-y-auto sm:max-w-[1024px]">
+        <DialogContent className="w-full mx-auto max-h-[90vh] overflow-y-auto sm:max-w-[1024px] no-scrollbar">
             <DialogHeader>
                 <DialogTitle className="text-xl font-bold flex items-center gap-2">
                     <UserCheck className="text-blue-600" />
@@ -42,7 +58,7 @@ export default function ActionModal({ employee }: Props) {
                         <AlertTriangle className="text-red-600" size={20} />
                         <h3 className="font-semibold text-red-800">Employee Status</h3>
                     </div>
-                    <div className="grid grid-cols-1 text-card md:grid-cols-3 gap-4 text-sm">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm text-black">
                         <div>
                             <span className="font-medium">Name:</span> {employee?.name}
                         </div>
@@ -51,7 +67,7 @@ export default function ActionModal({ employee }: Props) {
                         </div>
                         <div>
                             <span className="font-medium">Emotion Score:</span>
-                            <span className="text-red-600 font-bold ml-1">{employee?.score}</span>
+                            <span className="text-red-600 font-bold ml-1 font-en">{employee?.score}</span>
                         </div>
                     </div>
                 </div>
@@ -60,22 +76,16 @@ export default function ActionModal({ employee }: Props) {
                 <div className="space-y-4">
                     <h3 className="text-lg font-semibold">Quick Actions</h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                        <Button variant="outline" className="flex items-center gap-2 h-12">
-                            <Phone size={18} />
-                            Schedule 1-on-1 Call
-                        </Button>
-                        <Button variant="outline" className="flex items-center gap-2 h-12">
-                            <Mail size={18} />
-                            Send Check-in Email
-                        </Button>
-                        <Button variant="outline" className="flex items-center gap-2 h-12">
-                            <Calendar size={18} />
-                            Book HR Meeting
-                        </Button>
-                        <Button variant="outline" className="flex items-center gap-2 h-12">
-                            <MessageSquare size={18} />
-                            Send Supportive Message
-                        </Button>
+                        {
+                            QUICK_ACTIONS.map(({ name, value, icon }) => (
+                                <Button key={value} onClick={() => setSelected(value)} variant="outline"
+                                    className={cn(selected === value && "text-blue-700 hover:text-blue-700", "flex items-center gap-2 h-12 cursor-pointer")}
+                                >
+                                    {icon}
+                                    {name}
+                                </Button>
+                            ))
+                        }
                     </div>
                 </div>
 
@@ -83,14 +93,14 @@ export default function ActionModal({ employee }: Props) {
                 <div className="space-y-4">
                     <h3 className="text-lg font-semibold">Custom Action Plan</h3>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div className="space-y-2">
+                    <div className="flex flex-col md:flex-row gap-4 w-full">
+                        <div className="space-y-2 w-full">
                             <Label htmlFor="action-type">Action Type</Label>
                             <Select>
-                                <SelectTrigger>
+                                <SelectTrigger className="min-h-[48px] w-full">
                                     <SelectValue placeholder="Select action type" />
                                 </SelectTrigger>
-                                <SelectContent>
+                                <SelectContent className="">
                                     <SelectItem value="meeting">One-on-One Meeting</SelectItem>
                                     <SelectItem value="email">Email Follow-up</SelectItem>
                                     <SelectItem value="hr-referral">HR Referral</SelectItem>
@@ -101,10 +111,10 @@ export default function ActionModal({ employee }: Props) {
                             </Select>
                         </div>
 
-                        <div className="space-y-2">
+                        <div className="space-y-2 w-full">
                             <Label htmlFor="priority">Priority Level</Label>
                             <Select>
-                                <SelectTrigger>
+                                <SelectTrigger className="min-h-[48px] w-full">
                                     <SelectValue placeholder="Select priority" />
                                 </SelectTrigger>
                                 <SelectContent>
@@ -118,12 +128,12 @@ export default function ActionModal({ employee }: Props) {
 
                     <div className="space-y-2">
                         <Label htmlFor="assigned-to">Assign To</Label>
-                        <Input id="assigned-to" placeholder="Manager, HR Representative, etc." />
+                        <Input id="assigned-to" className="min-h-[48px]" placeholder="Manager, HR Representative, etc." />
                     </div>
 
                     <div className="space-y-2">
                         <Label htmlFor="due-date">Due Date</Label>
-                        <Input id="due-date" type="date" />
+                        <Input id="due-date" className="min-h-[48px]" type="date" />
                     </div>
 
                     <div className="space-y-2">
@@ -131,7 +141,7 @@ export default function ActionModal({ employee }: Props) {
                         <Textarea
                             id="notes"
                             placeholder="Describe the specific actions to be taken, observations, and any special considerations..."
-                            className="min-h-[100px]"
+                            className="min-h-[150px] resize-none"
                         />
                     </div>
 
@@ -140,7 +150,7 @@ export default function ActionModal({ employee }: Props) {
                         <Textarea
                             id="follow-up"
                             placeholder="When and how to follow up on this action..."
-                            className="min-h-[80px]"
+                            className="min-h-[150px] resize-none"
                         />
                     </div>
                 </div>
@@ -148,18 +158,13 @@ export default function ActionModal({ employee }: Props) {
 
             <div className="flex justify-end items-center gap-3 mt-6 pt-4 border-t">
                 <DialogClose asChild>
-                    <Button variant="outline">
+                    <Button variant="outline" className="min-h-[44px] cursor-pointer">
                         Cancel
                     </Button>
                 </DialogClose>
                 <DialogClose asChild>
-                    <Button className="bg-blue-600 hover:bg-blue-700 text-white">
+                    <Button className="bg-blue-600 hover:bg-blue-700 text-white min-h-[44px] cursor-pointer">
                         Create Action Plan
-                    </Button>
-                </DialogClose>
-                <DialogClose asChild>
-                    <Button className="bg-red-600 hover:bg-red-700 text-white">
-                        Create & Mark Urgent
                     </Button>
                 </DialogClose>
             </div>
