@@ -24,7 +24,7 @@ import { cn } from "@/lib/utils";
 import { actionFormSchema } from "@/lib/validators";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { AlertTriangle, ChevronDownIcon, Calendar as ICalendar, Mail, MessageSquare, Phone, UserCheck } from "lucide-react";
-import React, { useState } from "react";
+import React from "react";
 import { useForm, type SubmitHandler } from "react-hook-form";
 import type z from "zod";
 import Editor from "../editor";
@@ -55,14 +55,14 @@ interface Props {
 }
 
 export default function ActionModal({ employee }: Props) {
-    const [selected, setSelected] = useState("")
     const [open, setOpen] = React.useState(false)
 
     const form = useForm<z.infer<typeof actionFormSchema>>({
         resolver: zodResolver(actionFormSchema),
         defaultValues: {
-            actionType: undefined,
-            priority: undefined,
+            quickAction: undefined,
+            actionType: "One-on-One Meeting",
+            priority: "High",
             assignTo: "",
             dueDate: "",
             actionNotes: "",
@@ -110,25 +110,38 @@ export default function ActionModal({ employee }: Props) {
                         </div>
 
                         {/* Quick Actions */}
-                        <div className="space-y-6">
-                            <h3 className="text-lg font-semibold">Quick Actions</h3>
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                                {
-                                    QUICK_ACTIONS.map(({ name, value, icon }) => (
-                                        <Button
-                                            key={value}
-                                            type="button"
-                                            onClick={() => setSelected(value)}
-                                            variant="outline"
-                                            className={cn(selected === value && "text-blue-700 hover:text-blue-700", "flex items-center gap-2 h-12 cursor-pointer")}
-                                        >
-                                            {icon}
-                                            {name}
-                                        </Button>
-                                    ))
-                                }
-                            </div>
-                        </div>
+                        <FormField
+                            control={form.control}
+                            name="quickAction"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <div className="space-y-6">
+                                        <FormLabel className="text-lg font-semibold">Quick Actions</FormLabel>
+                                        <FormControl>
+                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                                {
+                                                    QUICK_ACTIONS.map(({ name, value, icon }) => (
+                                                        <Button
+                                                            key={value}
+                                                            type="button"
+                                                            onClick={() => field.onChange(value)}
+                                                            variant="outline"
+                                                            className={cn(
+                                                                field.value === value && "text-blue-700 hover:text-blue-700 border-blue-700",
+                                                                "flex items-center gap-2 h-12 cursor-pointer"
+                                                            )}
+                                                        >
+                                                            {icon}
+                                                            {name}
+                                                        </Button>
+                                                    ))
+                                                }
+                                            </div>
+                                        </FormControl>
+                                    </div>
+                                </FormItem>
+                            )}
+                        />
 
                         {/* Action Form */}
                         <div className="space-y-6">
@@ -189,7 +202,7 @@ export default function ActionModal({ employee }: Props) {
                                     control={form.control}
                                     name="assignTo"
                                     render={({ field }) => (
-                                        <FormItem className="w-full md:w-1/2 z-50">
+                                        <FormItem className="w-full md:w-1/2">
                                             <FormLabel>Assign To <span className="font-en text-red-600">*</span></FormLabel>
                                             <FormControl>
                                                 <Input

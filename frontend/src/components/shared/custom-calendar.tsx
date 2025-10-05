@@ -4,6 +4,7 @@ import { Calendar } from "@/components/ui/calendar";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { useSearchParams } from "react-router";
+import { cn } from "@/lib/utils";
 
 interface Props {
     popover?: boolean;
@@ -65,7 +66,7 @@ export default function CustomCalendar({ popover = true, filterValue }: Props) {
         <Button
             variant="outline"
             id="date"
-            className="justify-between font-normal min-h-[44px] font-en"
+            className={cn("justify-between font-normal min-h-[44px]", date ? "font-en" : 'font-raleway')}
         >
             {date ? formatDate(date) : "Select date"}
             <ChevronDownIcon />
@@ -95,7 +96,7 @@ export default function CustomCalendar({ popover = true, filterValue }: Props) {
                 mode="single"
                 selected={date}
                 onSelect={(d) => onSelectDate(d, false)}
-                className="rounded-md border shadow-sm font-en h-fit"
+                className="rounded-md border shadow-sm font-en h-fit placeholder:font-raleway"
                 captionLayout="dropdown"
             />
         </div>

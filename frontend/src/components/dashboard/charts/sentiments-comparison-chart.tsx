@@ -94,6 +94,7 @@ export default function SentimentsComparisonChart({ data }: Props) {
                 </div>
                 <CommonFilter
                     filterValue="sentiments"
+                    font="font-en"
                     filters={COMPARISON_FILTER}
                     otherClasses="min-h-[44px] sm:min-w-[150px]"
                 />

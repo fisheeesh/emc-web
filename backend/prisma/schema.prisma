@@ -88,15 +88,48 @@ model Notification {
 }
 
 model Department {
-  id        Int        @id @default(autoincrement())
-  name      String     @unique @db.VarChar(52)
-  employees Employee[]
+  id         Int          @id @default(autoincrement())
+  name       String       @unique @db.VarChar(52)
+  employees  Employee[]
+  ActionPlan ActionPlan[]
+}
+
+model ActionPlan {
+  id            String     @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  from          String
+  to            String
+  quickAction   String?
+  actionType    String
+  priority      String
+  assignTo      String
+  dueDate       DateTime
+  actionNotes   String
+  followUpNotes String
+  departmentId  Int
+  status        RStatus    @default(PENDING)
+  type          RType      @default(PENDING)
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+  department    Department @relation(fields: [departmentId], references: [id])
 }
 
 model Setting {
   id    Int    @id @default(autoincrement())
   key   String @unique @db.VarChar(50)
   value String @db.VarChar(200)
+}
+
+enum RType {
+  PENDING
+  PROCESSING
+  COMPLETED
+  FAILED
+}
+
+enum RStatus {
+  PENDING
+  APPROVED
+  REJECTED
 }
 
 enum Role {

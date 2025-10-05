@@ -97,6 +97,28 @@ export const EMOTION_FILTER = [
     { name: 'Critical', value: 'critical' },
 ]
 
+export const PRIORITY = [
+    { name: "All Priority", value: "all" },
+    { name: "High", value: "high" },
+    { name: "Medium", value: "medium" },
+    { name: "Low", value: "low" }
+]
+
+export const RSTATUS = [
+    { name: "All Status", value: "all" },
+    { name: "Pending", value: "pending" },
+    { name: "Approved", value: "approved" },
+    { name: "Rejected", value: "rejected" }
+]
+
+export const RType = [
+    { name: "All Type", value: "all" },
+    { name: "Pending", value: "pending" },
+    { name: "Processing", value: "processing" },
+    { name: "Completed", value: "completed" },
+    { name: "Failed", value: "failed" }
+]
+
 export const CRITICAL_DATA = [
     {
         id: 22323,

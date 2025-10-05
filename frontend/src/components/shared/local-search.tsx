@@ -25,7 +25,7 @@ export default function LocalSearch({ label = "Search by keywords...", filterVal
                 value={query}
                 type="search"
                 placeholder={label}
-                className="min-h-[44px] w-full lg:w-[300px] pl-10"
+                className="min-h-[44px] w-full lg:w-[300px] pl-10 font-en placeholder:font-raleway"
                 onChange={(e) => setQuery(e.target.value)}
             />
             <TbUserSearch className="absolute top-3 left-3 size-[18px]" />

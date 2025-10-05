@@ -65,10 +65,11 @@ const ACTION_TYPES = ["One-on-One Meeting", "Email Follow-up", "Workload Review"
 const PRIORITY = ["High", "Medium", "Low"] as const
 
 export const actionFormSchema = z.object({
+    quickAction: z.string().optional(),
     actionType: z.enum(ACTION_TYPES, { message: "Action Type is required" }),
     priority: z.enum(PRIORITY, { message: "Priority is required" }),
     assignTo: z.string().min(1, { message: "Assign To is required" }),
     dueDate: z.string().min(1, { message: "Due Date is required" }),
-    actionNotes: z.string().min(1, { message: "Action notes is required" }),
-    followUpNotes: z.string().min(1, { message: "Follow up notes is required" }),
+    actionNotes: z.string().min(30, { message: "Action notes must be at least thirty characters long." }),
+    followUpNotes: z.string().min(30, { message: "Action notes must be at least thirty characters long." }),
 })

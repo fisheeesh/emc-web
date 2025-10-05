@@ -1,6 +1,7 @@
 import { empInfiniteQuery } from "@/api/super-admin-query"
 import { ChartAreaInteractive } from "@/components/dashboard/charts/chart-interactive"
 import { SectionCards } from "@/components/dashboard/section-cards"
+import ActionsTable from "@/components/dashboard/tables/actions-table"
 import EmpTables from "@/components/dashboard/tables/emp-tables"
 import useTitle from "@/hooks/use-title"
 import { useInfiniteQuery } from "@tanstack/react-query"
@@ -46,6 +47,9 @@ export default function ManagementsPage() {
                     fetchNextPage={fetchEmpNextPage}
                     hasNextPage={hasEmpNextPage}
                 />
+            </div>
+            <div className="w-full">
+                <ActionsTable />
             </div>
         </section>
     )
