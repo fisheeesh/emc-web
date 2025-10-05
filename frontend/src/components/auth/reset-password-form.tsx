@@ -59,7 +59,7 @@ export function ResetPasswordForm({
                                     name="password"
                                     render={({ field }) => (
                                         <FormItem className="space-y-1">
-                                            <FormLabel>New Password <span className="text-red-600">*</span></FormLabel>
+                                            <FormLabel>New Password <span className="text-red-600 font-en">*</span></FormLabel>
                                             <FormControl>
                                                 <div className="relative">
                                                     <Input
@@ -93,7 +93,7 @@ export function ResetPasswordForm({
                                     name="confirmPassword"
                                     render={({ field }) => (
                                         <FormItem className="space-y-1">
-                                            <FormLabel>Repeat New Password <span className="text-red-600">*</span></FormLabel>
+                                            <FormLabel>Repeat New Password <span className="text-red-600 font-en">*</span></FormLabel>
                                             <FormControl>
                                                 <div className="relative">
                                                     <Input
@@ -102,7 +102,7 @@ export function ResetPasswordForm({
                                                         placeholder="Repeat your new password"
                                                         {...field}
                                                         inputMode="numeric"
-                                                        className="w-full min-h-[48px] font-en"
+                                                        className="w-full min-h-[48px] font-en placeholder:font-raleway"
                                                     />
                                                     <button
                                                         type="button"

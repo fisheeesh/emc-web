@@ -120,7 +120,7 @@ export default function CreateEditEmpModal<T extends z.ZodType<any, any, any>>({
                                             <div className="flex items-center gap-1 justify-between">
                                                 <FormLabel>
                                                     {field.name.charAt(0).toUpperCase() + field.name.slice(1)}
-                                                    <span className="text-red-600"> *</span>
+                                                    <span className="text-red-600 font-en">*</span>
                                                 </FormLabel>
                                             </div>
                                             <FormControl>

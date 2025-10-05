@@ -59,7 +59,7 @@ export default function ForgetPasswordForm({
                                     name="email"
                                     render={({ field }) => (
                                         <FormItem className="space-y-1">
-                                            <FormLabel>Email Address <span className="text-red-600">*</span></FormLabel>
+                                            <FormLabel>Email Address <span className="text-red-600 font-en">*</span></FormLabel>
                                             <FormControl>
                                                 <Input
                                                     id="phone"

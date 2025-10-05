@@ -70,7 +70,7 @@ export default function AuthForm<T extends z.ZodType<any, any, any>>({
                                                 <FormLabel>
                                                     {field.name === 'email' ? 'Email Address' :
                                                         field.name.charAt(0).toUpperCase() + field.name.slice(1)}
-                                                    <span className="text-red-600"> *</span>
+                                                    <span className="text-red-600 font-en">*</span>
                                                 </FormLabel>
                                                 {formType === 'LOGIN' && field.name === 'password' && <Link
                                                     to="/forgot-password"
