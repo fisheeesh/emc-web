@@ -60,3 +60,15 @@ export const createEmpSchema = z.object({
 export const updateEmpSchema = createEmpSchema.omit({ email: true, password: true }).extend({
     accType: z.enum(["ACTIVE", "FREEZE"], { message: "Account type is required" })
 });
+
+const ACTION_TYPES = ["One-on-One Meeting", "Email Follow-up", "Workload Review", "Mental Health Support", "Team Support"] as const
+const PRIORITY = ["High", "Medium", "Low"] as const
+
+export const actionFormSchema = z.object({
+    actionType: z.enum(ACTION_TYPES, { message: "Action Type is required" }),
+    priority: z.enum(PRIORITY, { message: "Priority is required" }),
+    assignTo: z.string().min(1, { message: "Assign To is required" }),
+    dueDate: z.string().min(1, { message: "Due Date is required" }),
+    actionNotes: z.string().min(1, { message: "Action notes is required" }),
+    followUpNotes: z.string().min(1, { message: "Follow up notes is required" }),
+})
