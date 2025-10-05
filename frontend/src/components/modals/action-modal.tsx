@@ -75,14 +75,14 @@ export default function ActionModal({ employee }: Props) {
     }
 
     return (
-        <DialogContent className="w-full mx-auto max-h-[90vh] overflow-visible sm:max-w-[1024px]">
+        <DialogContent className="w-full mx-auto max-h-[90vh] overflow-visible sm:max-w-[1024px] lg:px-8">
             <div className="max-h-[calc(90vh-2rem)] overflow-y-auto no-scrollbar">
                 <DialogHeader>
-                    <DialogTitle className="text-xl font-bold flex items-center gap-2">
-                        <UserCheck className="text-blue-600" />
+                    <DialogTitle className="text-lg md:text-xl font-bold flex items-center gap-2">
+                        <UserCheck className="text-blue-600 size-5 md:size-7" />
                         Take Action for {employee?.name || 'Employee'}
                     </DialogTitle>
-                    <DialogDescription>
+                    <DialogDescription className="text-xs md:text-sm">
                         Choose appropriate actions to support this employee's wellbeing
                     </DialogDescription>
                 </DialogHeader>
@@ -110,7 +110,7 @@ export default function ActionModal({ employee }: Props) {
                         </div>
 
                         {/* Quick Actions */}
-                        <div className="space-y-4">
+                        <div className="space-y-6">
                             <h3 className="text-lg font-semibold">Quick Actions</h3>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                                 {
@@ -131,7 +131,7 @@ export default function ActionModal({ employee }: Props) {
                         </div>
 
                         {/* Action Form */}
-                        <div className="space-y-4">
+                        <div className="space-y-6">
                             <h3 className="text-lg font-semibold">Custom Action Plan</h3>
 
                             <div className="flex flex-col md:flex-row gap-4 w-full">
@@ -189,7 +189,7 @@ export default function ActionModal({ employee }: Props) {
                                     control={form.control}
                                     name="assignTo"
                                     render={({ field }) => (
-                                        <FormItem className="w-full md:w-1/2">
+                                        <FormItem className="w-full md:w-1/2 z-50">
                                             <FormLabel>Assign To <span className="font-en text-red-600">*</span></FormLabel>
                                             <FormControl>
                                                 <Input
@@ -286,7 +286,7 @@ export default function ActionModal({ employee }: Props) {
                             />
                         </div>
 
-                        <div className="flex justify-end items-center gap-3 border-t pt-4">
+                        <div className="flex justify-end items-center gap-3 border-t pt-6 pb-2">
                             <DialogClose asChild>
                                 <Button type="button" variant="outline" className="min-h-[44px] cursor-pointer">
                                     Cancel

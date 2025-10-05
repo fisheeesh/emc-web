@@ -20,7 +20,9 @@ import {
     tablePlugin,
     thematicBreakPlugin,
     toolbarPlugin,
-    UndoRedo
+    UndoRedo,
+    directivesPlugin,
+    AdmonitionDirectiveDescriptor
 } from "@mdxeditor/editor";
 import '@mdxeditor/editor/style.css';
 import "./dark-editor.css";
@@ -46,6 +48,9 @@ function Editor({ value = "", onChange }: EditorProps) {
                 markdownShortcutPlugin(),
                 tablePlugin(),
                 imagePlugin(),
+                directivesPlugin({
+                    directiveDescriptors: [AdmonitionDirectiveDescriptor]
+                }),
                 diffSourcePlugin({ viewMode: "rich-text", diffMarkdown: "" }),
                 toolbarPlugin({
                     toolbarContents: () => (
@@ -78,4 +83,4 @@ function Editor({ value = "", onChange }: EditorProps) {
     )
 }
 
-export default Editor
+export default Editor;
