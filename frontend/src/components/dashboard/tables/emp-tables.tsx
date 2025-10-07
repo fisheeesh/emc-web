@@ -1,5 +1,6 @@
 import ConfirmModal from "@/components/modals/confirm-modal";
 import CreateEditEmpModal from "@/components/modals/create-edit-emp-modal";
+import EmpDetailsModal from "@/components/modals/emp-details-modal";
 import CommonFilter from "@/components/shared/common-filter";
 import CustomBadge from "@/components/shared/custom-badge";
 import LocalSearch from "@/components/shared/local-search";
@@ -41,6 +42,7 @@ interface Props {
 export default function EmpTables({ data, status, error, isFetchingNextPage, fetchNextPage, hasNextPage }: Props) {
     const [createOpen, setCreateOpen] = useState(false);
     const [editingEmp, setEditingEmp] = useState<Employee | null>(null);
+    const [viewEmp, setViewEmp] = useState<Employee | null>(null);
     const { deleteEmp, deletingEmp } = useDeleteEmp()
 
     return (
@@ -187,15 +189,15 @@ export default function EmpTables({ data, status, error, isFetchingNextPage, fet
                                                         <DropdownMenuContent className="w-30" align="end" forceMount>
                                                             <DropdownMenuGroup>
                                                                 <DropdownMenuItem asChild className="cursor-pointer">
-                                                                    <Dialog>
-                                                                        <DialogTrigger asChild>
-                                                                            <Button size='icon' variant='ghost' className="w-full cursor-pointer flex justify-start gap-2 px-1.5">
-                                                                                <BsEye />
-                                                                                View Details
-                                                                            </Button>
-                                                                        </DialogTrigger>
-                                                                        {/* <CreateEditEmpModal /> */}
-                                                                    </Dialog>
+                                                                    <Button
+                                                                        size='icon'
+                                                                        variant='ghost'
+                                                                        className="w-full cursor-pointer flex justify-start gap-2 px-1.5"
+                                                                        onClick={() => setViewEmp(emp)}
+                                                                    >
+                                                                        <BsEye />
+                                                                        View Details
+                                                                    </Button>
                                                                 </DropdownMenuItem>
                                                                 <DropdownMenuItem asChild className="cursor-pointer">
                                                                     <Button
@@ -250,6 +252,9 @@ export default function EmpTables({ data, status, error, isFetchingNextPage, fet
                                             }}
                                             onClose={() => setEditingEmp(null)}
                                         />}
+                                    </Dialog>
+                                    <Dialog open={!!viewEmp} onOpenChange={(o) => !o && setViewEmp(null)}>
+                                        {viewEmp && <EmpDetailsModal />}
                                     </Dialog>
                                 </TableBody>
                     }
