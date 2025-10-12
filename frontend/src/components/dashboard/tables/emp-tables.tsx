@@ -195,7 +195,7 @@ export default function EmpTables({ data, status, error, isFetchingNextPage, fet
                                                                         className="w-full cursor-pointer flex justify-start gap-2 px-1.5"
                                                                         onClick={() => setViewEmp(emp)}
                                                                     >
-                                                                        <BsEye />
+                                                                        <BsEye className="text-black dark:text-white" />
                                                                         View Details
                                                                     </Button>
                                                                 </DropdownMenuItem>
