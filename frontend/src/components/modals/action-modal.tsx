@@ -127,7 +127,7 @@ export default function ActionModal({ employee }: Props) {
                                                             onClick={() => field.onChange(value)}
                                                             variant="outline"
                                                             className={cn(
-                                                                field.value === value && "text-blue-700 hover:text-blue-700 border-blue-700",
+                                                                field.value === value && "text-blue-700 hover:text-blue-700 border-blue-700 dark:border-blue-700",
                                                                 "flex items-center gap-2 h-12 cursor-pointer"
                                                             )}
                                                         >

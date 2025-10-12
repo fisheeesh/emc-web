@@ -119,6 +119,79 @@ export const RType = [
     { name: "Failed", value: "failed" }
 ]
 
+export const LEADERBOARD = [
+    {
+        id: 1,
+        name: 'Swam Yi Phyo',
+        department: "IT",
+        points: 1100,
+        streak: 11,
+    },
+    {
+        id: 2,
+        name: 'Sarah Johnson',
+        department: "HR",
+        points: 1050,
+        streak: 9,
+    },
+    {
+        id: 3,
+        name: 'Michael Chen',
+        department: "Finance",
+        points: 980,
+        streak: 8,
+    },
+    {
+        id: 4,
+        name: 'Emily Rodriguez',
+        department: "Marketing",
+        points: 920,
+        streak: 10,
+    },
+    {
+        id: 5,
+        name: 'David Kim',
+        department: "Operations",
+        points: 875,
+        streak: 0,
+    },
+    {
+        id: 6,
+        name: 'Jessica Williams',
+        department: "Sales",
+        points: 840,
+        streak: 0,
+    },
+    {
+        id: 7,
+        name: 'James Anderson',
+        department: "IT",
+        points: 795,
+        streak: 0,
+    },
+    {
+        id: 8,
+        name: 'Maria Garcia',
+        department: "Customer Service",
+        points: 760,
+        streak: 0,
+    },
+    {
+        id: 9,
+        name: 'Robert Taylor',
+        department: "Finance",
+        points: 720,
+        streak: 4,
+    },
+    {
+        id: 10,
+        name: 'Amanda Lee',
+        department: "Marketing",
+        points: 685,
+        streak: 0,
+    }
+]
+
 export const CRITICAL_DATA = [
     {
         id: 22323,

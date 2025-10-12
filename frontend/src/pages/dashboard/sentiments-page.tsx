@@ -2,6 +2,7 @@ import { adminUserDataQuery, departmentsQuery, moodOverviewQuery, sentimentsComp
 import OverViewChart from "@/components/dashboard/charts/overview-chart";
 import SentimentsComparisonChart from "@/components/dashboard/charts/sentiments-comparison-chart";
 import CriticalTable from "@/components/dashboard/tables/critical-table";
+import LeaderBoardTable from "@/components/dashboard/tables/leaderboard-table";
 import WatchListTable from "@/components/dashboard/tables/watchlist-table";
 import useTitle from "@/hooks/use-title";
 import useFilterStore from "@/store/filter-store";
@@ -60,6 +61,10 @@ export default function SentimentsDashboardPage() {
                 {/* Sentiments Comparison Chart */}
                 <SentimentsComparisonChart data={sentimentsComparison.data} />
 
+            </div>
+            <div className="w-full">
+                {/* Critical Employees Table */}
+                <LeaderBoardTable />
             </div>
             <div className="w-full">
                 {/* Critical Employees Table */}
