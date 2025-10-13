@@ -37,16 +37,12 @@ export default function CreateEditEmpModal<T extends z.ZodType<any, any, any>>({
     const { editEmp, editingEmp } = useEditEmp()
 
     const [showPassword, setShowPassword] = useState(false);
+    const [selectedFileName, setSelectedFileName] = useState<string>("No file chosen");
 
     const form = useForm({
         resolver: zodResolver(schema) as any,
         defaultValues: defaultValues as DefaultValues<FormData>,
     })
-
-    const getFileName = () => {
-        const file = fileInputRef.current?.files?.[0]
-        return file ? file.name : "No file chosen"
-    }
 
     const onHandleSubmit: SubmitHandler<FormData> = async (values) => {
         const formData = new FormData()
@@ -71,6 +67,7 @@ export default function CreateEditEmpModal<T extends z.ZodType<any, any, any>>({
             createEmp(formData, {
                 onSettled: () => {
                     form.reset()
+                    setSelectedFileName("No file chosen")
                     onClose?.()
                 }
             })
@@ -81,6 +78,7 @@ export default function CreateEditEmpModal<T extends z.ZodType<any, any, any>>({
             editEmp(formData, {
                 onSettled: () => {
                     form.reset()
+                    setSelectedFileName("No file chosen")
                     onClose?.()
                 }
             })
@@ -184,11 +182,14 @@ export default function CreateEditEmpModal<T extends z.ZodType<any, any, any>>({
                                                                                     //* Set the actual File object as the value for the image field
                                                                                     const file = fileInputRef.current?.files?.[0] ?? null;
                                                                                     form.setValue('image' as Path<FormData>, file as any);
+
+                                                                                    //* Update the selected file name
+                                                                                    setSelectedFileName(file ? file.name : "No file chosen");
                                                                                 }}
                                                                             />
                                                                         </label>
                                                                         <span className="ml-3 text-sm">
-                                                                            {getFileName()}
+                                                                            {selectedFileName}
                                                                         </span>
                                                                     </div>
                                                                 ) : (
