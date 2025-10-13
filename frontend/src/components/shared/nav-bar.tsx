@@ -3,19 +3,21 @@ import halfDark from '@/assets/half-ata-logo.png'
 import light from '@/assets/light.png'
 import halfLight from '@/assets/light_logo.png'
 import { APP_NAME, NAVLINKS } from '@/lib/constants'
+import useFilterStore from '@/store/filter-store'
+import useUserStore from '@/store/user-store'
 import { useState } from 'react'
+import { IoMdLogOut } from "react-icons/io";
 import { NavLink, useNavigate } from 'react-router'
 import LogoutModal from '../modals/log-out-modal'
 import { Button } from '../ui/button'
 import { Dialog, DialogTrigger } from '../ui/dialog'
+import AnnouncementBtn from './announcement-btn'
 import AuthDropdown from './auth-drop-down'
+import CommonFilter from './common-filter'
 import LngBtn from './lng-btn'
 import { ModeToggle } from './mode-toggle'
 import NotiBtn from './noti-btn'
 import { useTheme } from './theme-provider'
-import CommonFilter from './common-filter'
-import useFilterStore from '@/store/filter-store'
-import useUserStore from '@/store/user-store'
 
 export default function Navbar() {
     const { theme } = useTheme()
@@ -59,7 +61,7 @@ export default function Navbar() {
                     </div>
 
                     {/* Desktop Right Side */}
-                    <div className='hidden min-[810px]:flex items-center gap-3'>
+                    <div className='hidden min-[860px]:flex items-center gap-3'>
                         {user?.role === 'SUPERADMIN' && <CommonFilter
                             filters={filters.departments}
                             filterValue='gDep'
@@ -67,12 +69,13 @@ export default function Navbar() {
                         />}
                         <NotiBtn />
                         <LngBtn />
+                        <AnnouncementBtn />
                         <ModeToggle />
                         <AuthDropdown />
                     </div>
 
                     {/* Mobile Hamburger Menu */}
-                    <div className="min-[810px]:hidden flex items-center mt-2">
+                    <div className="min-[860px]:hidden flex items-center mt-2">
                         <button
                             onClick={() => setIsMobMenuOpen(!isMobMenuOpen)}
                             className={`hamburger ${isMobMenuOpen ? 'open' : ''}`}
@@ -87,23 +90,26 @@ export default function Navbar() {
 
                 {isMobMenuOpen && (
                     <Dialog>
-                        <div className="min-[810px]:hidden bg-slate-50 dark:bg-slate-900 border-t dark:border-slate-700 border-gray-100 py-4">
+                        <div className="min-[860px]:hidden bg-slate-50 dark:bg-slate-900 border-t dark:border-slate-700 border-gray-100 py-4">
                             <div className="max-w-[1400px] mx-auto px-4 space-y-4">
                                 {renderNavLinks()}
-                                <div className='flex items-center gap-3 mt-5'>
+                                <div className='flex flex-col sm:flex-row sm:items-center gap-3 mt-5'>
                                     {user?.role === 'SUPERADMIN' && <CommonFilter
                                         filters={filters.departments}
                                         filterValue='gDep'
-                                        otherClasses="min-h-[36px] sm:min-w-[100px]"
+                                        otherClasses="min-h-[36px] sm:min-w-[100px] w-fit"
                                     />}
-                                    <NotiBtn />
-                                    <LngBtn />
-                                    <ModeToggle />
-                                    <DialogTrigger asChild>
-                                        <Button variant='destructive' className='rounded-full cursor-pointer'>
-                                            Log Out
-                                        </Button>
-                                    </DialogTrigger>
+                                    <div className='flex items-center gap-3'>
+                                        <NotiBtn />
+                                        <LngBtn />
+                                        <AnnouncementBtn />
+                                        <ModeToggle />
+                                        <DialogTrigger asChild>
+                                            <Button variant='destructive' size='icon' className='cursor-pointer'>
+                                                <IoMdLogOut />
+                                            </Button>
+                                        </DialogTrigger>
+                                    </div>
                                 </div>
                             </div>
                         </div>

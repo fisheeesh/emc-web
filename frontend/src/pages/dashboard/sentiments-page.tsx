@@ -22,7 +22,7 @@ export default function SentimentsDashboardPage() {
     const [searchParams] = useSearchParams()
 
     const gDep = searchParams.get('gDep') || 'all'
-    const duration = searchParams.get('duration') || 'today'
+    const duration = searchParams.get('duration') || '1'
     const sentimentsFilter = searchParams.get("sentiments") || '7'
 
     const dep = user?.role === 'SUPERADMIN' ? gDep : user?.departmentId.toString()

@@ -54,8 +54,9 @@ export const COMPARISON_DATA: ComparisonData[] = [
 ]
 
 export const OVERVIEW_FILTER = [
-    { name: 'Today', value: 'today' },
-    { name: 'This Month', value: 'month' },
+    { name: 'Today', value: '1' },
+    { name: 'This Week', value: '7' },
+    { name: 'This Month', value: '30' },
 ]
 
 export const COMPARISON_FILTER = [

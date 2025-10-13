@@ -10,7 +10,7 @@ export default function Empty({ label, classesName = "w-[200px] h-[150px] lg:h-[
                 loop={true}
                 autoplay={true}
             />
-            <p className='font-medium'>{label}</p>
+            <p className='font-medium text-center text-xs sm:text-base'>{label}</p>
         </>
     );
 }

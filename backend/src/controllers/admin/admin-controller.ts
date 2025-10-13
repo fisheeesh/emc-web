@@ -23,21 +23,19 @@ export const getMoodOverview = [
     query("duration", "Invalid Duration").trim().escape().optional(),
     async (req: CustomRequest, res: Response, next: NextFunction) => {
         const empId = req.employeeId
-        const { duration = 'today', dep } = req.query
+        const { duration = '1', dep } = req.query
 
         const emp = await getEmployeeById(empId!)
         checkEmployeeIfNotExits(emp)
 
         const now = new Date()
+        const start = startOfDay(subDays(now, +duration - 1))
+        const end = endOfDay(now)
 
-        const durationFilter = duration === 'today'
-            ? {
-                gte: startOfDay(now),
-                lte: endOfDay(now)
-            } : {
-                gte: startOfMonth(now),
-                lte: endOfDay(now)
-            }
+        const durationFilter = {
+            gte: start,
+            lte: end
+        }
 
         const percentages = await getMoodPercentages(emp!.departmentId, dep as string, emp!.role, durationFilter)
         // const cacheKey = `emotion-mood-overview-${JSON.stringify(durationFilter)}`
@@ -62,7 +60,7 @@ export const getSenitmentsComparison = [
 
         const now = new Date();
 
-        const start = startOfDay(subDays(now, duration === '7' ? 6 : 29))
+        const start = startOfDay(subDays(now, +duration - 1))
         const end = endOfDay(now)
 
         const result = await getSentimentsComparisonData(emp!.departmentId, dep as string, emp!.role, start, end);
