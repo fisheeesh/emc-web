@@ -10,12 +10,13 @@ datasource db {
 
 model Employee {
   id              Int                @id @default(autoincrement())
-  firstName       String?            @db.VarChar(52)
-  lastName        String?            @db.VarChar(52)
+  firstName       String?            @db.VarChar(100)
+  lastName        String?            @db.VarChar(100)
   phone           String?            @unique @db.VarChar(15)
   password        String
-  email           String             @unique @db.VarChar(52)
+  email           String             @unique @db.VarChar(100)
   position        String?
+  points          BigInt?            @default(0)
   accType         AccType            @default(ACTIVE)
   jobType         JobType            @default(FULLTIME)
   role            Role               @default(EMPLOYEE)
@@ -29,14 +30,46 @@ model Employee {
   lastCritical    DateTime?
   avgScore        Decimal            @default(0) @db.Decimal(3, 2)
   emotionCount    Int                @default(0)
-  emotionSum      Decimal            @default(0) @db.Decimal(3, 2)
+  emotionSum      Decimal            @default(0) @db.Decimal(6, 2)
   criticalTimes   CriticalEmployee[]
   checkIns        EmotionCheckIn[]
-  department      Department         @relation(fields: [departmentId], references: [id])
+  department      Department         @relation(fields: [departmentId], references: [id], onDelete: Restrict)
+
+  //* Single column indexes
+  @@index([departmentId])
+  @@index([role])
+  @@index([accType])
+  @@index([jobType])
+  @@index([position])
+  @@index([createdAt])
+  @@index([avgScore])
+  @@index([status])
+  //* Two-field combo indexes
+  @@index([departmentId, role])
+  @@index([departmentId, jobType])
+  @@index([departmentId, accType])
+  @@index([departmentId, position])
+  @@index([departmentId, status])
+  @@index([role, accType])
+  @@index([jobType, accType])
+  @@index([accType, position])
+  @@index([departmentId, avgScore])
+  @@index([status, avgScore])
+  //* Three-field combo indexes
+  @@index([departmentId, role, accType])
+  @@index([departmentId, jobType, accType])
+  @@index([departmentId, role, jobType])
+  @@index([departmentId, status, avgScore])
+  @@index([role, jobType, accType])
+  @@index([departmentId, accType, position])
+  //* Search optimization indexes
+  @@index([firstName, lastName])
+  @@index([email])
 }
 
 model Otp {
   id            Int      @id @default(autoincrement())
+  email         String   @unique @db.VarChar(100)
   otp           String
   rememberToken String
   count         Int      @default(0) @db.SmallInt
@@ -44,79 +77,163 @@ model Otp {
   verifyToken   String?
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
-  email         String   @unique @db.VarChar(52)
 }
 
 model EmotionCheckIn {
   id           Int      @id @default(autoincrement())
-  emoji        String
-  textFeeling  String
-  emotionScore Decimal  @default(0) @db.Decimal(3, 2)
   employeeId   Int
+  emoji        String
+  textFeeling  String   @db.Text
+  emotionScore Decimal  @db.Decimal(3, 2)
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
   employee     Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+
+  //* Single column indexes
+  @@index([employeeId])
+  @@index([emotionScore])
+  @@index([createdAt])
+  //* Two-field combo indexes
+  @@index([employeeId, createdAt])
+  @@index([employeeId, emotionScore])
+  @@index([emotionScore, createdAt])
+  @@index([createdAt, emotionScore])
+  //* Three-field combo indexes
+  @@index([employeeId, createdAt, emotionScore])
 }
 
 model CriticalEmployee {
-  id           Int          @id @default(autoincrement())
-  emotionScore Decimal      @default(0) @db.Decimal(3, 2)
+  id           Int       @id @default(autoincrement())
   employeeId   Int
-  createdAt    DateTime     @default(now())
-  updatedAt    DateTime     @updatedAt
-  status       Status       @default(NORMAL)
-  analyses     AIAnalysis[]
-  employee     Employee     @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+  departmentId Int
+  emotionScore Decimal   @db.Decimal(3, 2)
+  isResolved   Boolean   @default(false)
+  resolvedAt   DateTime?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  employee    Employee     @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+  department  Department   @relation(fields: [departmentId], references: [id], onDelete: Restrict)
+  analysis    AIAnalysis[]
+  actionPlans ActionPlan[]
+
+  //* Single column indexes
+  @@index([employeeId])
+  @@index([departmentId])
+  @@index([isResolved])
+  @@index([createdAt])
+  @@index([resolvedAt])
+  //* Two-field combo indexes
+  @@index([departmentId, isResolved])
+  @@index([departmentId, createdAt])
+  @@index([isResolved, createdAt])
+  @@index([employeeId, createdAt])
+  @@index([employeeId, isResolved])
+  //* Three-field combo indexes
+  @@index([departmentId, isResolved, createdAt])
+  @@index([employeeId, isResolved, createdAt])
 }
 
 model AIAnalysis {
   id         Int              @id @default(autoincrement())
-  input      String
-  output     String
+  criticalId Int
+  input      String           @db.Text
+  output     String           @db.Text
   createdAt  DateTime         @default(now())
   updatedAt  DateTime         @updatedAt
-  criticalId Int
   critical   CriticalEmployee @relation(fields: [criticalId], references: [id], onDelete: Cascade)
 }
 
 model Notification {
-  id        Int        @id @default(autoincrement())
-  content   String     @db.VarChar(255)
-  status    NotiStatus @default(SENT)
-  createdAt DateTime   @default(now())
-  updatedAt DateTime   @updatedAt
+  id           Int        @id @default(autoincrement())
+  departmentId Int
+  content      String     @db.Text
+  status       NotiStatus @default(SENT)
+  toSAdmin     Boolean    @default(false)
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+  department   Department @relation(fields: [departmentId], references: [id], onDelete: Cascade)
 }
 
 model Department {
-  id         Int          @id @default(autoincrement())
-  name       String       @unique @db.VarChar(52)
-  employees  Employee[]
-  ActionPlan ActionPlan[]
+  id                Int                @id @default(autoincrement())
+  name              String             @unique @db.VarChar(100)
+  description       String?            @db.Text
+  isActive          Boolean            @default(true)
+  createdAt         DateTime           @default(now())
+  updatedAt         DateTime           @updatedAt
+  employees         Employee[]
+  actionPlans       ActionPlan[]
+  notifications     Notification[]
+  criticalEmployees CriticalEmployee[]
 }
 
 model ActionPlan {
-  id            String     @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  from          String
-  to            String
-  quickAction   String?
-  actionType    String
-  priority      String
-  assignTo      String
-  dueDate       DateTime
-  actionNotes   String
-  followUpNotes String
+  id            String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  criticalId    Int
   departmentId  Int
-  status        RStatus    @default(PENDING)
-  type          RType      @default(PENDING)
-  createdAt     DateTime   @default(now())
-  updatedAt     DateTime   @updatedAt
-  department    Department @relation(fields: [departmentId], references: [id])
+  from          String    @db.VarChar(100)
+  to            String    @db.VarChar(100)
+  actionType    String    @db.VarChar(100)
+  priority      Priority  @default(MEDIUM)
+  assignTo      String    @db.VarChar(100)
+  dueDate       DateTime
+  actionNotes   String    @db.Text
+  followUpNotes String    @db.Text
+  quickAction   String?   @db.Text
+  suggestions   String?   @db.Text
+  status        RStatus   @default(PENDING)
+  type          RType     @default(PENDING)
+  completedAt   DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  criticalEmployee CriticalEmployee @relation(fields: [criticalId], references: [id], onDelete: Cascade)
+  department       Department       @relation(fields: [departmentId], references: [id], onDelete: Restrict)
+
+  //* Single column indexes
+  @@index([criticalId])
+  @@index([departmentId])
+  @@index([status])
+  @@index([priority])
+  @@index([actionType])
+  @@index([createdAt])
+  @@index([dueDate])
+  @@index([completedAt])
+  //* Two-field combo indexes
+  @@index([departmentId, status])
+  @@index([departmentId, priority])
+  @@index([departmentId, createdAt])
+  @@index([status, createdAt])
+  @@index([status, priority])
+  @@index([status, dueDate])
+  @@index([priority, createdAt])
+  @@index([actionType, status])
+  @@index([criticalId, createdAt])
+  //* Three-field combo indexes
+  @@index([departmentId, status, createdAt])
+  @@index([departmentId, status, priority])
+  @@index([departmentId, actionType, status])
+  @@index([status, priority, createdAt])
+  @@index([status, priority, dueDate])
+  @@index([departmentId, priority, createdAt])
+  //* Four-field combo index for complex filters
+  @@index([departmentId, status, priority, createdAt])
 }
 
 model Setting {
-  id    Int    @id @default(autoincrement())
-  key   String @unique @db.VarChar(50)
-  value String @db.VarChar(200)
+  id        Int      @id @default(autoincrement())
+  key       String   @unique @db.VarChar(100)
+  value     String   @db.Text
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+enum Priority {
+  LOW
+  MEDIUM
+  HIGH
+  URGENT
 }
 
 enum RType {

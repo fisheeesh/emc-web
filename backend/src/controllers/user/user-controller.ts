@@ -130,15 +130,14 @@ export const emotionCheckIn = [
                         }
                     })
 
-                    await tx.criticalEmployee.create({
-                        data: {
-                            employee: {
-                                connect: { id: emp!.id }
-                            },
-                            status: "CRITICAL",
-                            emotionScore: avgScore,
-                        }
-                    })
+                    // await tx.criticalEmployee.create({
+                    //     data: {
+                    //         employee: {
+                    //             connect: { id: emp!.id }
+                    //         },
+                    //         emotionScore: avgScore,
+                    //     }
+                    // })
                 }
 
                 return isCritical

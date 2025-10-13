@@ -1,6 +1,8 @@
 import { Button } from '@/components/ui/button';
-import { DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { DialogClose } from '@radix-ui/react-dialog';
 import { Briefcase, Calendar, Globe, Heart, Mail, MapPin, MapPinned, Phone, User } from 'lucide-react';
+import { MdOutlineSick } from "react-icons/md";
 
 export default function EmpDetailsModal() {
 
@@ -92,9 +94,9 @@ export default function EmpDetailsModal() {
                         </div>
 
                         <div className="flex items-center gap-3 py-2">
-                            <Heart className="w-5 h-5 text-gray-400" />
-                            <span className="text-sm text-gray-500 w-32">Marital status</span>
-                            <span className="text-sm font-medium">Married</span>
+                            <MdOutlineSick className="w-5 h-5 text-gray-400" />
+                            <span className="text-sm text-gray-500 w-32">Last Critical Time</span>
+                            <span className="text-sm font-medium">Null</span>
                         </div>
 
                         <div className="flex items-center gap-3 py-2">
@@ -200,6 +202,11 @@ export default function EmpDetailsModal() {
                         </div>
                     </div>
                 </div>
+                <DialogFooter className='py-5 border-t mt-5'>
+                    <DialogClose>
+                        <Button variant='outline' className='cursor-pointer'>Close</Button>
+                    </DialogClose>
+                </DialogFooter>
             </div>
         </DialogContent>
     );
