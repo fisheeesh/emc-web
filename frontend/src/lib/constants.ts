@@ -59,6 +59,11 @@ export const OVERVIEW_FILTER = [
     { name: 'This Month', value: '30' },
 ]
 
+export const LEADERBOARD_FILTER = [
+    { name: 'For This Week', value: '7' },
+    { name: 'For This Month', value: '30' },
+]
+
 export const COMPARISON_FILTER = [
     { name: "Last 7 days", value: "7" },
     { name: "Last 30 days", value: "30" }
@@ -170,27 +175,6 @@ export const LEADERBOARD = [
         points: 795,
         streak: 0,
     },
-    {
-        id: 8,
-        name: 'Maria Garcia',
-        department: "Customer Service",
-        points: 760,
-        streak: 0,
-    },
-    {
-        id: 9,
-        name: 'Robert Taylor',
-        department: "Finance",
-        points: 720,
-        streak: 4,
-    },
-    {
-        id: 10,
-        name: 'Amanda Lee',
-        department: "Marketing",
-        points: 685,
-        streak: 0,
-    }
 ]
 
 export const CRITICAL_DATA = [

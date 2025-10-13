@@ -62,25 +62,29 @@ export const createNewEmployee = [
         const emp = await getEmployeeById(empId!)
 
         checkEmployeeIfNotExits(emp)
-        checkUploadFile(req.file)
+
 
         const existEmp = await getEmployeeByEmail(email)
         checkEmployeeIfExits(existEmp)
 
-        const splitFileName = req.file?.filename?.split(".")[0]
-        await ImageQueue.add("optimize-image", {
-            filePath: req.file?.path,
-            fileName: `${splitFileName}.webp`,
-            width: 300,
-            height: 300,
-            quality: 100
-        }, {
-            attempts: 3,
-            backoff: {
-                type: "exponential",
-                delay: 1000
-            }
-        })
+        if (req.file) {
+            checkUploadFile(req.file)
+
+            const splitFileName = req.file?.filename?.split(".")[0]
+            await ImageQueue.add("optimize-image", {
+                filePath: req.file?.path,
+                fileName: `${splitFileName}.webp`,
+                width: 300,
+                height: 300,
+                quality: 100
+            }, {
+                attempts: 3,
+                backoff: {
+                    type: "exponential",
+                    delay: 1000
+                }
+            })
+        }
 
         const otp = 123456
         const hashedOTP = await generateHashedValue(otp.toString())

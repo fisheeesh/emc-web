@@ -68,6 +68,8 @@ export default function CreateEditEmpModal<T extends z.ZodType<any, any, any>>({
             formData.append("email", values.email)
             formData.append("password", values.password)
 
+            console.log(Object.fromEntries(formData))
+
             createEmp(formData, {
                 onSettled: () => {
                     form.reset()
