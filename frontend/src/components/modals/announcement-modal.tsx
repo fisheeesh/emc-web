@@ -17,13 +17,13 @@ import {
 import { Input } from "@/components/ui/input"
 import { zodResolver } from "@hookform/resolvers/zod"
 import '@mdxeditor/editor/style.css'
-import { Upload, UserCheck, X } from "lucide-react"
+import { DialogClose } from "@radix-ui/react-dialog"
+import { Upload, X } from "lucide-react"
 import { useState } from "react"
 import { useForm } from "react-hook-form"
+import { TfiAnnouncement } from "react-icons/tfi"
 import * as z from "zod"
 import Editor from "../editor"
-import { TfiAnnouncement } from "react-icons/tfi";
-import { DialogClose } from "@radix-ui/react-dialog"
 
 const formSchema = z.object({
     subject: z.string().min(1, "Subject is required"),
@@ -87,7 +87,7 @@ export default function AnnouncementModal() {
             </DialogHeader>
 
             <Form {...form}>
-                <div className="space-y-6">
+                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
                     <FormField
                         control={form.control}
                         name="subject"
@@ -114,7 +114,10 @@ export default function AnnouncementModal() {
                                 <FormLabel>Message Body <span className="font-en text-red-600">*</span></FormLabel>
                                 <FormControl>
                                     <div className="border rounded-md">
-                                        <Editor />
+                                        <Editor
+                                            value={field.value}
+                                            onChange={field.onChange}
+                                        />
                                     </div>
                                 </FormControl>
                                 <FormMessage />
@@ -192,8 +195,8 @@ export default function AnnouncementModal() {
                             Send Announcement
                         </Button>
                     </DialogFooter>
-                </div>
+                </form>
             </Form>
-        </DialogContent>
+        </DialogContent >
     )
 }
