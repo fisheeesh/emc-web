@@ -72,3 +72,18 @@ export const getEmployeesInfiniteData = async (options: any, status: string) => 
 
     return await prisma.employee.findMany(options)
 }
+
+export const getEmpLast4daysScores = async (id: number) => {
+    const scores = await prisma.emotionCheckIn.findMany({
+        where: {
+            employeeId: id
+        },
+        select: {
+            emotionScore: true,
+        },
+        orderBy: { createdAt: 'desc' },
+        take: 4
+    })
+
+    return scores.map(s => s.emotionScore);
+}

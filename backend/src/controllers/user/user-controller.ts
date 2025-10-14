@@ -57,7 +57,16 @@ export const emotionCheckIn = [
         //* Recieve emp's today mood message
         const { moodMessage } = req.body
         const empId = req.employeeId
-        const emp = await getEmployeeById(empId!)
+        const emp = await prisma.employee.findUnique({
+            where: { id: empId },
+            include: {
+                checkIns: {
+                    select: { emotionScore: true },
+                    orderBy: { createdAt: 'desc' },
+                    take: 4
+                }
+            }
+        });
         checkEmployeeIfNotExits(emp)
 
         //* Split emoji and text for db schema format
@@ -80,14 +89,19 @@ export const emotionCheckIn = [
         //* Get the score and format it
         const score = match ? parseFloat(match[0]) : null;
 
+        const last4Scores = emp!.checkIns.map(e => +e.emotionScore);
+        const last5Scores = [+score!, ...last4Scores];
+
+        const isValid = last5Scores.every(s => s >= -0.5);
+
         try {
             //* Calculate avgScore upfront
             const newEmotionSum = +emp!.emotionSum + score!;
             const newEmotionCount = emp!.emotionCount + 1;
             const avgScore = newEmotionSum / newEmotionCount;
             const isCritical = avgScore <= CRITICAL_POINT;
-            const isRecovered = emp!.status === 'WATCHLIST' && avgScore >= CRITICAL_POINT;
-            const isNewCritical = isCritical && emp!.status !== "CRITICAL";
+            const isRecovered = emp!.status === 'WATCHLIST' && isValid
+            const isNewCritical = avgScore <= CRITICAL_POINT && emp!.status !== "CRITICAL" && emp!.status !== "WATCHLIST"
 
             //* Optimized transaction - only critical DB operations
             await prisma.$transaction(async (tx) => {
