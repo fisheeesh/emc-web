@@ -5,6 +5,7 @@ import queryClient from "./query";
 export const invalidateEmpQueries = async () => {
     await Promise.all([
         queryClient.invalidateQueries({ queryKey: ['emps', 'infinite'], exact: false }),
+        queryClient.invalidateQueries({ queryKey: ['departments'] }),
     ]);
 };
 
