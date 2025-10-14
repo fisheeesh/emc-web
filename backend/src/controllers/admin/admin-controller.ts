@@ -1,16 +1,20 @@
 import { endOfDay, endOfMonth, endOfYear, startOfDay, startOfMonth, startOfYear, subDays } from "date-fns";
 import { NextFunction, Request, Response } from "express";
 import { query } from "express-validator";
+import { prisma } from "../../config/prisma-client";
 import { getAdminUserData } from "../../services/admin-services";
 import { getEmployeeById } from "../../services/auth-services";
 import { getAttendanceOverviewInfiniteData, getCheckInHoursData, getDailyAttendanceData, getMoodPercentages, getSentimentsComparisonData } from "../../services/emotion-check-in-services";
 import { getAllDepartmentsData } from "../../services/system-service";
 import { checkEmployeeIfNotExits } from "../../utils/check";
 import { getEmotionRange } from "../../utils/helplers";
+import { Prisma, PrismaClient } from "../../../generated/prisma";
 
 interface CustomRequest extends Request {
     employeeId?: number
 }
+
+const prismaClient = new PrismaClient()
 
 export const testAdmin = (req: Request, res: Response, next: NextFunction) => {
     res.status(200).json({
@@ -257,3 +261,50 @@ export const getAdminUser = async (req: CustomRequest, res: Response, next: Next
         data: result
     })
 }
+
+export const getLeaderboards = [
+    query("dep", "Invalid Department.").trim().escape().optional(),
+    query("kw", "Invalid Keyword.").trim().optional().escape(),
+    async (req: CustomRequest, res: Response, next: NextFunction) => {
+        const { dep, kw } = req.query
+        const empId = req.employeeId
+
+        const emp = await getEmployeeById(empId!)
+        checkEmployeeIfNotExits(emp)
+
+        const kwFilter: Prisma.EmployeeWhereInput = kw ? {
+            OR: [
+                { firstName: { contains: kw as string, mode: 'insensitive' } },
+                { lastName: { contains: kw as string, mode: 'insensitive' } }
+            ] as Prisma.EmployeeWhereInput[]
+        } : {}
+
+        const results = await prisma.employee.findMany({
+            where: {
+                departmentId:
+                    emp!.role !== 'SUPERADMIN'
+                        ? emp!.departmentId
+                        : dep && dep !== 'all'
+                            ? Number(dep)
+                            : undefined,
+                ...kwFilter
+            },
+            select: {
+                fullName: true,
+                email: true,
+                points: true,
+                avatar: true,
+                department: true,
+            },
+            orderBy: {
+                points: 'desc'
+            },
+            take: 7
+        })
+
+        res.status(200).json({
+            message: "Here is Leaderboards data.",
+            data: results
+        })
+    }
+]

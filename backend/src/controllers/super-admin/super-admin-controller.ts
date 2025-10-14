@@ -27,7 +27,7 @@ export const createNewEmployee = [
             return true
         }),
     body("password", "Password must be at least 8 digits.").trim().notEmpty().matches(/^[\d]+$/).isLength({ min: 8, max: 8 }),
-    body("position", "Position is required.").trim().notEmpty().escape(),
+    body("position", "Position is required.").trim().notEmpty(),
     body("role", "Role is required.").trim().notEmpty().escape()
         .custom(value => {
             if (!Object.values(Role).includes(value as Role)) {

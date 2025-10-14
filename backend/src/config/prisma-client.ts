@@ -22,6 +22,12 @@ export const prisma = new PrismaClient().$extends({
                     return getStatusFromScore(+employee.avgScore);
                 }
             },
+            points: {
+                needs: { points: true },
+                compute(employee) {
+                    return Number(employee.points)
+                }
+            },
             createdAt: {
                 needs: { createdAt: true },
                 compute(employee) {

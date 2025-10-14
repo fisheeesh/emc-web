@@ -1,8 +1,8 @@
 import { eachDayOfInterval, endOfDay, format, startOfDay } from "date-fns";
-import { Prisma, PrismaClient } from "../../generated/prisma";
+import { PrismaClient } from "../../generated/prisma";
 import { MOOD_THRESHOLDS } from "../config";
-import { departmentFilter, getEmotionRange, roundToHour } from "../utils/helplers";
 import { prisma } from "../config/prisma-client";
+import { departmentFilter, roundToHour } from "../utils/helplers";
 
 const prismaClient = new PrismaClient()
 
