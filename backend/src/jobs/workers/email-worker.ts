@@ -11,7 +11,7 @@ const FROM = "onboarding@resend.dev";
 type JobPayload = {
     subject: string,
     body: string,
-    to?: string
+    to?: string[]
 };
 
 const emailWorker = new Worker<JobPayload>(

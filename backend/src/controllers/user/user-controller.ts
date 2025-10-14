@@ -184,6 +184,16 @@ export const emotionCheckIn = [
                 try {
                     const bgTasks = [];
 
+                    const adminEmails = await prisma.employee.findMany({
+                        where: {
+                            departmentId: emp!.departmentId,
+                            role: "ADMIN"
+                        },
+                        select: {
+                            email: true
+                        }
+                    })
+
                     //* Cache invalidation
                     bgTasks.push(
                         CacheQueue.add("invalidate-emotion-cache", {
@@ -199,7 +209,8 @@ export const emotionCheckIn = [
                         bgTasks.push(
                             EmailQueue.add("notify-email", {
                                 subject: normal_subject(),
-                                body: normal_body(`${emp?.firstName} ${emp?.lastName}`)
+                                body: normal_body(`${emp?.firstName} ${emp?.lastName}`),
+                                to: adminEmails.map(admin => admin.email)
                             }, {
                                 jobId: `email-normal:${emp?.id}:${Date.now()}`
                             })
@@ -210,7 +221,8 @@ export const emotionCheckIn = [
                         bgTasks.push(
                             EmailQueue.add("notify-email", {
                                 subject: critical_subject(`${emp?.firstName} ${emp?.lastName}`),
-                                body: critical_body(`${emp?.firstName} ${emp?.lastName}`)
+                                body: critical_body(`${emp?.firstName} ${emp?.lastName}`),
+                                to: adminEmails.map(admin => admin.email)
                             }, {
                                 jobId: `email-critical:${emp?.id}:${Date.now()}`
                             })
