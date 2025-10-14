@@ -3,12 +3,26 @@ import { TIMEZONE } from '../config';
 import path from "path"
 import { unlink } from "node:fs/promises";
 
+export function getStatusFromScore(score: number) {
+    if (score >= 0.4) return 'positive';
+    if (score >= -0.3) return 'neutral';
+    if (score > -0.8) return 'negative';
+    return 'critical';
+}
+
 export const departmentFilter = (role: string, uDepartmentId: number, qDepartmentId?: string) => {
     return role !== 'SUPERADMIN'
         ? { employee: { departmentId: uDepartmentId } }
         : qDepartmentId && qDepartmentId !== 'all'
             ? { employee: { departmentId: Number(qDepartmentId) } }
             : {};
+}
+
+export const determineReputation = (score: number) => {
+    if (score >= 0.4) return 1000;
+    if (score >= -0.3) return 500;
+    if (score > -0.8) return -200;
+    return -500;
 }
 
 export const getEmotionRange = (status: string) => {

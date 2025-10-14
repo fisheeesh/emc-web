@@ -10,7 +10,7 @@ const analysisWorker = new Worker("analysisQueue", async (job) => {
     const { input } = job.data
 
     const { text } = await generateText({
-        model: groq("deepseek-r1-distill-llama-70b"),
+        model: groq("llama-3.3-70b-versatile"),
         prompt: `
             The following is an employee's last 7 days of emotional check-in data:
 

@@ -4,13 +4,16 @@ import sanitizeHtml from 'sanitize-html'
 import { PrismaClient } from "../../../generated/prisma"
 import { CRITICAL_POINT } from "../../config"
 import { errorCodes } from "../../config/error-codes"
+import { CacheQueue } from "../../jobs/queues/cache-queue"
+import { EmailQueue } from "../../jobs/queues/email-queue"
 import { ScoreQueue, ScoreQueueEvents } from "../../jobs/queues/score-queue"
 import { getEmployeeById } from "../../services/auth-services"
-import { authorize } from "../../utils/authorize"
-import { checkEmployeeIfNotExits, createHttpErrors } from "../../utils/check"
 import { getAllEmpEmotionHistory } from "../../services/emp-services"
+import { authorize } from "../../utils/authorize"
 import { getOrSetCache } from "../../utils/cache"
-import { CacheQueue } from "../../jobs/queues/cache-queue"
+import { checkEmployeeIfNotExits, createHttpErrors } from "../../utils/check"
+import { critical_body, critical_subject, normal_body, normal_subject } from "../../utils/email-templates"
+import { determineReputation } from "../../utils/helplers"
 
 const prisma = new PrismaClient()
 
@@ -78,84 +81,130 @@ export const emotionCheckIn = [
         const score = match ? parseFloat(match[0]) : null;
 
         try {
-            //* Since this is atomic opeartion -> transaction
-            const isCritical = await prisma.$transaction(async (tx) => {
-                //* Insert emotion check-in
-                await tx.emotionCheckIn.create({
-                    data: {
-                        employeeId: emp!.id,
-                        emoji: emoji.trim(),
-                        textFeeling: textFeeling.trim(),
-                        emotionScore: +score!
-                    }
-                })
+            //* Calculate avgScore upfront
+            const newEmotionSum = +emp!.emotionSum + score!;
+            const newEmotionCount = emp!.emotionCount + 1;
+            const avgScore = newEmotionSum / newEmotionCount;
+            const isCritical = avgScore <= CRITICAL_POINT;
+            const isRecovered = emp!.status === 'WATCHLIST' && avgScore >= CRITICAL_POINT;
+            const isNewCritical = isCritical && emp!.status !== "CRITICAL";
 
-                //* Update employee running totals **without avgScore** for precision
-                const updatedEmp = await tx.employee.update({
-                    where: { id: emp!.id },
-                    data: {
-                        emotionSum: { increment: +score! },
-                        emotionCount: { increment: 1 },
-                    }
-                })
+            //* Optimized transaction - only critical DB operations
+            await prisma.$transaction(async (tx) => {
+                //* Single combined update instead of multiple queries
+                const statusUpdate = isRecovered ? "NORMAL" : (isNewCritical ? "CRITICAL" : undefined);
 
-                //* Calculate avgScore with up-to-date data
-                const avgScore = +updatedEmp.emotionSum / +updatedEmp.emotionCount;
+                const updates = await Promise.all([
+                    //* 1. Insert emotion check-in
+                    tx.emotionCheckIn.create({
+                        data: {
+                            employeeId: emp!.id,
+                            emoji: emoji.trim(),
+                            textFeeling: textFeeling.trim(),
+                            emotionScore: score!
+                        }
+                    }),
 
-                //* Update avgScore field -> fresh
-                await tx.employee.update({
-                    where: { id: emp!.id },
-                    data: { avgScore }
-                })
-
-
-                //* Watchlist check
-                if (updatedEmp.status === 'WATCHLIST' && avgScore >= CRITICAL_POINT) {
-                    await tx.employee.update({
+                    //* 2. Update employee - combined in ONE query
+                    tx.employee.update({
                         where: { id: emp!.id },
                         data: {
-                            status: "NORMAL"
+                            emotionSum: newEmotionSum,
+                            emotionCount: newEmotionCount,
+                            avgScore,
+                            points: { increment: determineReputation(score!) },
+                            ...(statusUpdate && { status: statusUpdate }),
+                            ...(isNewCritical && { lastCritical: new Date() })
                         }
                     })
-                }
+                ]);
 
-                //* Critical check AFTER update
-                const isCritical = avgScore <= CRITICAL_POINT
-                if (isCritical && updatedEmp.status !== "CRITICAL") {
-                    await tx.employee.update({
-                        where: { id: emp!.id },
+                //* 3. Handle status-specific DB operations (only if needed)
+                if (isRecovered) {
+                    await tx.notification.create({
                         data: {
-                            status: "CRITICAL",
-                            lastCritical: new Date()
+                            avatar: emp?.avatar!,
+                            type: 'NORMAL',
+                            content: `🎉 Good news!!!. ${emp?.firstName} ${emp?.lastName} is back to normal. Yay!!!🙌`,
+                            department: { connect: { id: emp?.departmentId } }
                         }
-                    })
-
-                    // await tx.criticalEmployee.create({
-                    //     data: {
-                    //         employee: {
-                    //             connect: { id: emp!.id }
-                    //         },
-                    //         emotionScore: avgScore,
-                    //     }
-                    // })
+                    });
                 }
 
-                return isCritical
-            })
+                if (isNewCritical) {
+                    await Promise.all([
+                        tx.criticalEmployee.create({
+                            data: {
+                                employee: { connect: { id: emp!.id } },
+                                department: { connect: { id: emp!.departmentId } },
+                                emotionScore: avgScore,
+                            }
+                        }),
+                        tx.notification.create({
+                            data: {
+                                avatar: emp?.avatar!,
+                                type: 'CRITICAL',
+                                content: `${emp?.firstName} ${emp?.lastName}'s sentiments has dropped to critical. Please review.`,
+                                department: { connect: { id: emp?.departmentId } }
+                            }
+                        })
+                    ]);
+                }
 
-            //* Invalidate cache
-            await CacheQueue.add("invalidate-emotion-cache", {
-                pattern: "emotion-*"
-            }, {
-                jobId: `invalidate-${Date.now()}`,
-                priority: 1
-            })
+                return { updates, avgScore };
+            });
 
+            //* Response immdiately - Don't wait for background tasks
             res.status(200).json({
                 message: "Successfully checked in.",
                 score,
                 isCritical
-            })
+            });
+
+            //* Move all notifications to background
+            setImmediate(async () => {
+                try {
+                    const bgTasks = [];
+
+                    //* Cache invalidation
+                    bgTasks.push(
+                        CacheQueue.add("invalidate-emotion-cache", {
+                            pattern: "emotion-*"
+                        }, {
+                            jobId: `invalidate-${Date.now()}`,
+                            priority: 1
+                        })
+                    );
+
+                    //* Email notifications (only if status changed)
+                    if (isRecovered) {
+                        bgTasks.push(
+                            EmailQueue.add("notify-email", {
+                                subject: normal_subject(),
+                                body: normal_body(`${emp?.firstName} ${emp?.lastName}`)
+                            }, {
+                                jobId: `email-normal:${emp?.id}:${Date.now()}`
+                            })
+                        );
+                    }
+
+                    if (isNewCritical) {
+                        bgTasks.push(
+                            EmailQueue.add("notify-email", {
+                                subject: critical_subject(`${emp?.firstName} ${emp?.lastName}`),
+                                body: critical_body(`${emp?.firstName} ${emp?.lastName}`)
+                            }, {
+                                jobId: `email-critical:${emp?.id}:${Date.now()}`
+                            })
+                        );
+                    }
+
+                    await Promise.all(bgTasks);
+                } catch (bgError) {
+                    console.error('Background task error:', bgError);
+                }
+            });
+
         } catch (err: any) {
             return next(createHttpErrors({
                 message: err.message,

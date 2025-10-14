@@ -111,21 +111,8 @@ export default function NotiBtn() {
 
                             {/* Notification Content */}
                             <div className="flex-1">
-                                <div className="flex justify-between items-center">
-                                    <p className="text-sm font-semibold">{item.name}</p>
-                                    <span
-                                        className={`text-xs font-medium px-2 py-0.5 rounded-full ${item.status === "Critical"
-                                            ? "bg-red-100 text-red-600"
-                                            : item.status === "Warning"
-                                                ? "bg-yellow-100 text-yellow-600"
-                                                : "bg-gray-100 text-gray-600"
-                                            }`}
-                                    >
-                                        {item.status}
-                                    </span>
-                                </div>
                                 <p className="text-xs text-muted-foreground mt-1">{item.message}</p>
-                                <p className="text-[11px] text-muted-foreground italic mt-1">
+                                <p className="text-[11px] text-muted-foreground italic mt-1 font-en">
                                     {item.time}
                                 </p>
                             </div>

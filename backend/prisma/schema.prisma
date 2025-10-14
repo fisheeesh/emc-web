@@ -148,7 +148,9 @@ model Notification {
   id           Int        @id @default(autoincrement())
   departmentId Int
   content      String     @db.Text
+  avatar       String
   status       NotiStatus @default(SENT)
+  type         NotifType  @default(CRITICAL)
   toSAdmin     Boolean    @default(false)
   createdAt    DateTime   @default(now())
   updatedAt    DateTime   @updatedAt
@@ -276,4 +278,11 @@ enum Status {
 enum NotiStatus {
   SENT
   READ
+}
+
+enum NotifType {
+  CRITICAL
+  REQUEST
+  RESPONSE
+  NORMAL
 }

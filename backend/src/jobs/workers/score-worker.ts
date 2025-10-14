@@ -10,28 +10,49 @@ const scoreWorker = new Worker("scoreQueue", async (job) => {
     const { moodMessage } = job.data
 
     const { text } = await generateText({
-        model: groq("deepseek-r1-distill-llama-70b"),
+        model: groq("llama-3.3-70b-versatile"),
         prompt: `
-            The user has written the following message about how they feel: "${moodMessage}".
+            The user has submitted a mood check-in: "${moodMessage}"
 
-            You are an experienced professional therapist, but also fully aware of modern slang,
-            casual expressions, and how people talk today and can understand a wide range of emotional nuance.
-            You are fluent and knowledgeable in 3 lauguages such as English, Burmese and Thai.
+            This message may contain:
+            - An emoji (e.g., 😊, 😢, 😐, 🙂, 😤, 😔)
+            - A brief text description (e.g., "Just a normal day", "Feeling great!", "Not doing well")
+            - Or both combined (e.g., "🙂 Just a normal day", "😔 Feeling really down")
 
-            Your task:
-            - Assign a mood score between -1 and 1.
-            - Use **gradual scoring**, not just -1, 0, or 1.
-            - Only assign -1 or -0.9 or -0.8 or -0.7, or 1 or 0.9 or 0.8 or 0.7 if the message is extremely clear and absolute (100% positive = 1, or 100% negative/suicidal = -1).
-            - For messages that are positive but not extreme, use values like 0.6, 0.5 0.4.
-            - For messages that are negative but not extreme, use values like -0.6, -0.5, -0.4.
-            - For neutral, mixed, or uncertain moods, stay between -0.3 and 0.3
-            - If user emotion seems like anger issues, should assign between -0.5 to -0.6 based on the level of anger.
+            Analyze BOTH the emoji and text together to determine the user's emotional state.
 
-            Important:
-            - Output must be a single plain number, e.g. -0.7, 0.3, 0.9.
-            - Do not return any words, explanations, or markdown.`,
-        system: "You are a modern, professtional and culturally aware therapist who understands current slang and emotional nuance. Respond only with a numeric score."
+            Scoring Guidelines:
+            
+            **Positive Range (0.1 to 1.0):**
+            - 0.9 to 1.0: Extremely happy, euphoric, best day ever (😍, 🥳, "I'm so happy I could cry!")
+            - 0.7 to 0.8: Very happy, excited, great mood (😊, 😄, "Feeling amazing today!")
+            - 0.5 to 0.6: Happy, content, good vibes (🙂, 😌, "Things are going well")
+            - 0.3 to 0.4: Slightly positive, mild contentment (🙂, "It's okay", "Decent day")
+            - 0.1 to 0.2: Barely positive, neutral-leaning-good (🙂, "Just a normal day", "Nothing special")
+
+            **Neutral Range (-0.2 to 0.2):**
+            - -0.2 to 0.2: Truly neutral, indifferent, "meh" (😐, 😶, "Just existing", "Whatever")
+
+            **Negative Range (-1.0 to -0.1):**
+            - -0.1 to -0.2: Slightly off, minor discomfort (🙁, "Not my best day")
+            - -0.3 to -0.4: Somewhat negative, frustrated, tired (😕, 😞, "Feeling drained")
+            - -0.5 to -0.6: Clearly negative, angry, sad, stressed (😠, 😤, 😔, "Really frustrated", "Feeling angry")
+            - -0.7 to -0.8: Very negative, deeply sad, depressed (😭, 😢, "I feel awful", "Everything hurts")
+            - -0.9 to -1.0: Extremely negative, hopeless, suicidal thoughts (💔, "I can't do this anymore", "I want to give up")
+
+            **Special Considerations:**
+            - "Just a normal day" with 🙂 = around 0.1 to 0.2 (neutral-to-slightly-positive)
+            - If emoji contradicts text, weight the emoji slightly more (emojis often reveal true feelings)
+            - Anger/frustration should range from -0.5 to -0.7 depending on intensity
+            - Sarcasm or irony should be detected when possible (e.g., "Great day 🙄" is negative)
+
+            Output ONLY a single number between -1 and 1 (e.g., 0.15, -0.6, 0.8).
+            No explanations, no words, just the number.
+        `,
+        system: "You are an expert emotional intelligence therapist trained in emoji interpretation, modern communication styles, and multilingual sentiment analysis (English, Burmese, Thai). You provide precise, nuanced mood scores based on subtle emotional cues."
     })
+
+    console.log('Mood Score:', text)
 
     return text
 }, { connection: redis })

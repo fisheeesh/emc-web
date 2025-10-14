@@ -1,4 +1,5 @@
 import { PrismaClient } from "../../generated/prisma";
+import { getStatusFromScore } from "../utils/helplers";
 
 export const prisma = new PrismaClient().$extends({
     result: {
@@ -18,7 +19,7 @@ export const prisma = new PrismaClient().$extends({
             status: {
                 needs: { avgScore: true },
                 compute(employee) {
-                    return +employee.avgScore >= 0.4 ? 'positive' : +employee.avgScore >= -0.3 ? 'neutral' : +employee.avgScore > -0.8 ? 'negative' : 'critical'
+                    return getStatusFromScore(+employee.avgScore);
                 }
             },
             createdAt: {
@@ -50,7 +51,7 @@ export const prisma = new PrismaClient().$extends({
             status: {
                 needs: { emotionScore: true },
                 compute(emotionCheckIn) {
-                    return +emotionCheckIn.emotionScore >= 0.4 ? 'positive' : +emotionCheckIn.emotionScore >= -0.3 ? 'neutral' : +emotionCheckIn.emotionScore > -0.8 ? 'negative' : 'critical'
+                    return getStatusFromScore(+emotionCheckIn.emotionScore);
                 }
             },
             emotionScore: {
