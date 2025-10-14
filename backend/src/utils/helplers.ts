@@ -3,6 +3,18 @@ import { TIMEZONE } from '../config';
 import path from "path"
 import { unlink } from "node:fs/promises";
 
+export const calculatePositiveStreak = (scores: number[]): number => {
+    let streak = 0;
+    for (const s of scores) {
+        if (s >= 0.3) {
+            streak++;
+        } else {
+            return 0
+        }
+    }
+    return streak >= 3 ? streak : 0
+};
+
 export function getStatusFromScore(score: number) {
     if (score >= 0.4) return 'positive';
     if (score >= -0.3) return 'neutral';
@@ -18,12 +30,27 @@ export const departmentFilter = (role: string, uDepartmentId: number, qDepartmen
             : {};
 }
 
-export const determineReputation = (score: number) => {
-    if (score >= 0.4) return 1000;
-    if (score >= -0.3) return 500;
-    if (score > -0.8) return -200;
-    return -500;
-}
+export const determineReputation = (score: number, streak: number = 0) => {
+    let basePoints = 0;
+
+    if (score >= 0.4) {
+        basePoints = 1000;
+    } else if (score >= 0) {
+        basePoints = 500;
+    } else if (score >= -0.3) {
+        basePoints = 250;
+    } else if (score > -0.8) {
+        basePoints = -200;
+    } else {
+        basePoints = -500;
+    }
+
+    if (score >= 0 && streak >= 3) {
+        return basePoints * streak;
+    }
+
+    return basePoints;
+};
 
 export const getEmotionRange = (status: string) => {
     switch (status) {

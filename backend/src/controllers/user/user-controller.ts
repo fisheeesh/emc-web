@@ -13,7 +13,7 @@ import { authorize } from "../../utils/authorize"
 import { getOrSetCache } from "../../utils/cache"
 import { checkEmployeeIfNotExits, createHttpErrors } from "../../utils/check"
 import { critical_body, critical_subject, normal_body, normal_subject } from "../../utils/email-templates"
-import { determineReputation } from "../../utils/helplers"
+import { calculatePositiveStreak, determineReputation } from "../../utils/helplers"
 
 const prisma = new PrismaClient()
 
@@ -63,7 +63,7 @@ export const emotionCheckIn = [
                 checkIns: {
                     select: { emotionScore: true },
                     orderBy: { createdAt: 'desc' },
-                    take: 4
+                    take: 9
                 }
             }
         });
@@ -89,10 +89,12 @@ export const emotionCheckIn = [
         //* Get the score and format it
         const score = match ? parseFloat(match[0]) : null;
 
-        const last4Scores = emp!.checkIns.map(e => +e.emotionScore);
-        const last5Scores = [+score!, ...last4Scores];
+        const last9Scores = emp!.checkIns.map(e => +e.emotionScore);
+        const last10Scores = [+score!, ...last9Scores];
 
-        const isValid = last5Scores.every(s => s >= -0.5);
+        const isValid = last10Scores.slice(0, 5).every(s => s >= -0.5);
+
+        const positiveStreak = calculatePositiveStreak(last10Scores);
 
         try {
             //* Calculate avgScore upfront
@@ -102,6 +104,8 @@ export const emotionCheckIn = [
             const isCritical = avgScore <= CRITICAL_POINT;
             const isRecovered = emp!.status === 'WATCHLIST' && isValid
             const isNewCritical = avgScore <= CRITICAL_POINT && emp!.status !== "CRITICAL" && emp!.status !== "WATCHLIST"
+
+            const earnedPoints = determineReputation(score!, positiveStreak);
 
             //* Optimized transaction - only critical DB operations
             await prisma.$transaction(async (tx) => {
@@ -126,7 +130,7 @@ export const emotionCheckIn = [
                             emotionSum: newEmotionSum,
                             emotionCount: newEmotionCount,
                             avgScore,
-                            points: { increment: determineReputation(score!) },
+                            points: { increment: earnedPoints },
                             ...(statusUpdate && { status: statusUpdate }),
                             ...(isNewCritical && { lastCritical: new Date() })
                         }
