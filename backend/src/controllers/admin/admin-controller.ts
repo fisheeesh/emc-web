@@ -267,7 +267,7 @@ export const getLeaderboards = [
     query("kw", "Invalid Keyword.").trim().optional().escape(),
     query("duration", "Invalid Date.").trim().optional().escape(),
     async (req: CustomRequest, res: Response, next: NextFunction) => {
-        const { dep, kw, duration = '7' } = req.query
+        const { dep, kw, duration = '30' } = req.query
         const empId = req.employeeId
 
         const emp = await getEmployeeById(empId!)
@@ -284,12 +284,8 @@ export const getLeaderboards = [
         const start = startOfDay(subDays(now, +duration - 1))
         const end = endOfDay(now)
 
-        const durationFilter = {
-            gte: start,
-            lte: end
-        }
-
-        const results = await prisma.employee.findMany({
+        // Fetch employees with their check-ins within the duration
+        const employees = await prisma.employee.findMany({
             where: {
                 departmentId:
                     emp!.role !== 'SUPERADMIN'
@@ -302,41 +298,80 @@ export const getLeaderboards = [
             select: {
                 fullName: true,
                 email: true,
-                points: true,
                 avatar: true,
-                department: true,
+                firstName: true,
                 streak: true,
-            },
-            orderBy: [
-                { points: 'desc' },
-                { streak: 'desc' },
-                { firstName: 'asc' }
-            ],
-            take: 7
+                department: true,
+                checkIns: {
+                    where: {
+                        createdAt: {
+                            gte: start,
+                            lte: end
+                        }
+                    },
+                    select: {
+                        points: true
+                    }
+                }
+            }
         })
 
-        //* Add ranking with tie handling
+        // Calculate points from check-ins for the duration
+        const results = employees.map(employee => {
+            const periodPoints = employee.checkIns.reduce((sum, checkIn) => {
+                return sum + (checkIn.points ? Number(checkIn.points) : 0)
+            }, 0)
+
+            return {
+                fullName: employee.fullName,
+                email: employee.email,
+                avatar: employee.avatar,
+                department: employee.department,
+                streak: employee.streak,
+                points: periodPoints,
+                firstName: employee.firstName
+            }
+        })
+
+        // Sort by points (desc), streak (desc), firstName (asc)
+        results.sort((a, b) => {
+            if (b.points !== a.points) {
+                return b.points - a.points
+            }
+            if (b.streak !== a.streak) {
+                return (b.streak || 0) - (a.streak || 0)
+            }
+            return (a.firstName || '').localeCompare(b.firstName || '')
+        })
+
+        // Take top 7
+        const top7 = results.slice(0, 7)
+
+        // Add ranking with tie handling
         let currentRank = 1
-        let previousPoints: any = null
+        let previousPoints: number | null = null
         let employeesWithSameRank = 0
 
-        const rankedResults = results.map((employee) => {
+        const rankedResults = top7.map((employee) => {
             if (previousPoints !== null && employee.points < previousPoints) {
-                //* Points changed, update rank
+                // Points changed, update rank
                 currentRank += employeesWithSameRank
                 employeesWithSameRank = 1
             } else if (previousPoints === employee.points) {
-                //* Same points, increment counter
+                // Same points, increment counter
                 employeesWithSameRank++
             } else {
-                //* First employee
+                // First employee
                 employeesWithSameRank = 1
             }
 
             previousPoints = employee.points
 
+            // Remove firstName from final result
+            const { firstName, ...employeeData } = employee
+
             return {
-                ...employee,
+                ...employeeData,
                 rank: currentRank
             }
         })

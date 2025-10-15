@@ -60,8 +60,8 @@ export const OVERVIEW_FILTER = [
 ]
 
 export const LEADERBOARD_FILTER = [
-    { name: 'For This Week', value: '7' },
     { name: 'For This Month', value: '30' },
+    { name: 'For This Week', value: '7' },
 ]
 
 export const COMPARISON_FILTER = [

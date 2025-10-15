@@ -7,7 +7,7 @@ import WatchListTable from "@/components/dashboard/tables/watchlist-table";
 import useTitle from "@/hooks/use-title";
 import useFilterStore from "@/store/filter-store";
 import useUserStore from "@/store/user-store";
-import { useSuspenseQuery } from "@tanstack/react-query";
+import { useIsFetching, useSuspenseQuery } from "@tanstack/react-query";
 import { ArcElement, CategoryScale, Chart as ChartJS, Legend, LineElement, LinearScale, PointElement, Tooltip } from "chart.js";
 import { useEffect } from "react";
 import { useSearchParams } from "react-router";
@@ -25,6 +25,7 @@ export default function SentimentsDashboardPage() {
     const duration = searchParams.get('duration') || '1'
     const sentimentsFilter = searchParams.get("sentiments") || '7'
     const lKw = searchParams.get('lKw')
+    const lduration = searchParams.get("lduration")
 
     const dep = user?.role === 'SUPERADMIN' ? gDep : user?.departmentId.toString()
 
@@ -34,7 +35,13 @@ export default function SentimentsDashboardPage() {
     const { data: overviewData } = useSuspenseQuery(moodOverviewQuery(duration, dep))
     const { data: sentimentsComparison } = useSuspenseQuery(sentimentsComparisonQuery(sentimentsFilter, dep))
 
-    const { data: leaderboardsData } = useSuspenseQuery(leaderboardsQuery(lKw, dep))
+    const { data: leaderboardsData } = useSuspenseQuery(leaderboardsQuery(lKw, dep, lduration))
+
+    const isLeaderboardRefetching = useIsFetching({
+        queryKey: ['leaderboards']
+    }) > 0
+
+    console.log(isLeaderboardRefetching)
 
     useEffect(() => {
         if (departmentsData) {
@@ -67,7 +74,7 @@ export default function SentimentsDashboardPage() {
             </div>
             <div className="w-full">
                 {/* Critical Employees Table */}
-                <LeaderBoardTable data={leaderboardsData.data} />
+                <LeaderBoardTable data={leaderboardsData.data} isLoading={isLeaderboardRefetching} />
             </div>
             <div className="w-full">
                 {/* Critical Employees Table */}
