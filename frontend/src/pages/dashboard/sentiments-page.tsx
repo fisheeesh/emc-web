@@ -1,4 +1,4 @@
-import { adminUserDataQuery, departmentsQuery, leaderboardsQuery, moodOverviewQuery, sentimentsComparisonQuery } from "@/api/query";
+import { adminUserDataQuery, departmentsQuery, leaderboardsQuery, moodOverviewQuery, notificationQuery, sentimentsComparisonQuery } from "@/api/query";
 import OverViewChart from "@/components/dashboard/charts/overview-chart";
 import SentimentsComparisonChart from "@/components/dashboard/charts/sentiments-comparison-chart";
 import CriticalTable from "@/components/dashboard/tables/critical-table";
@@ -6,6 +6,7 @@ import LeaderBoardTable from "@/components/dashboard/tables/leaderboard-table";
 import WatchListTable from "@/components/dashboard/tables/watchlist-table";
 import useTitle from "@/hooks/use-title";
 import useFilterStore from "@/store/filter-store";
+import useNotiStore from "@/store/noti-store";
 import useUserStore from "@/store/user-store";
 import { useIsFetching, useSuspenseQuery } from "@tanstack/react-query";
 import { ArcElement, CategoryScale, Chart as ChartJS, Legend, LineElement, LinearScale, PointElement, Tooltip } from "chart.js";
@@ -19,6 +20,7 @@ export default function SentimentsDashboardPage() {
 
     const { user, setUser } = useUserStore()
     const { setFilters } = useFilterStore()
+    const { setNotis } = useNotiStore()
     const [searchParams] = useSearchParams()
 
     const gDep = searchParams.get('gDep') || 'all'
@@ -31,23 +33,25 @@ export default function SentimentsDashboardPage() {
 
     const { data: departmentsData } = useSuspenseQuery(departmentsQuery())
     const { data: adminUserData } = useSuspenseQuery(adminUserDataQuery())
-
     const { data: overviewData } = useSuspenseQuery(moodOverviewQuery(duration, dep))
     const { data: sentimentsComparison } = useSuspenseQuery(sentimentsComparisonQuery(sentimentsFilter, dep))
-
     const { data: leaderboardsData } = useSuspenseQuery(leaderboardsQuery(lKw, dep, lduration))
+    const { data: notificationsData } = useSuspenseQuery(notificationQuery())
+
 
     const isLeaderboardRefetching = useIsFetching({
         queryKey: ['leaderboards']
     }) > 0
-
-    console.log(isLeaderboardRefetching)
 
     useEffect(() => {
         if (departmentsData) {
             setFilters({
                 departments: departmentsData.data
             })
+        }
+
+        if (notificationsData) {
+            setNotis(notificationsData.data)
         }
 
         if (adminUserData) {
@@ -60,7 +64,7 @@ export default function SentimentsDashboardPage() {
                 departmentId: adminUserData.data.departmentId
             })
         }
-    }, [departmentsData, adminUserData, setUser, setFilters])
+    }, [departmentsData, adminUserData, setUser, setFilters, notificationsData, setNotis])
 
     return (
         <section className="flex flex-col items-center justify-center w-full gap-3">

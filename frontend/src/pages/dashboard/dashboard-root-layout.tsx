@@ -10,7 +10,7 @@ export default function DashboradRootLayout() {
 
     return (
         <section>
-            <Navbar/>
+            <Navbar />
             <div className="pt-20 md:pt-24 max-w-[1440px] mx-auto px-4 pb-5">
                 <Outlet />
             </div>

@@ -5,55 +5,16 @@ import {
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Bell } from "lucide-react";
+import { Bell, BellOff } from "lucide-react";
 import { Badge } from "../ui/badge";
 import { Button } from "../ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-
-const notiList = [
-    {
-        id: 1,
-        name: "John Doe",
-        image: "https://randomuser.me/api/portraits/men/32.jpg",
-        status: "Critical",
-        message: "John Doe’s sentiment has dropped to critical. Please review.",
-        time: "2 mins ago",
-    },
-    {
-        id: 2,
-        name: "Jane Smith",
-        image: "https://randomuser.me/api/portraits/women/45.jpg",
-        status: "Critical",
-        message: "Jane Smith requires attention. Status marked as critical.",
-        time: "30 mins ago",
-    },
-    {
-        id: 3,
-        name: "Michael Lee",
-        image: "https://randomuser.me/api/portraits/men/52.jpg",
-        status: "Warning",
-        message: "Michael Lee’s sentiment is trending negative.",
-        time: "1 hour ago",
-    },
-    {
-        id: 4,
-        name: "Michael Lee",
-        image: "https://randomuser.me/api/portraits/men/52.jpg",
-        status: "Warning",
-        message: "Michael Lee’s sentiment is trending negative.",
-        time: "1 hour ago",
-    },
-    {
-        id: 5,
-        name: "Michael Lee",
-        image: "https://randomuser.me/api/portraits/men/52.jpg",
-        status: "Warning",
-        message: "Michael Lee’s sentiment is trending negative.",
-        time: "1 hour ago",
-    },
-];
+import useNotiStore from "@/store/noti-store";
+import { IMG_URL } from "@/lib/constants";
 
 export default function NotiBtn() {
+    const { notifications } = useNotiStore()
+
     return (
         <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -62,17 +23,17 @@ export default function NotiBtn() {
                     variant="outline"
                     className="cursor-pointer relative"
                 >
-                    <Badge
+                    {!!notifications.length && <Badge
                         variant="destructive"
                         className="h-5 min-w-5 absolute -top-2 -right-2 rounded-full px-1"
                     >
-                        {notiList.length}
-                    </Badge>
+                        {notifications.length}
+                    </Badge>}
                     <Bell />
                 </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent
-                className="w-[320px] h-[350px] flex flex-col p-0"
+                className="w-[350px] h-[350px] flex flex-col p-0"
                 align="end"
             >
                 {/* Sticky Header */}
@@ -93,31 +54,35 @@ export default function NotiBtn() {
 
                 {/* Scrollable Notification List */}
                 <div className="overflow-y-auto flex-1 p-2 space-y-2">
-                    {notiList.map((item) => (
-                        <DropdownMenuItem
-                            key={item.id}
-                            className="cursor-pointer flex items-start gap-3 p-3 rounded-md hover:bg-muted/50"
-                        >
-                            {/* Avatar */}
-                            <Avatar className="h-10 w-10">
-                                <AvatarImage src={item.image} alt={item.name} />
-                                <AvatarFallback>
-                                    {item.name
-                                        .split(" ")
-                                        .map((n) => n[0])
-                                        .join("")}
-                                </AvatarFallback>
-                            </Avatar>
+                    {notifications.length === 0 ? (
+                        <div className="flex flex-col items-center justify-center h-full gap-2">
+                            <BellOff className="h-12 w-12 text-muted-foreground/50" />
+                            <p className="text-sm text-muted-foreground">No notifications</p>
+                        </div>
+                    ) : (
+                        notifications.map((item) => (
+                            <DropdownMenuItem
+                                key={item.id}
+                                className="cursor-pointer flex items-start gap-3 p-3 rounded-md hover:bg-muted/50"
+                            >
+                                {/* Avatar */}
+                                <Avatar className="h-10 w-10">
+                                    <AvatarImage src={IMG_URL + item.avatar} alt={item.avatar} />
+                                    <AvatarFallback>
+                                        U
+                                    </AvatarFallback>
+                                </Avatar>
 
-                            {/* Notification Content */}
-                            <div className="flex-1">
-                                <p className="text-xs text-muted-foreground mt-1">{item.message}</p>
-                                <p className="text-[11px] text-muted-foreground italic mt-1 font-en">
-                                    {item.time}
-                                </p>
-                            </div>
-                        </DropdownMenuItem>
-                    ))}
+                                {/* Notification Content */}
+                                <div className="flex-1">
+                                    <p className="text-xs text-muted-foreground mt-1">{item.content}</p>
+                                    <p className="text-[11px] text-muted-foreground italic mt-1 font-en">
+                                        {item.createdAt}
+                                    </p>
+                                </div>
+                            </DropdownMenuItem>
+                        ))
+                    )}
                 </div>
             </DropdownMenuContent>
         </DropdownMenu>

@@ -143,4 +143,15 @@ export const leaderboardsQuery = (lKw: string | null = null, dep: string | null 
     queryFn: () => fetchLeaderboards({ lKw, dep, duration })
 })
 
+const fetchAllNotifications = async () => {
+    const res = await api.get("/admin/notifications")
+
+    return res.data
+}
+
+export const notificationQuery = () => ({
+    queryKey: ['notifications'],
+    queryFn: fetchAllNotifications
+})
+
 export default queryClient

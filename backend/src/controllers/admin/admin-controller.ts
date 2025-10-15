@@ -382,3 +382,29 @@ export const getLeaderboards = [
         })
     }
 ]
+
+export const getAllNotifications = async (req: CustomRequest, res: Response, next: NextFunction) => {
+    const empId = req.employeeId
+
+    const emp = await getEmployeeById(empId!)
+    checkEmployeeIfNotExits(emp)
+
+    const isSAdmin = emp!.role === 'SUPERADMIN'
+
+    const results = await prismaClient.notification.findMany({
+        where: isSAdmin
+            ? { toSAdmin: true } 
+            : {
+                departmentId: emp!.departmentId,
+                toSAdmin: false
+            },
+        orderBy: {
+            createdAt: 'desc'
+        }
+    })
+
+    res.status(200).json({
+        message: "Here is all notifications",
+        data: results
+    })
+}
