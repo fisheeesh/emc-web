@@ -70,3 +70,33 @@ interface LeaderboardData {
     },
     fullName: string
 }
+
+interface CriticalEmployee {
+    id: number,
+    emotionScore: number,
+    isResolved: boolean,
+    resolvedAt: string,
+    department: {
+        id: number,
+        name: string
+    },
+    employee: {
+        id: number,
+        fullName: string,
+        avatar: string,
+        email: string,
+        lastCritical: string
+    }
+    createdAt: string,
+}
+
+interface WatchlistEmployee {
+    id: number,
+    fullName: string,
+    avatar: string,
+    email: string,
+    department: {
+        id: number,
+        name: string
+    },
+}

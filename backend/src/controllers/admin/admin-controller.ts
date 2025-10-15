@@ -1,14 +1,15 @@
 import { endOfDay, endOfMonth, endOfYear, startOfDay, startOfMonth, startOfYear, subDays } from "date-fns";
 import { NextFunction, Request, Response } from "express";
 import { query } from "express-validator";
+import { Prisma, PrismaClient } from "../../../generated/prisma";
 import { prisma } from "../../config/prisma-client";
 import { getAdminUserData } from "../../services/admin-services";
 import { getEmployeeById } from "../../services/auth-services";
+import { getAllCriticalInfinite, getAllWatchlistInfinite } from "../../services/critical-services";
 import { getAttendanceOverviewInfiniteData, getCheckInHoursData, getDailyAttendanceData, getMoodPercentages, getSentimentsComparisonData } from "../../services/emotion-check-in-services";
 import { getAllDepartmentsData } from "../../services/system-service";
 import { checkEmployeeIfNotExits } from "../../utils/check";
 import { getEmotionRange } from "../../utils/helplers";
-import { Prisma, PrismaClient } from "../../../generated/prisma";
 
 interface CustomRequest extends Request {
     employeeId?: number
@@ -284,7 +285,7 @@ export const getLeaderboards = [
         const start = startOfDay(subDays(now, +duration - 1))
         const end = endOfDay(now)
 
-        // Fetch employees with their check-ins within the duration
+        //* Fetch employees with their check-ins within the duration
         const employees = await prisma.employee.findMany({
             where: {
                 departmentId:
@@ -316,7 +317,7 @@ export const getLeaderboards = [
             }
         })
 
-        // Calculate points from check-ins for the duration
+        //* Calculate points from check-ins for the duration
         const results = employees.map(employee => {
             const periodPoints = employee.checkIns.reduce((sum, checkIn) => {
                 return sum + (checkIn.points ? Number(checkIn.points) : 0)
@@ -333,7 +334,7 @@ export const getLeaderboards = [
             }
         })
 
-        // Sort by points (desc), streak (desc), firstName (asc)
+        //* Sort by points (desc), streak (desc), firstName (asc)
         results.sort((a, b) => {
             if (b.points !== a.points) {
                 return b.points - a.points
@@ -344,30 +345,30 @@ export const getLeaderboards = [
             return (a.firstName || '').localeCompare(b.firstName || '')
         })
 
-        // Take top 7
+        //* Take top 7
         const top7 = results.slice(0, 7)
 
-        // Add ranking with tie handling
+        //* Add ranking with tie handling
         let currentRank = 1
         let previousPoints: number | null = null
         let employeesWithSameRank = 0
 
         const rankedResults = top7.map((employee) => {
             if (previousPoints !== null && employee.points < previousPoints) {
-                // Points changed, update rank
+                //* Points changed, update rank
                 currentRank += employeesWithSameRank
                 employeesWithSameRank = 1
             } else if (previousPoints === employee.points) {
-                // Same points, increment counter
+                //* Same points, increment counter
                 employeesWithSameRank++
             } else {
-                // First employee
+                //* First employee
                 employeesWithSameRank = 1
             }
 
             previousPoints = employee.points
 
-            // Remove firstName from final result
+            //* Remove firstName from final result
             const { firstName, ...employeeData } = employee
 
             return {
@@ -393,7 +394,7 @@ export const getAllNotifications = async (req: CustomRequest, res: Response, nex
 
     const results = await prismaClient.notification.findMany({
         where: isSAdmin
-            ? { toSAdmin: true } 
+            ? { toSAdmin: true }
             : {
                 departmentId: emp!.departmentId,
                 toSAdmin: false
@@ -408,3 +409,118 @@ export const getAllNotifications = async (req: CustomRequest, res: Response, nex
         data: results
     })
 }
+
+export const getAllCriticalEmps = [
+    query("limit", "Limit must be LogId.").isInt({ gt: 6 }).optional(),
+    query("cursor", "Cursor must be unsigned integer.").isInt({ gt: 0 }).optional(),
+    query("dep", "Invalid Department.").trim().escape().optional(),
+    query("kw", "Invalid Keyword.").trim().optional().escape(),
+    query("ts", "Invalid Timestamp").trim().optional().escape(),
+    async (req: CustomRequest, res: Response, next: NextFunction) => {
+        const empId = req.employeeId
+        const emp = await getEmployeeById(empId!)
+
+        checkEmployeeIfNotExits(emp)
+
+        const { limit = 7, cursor: lastCursor, dep, kw, ts = 'desc' } = req.query
+
+        const options = {
+            take: +limit + 1,
+            skip: lastCursor ? 1 : 0,
+            cursor: lastCursor ? { id: +lastCursor } : undefined,
+            where: {
+                employee: {
+                    OR: [
+                        { firstName: { contains: kw as string, mode: 'insensitive' } },
+                        { lastName: { contains: kw as string, mode: 'insensitive' } }
+                    ]
+                },
+                departmentId:
+                    emp!.role !== 'SUPERADMIN'
+                        ? emp!.departmentId
+                        : dep && dep !== 'all'
+                            ? Number(dep)
+                            : undefined,
+            },
+            select: {
+                id: true,
+                emotionScore: true,
+                isResolved: true,
+                resolvedAt: true,
+                createdAt: true,
+                department: true,
+                employee: {
+                    select: { fullName: true, avatar: true, email: true, lastCritical: true }
+                }
+            },
+            orderBy: {
+                createdAt: ts
+            }
+        }
+
+        const results = await getAllCriticalInfinite(options)
+
+        res.status(200).json({
+            message: "Here is all critical employees data",
+            data: results
+        })
+    }
+]
+
+export const getAllWatchlistEmps = [
+    query("limit", "Limit must be LogId.").isInt({ gt: 6 }).optional(),
+    query("cursor", "Cursor must be unsigned integer.").isInt({ gt: 0 }).optional(),
+    query("dep", "Invalid Department.").trim().escape().optional(),
+    query("kw", "Invalid Keyword.").trim().optional().escape(),
+    query("ts", "Invalid Timestamp").trim().optional().escape(),
+    async (req: CustomRequest, res: Response, next: NextFunction) => {
+        const empId = req.employeeId
+        const emp = await getEmployeeById(empId!)
+
+        checkEmployeeIfNotExits(emp)
+
+        const { limit = 7, cursor: lastCursor, dep, kw, ts = 'desc' } = req.query
+
+        const kwFilter: Prisma.EmployeeWhereInput = kw ? {
+            OR: [
+                { firstName: { contains: kw as string, mode: "insensitive" } },
+                { lastName: { contains: kw as string, mode: 'insensitive' } }
+            ]
+        } : {}
+
+        const options = {
+            take: +limit + 1,
+            skip: lastCursor ? 1 : 0,
+            cursor: lastCursor ? { id: +lastCursor } : undefined,
+            where: {
+                ...kwFilter,
+                status: 'WATCHLIST',
+                departmentId:
+                    emp!.role !== 'SUPERADMIN'
+                        ? emp!.departmentId
+                        : dep && dep !== 'all'
+                            ? Number(dep)
+                            : undefined,
+            },
+            select: {
+                id: true,
+                fullName: true,
+                avatar: true,
+                email: true,
+                department: true,
+            },
+            orderBy: {
+                createdAt: ts
+            }
+        }
+
+        const results = await getAllWatchlistInfinite(options)
+
+        res.status(200).json({
+            message: "Here is all watchlist employees data",
+            data: results
+        })
+    }
+]
+
+

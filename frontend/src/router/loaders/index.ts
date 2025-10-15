@@ -1,5 +1,5 @@
 import api, { authApi } from "@/api"
-import queryClient, { adminUserDataQuery, attendanceOverviewQuery, checkInHoursQuery, dailyAttendanceQuery, departmentsQuery, leaderboardsQuery, moodOverviewQuery, notificationQuery, sentimentsComparisonQuery } from "@/api/query"
+import queryClient, { adminUserDataQuery, attendanceOverviewQuery, checkInHoursQuery, criticalQuery, dailyAttendanceQuery, departmentsQuery, leaderboardsQuery, moodOverviewQuery, notificationQuery, sentimentsComparisonQuery, watchlistQuery } from "@/api/query"
 import useAuthStore, { Status } from "@/store/auth-store"
 import { redirect } from "react-router"
 
@@ -21,7 +21,9 @@ export const senitmentsLoader = async () => {
         queryClient.ensureQueryData(departmentsQuery()),
         queryClient.ensureQueryData(adminUserDataQuery()),
         queryClient.ensureQueryData(leaderboardsQuery()),
-        queryClient.ensureQueryData(notificationQuery())
+        queryClient.ensureQueryData(notificationQuery()),
+        queryClient.ensureInfiniteQueryData(criticalQuery()),
+        queryClient.ensureInfiniteQueryData(watchlistQuery())
     ])
 
     return null

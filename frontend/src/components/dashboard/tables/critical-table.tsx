@@ -7,7 +7,17 @@ import { CRITICAL_DATA } from "@/lib/constants";
 import DetailsModal from "../../modals/details-modal";
 import ActionModal from "../../modals/action-modal";
 
-export default function CriticalTable() {
+interface Props {
+    data: CriticalEmployee[]
+    status: "error" | 'success' | 'pending',
+    error: Error | null,
+    isFetching?: boolean,
+    isFetchingNextPage: boolean,
+    fetchNextPage: () => void,
+    hasNextPage: boolean
+}
+
+export default function CriticalTable({ data, status, error, isFetchingNextPage, fetchNextPage, hasNextPage }: Props) {
     return (
         <Card className="rounded-md border-destructive border-2 flex flex-col gap-5">
             <CardHeader className="flex flex-col md:flex-row gap-3 md:gap-0 justify-between">
@@ -15,7 +25,7 @@ export default function CriticalTable() {
                     <CardTitle className="text-xl md:text-2xl text-destructive">Critical Mood Table</CardTitle>
                     <CardDescription>Employees whose average sentiment score lower than particular points will be shown here</CardDescription>
                 </div>
-                <LocalSearch filterValue="criEmp" />
+                <LocalSearch filterValue="cKw" />
             </CardHeader>
 
             <CardContent>

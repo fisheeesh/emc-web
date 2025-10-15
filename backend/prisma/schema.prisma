@@ -113,7 +113,6 @@ model CriticalEmployee {
   resolvedAt   DateTime?
   createdAt    DateTime  @default(now())
   updatedAt    DateTime  @updatedAt
-
   employee    Employee     @relation(fields: [employeeId], references: [id], onDelete: Cascade)
   department  Department   @relation(fields: [departmentId], references: [id], onDelete: Restrict)
   analysis    AIAnalysis[]

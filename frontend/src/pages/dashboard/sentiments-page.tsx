@@ -1,4 +1,4 @@
-import { adminUserDataQuery, departmentsQuery, leaderboardsQuery, moodOverviewQuery, notificationQuery, sentimentsComparisonQuery } from "@/api/query";
+import { adminUserDataQuery, criticalQuery, departmentsQuery, leaderboardsQuery, moodOverviewQuery, notificationQuery, sentimentsComparisonQuery, watchlistQuery } from "@/api/query";
 import OverViewChart from "@/components/dashboard/charts/overview-chart";
 import SentimentsComparisonChart from "@/components/dashboard/charts/sentiments-comparison-chart";
 import CriticalTable from "@/components/dashboard/tables/critical-table";
@@ -8,7 +8,7 @@ import useTitle from "@/hooks/use-title";
 import useFilterStore from "@/store/filter-store";
 import useNotiStore from "@/store/noti-store";
 import useUserStore from "@/store/user-store";
-import { useIsFetching, useSuspenseQuery } from "@tanstack/react-query";
+import { useInfiniteQuery, useIsFetching, useSuspenseQuery } from "@tanstack/react-query";
 import { ArcElement, CategoryScale, Chart as ChartJS, Legend, LineElement, LinearScale, PointElement, Tooltip } from "chart.js";
 import { useEffect } from "react";
 import { useSearchParams } from "react-router";
@@ -28,6 +28,10 @@ export default function SentimentsDashboardPage() {
     const sentimentsFilter = searchParams.get("sentiments") || '7'
     const lKw = searchParams.get('lKw')
     const lduration = searchParams.get("lduration")
+    const cKw = searchParams.get("cKw")
+    const wKw = searchParams.get("wKw")
+    const cTs = searchParams.get("cTs")
+    const wTs = searchParams.get("wTs")
 
     const dep = user?.role === 'SUPERADMIN' ? gDep : user?.departmentId.toString()
 
@@ -38,6 +42,28 @@ export default function SentimentsDashboardPage() {
     const { data: leaderboardsData } = useSuspenseQuery(leaderboardsQuery(lKw, dep, lduration))
     const { data: notificationsData } = useSuspenseQuery(notificationQuery())
 
+    const {
+        status: cStatus,
+        data: cData,
+        error: cError,
+        isFetching: isCFetching,
+        isFetchingNextPage: isCFetchingNextPage,
+        fetchNextPage: fetchCNextPage,
+        hasNextPage: hasCNextPage,
+    } = useInfiniteQuery(criticalQuery(cKw, dep, cTs))
+
+    const {
+        status: wStatus,
+        data: wData,
+        error: wError,
+        isFetching: isWFetching,
+        isFetchingNextPage: isWFetchingNextPage,
+        fetchNextPage: fetchWNextPage,
+        hasNextPage: hasWNextPage,
+    } = useInfiniteQuery(watchlistQuery(wKw, dep, wTs))
+
+    const allCriticals = cData?.pages.flatMap(page => page.data) ?? []
+    const allWatchlists = wData?.pages.flatMap(page => page.data) ?? []
 
     const isLeaderboardRefetching = useIsFetching({
         queryKey: ['leaderboards']
@@ -82,11 +108,27 @@ export default function SentimentsDashboardPage() {
             </div>
             <div className="w-full">
                 {/* Critical Employees Table */}
-                <CriticalTable />
+                <CriticalTable
+                    data={allCriticals}
+                    status={cStatus}
+                    error={cError}
+                    isFetching={isCFetching}
+                    isFetchingNextPage={isCFetchingNextPage}
+                    fetchNextPage={fetchCNextPage}
+                    hasNextPage={hasCNextPage}
+                />
             </div>
             <div className="w-full">
                 {/* Watchlist Employees Table */}
-                <WatchListTable />
+                <WatchListTable
+                    data={allWatchlists}
+                    status={wStatus}
+                    error={wError}
+                    isFetching={isWFetching}
+                    isFetchingNextPage={isWFetchingNextPage}
+                    fetchNextPage={fetchWNextPage}
+                    hasNextPage={hasWNextPage}
+                />
             </div>
         </section>
     )

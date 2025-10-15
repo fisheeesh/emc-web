@@ -88,7 +88,7 @@ const fetchAttendanceOverview = async ({ pageParam = null, q = null, empStatus =
     if (date) query += `&date=${date}`
     if (dep) query += `&dep=${dep}`
     if (ts) query += `&ts=${ts}`
-    const res = await api.get(`admin/attendance-overview?${query}`)
+    const res = await api.get(`admin/attendance-overview${query}`)
 
     return res.data
 }
@@ -152,6 +152,52 @@ const fetchAllNotifications = async () => {
 export const notificationQuery = () => ({
     queryKey: ['notifications'],
     queryFn: fetchAllNotifications
+})
+
+const fetchAllCriticalEmps = async ({ pageParam, cKw, dep, ts }: {
+    pageParam?: number | null,
+    cKw?: string | null,
+    dep?: string | null,
+    ts?: string | null
+}) => {
+    let query = pageParam ? `?limit=7&cursor=${pageParam}` : "?limit=7"
+    if (cKw) query += `&kw=${cKw}`
+    if (dep) query += `&dep=${dep}`
+    if (ts) query += `&ts=${ts}`
+    const res = await api.get(`/admin/critical-emps${query}`)
+
+    return res.data
+}
+
+export const criticalQuery = (cKw: string | null = null, dep: string | null = null, ts: string | null = null) => ({
+    queryKey: ['critical', 'infinite', cKw, dep, ts],
+    queryFn: ({ pageParam = null }: { pageParam: number | null }) => fetchAllCriticalEmps({ pageParam, cKw, dep, ts }),
+    initialPageParam: null,
+    // @ts-expect-error ignore type check
+    getNextPageParam: (lastPage, pages) => lastPage.nextCursor ?? undefined
+})
+
+const fetchAllWatchlistEmps = async ({ pageParam, wKw, dep, ts }: {
+    pageParam?: number | null,
+    wKw?: string | null,
+    dep?: string | null,
+    ts?: string | null
+}) => {
+    let query = pageParam ? `?limit=7&cursor=${pageParam}` : "?limit=7"
+    if (wKw) query += `&kw=${wKw}`
+    if (dep) query += `&dep=${dep}`
+    if (ts) query += `&ts=${ts}`
+    const res = await api.get(`/admin/watchlist-emps${query}`)
+
+    return res.data
+}
+
+export const watchlistQuery = (wKw: string | null = null, dep: string | null = null, ts: string | null = null) => ({
+    queryKey: ['watchlist', 'infinite', wKw, dep, ts],
+    queryFn: ({ pageParam = null }: { pageParam: number | null }) => fetchAllWatchlistEmps({ pageParam, wKw, dep, ts }),
+    initialPageParam: null,
+    // @ts-expect-error ignore type check
+    getNextPageParam: (lastPage, pages) => lastPage.nextCursor ?? undefined
 })
 
 export default queryClient
