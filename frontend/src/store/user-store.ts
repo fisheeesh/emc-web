@@ -20,18 +20,18 @@ interface Action {
     clearUser: () => void
 }
 
-const inititalState: State = {
+const initialState: State = {
     user: null
 }
 
 const useUserStore = create<State & Action>()(
     persist(
         immer((set) => ({
-            ...inititalState,
+            ...initialState,
             setUser: (user: User) => set(state => {
                 state.user = user
             }),
-            clearUser: () => set(inititalState)
+            clearUser: () => set(initialState)
         })),
         {
             name: "current-user",

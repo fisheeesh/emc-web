@@ -15,7 +15,7 @@ interface Action {
     clearFilters: () => void
 }
 
-const inititalState: State = {
+const initialState: State = {
     filters: {
         departments: []
     }
@@ -24,11 +24,11 @@ const inititalState: State = {
 const useFilterStore = create<State & Action>()(
     persist(
         immer((set) => ({
-            ...inititalState,
+            ...initialState,
             setFilters: (filters: Filters) => set(state => {
                 state.filters = filters
             }),
-            clearFilters: () => set(inititalState)
+            clearFilters: () => set(initialState)
         })),
         {
             name: "filters",
