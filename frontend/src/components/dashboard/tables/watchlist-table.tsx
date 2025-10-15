@@ -6,7 +6,17 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { CRITICAL_DATA } from "@/lib/constants";
 import DetailsModal from "../../modals/details-modal";
 
-export default function WatchListTable() {
+interface Props {
+    data: WatchlistEmployee[]
+    status: "error" | 'success' | 'pending',
+    error: Error | null,
+    isFetching?: boolean,
+    isFetchingNextPage: boolean,
+    fetchNextPage: () => void,
+    hasNextPage: boolean
+}
+
+export default function WatchListTable({ data, status, error, isFetchingNextPage, fetchNextPage, hasNextPage }: Props) {
     return (
         <Card className="rounded-md border-yellow-500 border-2 flex flex-col gap-5">
             <CardHeader className="flex flex-col md:flex-row gap-3 md:gap-0 justify-between">
@@ -14,7 +24,7 @@ export default function WatchListTable() {
                     <CardTitle className="text-xl md:text-2xl text-yellow-600">WatchList Employees</CardTitle>
                     <CardDescription>Employees moved from critical status after intervention, now under ongoing observation for stability</CardDescription>
                 </div>
-                <LocalSearch filterValue="watEmp" />
+                <LocalSearch filterValue="wKw" />
             </CardHeader>
 
             <CardContent>
