@@ -7,14 +7,16 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { IMG_URL, LEADERBOARD, LEADERBOARD_FILTER } from "@/lib/constants";
+import { IMG_URL, LEADERBOARD_FILTER } from "@/lib/constants";
 import { getInitialName } from "@/lib/utils";
 import { MdOutlineEmail } from "react-icons/md";
 
-export default function LeaderBoardTable() {
-    const renderRank = (index: number) => {
-        const rank = index + 1;
+interface Props {
+    data: LeaderboardData[]
+}
 
+export default function LeaderBoardTable({ data }: Props) {
+    const renderRank = (rank: number) => {
         if (rank === 1) {
             return (
                 <img
@@ -84,28 +86,28 @@ export default function LeaderBoardTable() {
 
                     <TableBody>
                         {
-                            LEADERBOARD.map((emp, index) => (
-                                <TableRow key={emp.id}>
+                            data.map((emp, index) => (
+                                <TableRow key={index}>
                                     <TableCell className="py-6 w-32 text-center">
-                                        {renderRank(index)}
+                                        {renderRank(emp.rank)}
                                     </TableCell>
                                     <TableCell className="w-2/4">
                                         <div className="flex items-center gap-4">
                                             <Avatar className="size-9">
-                                                <AvatarImage src={IMG_URL} alt={emp.name} />
-                                                <AvatarFallback>{getInitialName(emp.name)}</AvatarFallback>
+                                                <AvatarImage src={IMG_URL + emp.avatar} alt={emp.fullName} />
+                                                <AvatarFallback>{getInitialName(emp.fullName)}</AvatarFallback>
                                             </Avatar>
-                                            <span className="whitespace-nowrap">{emp.name}</span>
+                                            <span className="whitespace-nowrap">{emp.fullName}</span>
                                         </div>
                                     </TableCell>
                                     <TableCell>
-                                        <span className="whitespace-nowrap">{emp.department}</span>
+                                        <span className="whitespace-nowrap">{emp.department.name}</span>
                                     </TableCell>
                                     <TableCell className="text-center">
                                         <span className="whitespace-nowrap font-en">{emp.points}</span>
                                     </TableCell>
                                     <TableCell className="text-center">
-                                        <span className="whitespace-nowrap font-en">{emp.streak === 0 ? '-' : emp.streak}</span>
+                                        <span className="whitespace-nowrap font-en">{!emp.streak ? '-' : emp.streak}</span>
                                     </TableCell>
                                     <TableCell className="text-center">
                                         <Button size='icon' className="p-2 rounded-full bg-muted dark:text-white text-black cursor-pointer hover:bg-gray-200 dark:hover:bg-slate-700">

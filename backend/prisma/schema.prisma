@@ -17,6 +17,7 @@ model Employee {
   email           String             @unique @db.VarChar(100)
   position        String?
   points          BigInt?            @default(0)
+  streak          Int?
   accType         AccType            @default(ACTIVE)
   jobType         JobType            @default(FULLTIME)
   role            Role               @default(EMPLOYEE)
@@ -84,6 +85,7 @@ model EmotionCheckIn {
   employeeId   Int
   emoji        String
   textFeeling  String   @db.Text
+  points       BigInt?
   emotionScore Decimal  @db.Decimal(3, 2)
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt

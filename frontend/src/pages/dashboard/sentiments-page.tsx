@@ -1,4 +1,4 @@
-import { adminUserDataQuery, departmentsQuery, moodOverviewQuery, sentimentsComparisonQuery } from "@/api/query";
+import { adminUserDataQuery, departmentsQuery, leaderboardsQuery, moodOverviewQuery, sentimentsComparisonQuery } from "@/api/query";
 import OverViewChart from "@/components/dashboard/charts/overview-chart";
 import SentimentsComparisonChart from "@/components/dashboard/charts/sentiments-comparison-chart";
 import CriticalTable from "@/components/dashboard/tables/critical-table";
@@ -24,6 +24,7 @@ export default function SentimentsDashboardPage() {
     const gDep = searchParams.get('gDep') || 'all'
     const duration = searchParams.get('duration') || '1'
     const sentimentsFilter = searchParams.get("sentiments") || '7'
+    const lKw = searchParams.get('lKw')
 
     const dep = user?.role === 'SUPERADMIN' ? gDep : user?.departmentId.toString()
 
@@ -32,6 +33,8 @@ export default function SentimentsDashboardPage() {
 
     const { data: overviewData } = useSuspenseQuery(moodOverviewQuery(duration, dep))
     const { data: sentimentsComparison } = useSuspenseQuery(sentimentsComparisonQuery(sentimentsFilter, dep))
+
+    const { data: leaderboardsData } = useSuspenseQuery(leaderboardsQuery(lKw, dep))
 
     useEffect(() => {
         if (departmentsData) {
@@ -64,7 +67,7 @@ export default function SentimentsDashboardPage() {
             </div>
             <div className="w-full">
                 {/* Critical Employees Table */}
-                <LeaderBoardTable />
+                <LeaderBoardTable data={leaderboardsData.data} />
             </div>
             <div className="w-full">
                 {/* Critical Employees Table */}

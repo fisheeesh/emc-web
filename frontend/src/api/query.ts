@@ -107,12 +107,6 @@ const fetchCheckInHours = async ({ date, month, year, dep }: {
     year?: string | null,
     dep?: string | null,
 }) => {
-    // let query = "?"
-    // if(date) query += date ?
-    //     `?duration=${date}&type=day`
-    //     : month ? `?duration=${month}&type=month`
-    //         : year ? `?duration=${year}&type=year` : ''
-
     let query = "?"
     if (date) query += `&duration=${date}&type=day`
     else if (month) query += `&duration=${month}&type=month`
@@ -127,6 +121,26 @@ const fetchCheckInHours = async ({ date, month, year, dep }: {
 export const checkInHoursQuery = (date: string | null = null, month: string | null = null, year: string | null = null, dep: string | null = null) => ({
     queryKey: ['check-in-hours', date, month, year, dep],
     queryFn: () => fetchCheckInHours({ date, month, year, dep }),
+})
+
+const fetchLeaderboards = async ({ lKw, dep, duration }: {
+    lKw?: string | null,
+    dep?: string | null,
+    duration?: string | null
+}) => {
+    let query = '?'
+    if (lKw) query += `&kw=${lKw}`
+    else if (duration) query += `&duration=${duration}`
+    if (dep) query += `&dep=${dep}`
+
+    const res = await api.get(`admin/leaderboards${query}`)
+
+    return res.data
+}
+
+export const leaderboardsQuery = (lKw: string | null = null, dep: string | null = null, duration: string | null = null) => ({
+    queryKey: ['leaderboards', lKw ?? undefined, dep ?? undefined, duration ?? undefined],
+    queryFn: () => fetchLeaderboards({ lKw, dep, duration })
 })
 
 export default queryClient

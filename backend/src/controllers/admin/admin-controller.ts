@@ -265,8 +265,9 @@ export const getAdminUser = async (req: CustomRequest, res: Response, next: Next
 export const getLeaderboards = [
     query("dep", "Invalid Department.").trim().escape().optional(),
     query("kw", "Invalid Keyword.").trim().optional().escape(),
+    query("duration", "Invalid Date.").trim().optional().escape(),
     async (req: CustomRequest, res: Response, next: NextFunction) => {
-        const { dep, kw } = req.query
+        const { dep, kw, duration = '7' } = req.query
         const empId = req.employeeId
 
         const emp = await getEmployeeById(empId!)
@@ -278,6 +279,15 @@ export const getLeaderboards = [
                 { lastName: { contains: kw as string, mode: 'insensitive' } }
             ] as Prisma.EmployeeWhereInput[]
         } : {}
+
+        const now = new Date()
+        const start = startOfDay(subDays(now, +duration - 1))
+        const end = endOfDay(now)
+
+        const durationFilter = {
+            gte: start,
+            lte: end
+        }
 
         const results = await prisma.employee.findMany({
             where: {
@@ -295,16 +305,45 @@ export const getLeaderboards = [
                 points: true,
                 avatar: true,
                 department: true,
+                streak: true,
             },
-            orderBy: {
-                points: 'desc'
-            },
+            orderBy: [
+                { points: 'desc' },
+                { streak: 'desc' },
+                { firstName: 'asc' }
+            ],
             take: 7
+        })
+
+        //* Add ranking with tie handling
+        let currentRank = 1
+        let previousPoints: any = null
+        let employeesWithSameRank = 0
+
+        const rankedResults = results.map((employee) => {
+            if (previousPoints !== null && employee.points < previousPoints) {
+                //* Points changed, update rank
+                currentRank += employeesWithSameRank
+                employeesWithSameRank = 1
+            } else if (previousPoints === employee.points) {
+                //* Same points, increment counter
+                employeesWithSameRank++
+            } else {
+                //* First employee
+                employeesWithSameRank = 1
+            }
+
+            previousPoints = employee.points
+
+            return {
+                ...employee,
+                rank: currentRank
+            }
         })
 
         res.status(200).json({
             message: "Here is Leaderboards data.",
-            data: results
+            data: rankedResults
         })
     }
 ]

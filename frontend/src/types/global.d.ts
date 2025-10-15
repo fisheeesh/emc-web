@@ -57,3 +57,16 @@ interface AttendanceOverviewData {
     status: "positive" | "neutral" | "negative" | "critical",
     employee: Employee
 }
+
+interface LeaderboardData {
+    rank: number,
+    email: string,
+    streak: number,
+    points: number,
+    avatar: string,
+    department: {
+        id: number,
+        name: string
+    },
+    fullName: string
+}

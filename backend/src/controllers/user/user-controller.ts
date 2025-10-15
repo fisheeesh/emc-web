@@ -119,7 +119,8 @@ export const emotionCheckIn = [
                             employeeId: emp!.id,
                             emoji: emoji.trim(),
                             textFeeling: textFeeling.trim(),
-                            emotionScore: score!
+                            emotionScore: score!,
+                            points: earnedPoints
                         }
                     }),
 
@@ -129,6 +130,7 @@ export const emotionCheckIn = [
                         data: {
                             emotionSum: newEmotionSum,
                             emotionCount: newEmotionCount,
+                            streak: positiveStreak,
                             avgScore,
                             points: { increment: earnedPoints },
                             ...(statusUpdate && { status: statusUpdate }),
