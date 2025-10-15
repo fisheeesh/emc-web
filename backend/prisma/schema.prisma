@@ -105,18 +105,18 @@ model EmotionCheckIn {
 }
 
 model CriticalEmployee {
-  id           Int       @id @default(autoincrement())
+  id           Int          @id @default(autoincrement())
   employeeId   Int
   departmentId Int
-  emotionScore Decimal   @db.Decimal(3, 2)
-  isResolved   Boolean   @default(false)
+  emotionScore Decimal      @db.Decimal(3, 2)
+  isResolved   Boolean      @default(false)
   resolvedAt   DateTime?
-  createdAt    DateTime  @default(now())
-  updatedAt    DateTime  @updatedAt
-  employee    Employee     @relation(fields: [employeeId], references: [id], onDelete: Cascade)
-  department  Department   @relation(fields: [departmentId], references: [id], onDelete: Restrict)
-  analysis    AIAnalysis[]
-  actionPlans ActionPlan[]
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+  employee     Employee     @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+  department   Department   @relation(fields: [departmentId], references: [id], onDelete: Restrict)
+  analysis     AIAnalysis[]
+  actionPlans  ActionPlan[]
 
   //* Single column indexes
   @@index([employeeId])

@@ -458,11 +458,19 @@ export const getAllCriticalEmps = [
             }
         }
 
-        const results = await getAllCriticalInfinite(options)
+        const criticalEmps = await getAllCriticalInfinite(options)
+
+        const hasNextPage = criticalEmps!.length > +limit
+        if (hasNextPage) criticalEmps.pop()
+
+        const nextCursor = hasNextPage ? criticalEmps[criticalEmps.length - 1].id : null
 
         res.status(200).json({
             message: "Here is all critical employees data",
-            data: results
+            hasNextPage,
+            nextCursor,
+            prevCursor: lastCursor || undefined,
+            data: criticalEmps
         })
     }
 ]
@@ -514,11 +522,19 @@ export const getAllWatchlistEmps = [
             }
         }
 
-        const results = await getAllWatchlistInfinite(options)
+        const watchlistEmps = await getAllWatchlistInfinite(options)
+
+        const hasNextPage = watchlistEmps!.length > +limit
+        if (hasNextPage) watchlistEmps.pop()
+
+        const nextCursor = hasNextPage ? watchlistEmps[watchlistEmps.length - 1].id : null
 
         res.status(200).json({
             message: "Here is all watchlist employees data",
-            data: results
+            hasNextPage,
+            nextCursor,
+            prevCursor: lastCursor || undefined,
+            data: watchlistEmps
         })
     }
 ]

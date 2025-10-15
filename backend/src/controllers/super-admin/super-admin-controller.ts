@@ -1,7 +1,6 @@
 import { NextFunction, Request, Response } from "express"
 import { body, query, validationResult } from "express-validator"
-import { AccType, JobType, Prisma, Role } from "../../../generated/prisma"
-import { DEPARTMENTS } from "../../config"
+import { AccType, JobType, Priority, Prisma, Role, RStatus, RType } from "../../../generated/prisma"
 import { errorCodes } from "../../config/error-codes"
 import { ImageQueue } from "../../jobs/queues/image-queue"
 import { createEmployeeWithOTP, getEmployeeByEmail, getEmployeeById } from "../../services/auth-services"
@@ -9,6 +8,7 @@ import { deleteEmployeeById, getEmployeesInfiniteData, updateEmpDataById } from 
 import { checkEmployeeIfExits, checkEmployeeIfNotExits, checkUploadFile, createHttpErrors } from "../../utils/check"
 import { generateHashedValue, generateToken } from "../../utils/generate"
 import { removeFiles } from "../../utils/helplers"
+import { getAllActionPlansInfinite } from "../../services/action-plan-services"
 
 interface CustomRequest extends Request {
     employeeId?: number
@@ -364,6 +364,103 @@ export const deleteEmployee = [
         res.status(200).json({
             message: "Employee deleted successfully.",
             empId: deletedEmp.id
+        })
+    }
+]
+
+export const getAllActionPlans = [
+    query("limit", "Limit must be LogId.").isInt({ gt: 6 }).optional(),
+    query("cursor", "Cursor must be unsigned integer.").isInt({ gt: 0 }).optional(),
+    query("dep", "Invalid Department.").isInt({ gt: 0 }).optional(),
+    query("kw", "Invalid Keyword.").trim().escape().optional(),
+    query("priority", "Invalid Priority.").trim().escape().optional(),
+    query("status", "Invalid Status.").trim().escape().optional(),
+    query("type", "Invalid Type.").trim().escape().optional(),
+    query("ts", "Invalid Timestamp.").trim().escape().optional(),
+    async (req: CustomRequest, res: Response, next: NextFunction) => {
+        const empId = req.employeeId
+        const emp = await getEmployeeById(empId!)
+        checkEmployeeIfNotExits(emp)
+
+        const { limit = 7, cursor: lastCursor, dep, kw, priority, status, type, ts = 'desc' } = req.query
+
+        const kwFilter: Prisma.ActionPlanWhereInput = kw ? {
+            OR: [
+                { id: { contains: kw as string, mode: 'insensitive' } },
+            ] as unknown as Prisma.ActionPlanWhereInput[]
+        } : {}
+
+        const depFilter: Prisma.ActionPlanWhereInput =
+            dep && dep !== 'all' ? {
+                departmentId: +dep
+            } : {}
+
+        const priorityFilter: Prisma.ActionPlanWhereInput =
+            priority && priority !== "all" &&
+                Object.values(Priority).includes(priority as Priority)
+                ? { priority: priority as Priority }
+                : {};
+
+        const statusFilter: Prisma.ActionPlanWhereInput =
+            status && status !== "all" &&
+                Object.values(RStatus).includes(status as RStatus)
+                ? { status: status as RStatus }
+                : {};
+
+        const typeFilter: Prisma.ActionPlanWhereInput =
+            type && type !== "all" &&
+                Object.values(RType).includes(type as RType)
+                ? { type: type as RType }
+                : {};
+
+        const options = {
+            take: +limit + 1,
+            skip: lastCursor ? 1 : 0,
+            cursor: lastCursor ? { id: +lastCursor } : undefined,
+            where: {
+                ...depFilter,
+                ...priorityFilter,
+                ...statusFilter,
+                ...typeFilter,
+                ...kwFilter,
+            },
+            select: {
+                id: true,
+                department: true,
+                criticalEmployee: {
+                    fullName: true,
+                },
+                priority: true,
+                status: true,
+                type: true,
+                createdAt: true,
+                dueDate: true,
+                assignTo: true,
+                actionType: true,
+                quickAction: true,
+                actionNotes: true,
+                followUpNotes: true,
+                suggestions: true
+            },
+            orderBy: {
+                createdAt: ts
+            }
+        }
+
+        const actionPlans = await getAllActionPlansInfinite(options)
+
+        const hasNextPage = actionPlans.length > +limit
+
+        if (hasNextPage) actionPlans.pop()
+
+        const nextCursor = hasNextPage ? actionPlans[actionPlans.length - 1].id : null
+
+        res.status(200).json({
+            message: "Here is all action plans with infinite scroll.",
+            hasNextPage,
+            nextCursor,
+            prevCursor: lastCursor || undefined,
+            data: actionPlans
         })
     }
 ]
