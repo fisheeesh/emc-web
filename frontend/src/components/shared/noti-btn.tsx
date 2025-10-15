@@ -57,7 +57,7 @@ export default function NotiBtn() {
                     {notifications.length === 0 ? (
                         <div className="flex flex-col items-center justify-center h-full gap-2">
                             <BellOff className="h-12 w-12 text-muted-foreground/50" />
-                            <p className="text-sm text-muted-foreground">No notifications</p>
+                            <p className="text-sm text-muted-foreground">No notifications at all</p>
                         </div>
                     ) : (
                         notifications.map((item) => (
