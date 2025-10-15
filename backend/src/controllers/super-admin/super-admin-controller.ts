@@ -428,7 +428,13 @@ export const getAllActionPlans = [
                 id: true,
                 department: true,
                 criticalEmployee: {
-                    fullName: true,
+                    select: {
+                        employee: {
+                            select: {
+                                fullName: true
+                            }
+                        }
+                    }
                 },
                 priority: true,
                 status: true,
@@ -453,7 +459,7 @@ export const getAllActionPlans = [
 
         if (hasNextPage) actionPlans.pop()
 
-        const nextCursor = hasNextPage ? actionPlans[actionPlans.length - 1].id : null
+        const nextCursor = hasNextPage ? actionPlans![actionPlans.length - 1].id : null
 
         res.status(200).json({
             message: "Here is all action plans with infinite scroll.",

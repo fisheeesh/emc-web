@@ -1,13 +1,26 @@
 import CommonFilter from "@/components/shared/common-filter";
 import LocalSearch from "@/components/shared/local-search";
+import TableSkeleton from "@/components/shared/table-skeleton";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogTrigger } from "@/components/ui/dialog";
+import Empty from "@/components/ui/empty";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { CRITICAL_DATA, PRIORITY, RSTATUS, RType, TSFILTER } from "@/lib/constants";
-import DetailsModal from "../../modals/details-modal";
+import { PRIORITY, RSTATUS, RType, TSFILTER } from "@/lib/constants";
+// import DetailsModal from "../../modals/details-modal";
+import { formatId } from "@/lib/utils";
 
-export default function ActionsTable() {
+interface Props {
+    data: ActionPlan[]
+    status: "error" | 'success' | 'pending',
+    error: Error | null,
+    isFetching?: boolean,
+    isFetchingNextPage: boolean,
+    fetchNextPage: () => void,
+    hasNextPage: boolean
+}
+
+export default function ActionsTable({ data, status, error, isFetchingNextPage, fetchNextPage, hasNextPage }: Props) {
     return (
         <Card className="rounded-md flex flex-col gap-5">
             <CardHeader className="space-y-2">
@@ -27,17 +40,17 @@ export default function ActionsTable() {
                         otherClasses="min-h-[44px] sm:min-w-[150px]"
                     />
                     <CommonFilter
-                        filterValue="status"
+                        filterValue="rStatus"
                         filters={RSTATUS}
                         otherClasses="min-h-[44px] sm:min-w-[150px]"
                     />
                     <CommonFilter
-                        filterValue="type"
+                        filterValue="rType"
                         filters={RType}
                         otherClasses="min-h-[44px] sm:min-w-[150px]"
                     />
                     <CommonFilter
-                        filterValue="due"
+                        filterValue="rTs"
                         filters={TSFILTER}
                         otherClasses="min-h-[44px] sm:min-w-[150px]"
                     />
@@ -59,47 +72,78 @@ export default function ActionsTable() {
                         </TableRow>
                     </TableHeader>
 
-                    <TableBody>
-                        {
-                            CRITICAL_DATA.map((emp) => (
-                                <TableRow key={emp.id}>
-                                    <TableCell className="py-6">
-                                        <span className="whitespace-nowrap">{emp.name}</span>
-                                    </TableCell>
-                                    <TableCell>
-                                        <span className="whitespace-nowrap">{emp.department}</span>
-                                    </TableCell>
-                                    <TableCell>
-                                        <span className="whitespace-nowrap">{emp.contact}</span>
-                                    </TableCell>
-                                    <TableCell>
-                                        <span className="whitespace-nowrap">{emp.contact}</span>
-                                    </TableCell>
-                                    <TableCell>
-                                        <span className="whitespace-nowrap">Pending</span>
-                                    </TableCell>
-                                    <TableCell>
-                                        <span className="whitespace-nowrap">Pending</span>
-                                    </TableCell>
-                                    <TableCell>
-                                        <span className="whitespace-nowrap font-en">Oct 6, 2025</span>
-                                    </TableCell>
-                                    <TableCell className="space-x-2 text-center">
-                                        {/* Details Dialog */}
-                                        <Dialog>
-                                            <DialogTrigger asChild>
-                                                <Button variant='outline' className="cursor-pointer">
-                                                    Details
-                                                </Button>
-                                            </DialogTrigger>
-                                            <DetailsModal employee={emp} />
-                                        </Dialog>
-                                    </TableCell>
-                                </TableRow>
-                            ))
-                        }
-                    </TableBody>
+                    {
+                        status === 'pending' ?
+                            <TableSkeleton cols={8} />
+                            : status === 'error'
+                                ? <TableBody>
+                                    <TableRow>
+                                        <TableCell colSpan={10} className="text-center py-10">
+                                            Error: {error?.message}
+                                        </TableCell>
+                                    </TableRow>
+                                </TableBody>
+                                :
+                                <TableBody>
+                                    {
+                                        data.map((action) => (
+                                            <TableRow key={action.id}>
+                                                <TableCell className="py-6">
+                                                    <span className="whitespace-nowrap">{formatId(action.id)}</span>
+                                                </TableCell>
+                                                <TableCell>
+                                                    <span className="whitespace-nowrap">{action.department.name}</span>
+                                                </TableCell>
+                                                <TableCell>
+                                                    <span className="whitespace-nowrap">{"HI"}</span>
+                                                </TableCell>
+                                                <TableCell>
+                                                    <span className="whitespace-nowrap">{action.priority}</span>
+                                                </TableCell>
+                                                <TableCell>
+                                                    <span className="whitespace-nowrap">{action.type}</span>
+                                                </TableCell>
+                                                <TableCell>
+                                                    <span className="whitespace-nowrap">{action.status}</span>
+                                                </TableCell>
+                                                <TableCell>
+                                                    <span className="whitespace-nowrap font-en">{action.dueDate}</span>
+                                                </TableCell>
+                                                <TableCell className="space-x-2 text-center">
+                                                    {/* Details Dialog */}
+                                                    <Dialog>
+                                                        <DialogTrigger asChild>
+                                                            <Button variant='outline' className="cursor-pointer">
+                                                                Details
+                                                            </Button>
+                                                        </DialogTrigger>
+                                                        {/* <DetailsModal employee={emp} /> */}
+                                                    </Dialog>
+                                                </TableCell>
+                                            </TableRow>
+                                        ))
+                                    }
+                                </TableBody>
+                    }
                 </Table>
+                <div className="my-4 flex flex-col items-center justify-center">
+                    {data.length > 0 && <Button
+                        className="cursor-pointer"
+                        onClick={() => fetchNextPage()}
+                        disabled={!hasNextPage || isFetchingNextPage}
+                        variant={!hasNextPage ? "ghost" : "secondary"}
+                    >
+                        {isFetchingNextPage
+                            ? "Loading more..."
+                            : hasNextPage
+                                ? "Load More"
+                                : "Nothing more to load"}
+                    </Button>}
+                </div>
+
+                {data.length === 0 && status === 'success' && <div className="my-4 flex flex-col items-center justify-center">
+                    <Empty label="No records found" classesName="w-[300px] h-[200px] " />
+                </div>}
             </CardContent>
         </Card>
     )

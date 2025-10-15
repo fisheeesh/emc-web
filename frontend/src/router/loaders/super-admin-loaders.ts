@@ -1,8 +1,11 @@
 import queryClient from "@/api/query"
-import { empInfiniteQuery } from "@/api/super-admin-query"
+import { actionPlansQuery, empInfiniteQuery } from "@/api/super-admin-query"
 
 export const managementsLoader = async () => {
-    await queryClient.ensureInfiniteQueryData(empInfiniteQuery())
-    
+    await Promise.all([
+        queryClient.ensureInfiniteQueryData(empInfiniteQuery()),
+        queryClient.ensureInfiniteQueryData(actionPlansQuery())
+    ])
+
     return null
 }

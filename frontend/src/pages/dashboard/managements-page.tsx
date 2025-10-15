@@ -1,4 +1,4 @@
-import { empInfiniteQuery } from "@/api/super-admin-query"
+import { actionPlansQuery, empInfiniteQuery } from "@/api/super-admin-query"
 import { ChartAreaInteractive } from "@/components/dashboard/charts/chart-interactive"
 import { SectionCards } from "@/components/dashboard/section-cards"
 import ActionsTable from "@/components/dashboard/tables/actions-table"
@@ -19,6 +19,12 @@ export default function ManagementsPage() {
     const accType = searchParams.get("accType")
     const jobType = searchParams.get("jobType")
 
+    const rKw = searchParams.get("rKw")
+    const priority = searchParams.get("priority")
+    const rStatus = searchParams.get("rStatus")
+    const rType = searchParams.get("rType")
+    const rTs = searchParams.get("rTs")
+
     const {
         status: empStatus,
         data: empData,
@@ -29,7 +35,18 @@ export default function ManagementsPage() {
         hasNextPage: hasEmpNextPage,
     } = useInfiniteQuery(empInfiniteQuery(kw, dep, role, jobType, accType, status, ts))
 
+    const {
+        status: actionStatus,
+        data: actionData,
+        error: actionError,
+        isFetching: isActionFetching,
+        isFetchingNextPage: isActionFetchingNextPage,
+        fetchNextPage: fetchActionNextPage,
+        hasNextPage: hasActionNextPage,
+    } = useInfiniteQuery(actionPlansQuery(rKw, dep, priority, rStatus, rType, rTs))
+
     const allEmps = empData?.pages.flatMap(page => page.data) ?? []
+    const allActionPlans = actionData?.pages.flatMap(page => page.data) ?? []
 
     return (
         <section className="flex flex-col items-center justify-center w-full gap-3">
@@ -49,7 +66,15 @@ export default function ManagementsPage() {
                 />
             </div>
             <div className="w-full">
-                <ActionsTable />
+                <ActionsTable
+                    data={allActionPlans}
+                    status={actionStatus}
+                    error={actionError}
+                    isFetching={isActionFetching}
+                    isFetchingNextPage={isActionFetchingNextPage}
+                    fetchNextPage={fetchActionNextPage}
+                    hasNextPage={hasActionNextPage}
+                />
             </div>
         </section>
     )

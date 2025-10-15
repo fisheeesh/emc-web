@@ -100,3 +100,22 @@ interface WatchlistEmployee {
         name: string
     },
 }
+
+interface ActionPlan {
+    id: string
+    department: {
+        id: number,
+        name: string
+    },
+    priority: string,
+    status: string,
+    type: string,
+    createdAt: string,
+    dueDate: string,
+    assignTo: string,
+    actionType: string,
+    quickAction: string,
+    actionNotes: string,
+    followUpNotes: string,
+    suggestions: string,
+}

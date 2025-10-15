@@ -32,3 +32,26 @@ export const empInfiniteQuery = (kw: string | null = null, dep: string | null = 
     // @ts-expect-error ignore type check
     getNextPageParam: (lastPage, pages) => lastPage.nextCursor ?? undefined
 })
+
+const fetchAllActionPlans = async ({ pageParam = null, kw = null, dep = null, priority = null, status = null, type = null, ts = null }: {
+    pageParam?: number | null, kw?: string | null, dep?: string | null, priority?: string | null, status?: string | null, type?: string | null, ts?: string | null
+}) => {
+    let query = pageParam ? `?limit=7&cursor=${pageParam}` : "?limit=7"
+    if (kw) query += `&kw=${kw}`
+    if (dep) query += `&dep=${dep}`
+    if (priority) query += `&priority=${priority}`
+    if (status) query += `&status=${status}`
+    if (type) query += `&type=${type}`
+    if (ts) query += `&ts=${ts}`
+    const res = await superApi.get(`/super-admin/action-plans${query}`)
+
+    return res.data
+}
+
+export const actionPlansQuery = (kw: string | null = null, dep: string | null = null, priority: string | null = null, status: string | null = null, type: string | null = null, ts: string | null = null) => ({
+    queryKey: ["action-plans", "infinite", kw ?? undefined, dep ?? undefined, priority ?? undefined, status ?? undefined, type ?? undefined, ts ?? undefined],
+    queryFn: ({ pageParam = null }: { pageParam?: number | null }) => fetchAllActionPlans({ pageParam, kw, dep, priority, status, type, ts }),
+    initialPageParam: null,
+    // @ts-expect-error ignore type check
+    getNextPageParam: (lastPage, pages) => lastPage.nextCursor ?? undefined
+})

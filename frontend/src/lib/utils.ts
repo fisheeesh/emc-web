@@ -27,3 +27,7 @@ export const YEARS = Array.from({ length: 6 }, (_, i) => {
     value: `${year}-01-01`,
   }
 })
+
+export function formatId(id: string) {
+  return `..${id.substring(id.length - 6)}`;
+}
