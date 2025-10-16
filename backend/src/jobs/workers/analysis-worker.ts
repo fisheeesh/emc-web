@@ -4,6 +4,7 @@ import { groq } from "@ai-sdk/groq";
 import { generateText } from "ai";
 import dotenv from "dotenv";
 import { prisma } from "../../config/prisma-client";
+import { createAnalysisPrompt, createAnalysisSystemPrompt } from "../../utils/ai-promts";
 dotenv.config();
 
 interface CheckInData {
@@ -49,53 +50,8 @@ const analysisWorker = new Worker("analysisQueue", async (job) => {
 
     const { text } = await generateText({
         model: groq("llama-3.3-70b-versatile"),
-        prompt: `
-Analyze the following emotional check-in data for ${employeeName} from ${new Date(startDate).toLocaleDateString()} to ${new Date(endDate).toLocaleDateString()}:
-
-${statsInfo}
-
-EMOTIONAL CHECK-IN ENTRIES:
-${formattedCheckIns}
-
-Based on this data, provide a comprehensive emotional analysis in the following JSON format:
-
-{
-    "overallMood": "A detailed paragraph (100-200 words) describing the employee's overall emotional state throughout the week. Mention specific patterns, peaks, dips, and overall trajectory. Reference specific check-ins when relevant.",
-    "moodTrend": "A detailed paragraph (100-150 words) analyzing the emotional trend with specific percentages and comparisons. Describe whether emotions are improving, declining, or stable. Include statistical insights.",
-    "keyInsights": [
-        "First specific observation about timing, patterns, or triggers (be detailed and reference actual check-in data)",
-        "Second insight about emotional patterns or correlations",
-        "Third insight about resilience, recovery, or concerning patterns",
-        "Fourth insight about work-life balance or overall wellbeing indicators"
-    ],
-    "recommendations": [
-        "First specific, actionable recommendation for HR/manager based on the data",
-        "Second practical step that addresses identified patterns",
-        "Third recommendation for support or intervention",
-        "Fourth suggestion for maintaining or improving wellbeing"
-    ]
-}
-
-IMPORTANT INSTRUCTIONS:
-- Analyze the ACTUAL data provided, don't make up information
-- Be specific about times, dates, and emotional patterns you observe
-- If you see critical/negative emotions, address them seriously in recommendations
-- Reference specific check-ins in your analysis (e.g., "On October 14th...")
-- Make insights and recommendations directly related to the observed patterns
-- Keep each insight and recommendation as a complete, detailed sentence
-- Return ONLY valid JSON, no markdown formatting or code blocks
-- Ensure all text is professional, empathetic, and culturally sensitive
-- Handle Burmese, English, and Thai feelings appropriately
-`,
-        system: `You are an expert workplace mental health analyst and therapist. Your role is to:
-1. Carefully analyze emotional check-in data
-2. Identify patterns, trends, and concerning signals
-3. Provide specific, actionable insights based on actual data
-4. Make realistic recommendations that HR can implement
-5. Be culturally sensitive and professional
-6. Return analysis in valid JSON format only
-
-Always base your analysis on the actual data provided, not generic responses.`
+        prompt: createAnalysisPrompt(employeeName, startDate, endDate, statsInfo, formattedCheckIns),
+        system: createAnalysisSystemPrompt()
     })
 
     //* Parse the JSON response

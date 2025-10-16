@@ -74,7 +74,6 @@ export const generateAIAnalysis = [
                 textFeeling: true,
                 emoji: true,
                 checkInTime: true,
-                emotionScore: true,
                 status: true
             },
             orderBy: {
@@ -91,19 +90,19 @@ export const generateAIAnalysis = [
         }
 
         //* Map emotionScore to status for AI analysis
-        const checkInsWithStatus = emotionCheckIns.map(checkIn => ({
-            textFeeling: checkIn.textFeeling,
-            emoji: checkIn.emoji,
-            checkInTime: checkIn.checkInTime,
-            status: checkIn.status
-        }))
+        // const checkInsWithStatus = emotionCheckIns.map(checkIn => ({
+        //     textFeeling: checkIn.textFeeling,
+        //     emoji: checkIn.emoji,
+        //     checkInTime: checkIn.checkInTime,
+        //     status: checkIn.status
+        // }))
 
         const employeeName = `${criticalEmp.employee.fullName}`.trim() || "Employee"
 
         try {
             //* Add job to queue
             const job = await AnalysisQueue.add("generateAnalysis", {
-                checkIns: checkInsWithStatus,
+                checkIns: emotionCheckIns,
                 employeeName,
                 startDate: start.toISOString(),
                 endDate: end.toISOString(),
