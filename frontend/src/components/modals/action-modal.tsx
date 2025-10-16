@@ -20,22 +20,23 @@ import {
     PopoverContent,
     PopoverTrigger,
 } from "@/components/ui/popover";
+import useGenerateAIRecommendation from "@/hooks/use-generate-ai-recommendation";
 import { cn } from "@/lib/utils";
 import { actionFormSchema } from "@/lib/validators";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { AlertTriangle, ChevronDownIcon, Calendar as ICalendar, Mail, MessageSquare, Phone, UserCheck } from "lucide-react";
+import { type MDXEditorMethods } from "@mdxeditor/editor";
+import { AlertTriangle, ChevronDownIcon, Calendar as ICalendar, Mail, MessageSquare, Phone } from "lucide-react";
 import React, { useRef } from "react";
 import { useForm, type SubmitHandler } from "react-hook-form";
+import { LiaBrainSolid } from "react-icons/lia";
+import { MdAdminPanelSettings } from "react-icons/md";
+import { toast } from "sonner";
 import type z from "zod";
 import Editor from "../editor";
+import Spinner from "../shared/spinner";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
-import { LiaBrainSolid } from "react-icons/lia";
-import Spinner from "../shared/spinner";
-import useGenerateAIRecommendation from "@/hooks/use-generate-ai-recommendation";
-import { toast } from "sonner";
-import { type MDXEditorMethods } from "@mdxeditor/editor";
 
 type QuickAction = {
     name: string;
@@ -119,11 +120,11 @@ export default function ActionModal({ employee }: Props) {
             <div className="max-h-[calc(90vh-2rem)] overflow-y-auto no-scrollbar">
                 <DialogHeader>
                     <DialogTitle className="text-lg md:text-xl font-bold flex items-center gap-2">
-                        <UserCheck className="text-blue-600 size-5 md:size-7" />
-                        Take Action for {employee?.name || 'Employee'}
+                        <MdAdminPanelSettings className="text-blue-600 size-5 md:size-7" />
+                        Create Action Plan for {employee?.name || 'Employee'}
                     </DialogTitle>
                     <DialogDescription className="text-xs md:text-sm">
-                        Choose appropriate actions to support this employee's wellbeing
+                        Submit an action plan to support this employee's wellbeing. This will be sent to senior leadership for review and approval.
                     </DialogDescription>
                 </DialogHeader>
 
@@ -164,7 +165,13 @@ export default function ActionModal({ employee }: Props) {
                                                         <Button
                                                             key={value}
                                                             type="button"
-                                                            onClick={() => field.onChange(value)}
+                                                            onClick={() => {
+                                                                if (field.value === value) {
+                                                                    field.onChange(undefined)
+                                                                } else {
+                                                                    field.onChange(value)
+                                                                }
+                                                            }}
                                                             variant="outline"
                                                             className={cn(
                                                                 field.value === value && "text-blue-700 hover:text-blue-700 border-blue-700 dark:border-blue-700",

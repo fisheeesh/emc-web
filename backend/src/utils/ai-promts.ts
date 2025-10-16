@@ -131,13 +131,22 @@ Based on this data, generate a comprehensive mental health assessment and action
 1. Start with a clear title summarizing the ${empName}e's mood trend
 2. Create a table with exactly 3 columns:
     - Date (format: MMM DD, YYYY)
-    - ${empName}e's Emotion Check-In (combine emoji + text feeling)
+    - ${empName}'s Emotion Check-In (combine emoji + text feeling)
     - Interpretation (your empathetic analysis of what this might indicate)
 3. Include all available check-ins (up to 7 days)
 4. After the table, provide specific, actionable recommendations
 5. Be empathetic, professional, and culturally sensitive
 6. Consider patterns, deterioration, or improvement in mood
 7. Prioritize recommendations by urgency
+8. **CRITICAL**: Use ==highlight syntax== to emphasize the most important or urgent points in your recommendations. Wrap key phrases, critical actions, or urgent concerns with ==double equal signs== like this: ==Immediate crisis intervention required==
+
+**Highlighting Guidelines:**
+- Highlight urgent timeframes (e.g., ==within 24 hours==, ==immediately==)
+- Highlight critical actions (e.g., ==crisis intervention==, ==professional help needed==)
+- Highlight concerning patterns (e.g., ==severe deterioration==, ==suicidal ideation risk==)
+- Highlight key resources (e.g., ==Employee Assistance Program==, ==Mental Health Professional==)
+- Use highlights sparingly (3-7 highlights total) for maximum impact
+- Only highlight genuinely important information, not general advice
 
 Return ONLY the markdown-formatted report, nothing else.
 `.trim();

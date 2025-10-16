@@ -1,6 +1,6 @@
 import express from "express"
-import { generateAIRecommendation, getAdminUser, getAllDepartments, getAllNotifications, testAdmin } from "../../../controllers/admin/admin-controller"
-import { generateAIAnalysis } from "../../../controllers/admin/ai-analysis-controller"
+import { getAdminUser, getAllDepartments, getAllNotifications, testAdmin } from "../../../controllers/admin/admin-controller"
+import { generateAIAnalysis, generateAIRecommendation } from "../../../controllers/admin/ai-controller"
 import { getAttendanceOverView, getCheckInHours, getDailyAttendance } from "../../../controllers/admin/attendance-controller"
 import { getAllCriticalEmps, getAllWatchlistEmps, getLeaderboards, getMoodOverview, getSenitmentsComparison } from "../../../controllers/admin/sentiments-controller"
 import { setMaintenance } from "../../../controllers/admin/system-contorller"
