@@ -1,4 +1,4 @@
-const dashboardLink = `${process.env.DASHBOARD_URL}/dashboard/sentiments`
+const dashboardLink = `${process.env.DASHBOARD_URL}`
 
 export const critical_subject = (empName: string) => `🚨 Wellness Alert: ${empName} May Need Support`;
 
@@ -167,7 +167,7 @@ export const critical_body = (empName: string) => `
                         </div>
 
                         <div class="button-container">
-                            <a href="${dashboardLink}" class="dashboard-button">
+                            <a href="${dashboardLink}/dashboard/sentiments" class="dashboard-button">
                                 📊 View AI Analysis & Sentiment Dashboard
                             </a>
                         </div>
@@ -361,3 +361,50 @@ export const normal_body = (empName: string) => `
     </body>
     </html>
 `
+
+export const request_subject = (priority: string) => `⚠️ Action Plan Approval Required - ${priority} Priority`
+
+export const request_body = (cEmpName: string, adminName: string, depName: string, actionType: string, priority: string, dueDate: string) => `
+            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+                <h2 style="color: #dc2626;">Action Plan Requires Your Approval</h2>
+                
+                <div style="background: #fee2e2; border-left: 4px solid #dc2626; padding: 16px; margin: 20px 0;">
+                    <p style="margin: 0; font-weight: bold;">Critical Employee Alert</p>
+                </div>
+                
+                <table style="width: 100%; border-collapse: collapse; margin: 20px 0;">
+                    <tr>
+                        <td style="padding: 8px; border-bottom: 1px solid #e5e7eb;"><strong>Employee:</strong></td>
+                        <td style="padding: 8px; border-bottom: 1px solid #e5e7eb;">${cEmpName}</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 8px; border-bottom: 1px solid #e5e7eb;"><strong>Department:</strong></td>
+                        <td style="padding: 8px; border-bottom: 1px solid #e5e7eb;">${depName}</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 8px; border-bottom: 1px solid #e5e7eb;"><strong>Submitted By:</strong></td>
+                        <td style="padding: 8px; border-bottom: 1px solid #e5e7eb;">${adminName}</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 8px; border-bottom: 1px solid #e5e7eb;"><strong>Priority:</strong></td>
+                        <td style="padding: 8px; border-bottom: 1px solid #e5e7eb;"><span style="color: ${priority === 'HIGH' ? '#dc2626' : priority === 'MEDIUM' ? '#f59e0b' : '#10b981'}; font-weight: bold;">${priority}</span></td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 8px; border-bottom: 1px solid #e5e7eb;"><strong>Action Type:</strong></td>
+                        <td style="padding: 8px; border-bottom: 1px solid #e5e7eb;">${actionType}</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 8px; border-bottom: 1px solid #e5e7eb;"><strong>Due Date:</strong></td>
+                        <td style="padding: 8px; border-bottom: 1px solid #e5e7eb;">${new Date(dueDate).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</td>
+                    </tr>
+                </table>
+                
+                <p style="color: #6b7280; margin: 20px 0;">Please review and approve this action plan to begin employee support intervention.</p>
+                
+                <a href="${dashboardLink}}/dashboard/managements" style="display: inline-block; background: #2563eb; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; margin: 20px 0;">Review Action Plan</a>
+                
+                <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 30px 0;">
+                
+                <p style="color: #9ca3af; font-size: 12px;">This is an automated notification from the Employee Wellbeing Management System.</p>
+            </div>
+        `
