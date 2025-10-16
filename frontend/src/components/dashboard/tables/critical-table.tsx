@@ -1,15 +1,21 @@
 import ActionModal from "@/components/modals/action-modal";
+import ConfirmModal from "@/components/modals/confirm-modal";
 import DetailsModal from "@/components/modals/details-modal";
 import LocalSearch from "@/components/shared/local-search";
 import TableSkeleton from "@/components/shared/table-skeleton";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Dialog, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog } from "@/components/ui/dialog";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import Empty from "@/components/ui/empty";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { IMG_URL } from "@/lib/constants";
 import { getInitialName } from "@/lib/utils";
+import { useState } from "react";
+import { GrMoreVertical, GrNotes } from "react-icons/gr";
+import { IoSparklesOutline } from "react-icons/io5";
+import { RiDeleteBin5Line } from "react-icons/ri";
 
 interface Props {
     data: CriticalEmployee[]
@@ -22,6 +28,10 @@ interface Props {
 }
 
 export default function CriticalTable({ data, status, error, isFetchingNextPage, fetchNextPage, hasNextPage }: Props) {
+    const [viewAnalysis, setViewAnalysis] = useState<CriticalEmployee | null>(null);
+    const [viewAction, setViewAction] = useState<CriticalEmployee | null>(null);
+    const [deleteCEmp, setDeleteCEmp] = useState<CriticalEmployee | null>(null);
+
     return (
         <Card className="rounded-md border-destructive border-2 flex flex-col gap-5">
             <CardHeader className="flex flex-col md:flex-row gap-3 md:gap-0 justify-between">
@@ -86,40 +96,80 @@ export default function CriticalTable({ data, status, error, isFetchingNextPage,
                                                 <TableCell className="text-center">
                                                     <span className="whitespace-nowrap font-en">{emp.resolvedAt ?? '—'}</span>
                                                 </TableCell>
-                                                <TableCell className="space-x-2 text-center">
-                                                    {/* Details Dialog */}
-                                                    <Dialog>
-                                                        <DialogTrigger asChild>
-                                                            <Button variant='outline' className="cursor-pointer">
-                                                                Details
+                                                <TableCell className="text-center">
+                                                    <DropdownMenu>
+                                                        <DropdownMenuTrigger asChild>
+                                                            <Button size='icon' variant='ghost' className="cursor-pointer">
+                                                                <GrMoreVertical className="size-4" />
                                                             </Button>
-                                                        </DialogTrigger>
-                                                        <DetailsModal
-                                                            empName={emp.employee.fullName}
-                                                            analysis={emp.analysis}
-                                                            criticalEmpId={emp.id}
-                                                        />
-                                                    </Dialog>
-
-                                                    {/* Action Dialog */}
-                                                    <Dialog>
-                                                        <DialogTrigger asChild>
-                                                            <Button className="cursor-pointer bg-brand hover:bg-blue-600 text-white">
-                                                                Action
-                                                            </Button>
-                                                        </DialogTrigger>
-                                                        <ActionModal employee={{
-                                                            id: emp.id,
-                                                            name: emp.employee.fullName,
-                                                            department: emp.department.name,
-                                                            score: emp.emotionScore,
-                                                            contact: emp.employee.email
-                                                        }} />
-                                                    </Dialog>
+                                                        </DropdownMenuTrigger>
+                                                        <DropdownMenuContent className="w-30" align="end" forceMount>
+                                                            <DropdownMenuGroup>
+                                                                <DropdownMenuItem asChild className="cursor-pointer">
+                                                                    <Button
+                                                                        size='icon'
+                                                                        variant='ghost'
+                                                                        className="w-full cursor-pointer flex justify-start gap-2 px-1.5"
+                                                                        onClick={() => setViewAnalysis(emp)}
+                                                                    >
+                                                                        <IoSparklesOutline className="text-black dark:text-white" />
+                                                                        Analysis
+                                                                    </Button>
+                                                                </DropdownMenuItem>
+                                                                <DropdownMenuItem asChild className="cursor-pointer">
+                                                                    <Button
+                                                                        size='icon'
+                                                                        variant='ghost'
+                                                                        className="w-full cursor-pointer flex justify-start gap-2 px-1.5"
+                                                                        onClick={() => setViewAction(emp)}
+                                                                    >
+                                                                        <GrNotes className="text-black dark:text-white" />
+                                                                        Action
+                                                                    </Button>
+                                                                </DropdownMenuItem>
+                                                                <DropdownMenuItem asChild className="cursor-pointer">
+                                                                    <Button
+                                                                        size='icon'
+                                                                        variant='ghost'
+                                                                        className="w-full cursor-pointer text-red-600! flex justify-start gap-2 px-1.5"
+                                                                        onClick={() => setDeleteCEmp(emp)}
+                                                                    >
+                                                                        <RiDeleteBin5Line className=" hover:text-red-600" />
+                                                                        Delete
+                                                                    </Button>
+                                                                </DropdownMenuItem>
+                                                            </DropdownMenuGroup>
+                                                        </DropdownMenuContent>
+                                                    </DropdownMenu>
                                                 </TableCell>
                                             </TableRow>
                                         ))
                                     }
+                                    <Dialog open={!!viewAnalysis} onOpenChange={(o) => !o && setViewAnalysis(null)}>
+                                        {viewAnalysis && <DetailsModal
+                                            empName={viewAnalysis.employee.fullName}
+                                            analysis={viewAnalysis.analysis}
+                                            criticalEmpId={viewAnalysis.id}
+                                        />}
+                                    </Dialog>
+                                    <Dialog open={!!viewAction} onOpenChange={(o) => !o && setViewAction(null)}>
+                                        {viewAction && <ActionModal employee={{
+                                            id: viewAction.id,
+                                            name: viewAction.employee.fullName,
+                                            department: viewAction.department.name,
+                                            score: viewAction.emotionScore,
+                                            contact: viewAction.employee.email
+                                        }} />}
+                                    </Dialog>
+                                    <Dialog open={!!deleteCEmp} onOpenChange={(o) => !o && setDeleteCEmp(null)}>
+                                        {deleteCEmp && <ConfirmModal
+                                            title="Delete Critical Employee Information Confirmation."
+                                            description={`Are you sure you want to delete this critical employee information? This action cannot be undone.`}
+                                            isLoading={false}
+                                            loadingLabel="Deleting..."
+                                            onConfirm={() => console.log('hi')}
+                                        />}
+                                    </Dialog>
                                 </TableBody>
                     }
                 </Table>

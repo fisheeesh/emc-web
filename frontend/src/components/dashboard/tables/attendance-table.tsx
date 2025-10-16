@@ -2,7 +2,7 @@ import LocalSearch from "@/components/shared/local-search";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { EMOTION_FILTER, TSFILTER } from "@/lib/constants";
+import { EMOTION_FILTER, IMG_URL, TSFILTER } from "@/lib/constants";
 import { Dialog, DialogTrigger } from "@radix-ui/react-dialog";
 
 import EmpEmotionModal from "@/components/modals/emp-emotion-modal";
@@ -11,6 +11,8 @@ import CustomBadge from "@/components/shared/custom-badge";
 import CustomCalendar from "@/components/shared/custom-calendar";
 import Empty from "@/components/ui/empty";
 import TableSkeleton from "@/components/shared/table-skeleton";
+import { getInitialName } from "@/lib/utils";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 
 interface Props {
     data: AttendanceOverviewData[]
@@ -75,7 +77,13 @@ export default function AttendanceTable({ data, status, error, isFetchingNextPag
                                         data.map((att) => (
                                             <TableRow key={att.id}>
                                                 <TableCell className="py-6">
-                                                    <span className="whitespace-nowrap">{att.employee.fullName}</span>
+                                                    <div className="flex items-center gap-2">
+                                                        <Avatar className="size-9">
+                                                            <AvatarImage src={IMG_URL + att.employee.avatar} alt={att.employee.fullName} />
+                                                            <AvatarFallback>{getInitialName(att.employee.fullName)}</AvatarFallback>
+                                                        </Avatar>
+                                                        <span className="whitespace-nowrap">{att.employee.fullName}</span>
+                                                    </div>
                                                 </TableCell>
                                                 <TableCell className="">
                                                     <span className="whitespace-nowrap">{att.employee.position}</span>

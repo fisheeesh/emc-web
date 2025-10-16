@@ -32,6 +32,7 @@ import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
 import { LiaBrainSolid } from "react-icons/lia";
+import Spinner from "../shared/spinner";
 
 type QuickAction = {
     name: string;
@@ -76,7 +77,7 @@ export default function ActionModal({ employee }: Props) {
     }
 
     return (
-        <DialogContent className="w-full mx-auto max-h-[90vh] overflow-visible sm:max-w-[1024px] lg:px-8">
+        <DialogContent className="w-full mx-auto max-h-[95vh] overflow-visible sm:max-w-[1024px] lg:px-8">
             <div className="max-h-[calc(90vh-2rem)] overflow-y-auto no-scrollbar">
                 <DialogHeader>
                     <DialogTitle className="text-lg md:text-xl font-bold flex items-center gap-2">
@@ -187,9 +188,9 @@ export default function ActionModal({ employee }: Props) {
                                                     </SelectTrigger>
                                                 </FormControl>
                                                 <SelectContent>
-                                                    <SelectItem value="High">High - Immediate</SelectItem>
-                                                    <SelectItem value="Medium">Medium - This Week</SelectItem>
-                                                    <SelectItem value="Low">Low - Monitor</SelectItem>
+                                                    <SelectItem value="HIGH">High - Immediate</SelectItem>
+                                                    <SelectItem value="MEDIUM">Medium - This Week</SelectItem>
+                                                    <SelectItem value="LOW">Low - Monitor</SelectItem>
                                                 </SelectContent>
                                             </Select>
                                             <FormMessage />
@@ -267,10 +268,15 @@ export default function ActionModal({ employee }: Props) {
                                         <div className="flex items-end justify-between">
                                             <FormLabel>Action Notes <span className="font-en text-red-600">*</span></FormLabel>
                                             <Button
-                                                className="flex items-center gap-1.5 cursor-pointer bg-gradient-to-r from-purple-400 via-pink-500 to-blue-500 text-white font-semibold hover:from-pink-500 hover:via-purple-500 hover:to-blue-400 transition-colors duration-300"
+                                                type="button"
+                                                className="relative flex items-center gap-1.5 min-h-[40px] cursor-pointer overflow-hidden bg-gradient-to-r from-purple-500 via-pink-500 to-blue-500 text-white font-semibold before:absolute before:inset-0 before:bg-gradient-to-r before:from-transparent before:via-white/30 before:to-transparent before:animate-[shimmer_2s_ease-in-out_infinite] before:[animation-delay:0s]"
+                                                style={{
+                                                    animationTimingFunction: 'linear'
+                                                }}
                                             >
-                                                <LiaBrainSolid />
-                                                Generate AI Notes
+                                                <Spinner isLoading={false} label="Generating...">
+                                                    <LiaBrainSolid /> Generate AI Notes
+                                                </Spinner>
                                             </Button>
                                         </div>
                                         <FormControl>
