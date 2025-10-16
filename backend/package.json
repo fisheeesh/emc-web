@@ -5,13 +5,14 @@
   "main": "index.js",
   "scripts": {
     "test": "jest",
-    "dev": "npm-run-all --parallel dev:node score analysis image email",
+    "dev": "npm-run-all --parallel dev:node score analysis image email note",
     "dev:node": "nodemon src/index.ts",
     "score": "nodemon src/jobs/workers/score-worker.ts",
     "analysis": "nodemon src/jobs/workers/analysis-worker.ts",
     "image": "nodemon src/jobs/workers/image-worker.ts",
     "cache": "nodemon src/jobs/workers/cache-worker.ts",
     "email": "nodemon src/jobs/workers/email-worker.ts",
+    "note": "nodemon src/jobs/workers/notes-worker.ts",
     "build": "tsc -p .",
     "start": "node dist/index.js"
   },
