@@ -23,14 +23,18 @@ export const createEmotionCheckIn = async (emotion: any) => {
 
 export const getMoodPercentages = async (uDepartmentId: number, qDepartmentId: string, role: string, durationFilter: any) => {
     try {
-        //* Get all check-ins for employees in the same dep
-        const todayCheckIns = await prismaClient.emotionCheckIn.groupBy({
-            by: ['employeeId'],
+        //* Get the most recent check-in for each employee in the duration period
+        const recentCheckIns = await prismaClient.emotionCheckIn.findMany({
             where: {
                 ...departmentFilter(role, uDepartmentId, qDepartmentId),
                 createdAt: durationFilter,
             },
-            _avg: {
+            orderBy: {
+                createdAt: 'desc'
+            },
+            distinct: ['employeeId'],
+            select: {
+                employeeId: true,
                 emotionScore: true
             }
         })
@@ -49,8 +53,8 @@ export const getMoodPercentages = async (uDepartmentId: number, qDepartmentId: s
 
         let posi = 0, neu = 0, nega = 0, crit = 0;
 
-        for (const row of todayCheckIns) {
-            const score = Number(row._avg.emotionScore) ?? 0
+        for (const row of recentCheckIns) {
+            const score = Number(row.emotionScore) ?? 0
 
             if (score >= MOOD_THRESHOLDS.positive) posi++
             else if (score >= MOOD_THRESHOLDS.neutralMin) neu++
