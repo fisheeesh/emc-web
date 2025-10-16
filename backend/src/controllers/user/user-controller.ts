@@ -177,8 +177,6 @@ export const emotionCheckIn = [
             //* Response immdiately - Don't wait for background tasks
             res.status(200).json({
                 message: "Successfully checked in.",
-                score,
-                isCritical
             });
 
             //* Move all notifications to background

@@ -12,6 +12,12 @@ interface CustomRequest extends Request {
     employeeId?: number
 }
 
+
+/**
+ * body ka ny cEmp nae pat tat tae info ta khu khu u ml
+ * ae dr nae cEmp yae last 7 days emotionCheck-in to track ml
+ * ae dr ko input a ny nae ai ko pay p response pyn u ml return pyn ml
+ */
 export const generateAIAnalysis = [
     body("criticalEmpId", "Critical Employee Id is required.").isInt({ gt: 0 }),
     async (req: CustomRequest, res: Response, next: NextFunction) => {
@@ -209,6 +215,7 @@ export const generateAIRecommendation = [
 
             //* Return the generated markdown directly
             res.status(200).json({
+                success: true,
                 message: "AI recommendation generated successfully",
                 data: result
             })

@@ -1,5 +1,5 @@
 import express from "express"
-import { getAdminUser, getAllDepartments, getAllNotifications, testAdmin } from "../../../controllers/admin/admin-controller"
+import { createActionPlan, getAdminUser, getAllDepartments, getAllNotifications, testAdmin } from "../../../controllers/admin/admin-controller"
 import { generateAIAnalysis, generateAIRecommendation } from "../../../controllers/admin/ai-controller"
 import { getAttendanceOverView, getCheckInHours, getDailyAttendance } from "../../../controllers/admin/attendance-controller"
 import { getAllCriticalEmps, getAllWatchlistEmps, getLeaderboards, getMoodOverview, getSenitmentsComparison } from "../../../controllers/admin/sentiments-controller"
@@ -26,10 +26,12 @@ router.get("/daily-attendance", getDailyAttendance)
 router.get("/check-in-hours", getCheckInHours)
 router.get("/attendance-overview", getAttendanceOverView)
 
-//* AI-Analysis
+//* AI routes
 router.post("/ai-analysis", generateAIAnalysis)
-
 router.post("/generate-recommendation", generateAIRecommendation)
+
+//* Action Plans
+router.post("/action-plans", createActionPlan)
 
 
 export default router

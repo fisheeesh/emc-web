@@ -179,8 +179,6 @@ model ActionPlan {
   id            String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   criticalId    Int       @unique
   departmentId  Int
-  from          String    @db.VarChar(100)
-  to            String    @db.VarChar(100)
   actionType    String    @db.VarChar(100)
   priority      Priority  @default(MEDIUM)
   assignTo      String    @db.VarChar(100)

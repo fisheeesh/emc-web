@@ -63,7 +63,6 @@ export const createNewEmployee = [
 
         checkEmployeeIfNotExits(emp)
 
-
         const existEmp = await getEmployeeByEmail(email)
         checkEmployeeIfExits(existEmp)
 
