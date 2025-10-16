@@ -62,7 +62,7 @@ export const updateEmpSchema = createEmpSchema.omit({ email: true, password: tru
 });
 
 const ACTION_TYPES = ["One-on-One Meeting", "Email Follow-up", "Workload Review", "Mental Health Support", "Team Support"] as const
-const PRIORITY = ["High", "Medium", "Low"] as const
+const PRIORITY = ["HIGH", "MEDIUM", "LOW"] as const
 
 export const actionFormSchema = z.object({
     quickAction: z.string().optional(),

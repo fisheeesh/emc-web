@@ -21,12 +21,10 @@ interface Props {
 
 export default function DetailsModal({ analysis: initialAnalysis, empName, criticalEmpId }: Props) {
     const [analysis, setAnalysis] = useState<Analysis | undefined>(initialAnalysis);
-    const [isGenerating, setIsGenerating] = useState(false);
     const [progress, setProgress] = useState(0);
-    const { generateAnalysis } = useGenerateAIAnalysis();
+    const { generateAnalysis, generating } = useGenerateAIAnalysis();
 
     const handleGenerateAnalysis = async () => {
-        setIsGenerating(true);
         setProgress(0);
 
         //* Start progress
@@ -49,7 +47,6 @@ export default function DetailsModal({ analysis: initialAnalysis, empName, criti
             //* Wait a moment to show 100%
             setTimeout(() => {
                 setAnalysis(response.data);
-                setIsGenerating(false);
                 setProgress(0);
                 toast.success('Success', {
                     description: "AI-Analysis generated successfully.",
@@ -57,14 +54,13 @@ export default function DetailsModal({ analysis: initialAnalysis, empName, criti
             }, 500);
         } catch (error) {
             clearInterval(interval);
-            setIsGenerating(false);
             setProgress(0);
         }
     };
 
     return (
         <DialogContent className="w-full mx-auto max-h-[95vh] overflow-y-auto sm:max-w-[1024px] no-scrollbar">
-            {!analysis && !isGenerating ? (
+            {!analysis && !generating ? (
                 <div className="min-h-[500px] flex flex-col items-center justify-center p-8">
                     <div className="relative mb-8">
                         {/* Animated rings */}
@@ -108,7 +104,7 @@ export default function DetailsModal({ analysis: initialAnalysis, empName, criti
                         </div>
                     </div>
                 </div>
-            ) : !analysis && isGenerating ? (
+            ) : !analysis && generating ? (
                 <div className="min-h-[500px] flex flex-col items-center justify-center p-8">
                     <div className="relative mb-8">
                         {/* Spinning gradient ring */}

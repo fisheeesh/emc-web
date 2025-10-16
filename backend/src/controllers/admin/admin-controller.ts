@@ -154,7 +154,6 @@ export const generateAIRecommendation = [
 
             //* Return the generated markdown directly
             res.status(200).json({
-                success: true,
                 message: "AI recommendation generated successfully",
                 data: result
             })
