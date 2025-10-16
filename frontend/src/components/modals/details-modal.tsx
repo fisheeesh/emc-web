@@ -1,5 +1,6 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+import { useState } from "react";
 import {
-    DialogClose,
     DialogContent,
     DialogDescription,
     DialogHeader,
@@ -7,89 +8,228 @@ import {
 } from "@/components/ui/dialog";
 import { IoSparklesOutline } from "react-icons/io5";
 import { Button } from "../ui/button";
+import { Loader2 } from "lucide-react";
+import { DialogClose } from "@radix-ui/react-dialog";
+import useGenerateAIAnalysis from "@/hooks/use-generate-ai-analysis";
+import { toast } from "sonner";
 
 interface Props {
-    employee: {
-        id: number,
-        name: string,
-        department: string,
-        contact: string,
-        score: number
-    }
+    analysis?: Analysis;
+    empName: string;
+    criticalEmpId: number;
 }
 
-export default function DetailsModal({ employee }: Props) {
+export default function DetailsModal({ analysis: initialAnalysis, empName, criticalEmpId }: Props) {
+    const [analysis, setAnalysis] = useState<Analysis | undefined>(initialAnalysis);
+    const [isGenerating, setIsGenerating] = useState(false);
+    const [progress, setProgress] = useState(0);
+    const { generateAnalysis } = useGenerateAIAnalysis();
+
+    const handleGenerateAnalysis = async () => {
+        setIsGenerating(true);
+        setProgress(0);
+
+        //* Start progress
+        const interval = setInterval(() => {
+            setProgress((prev) => {
+                if (prev >= 90) {
+                    return prev;
+                }
+                return prev + 5;
+            });
+        }, 1000);
+
+        try {
+            const response = await generateAnalysis({ criticalEmpId });
+
+            //* Complete progress
+            clearInterval(interval);
+            setProgress(100);
+
+            //* Wait a moment to show 100%
+            setTimeout(() => {
+                setAnalysis(response.data);
+                setIsGenerating(false);
+                setProgress(0);
+                toast.success('Success', {
+                    description: "AI-Analysis generated successfully.",
+                });
+            }, 500);
+        } catch (error) {
+            clearInterval(interval);
+            setIsGenerating(false);
+            setProgress(0);
+        }
+    };
+
     return (
-        <DialogContent className="w-full mx-auto max-h-[80vh] overflow-y-auto sm:max-w-[1024px] no-scrollbar">
-            <DialogHeader>
-                <DialogTitle className="flex items-center gap-2 text-xl font-bold bg-gradient-to-r from-purple-400 via-pink-500 to-blue-500 bg-clip-text text-transparent">
-                    <IoSparklesOutline className="text-xl text-pink-400" />
-                    AI-Powered Weekly Emotional Analysis
-                </DialogTitle>
-                <DialogDescription>
-                    Summary of {employee.name}'s emotional state across the week
-                </DialogDescription>
-            </DialogHeader>
+        <DialogContent className="w-full mx-auto max-h-[95vh] overflow-y-auto sm:max-w-[1024px] no-scrollbar">
+            {!analysis && !isGenerating ? (
+                <div className="min-h-[500px] flex flex-col items-center justify-center p-8">
+                    <div className="relative mb-8">
+                        {/* Animated rings */}
+                        <div className="absolute inset-0 rounded-full bg-gradient-to-r from-purple-400 via-pink-500 to-blue-500 opacity-20 blur-2xl animate-pulse"></div>
+                        <div className="absolute inset-0 rounded-full bg-gradient-to-r from-purple-400 via-pink-500 to-blue-500 opacity-10 blur-3xl animate-pulse" style={{ animationDelay: '1s' }}></div>
 
-            <div className="space-y-6 mt-2 border-b pb-5">
-                <div className="space-y-2">
-                    <p className="font-semibold text-sm">Day 1</p>
-                    <p className="text-sm text-muted-foreground">
-                        Tired and stressed, workload overwhelming. That's a red flag. Maybe they're taking on too much or not managing their time well.
+                        {/* Main button with shimmer effect */}
+                        <div className="relative">
+                            <Button
+                                onClick={handleGenerateAnalysis}
+                                className="relative h-32 w-32 rounded-full bg-gradient-to-r from-purple-500 via-pink-500 to-blue-500 hover:from-purple-600 hover:via-pink-600 hover:to-blue-600 shadow-2xl transition-all duration-300 hover:scale-105 overflow-hidden group"
+                            >
+                                {/* Shimmer effect */}
+                                <div className="absolute inset-0 -translate-x-full animate-shimmer bg-gradient-to-r from-transparent via-white/30 to-transparent group-hover:translate-x-full transition-transform duration-1000"></div>
+
+                                <IoSparklesOutline className="text-5xl text-white relative z-10" />
+                            </Button>
+                        </div>
+                    </div>
+
+                    <h3 className="text-2xl font-bold bg-gradient-to-r from-purple-400 via-pink-500 to-blue-500 bg-clip-text text-transparent mb-3">
+                        Unlock AI-Powered Insights
+                    </h3>
+                    <p className="text-center text-muted-foreground max-w-md mb-6">
+                        Generate a comprehensive emotional analysis for {empName} using advanced AI.
+                        Get actionable insights and personalized recommendations.
                     </p>
-                </div>
 
-                <div className="space-y-2">
-                    <p className="font-semibold text-sm">Day 2</p>
-                    <p className="text-sm text-muted-foreground">
-                        Trouble sleeping and anxious. Lack of sleep can really affect mental health, making everything feel worse. Maybe the anxiety is about work or personal stuff, but it's spilling over.
+                    <div className="flex flex-wrap gap-3 justify-center text-sm text-muted-foreground">
+                        <div className="flex items-center gap-2">
+                            <div className="h-2 w-2 rounded-full bg-purple-500"></div>
+                            <span>Weekly Mood Trends</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                            <div className="h-2 w-2 rounded-full bg-pink-500"></div>
+                            <span>Key Insights</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                            <div className="h-2 w-2 rounded-full bg-blue-500"></div>
+                            <span>Recommendations</span>
+                        </div>
+                    </div>
+                </div>
+            ) : !analysis && isGenerating ? (
+                <div className="min-h-[500px] flex flex-col items-center justify-center p-8">
+                    <div className="relative mb-8">
+                        {/* Spinning gradient ring */}
+                        <div className="absolute inset-0 rounded-full bg-gradient-to-r from-purple-400 via-pink-500 to-blue-500 opacity-30 blur-xl animate-spin-slow"></div>
+
+                        <div className="relative h-32 w-32 rounded-full bg-background flex items-center justify-center border-4 border-muted">
+                            <Loader2 className="h-16 w-16 text-pink-500 animate-spin" />
+                        </div>
+                    </div>
+
+                    <h3 className="text-2xl font-bold bg-gradient-to-r from-purple-400 via-pink-500 to-blue-500 bg-clip-text text-transparent mb-3 flex items-center gap-2">
+                        <IoSparklesOutline className="text-pink-500 animate-pulse" />
+                        Generating AI Analysis
+                    </h3>
+
+                    <p className="text-center text-muted-foreground max-w-md mb-6">
+                        Creating comprehensive emotional analysis for <span className="font-semibold text-foreground">{empName}</span>
                     </p>
-                </div>
 
-                <div className="space-y-2">
-                    <p className="font-semibold text-sm">Day 3</p>
-                    <p className="text-sm text-muted-foreground">
-                        Unmotivated, avoiding colleagues, skipped lunch. Skipping meals isn't good for energy or mood. Avoiding others could mean they're feeling isolated or just can't handle social interactions right now.
-                    </p>
-                </div>
+                    {/* Progress bar */}
+                    <div className="w-full max-w-md mb-4">
+                        <div className="h-2 bg-muted rounded-full overflow-hidden">
+                            <div
+                                className="h-full bg-gradient-to-r from-purple-500 via-pink-500 to-blue-500 transition-all duration-500 ease-out relative overflow-hidden"
+                                style={{ width: `${progress}%` }}
+                            >
+                                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent animate-shimmer"></div>
+                            </div>
+                        </div>
+                        <p className="text-center text-sm text-muted-foreground mt-2 font-mono">{progress}%</p>
+                    </div>
 
-                <div className="space-y-2">
-                    <p className="font-semibold text-sm">Day 4</p>
-                    <p className="text-sm text-muted-foreground">
-                        Headache, thinking about quitting. Physical symptoms like headaches can be a sign of stress. Thinking about quitting is serious; it shows they're feeling stuck or hopeless.
-                    </p>
+                    <div className="bg-amber-500/10 border border-amber-500/20 rounded-lg p-4 max-w-md">
+                        <p className="text-sm text-amber-600 dark:text-amber-400 text-center">
+                            Please don't refresh or close this modal. This will take <span className="font-en">10-15</span> seconds.
+                        </p>
+                    </div>
                 </div>
+            ) : (
+                <>
+                    <DialogHeader>
+                        <DialogTitle className="flex items-center gap-2 text-xl font-bold bg-gradient-to-r from-purple-400 via-pink-500 to-blue-500 bg-clip-text text-transparent">
+                            <IoSparklesOutline className="text-xl text-pink-400" />
+                            AI-Powered Weekly Emotional Analysis
+                        </DialogTitle>
+                        <DialogDescription className="line-clamp-1">
+                            Summary of {empName}'s emotional state across the week
+                        </DialogDescription>
+                    </DialogHeader>
 
-                <div className="space-y-2">
-                    <p className="font-semibold text-sm">Day 5</p>
-                    <p className="text-sm text-muted-foreground">
-                        Pretending to be fine but feeling heavy and hopeless. This is concerning. They might feel they can't open up about their true feelings, which can make things worse.
-                    </p>
-                </div>
+                    <div className="space-y-6 mt-4">
+                        {/* Week Range */}
+                        <div className="bg-muted/50 rounded-lg p-4">
+                            <p className="text-sm text-muted-foreground">Analysis Period</p>
+                            <p className="text-lg font-semibold font-en">{analysis?.weekRange}</p>
+                        </div>
 
-                <div className="space-y-2">
-                    <p className="font-semibold text-sm">Day 6</p>
-                    <p className="text-sm text-muted-foreground">
-                        Couldn't focus, made mistakes, felt guilty. Lack of focus can lead to mistakes, which then cause more stress and guilt. It's a vicious cycle.
-                    </p>
-                </div>
+                        {/* Overall Mood */}
+                        <div className="space-y-2">
+                            <h3 className="text-lg font-semibold flex items-center gap-2">
+                                <span className="h-2 w-2 rounded-full bg-purple-500"></span>
+                                Overall Mood
+                            </h3>
+                            <div className="bg-gradient-to-r from-purple-500/10 via-pink-500/10 to-blue-500/10 rounded-lg p-4 border border-purple-500/20">
+                                <p className="text-base leading-relaxed">{analysis?.overallMood}</p>
+                            </div>
+                        </div>
 
-                <div className="space-y-2">
-                    <p className="font-semibold text-sm">Day 7</p>
-                    <p className="text-sm text-muted-foreground">
-                        Exhausted, questioning the point of everything. This sounds like they might be experiencing a deeper issue, maybe even depression or burnout.
-                    </p>
-                </div>
-            </div>
+                        {/* Mood Trend */}
+                        <div className="space-y-2">
+                            <h3 className="text-lg font-semibold flex items-center gap-2">
+                                <span className="h-2 w-2 rounded-full bg-pink-500"></span>
+                                Mood Trend
+                            </h3>
+                            <div className="bg-pink-500/5 rounded-lg p-4 border border-pink-500/20">
+                                <p className="text-base leading-relaxed">{analysis?.moodTrend}</p>
+                            </div>
+                        </div>
 
-            <div className="flex justify-end items-center gap-2 mt-4">
-                <DialogClose asChild>
-                    <Button className="flex items-center gap-2 cursor-pointer bg-gradient-to-r from-purple-400 via-pink-500 to-blue-500 text-white font-semibold hover:from-pink-500 hover:via-purple-500 hover:to-blue-400 transition-colors duration-300">
-                        <IoSparklesOutline className="text-xl" />
-                        Generate AI-Suggestion
-                    </Button>
-                </DialogClose>
-            </div>
+                        {/* Key Insights */}
+                        <div className="space-y-2">
+                            <h3 className="text-lg font-semibold flex items-center gap-2">
+                                <span className="h-2 w-2 rounded-full bg-blue-500"></span>
+                                Key Insights
+                            </h3>
+                            <div className="space-y-2">
+                                {analysis?.keyInsights.map((insight, index) => (
+                                    <div key={index} className="bg-blue-500/5 rounded-lg p-3 border border-blue-500/20 flex gap-3">
+                                        <span className="text-blue-500 font-bold font-en">{index + 1}.</span>
+                                        <p className="text-sm flex-1 leading-relaxed">{insight}</p>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+
+                        {/* Recommendations */}
+                        <div className="space-y-2">
+                            <h3 className="text-lg font-semibold flex items-center gap-2">
+                                <IoSparklesOutline className="text-amber-500" />
+                                Recommendations
+                            </h3>
+                            <div className="space-y-2">
+                                {analysis?.recommendations.map((rec, index) => (
+                                    <div key={index} className="bg-gradient-to-r from-amber-500/5 to-orange-500/5 rounded-lg p-3 border border-amber-500/20 flex gap-3">
+                                        <span className="text-amber-500">✦</span>
+                                        <p className="text-sm flex-1 leading-relaxed">{rec}</p>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="mt-5 pt-5 border-t flex justify-end">
+                        <DialogClose asChild>
+                            <Button variant='outline' className="cursor-pointer">
+                                Close
+                            </Button>
+                        </DialogClose>
+                    </div>
+                </>
+            )}
         </DialogContent>
-    )
+    );
 }

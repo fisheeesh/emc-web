@@ -1,3 +1,5 @@
+import ActionModal from "@/components/modals/action-modal";
+import DetailsModal from "@/components/modals/details-modal";
 import LocalSearch from "@/components/shared/local-search";
 import TableSkeleton from "@/components/shared/table-skeleton";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -8,8 +10,6 @@ import Empty from "@/components/ui/empty";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { IMG_URL } from "@/lib/constants";
 import { getInitialName } from "@/lib/utils";
-// import ActionModal from "../../modals/action-modal";
-// import DetailsModal from "../../modals/details-modal";
 
 interface Props {
     data: CriticalEmployee[]
@@ -40,6 +40,7 @@ export default function CriticalTable({ data, status, error, isFetchingNextPage,
                             <TableHead className="whitespace-nowrap font-semibold">Department</TableHead>
                             <TableHead className="whitespace-nowrap font-semibold">Contact</TableHead>
                             <TableHead className="whitespace-nowrap text-center font-semibold">EmotionScore</TableHead>
+                            <TableHead className="whitespace-nowrap text-center font-semibold">Issued At</TableHead>
                             <TableHead className="whitespace-nowrap text-center font-semibold">Resolved At</TableHead>
                             <TableHead className="whitespace-nowrap text-center font-semibold">Actions</TableHead>
                         </TableRow>
@@ -47,7 +48,7 @@ export default function CriticalTable({ data, status, error, isFetchingNextPage,
 
                     {
                         status === 'pending' ?
-                            <TableSkeleton cols={5} />
+                            <TableSkeleton cols={7} />
                             : status === 'error'
                                 ? <TableBody>
                                     <TableRow>
@@ -79,6 +80,12 @@ export default function CriticalTable({ data, status, error, isFetchingNextPage,
                                                 <TableCell className="text-center">
                                                     <span className="whitespace-nowrap font-en">{emp.emotionScore}</span>
                                                 </TableCell>
+                                                <TableCell className="text-center">
+                                                    <span className="whitespace-nowrap font-en">{emp.createdAt}</span>
+                                                </TableCell>
+                                                <TableCell className="text-center">
+                                                    <span className="whitespace-nowrap font-en">{emp.resolvedAt ?? '—'}</span>
+                                                </TableCell>
                                                 <TableCell className="space-x-2 text-center">
                                                     {/* Details Dialog */}
                                                     <Dialog>
@@ -87,7 +94,11 @@ export default function CriticalTable({ data, status, error, isFetchingNextPage,
                                                                 Details
                                                             </Button>
                                                         </DialogTrigger>
-                                                        {/* <DetailsModal employee={emp} /> */}
+                                                        <DetailsModal
+                                                            empName={emp.employee.fullName}
+                                                            analysis={emp.analysis}
+                                                            criticalEmpId={emp.id}
+                                                        />
                                                     </Dialog>
 
                                                     {/* Action Dialog */}
@@ -97,7 +108,13 @@ export default function CriticalTable({ data, status, error, isFetchingNextPage,
                                                                 Action
                                                             </Button>
                                                         </DialogTrigger>
-                                                        {/* <ActionModal employee={emp} /> */}
+                                                        <ActionModal employee={{
+                                                            id: emp.id,
+                                                            name: emp.employee.fullName,
+                                                            department: emp.department.name,
+                                                            score: emp.emotionScore,
+                                                            contact: emp.employee.email
+                                                        }} />
                                                     </Dialog>
                                                 </TableCell>
                                             </TableRow>
