@@ -1,7 +1,7 @@
 import { Queue, QueueEvents } from 'bullmq'
 import { redis } from '../../config/redis-client'
 
-export const NotesQueue = new Queue('notesQueue', {
+export const RecommendationQueue = new Queue('recommendationQueue', {
     connection: redis,
     defaultJobOptions: {
         attempts: 3,
@@ -14,6 +14,6 @@ export const NotesQueue = new Queue('notesQueue', {
     }
 })
 
-export const NotesQueueEvents = new QueueEvents('notesQueue', {
+export const RecommendationQueueEvents = new QueueEvents('recommendationQueue', {
     connection: redis
 })

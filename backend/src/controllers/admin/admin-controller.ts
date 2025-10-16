@@ -8,7 +8,7 @@ import { body, validationResult } from "express-validator";
 import { errorCodes } from "../../config/error-codes";
 import { prisma } from "../../config/prisma-client";
 import { subDays, startOfDay, endOfDay } from "date-fns";
-import { NotesQueue, NotesQueueEvents } from "../../jobs/queues/notes-queue";
+import { RecommendationQueue, RecommendationQueueEvents } from "../../jobs/queues/recommendation-queue";
 
 interface CustomRequest extends Request {
     employeeId?: number
@@ -74,8 +74,7 @@ export const getAllNotifications = async (req: CustomRequest, res: Response, nex
     })
 }
 
-// Controller - generateAINotes
-export const generateAINotes = [
+export const generateAIRecommendation = [
     body("criticalEmpId", "Critical Employee Id is required.").isInt({ gt: 0 }),
     async (req: CustomRequest, res: Response, next: NextFunction) => {
         const errors = validationResult(req).array({ onlyFirstError: true })
@@ -145,34 +144,34 @@ export const generateAINotes = [
 
         try {
             //* Add job to the queue
-            const job = await NotesQueue.add('generate-notes', {
+            const job = await RecommendationQueue.add('generate-recommendation', {
                 empName: criticalEmp.employee.fullName,
                 emotionCheckIns
             })
 
             //* Wait for the job to complete using QueueEvents
-            const result = await job.waitUntilFinished(NotesQueueEvents, 60000)
+            const result = await job.waitUntilFinished(RecommendationQueueEvents, 60000)
 
             //* Return the generated markdown directly
             res.status(200).json({
                 success: true,
-                message: "AI notes generated successfully",
+                message: "AI recommendation generated successfully",
                 data: result
             })
 
         } catch (error: any) {
-            console.error("Error generating AI notes:", error)
+            console.error("Error generating AI recommendation:", error)
 
             if (error.message?.includes('timeout')) {
                 return next(createHttpErrors({
-                    message: "AI notes generation is taking longer than expected. Please try again.",
+                    message: "AI recommendation generation is taking longer than expected. Please try again.",
                     status: 408,
                     code: errorCodes.timeout
                 }))
             }
 
             return next(createHttpErrors({
-                message: "Failed to generate AI notes. Please try again.",
+                message: "Failed to generate AI recommendation. Please try again.",
                 status: 500,
                 code: errorCodes.server
             }))

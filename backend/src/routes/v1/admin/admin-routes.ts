@@ -1,9 +1,9 @@
 import express from "express"
-import { getAdminUser, getAllDepartments, testAdmin, getAllNotifications, generateAINotes } from "../../../controllers/admin/admin-controller"
-import { setMaintenance } from "../../../controllers/admin/system-contorller"
-import { getDailyAttendance, getCheckInHours, getAttendanceOverView } from "../../../controllers/admin/attendance-controller"
-import { getMoodOverview, getSenitmentsComparison, getLeaderboards, getAllCriticalEmps, getAllWatchlistEmps } from "../../../controllers/admin/sentiments-controller"
+import { generateAIRecommendation, getAdminUser, getAllDepartments, getAllNotifications, testAdmin } from "../../../controllers/admin/admin-controller"
 import { generateAIAnalysis } from "../../../controllers/admin/ai-analysis-controller"
+import { getAttendanceOverView, getCheckInHours, getDailyAttendance } from "../../../controllers/admin/attendance-controller"
+import { getAllCriticalEmps, getAllWatchlistEmps, getLeaderboards, getMoodOverview, getSenitmentsComparison } from "../../../controllers/admin/sentiments-controller"
+import { setMaintenance } from "../../../controllers/admin/system-contorller"
 
 const router = express.Router()
 
@@ -29,7 +29,7 @@ router.get("/attendance-overview", getAttendanceOverView)
 //* AI-Analysis
 router.post("/ai-analysis", generateAIAnalysis)
 
-router.post("/generate-notes", generateAINotes)
+router.post("/generate-recommendation", generateAIRecommendation)
 
 
 export default router

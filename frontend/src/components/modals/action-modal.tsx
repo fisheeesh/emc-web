@@ -275,7 +275,7 @@ export default function ActionModal({ employee }: Props) {
                                                 }}
                                             >
                                                 <Spinner isLoading={false} label="Generating...">
-                                                    <LiaBrainSolid /> Generate AI Notes
+                                                    <LiaBrainSolid /> Generate AI Recommendation
                                                 </Spinner>
                                             </Button>
                                         </div>

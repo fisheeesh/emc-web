@@ -109,7 +109,7 @@ Always base your analysis on the actual data provided, not generic responses.
 `.trim()
 }
 
-export const createNotesPrompt = (empName: string, emotionCheckIns: EmotionCheckIn[]) => {
+export const createRecommendationPrompt = (empName: string, emotionCheckIns: EmotionCheckIn[]) => {
     const checkInsData = emotionCheckIns.map((checkIn, index) => ({
         index: index + 1,
         date: format(new Date(checkIn.createdAt), "yyyy-MM-dd"),
@@ -143,7 +143,7 @@ Return ONLY the markdown-formatted report, nothing else.
 `.trim();
 };
 
-export const createNotesSystemPrompt = () => {
+export const createRecommendationSystemPrompt = () => {
     return `
 You are an expert workplace mental health analyst and therapist with the following qualifications:
 
