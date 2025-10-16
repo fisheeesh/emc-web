@@ -37,6 +37,7 @@ import Spinner from "../shared/spinner";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
+import useCreateActionPlan from "@/hooks/use-create-action-plan";
 
 type QuickAction = {
     name: string;
@@ -56,14 +57,17 @@ interface Props {
         id: number,
         name: string,
         department: string,
+        departmentId: number,
         contact: string,
         score: number
-    }
+    },
+    onClose?: () => void;
 }
 
-export default function ActionModal({ employee }: Props) {
+export default function ActionModal({ employee, onClose }: Props) {
     const [open, setOpen] = React.useState(false)
     const { generateRecommendation, generating } = useGenerateAIRecommendation()
+    const { createActionPlan, creatingActionPlan } = useCreateActionPlan()
 
     const actionNotesEditorRef = useRef<MDXEditorMethods>(null);
     const followUpNotesEditorRef = useRef<MDXEditorMethods>(null);
@@ -96,7 +100,7 @@ export default function ActionModal({ employee }: Props) {
                 form.trigger('actionNotes')
 
                 toast.success('Success', {
-                    description: "AI recommendation has been generated successfully",
+                    description: "AI recommendation has been generated",
                 })
             } else {
                 toast.error('Error', {
@@ -112,8 +116,25 @@ export default function ActionModal({ employee }: Props) {
     }
 
     const onSubmit: SubmitHandler<z.infer<typeof actionFormSchema>> = async (values) => {
-        console.log(values)
+        createActionPlan({
+            criticalEmpId: employee.id,
+            depId: employee.departmentId,
+            quickAction: values.quickAction,
+            actionType: values.actionType,
+            priority: values.priority,
+            assignTo: values.assignTo,
+            dueDate: values.dueDate,
+            actionNotes: values.actionNotes,
+            followUpNotes: values.followUpNotes,
+        }, {
+            onSettled: () => {
+                form.reset()
+                onClose?.()
+            }
+        })
     }
+
+    const isWorking = form.formState.isSubmitting || creatingActionPlan
 
     return (
         <DialogContent className="w-full mx-auto max-h-[95vh] overflow-visible sm:max-w-[1200px] lg:px-8">
@@ -124,7 +145,7 @@ export default function ActionModal({ employee }: Props) {
                         Create Action Plan for {employee?.name || 'Employee'}
                     </DialogTitle>
                     <DialogDescription className="text-xs md:text-sm">
-                        Submit an action plan to support this employee's wellbeing. This will be sent to senior leadership for review and approval.
+                        Submit an action plan to support this employee's wellbeing. This will be sent to Upper Management for review and approval.
                     </DialogDescription>
                 </DialogHeader>
 
@@ -163,6 +184,7 @@ export default function ActionModal({ employee }: Props) {
                                                 {
                                                     QUICK_ACTIONS.map(({ name, value, icon }) => (
                                                         <Button
+                                                            disabled={isWorking}
                                                             key={value}
                                                             type="button"
                                                             onClick={() => {
@@ -201,7 +223,7 @@ export default function ActionModal({ employee }: Props) {
                                     render={({ field }) => (
                                         <FormItem className="w-full">
                                             <FormLabel>Action Type <span className="font-en text-red-600">*</span></FormLabel>
-                                            <Select onValueChange={field.onChange} value={field.value}>
+                                            <Select onValueChange={field.onChange} value={field.value} disabled={isWorking}>
                                                 <FormControl>
                                                     <SelectTrigger className="min-h-[48px] w-full">
                                                         <SelectValue placeholder="Select action type" />
@@ -226,7 +248,7 @@ export default function ActionModal({ employee }: Props) {
                                     render={({ field }) => (
                                         <FormItem className="w-full">
                                             <FormLabel>Priority Level <span className="font-en text-red-600">*</span></FormLabel>
-                                            <Select onValueChange={field.onChange} value={field.value}>
+                                            <Select onValueChange={field.onChange} value={field.value} disabled={isWorking}>
                                                 <FormControl>
                                                     <SelectTrigger className="min-h-[48px] w-full">
                                                         <SelectValue placeholder="Select priority" />
@@ -256,6 +278,7 @@ export default function ActionModal({ employee }: Props) {
                                                     {...field}
                                                     className="min-h-[48px]"
                                                     placeholder="Manager, HR Representative, etc."
+                                                    disabled={isWorking}
                                                 />
                                             </FormControl>
                                             <FormMessage />
@@ -273,6 +296,7 @@ export default function ActionModal({ employee }: Props) {
                                                 <PopoverTrigger asChild>
                                                     <FormControl>
                                                         <Button
+                                                            disabled={isWorking}
                                                             variant="outline"
                                                             className={cn(
                                                                 "min-h-[48px] w-full justify-between font-normal",
@@ -286,6 +310,7 @@ export default function ActionModal({ employee }: Props) {
                                                 </PopoverTrigger>
                                                 <PopoverContent className="w-auto overflow-hidden p-0" align="start">
                                                     <Calendar
+                                                        disabled={isWorking}
                                                         className="font-en"
                                                         mode="single"
                                                         selected={field.value ? new Date(field.value) : undefined}
@@ -313,7 +338,7 @@ export default function ActionModal({ employee }: Props) {
                                         <div className="flex items-end justify-between">
                                             <FormLabel>Action Notes <span className="font-en text-red-600">*</span></FormLabel>
                                             <Button
-                                                disabled={generating}
+                                                disabled={generating || isWorking}
                                                 onClick={handleAIRecommendation}
                                                 type="button"
                                                 className="relative flex items-center gap-1.5 min-h-[40px] cursor-pointer overflow-hidden bg-gradient-to-r from-purple-500 via-pink-500 to-blue-500 text-white font-semibold before:absolute before:inset-0 before:bg-gradient-to-r before:from-transparent before:via-white/30 before:to-transparent before:animate-[shimmer_2s_ease-in-out_infinite] before:[animation-delay:0s]"
@@ -365,12 +390,14 @@ export default function ActionModal({ employee }: Props) {
 
                         <div className="flex justify-end items-center gap-3 border-t pt-6 pb-2">
                             <DialogClose asChild>
-                                <Button type="button" variant="outline" className="min-h-[44px] cursor-pointer">
+                                <Button disabled={isWorking} type="button" variant="outline" className="min-h-[44px] cursor-pointer">
                                     Cancel
                                 </Button>
                             </DialogClose>
-                            <Button type="submit" className="bg-blue-600 hover:bg-blue-700 text-white min-h-[44px] cursor-pointer">
-                                Create Action Plan
+                            <Button disabled={isWorking} type="submit" className="bg-blue-600 hover:bg-blue-700 text-white min-h-[44px] cursor-pointer">
+                                <Spinner isLoading={isWorking} label="Submitting...">
+                                    Create Action Plan
+                                </Spinner>
                             </Button>
                         </div>
                     </form>

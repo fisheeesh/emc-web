@@ -153,13 +153,17 @@ export default function CriticalTable({ data, status, error, isFetchingNextPage,
                                         />}
                                     </Dialog>
                                     <Dialog open={!!viewAction} onOpenChange={(o) => !o && setViewAction(null)}>
-                                        {viewAction && <ActionModal employee={{
-                                            id: viewAction.id,
-                                            name: viewAction.employee.fullName,
-                                            department: viewAction.department.name,
-                                            score: viewAction.emotionScore,
-                                            contact: viewAction.employee.email
-                                        }} />}
+                                        {viewAction && <ActionModal
+                                            employee={{
+                                                id: viewAction.id,
+                                                name: viewAction.employee.fullName,
+                                                department: viewAction.department.name,
+                                                departmentId: viewAction.department.id,
+                                                score: viewAction.emotionScore,
+                                                contact: viewAction.employee.email
+                                            }}
+                                            onClose={() => setViewAction(null)}
+                                        />}
                                     </Dialog>
                                     <Dialog open={!!deleteCEmp} onOpenChange={(o) => !o && setDeleteCEmp(null)}>
                                         {deleteCEmp && <ConfirmModal
