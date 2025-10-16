@@ -113,7 +113,7 @@ export default function LeaderBoardTable({ data, isLoading }: Props) {
                                                 <span className="whitespace-nowrap font-en">{emp.points}</span>
                                             </TableCell>
                                             <TableCell className="text-center">
-                                                <span className="whitespace-nowrap font-en">{!emp.streak ? '-' : emp.streak}</span>
+                                                <span className="whitespace-nowrap font-en">{!emp.streak ? '—' : emp.streak}</span>
                                             </TableCell>
                                             <TableCell className="text-center">
                                                 <Button size='icon' className="p-2 rounded-full bg-muted dark:text-white text-black cursor-pointer hover:bg-gray-200 dark:hover:bg-slate-700">

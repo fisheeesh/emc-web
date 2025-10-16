@@ -86,7 +86,8 @@ interface CriticalEmployee {
         avatar: string,
         email: string,
         lastCritical: string
-    }
+    },
+    analysis: Analysis
     createdAt: string,
 }
 
@@ -99,6 +100,17 @@ interface WatchlistEmployee {
         id: number,
         name: string
     },
+}
+
+interface Analysis {
+    id: number,
+    criticalId: number,
+    weekRange: number,
+    overallMood: string,
+    moodTrend: string,
+    keyInsights: string[],
+    recommendations: string[],
+    createdAt: string
 }
 
 interface ActionPlan {

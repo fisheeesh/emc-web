@@ -1,3 +1,5 @@
+import defaultPfp from "@/assets/default_pfp.svg";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -5,15 +7,24 @@ import {
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { IMG_URL } from "@/lib/constants";
+import useNotiStore from "@/store/noti-store";
 import { Bell, BellOff } from "lucide-react";
+import moment from "moment";
 import { Badge } from "../ui/badge";
 import { Button } from "../ui/button";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import useNotiStore from "@/store/noti-store";
-import { IMG_URL } from "@/lib/constants";
 
 export default function NotiBtn() {
     const { notifications } = useNotiStore()
+
+    const handleMarkAsRead = (e: React.MouseEvent, notificationId: string) => {
+        e.stopPropagation();
+        console.log("Mark as read:", notificationId);
+    };
+
+    const handleNotificationClick = (notificationId: string) => {
+        console.log("Notification clicked:", notificationId);
+    };
 
     return (
         <DropdownMenu>
@@ -63,22 +74,30 @@ export default function NotiBtn() {
                         notifications.map((item) => (
                             <DropdownMenuItem
                                 key={item.id}
-                                className="cursor-pointer flex items-start gap-3 p-3 rounded-md hover:bg-muted/50"
+                                className="cursor-pointer flex items-start gap-3 p-3 rounded-md hover:bg-muted/50 group relative"
+                                onClick={() => handleNotificationClick(String(item.id))}
                             >
-                                {/* Avatar */}
+
                                 <Avatar className="h-10 w-10">
                                     <AvatarImage src={IMG_URL + item.avatar} alt={item.avatar} />
                                     <AvatarFallback>
-                                        U
+                                        <img src={defaultPfp} alt="default_pfp" className="dark:invert" />
                                     </AvatarFallback>
                                 </Avatar>
 
-                                {/* Notification Content */}
                                 <div className="flex-1">
                                     <p className="text-xs text-muted-foreground mt-1">{item.content}</p>
-                                    <p className="text-[11px] text-muted-foreground italic mt-1 font-en">
-                                        {item.createdAt}
-                                    </p>
+                                    <div className="flex items-center justify-between">
+                                        <p className="text-[11px] text-muted-foreground italic mt-1 font-en">
+                                            {moment(item.createdAt).fromNow()}
+                                        </p>
+                                        <p
+                                            onClick={(e) => handleMarkAsRead(e, String(item.id))}
+                                            className="underline opacity-0 group-hover:opacity-100 
+                                        transition-opacity duration-200 text-[10px] hover:text-brand text-muted-foreground">
+                                            Mark as read
+                                        </p>
+                                    </div>
                                 </div>
                             </DropdownMenuItem>
                         ))

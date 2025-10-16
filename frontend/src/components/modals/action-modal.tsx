@@ -31,6 +31,7 @@ import Editor from "../editor";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
+import { LiaBrainSolid } from "react-icons/lia";
 
 type QuickAction = {
     name: string;
@@ -263,7 +264,15 @@ export default function ActionModal({ employee }: Props) {
                                 name="actionNotes"
                                 render={({ field }) => (
                                     <FormItem>
-                                        <FormLabel>Action Notes <span className="font-en text-red-600">*</span></FormLabel>
+                                        <div className="flex items-end justify-between">
+                                            <FormLabel>Action Notes <span className="font-en text-red-600">*</span></FormLabel>
+                                            <Button
+                                                className="flex items-center gap-1.5 cursor-pointer bg-gradient-to-r from-purple-400 via-pink-500 to-blue-500 text-white font-semibold hover:from-pink-500 hover:via-purple-500 hover:to-blue-400 transition-colors duration-300"
+                                            >
+                                                <LiaBrainSolid />
+                                                Generate AI Notes
+                                            </Button>
+                                        </div>
                                         <FormControl>
                                             <div className="editor-wrapper">
                                                 <Editor

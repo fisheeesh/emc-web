@@ -1,7 +1,7 @@
-import dark from '@/assets/dark.png'
-import halfDark from '@/assets/half-ata-logo.png'
-import light from '@/assets/light.png'
-import halfLight from '@/assets/light_logo.png'
+import fullDark from '@/assets/full-dark.png'
+import halfDark from '@/assets/half-dark.png'
+import fullLight from '@/assets/full-light.png'
+import halfLight from '@/assets/half-dark.png'
 import { APP_NAME, NAVLINKS } from '@/lib/constants'
 import useFilterStore from '@/store/filter-store'
 import useUserStore from '@/store/user-store'
@@ -47,7 +47,7 @@ export default function Navbar() {
                     {/* Logo & Links */}
                     <div className="flex items-center cursor-pointer gap-2" onClick={() => navigate('/')}>
                         <img
-                            src={theme == 'dark' ? light : dark}
+                            src={theme == 'dark' ? fullLight : fullDark}
                             alt="ata_logo"
                             className='w-[180px] hidden md:block'
                         />
