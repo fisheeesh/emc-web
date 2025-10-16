@@ -22,19 +22,22 @@ import {
     toolbarPlugin,
     UndoRedo,
     directivesPlugin,
-    AdmonitionDirectiveDescriptor
+    AdmonitionDirectiveDescriptor,
+    type MDXEditorMethods
 } from "@mdxeditor/editor";
 import '@mdxeditor/editor/style.css';
 import "./dark-editor.css";
+import { forwardRef } from "react";
 
 interface EditorProps {
     value?: string;
     onChange?: (value: string) => void;
 }
 
-function Editor({ value = "", onChange }: EditorProps) {
+const Editor = forwardRef<MDXEditorMethods, EditorProps>(({ value = "", onChange }, ref) => {
     return (
         <MDXEditor
+            ref={ref}
             markdown={value}
             onChange={onChange}
             className="markdown-editor dark-editor grid w-full border"
@@ -81,6 +84,8 @@ function Editor({ value = "", onChange }: EditorProps) {
             ]}
         />
     )
-}
+});
+
+Editor.displayName = "Editor";
 
 export default Editor;

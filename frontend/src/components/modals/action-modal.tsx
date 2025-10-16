@@ -24,7 +24,7 @@ import { cn } from "@/lib/utils";
 import { actionFormSchema } from "@/lib/validators";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { AlertTriangle, ChevronDownIcon, Calendar as ICalendar, Mail, MessageSquare, Phone, UserCheck } from "lucide-react";
-import React from "react";
+import React, { useRef } from "react";
 import { useForm, type SubmitHandler } from "react-hook-form";
 import type z from "zod";
 import Editor from "../editor";
@@ -33,12 +33,16 @@ import { Input } from "../ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
 import { LiaBrainSolid } from "react-icons/lia";
 import Spinner from "../shared/spinner";
+import useGenerateAIRecommendation from "@/hooks/use-generate-ai-recommendation";
+import { toast } from "sonner";
+import { type MDXEditorMethods } from "@mdxeditor/editor";
 
 type QuickAction = {
     name: string;
     value: string;
     icon: React.ReactNode;
 }
+
 const QUICK_ACTIONS: QuickAction[] = [
     { name: "Schedule one-on-one Call", value: " Schedule 1-on-1 Call", icon: <Phone size={18} /> },
     { name: "Send Check-in Email", value: " Send Check-in Email", icon: <Mail size={18} /> },
@@ -58,13 +62,17 @@ interface Props {
 
 export default function ActionModal({ employee }: Props) {
     const [open, setOpen] = React.useState(false)
+    const { generateRecommendation, generating } = useGenerateAIRecommendation()
+
+    const actionNotesEditorRef = useRef<MDXEditorMethods>(null);
+    const followUpNotesEditorRef = useRef<MDXEditorMethods>(null);
 
     const form = useForm<z.infer<typeof actionFormSchema>>({
         resolver: zodResolver(actionFormSchema),
         defaultValues: {
             quickAction: undefined,
             actionType: "One-on-One Meeting",
-            priority: "High",
+            priority: "HIGH",
             assignTo: "",
             dueDate: "",
             actionNotes: "",
@@ -72,12 +80,42 @@ export default function ActionModal({ employee }: Props) {
         }
     })
 
+    const handleAIRecommendation = async () => {
+        try {
+            const res = await generateRecommendation({ criticalEmpId: employee.id })
+
+            if (res?.success && res?.data) {
+                //* Use the editor ref to set markdown directly
+                if (actionNotesEditorRef.current) {
+                    actionNotesEditorRef.current.setMarkdown(res.data)
+                }
+
+                //* Also update the form value
+                form.setValue('actionNotes', res.data)
+                form.trigger('actionNotes')
+
+                toast.success('Success', {
+                    description: "AI recommendation has been generated successfully",
+                })
+            } else {
+                toast.error('Error', {
+                    description: res?.message || 'Failed to generate AI recommendation'
+                })
+            }
+        } catch (error) {
+            console.error("Error generating AI recommendation:", error)
+            toast.error('Error', {
+                description: (error instanceof Error) ? error.message : 'There was a problem generating AI recommendation'
+            })
+        }
+    }
+
     const onSubmit: SubmitHandler<z.infer<typeof actionFormSchema>> = async (values) => {
         console.log(values)
     }
 
     return (
-        <DialogContent className="w-full mx-auto max-h-[95vh] overflow-visible sm:max-w-[1024px] lg:px-8">
+        <DialogContent className="w-full mx-auto max-h-[95vh] overflow-visible sm:max-w-[1200px] lg:px-8">
             <div className="max-h-[calc(90vh-2rem)] overflow-y-auto no-scrollbar">
                 <DialogHeader>
                     <DialogTitle className="text-lg md:text-xl font-bold flex items-center gap-2">
@@ -268,20 +306,23 @@ export default function ActionModal({ employee }: Props) {
                                         <div className="flex items-end justify-between">
                                             <FormLabel>Action Notes <span className="font-en text-red-600">*</span></FormLabel>
                                             <Button
+                                                disabled={generating}
+                                                onClick={handleAIRecommendation}
                                                 type="button"
                                                 className="relative flex items-center gap-1.5 min-h-[40px] cursor-pointer overflow-hidden bg-gradient-to-r from-purple-500 via-pink-500 to-blue-500 text-white font-semibold before:absolute before:inset-0 before:bg-gradient-to-r before:from-transparent before:via-white/30 before:to-transparent before:animate-[shimmer_2s_ease-in-out_infinite] before:[animation-delay:0s]"
                                                 style={{
                                                     animationTimingFunction: 'linear'
                                                 }}
                                             >
-                                                <Spinner isLoading={false} label="Generating...">
-                                                    <LiaBrainSolid /> Generate AI Recommendation
+                                                <Spinner isLoading={generating} label="Generating...">
+                                                    <LiaBrainSolid className="size-4.5" /> Generate AI Recommendation
                                                 </Spinner>
                                             </Button>
                                         </div>
                                         <FormControl>
                                             <div className="editor-wrapper">
                                                 <Editor
+                                                    ref={actionNotesEditorRef}
                                                     value={field.value}
                                                     onChange={field.onChange}
                                                 />
@@ -302,6 +343,7 @@ export default function ActionModal({ employee }: Props) {
                                         <FormControl>
                                             <div className="editor-wrapper">
                                                 <Editor
+                                                    ref={followUpNotesEditorRef}
                                                     value={field.value}
                                                     onChange={field.onChange}
                                                 />
