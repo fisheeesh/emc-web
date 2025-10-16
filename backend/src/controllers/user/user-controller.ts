@@ -143,7 +143,7 @@ export const emotionCheckIn = [
                 if (isRecovered) {
                     await tx.notification.create({
                         data: {
-                            avatar: emp?.avatar!,
+                            avatar: emp!.avatar! ?? "",
                             type: 'NORMAL',
                             content: `🎉 Good news!!!. ${emp?.firstName} ${emp?.lastName} is back to normal. Yay!!!🙌`,
                             department: { connect: { id: emp?.departmentId } }
@@ -162,7 +162,7 @@ export const emotionCheckIn = [
                         }),
                         tx.notification.create({
                             data: {
-                                avatar: emp?.avatar!,
+                                avatar: emp!.avatar! ?? "",
                                 type: 'CRITICAL',
                                 content: `${emp?.firstName} ${emp?.lastName}'s sentiments has dropped to critical. Please review.`,
                                 department: { connect: { id: emp?.departmentId } }
