@@ -16,7 +16,7 @@ model Employee {
   password        String
   email           String             @unique @db.VarChar(100)
   position        String?
-  points          BigInt?            @default(0)
+  points          BigInt?            @default(1000)
   streak          Int?
   accType         AccType            @default(ACTIVE)
   jobType         JobType            @default(FULLTIME)
@@ -29,9 +29,9 @@ model Employee {
   createdAt       DateTime           @default(now())
   updatedAt       DateTime           @updatedAt
   lastCritical    DateTime?
-  avgScore        Decimal            @default(0) @db.Decimal(3, 2)
-  emotionCount    Int                @default(0)
-  emotionSum      Decimal            @default(0) @db.Decimal(6, 2)
+  avgScore        Decimal            @default(1) @db.Decimal(3, 2)
+  emotionCount    Int                @default(1)
+  emotionSum      Decimal            @default(1) @db.Decimal(6, 2)
   criticalTimes   CriticalEmployee[]
   checkIns        EmotionCheckIn[]
   department      Department         @relation(fields: [departmentId], references: [id], onDelete: Restrict)
@@ -105,18 +105,19 @@ model EmotionCheckIn {
 }
 
 model CriticalEmployee {
-  id           Int          @id @default(autoincrement())
+  id           Int        @id @default(autoincrement())
   employeeId   Int
   departmentId Int
-  emotionScore Decimal      @db.Decimal(3, 2)
-  isResolved   Boolean      @default(false)
+  emotionScore Decimal    @db.Decimal(3, 2)
+  isResolved   Boolean    @default(false)
   resolvedAt   DateTime?
-  createdAt    DateTime     @default(now())
-  updatedAt    DateTime     @updatedAt
-  employee     Employee     @relation(fields: [employeeId], references: [id], onDelete: Cascade)
-  department   Department   @relation(fields: [departmentId], references: [id], onDelete: Restrict)
-  analysis     AIAnalysis[]
-  actionPlans  ActionPlan[]
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+  employee     Employee   @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+  department   Department @relation(fields: [departmentId], references: [id], onDelete: Restrict)
+
+  analysis   AIAnalysis?
+  actionPlan ActionPlan?
 
   //* Single column indexes
   @@index([employeeId])
@@ -136,20 +137,23 @@ model CriticalEmployee {
 }
 
 model AIAnalysis {
-  id         Int              @id @default(autoincrement())
-  criticalId Int
-  input      String           @db.Text
-  output     String           @db.Text
-  createdAt  DateTime         @default(now())
-  updatedAt  DateTime         @updatedAt
-  critical   CriticalEmployee @relation(fields: [criticalId], references: [id], onDelete: Cascade)
+  id              Int              @id @default(autoincrement())
+  criticalId      Int              @unique
+  weekRange       String
+  overallMood     String           @db.Text
+  moodTrend       String           @db.Text
+  keyInsights     String[]
+  recommendations String[]
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+  critical        CriticalEmployee @relation(fields: [criticalId], references: [id], onDelete: Cascade)
 }
 
 model Notification {
   id           Int        @id @default(autoincrement())
   departmentId Int
   content      String     @db.Text
-  avatar       String
+  avatar       String?
   status       NotiStatus @default(SENT)
   type         NotifType  @default(CRITICAL)
   toSAdmin     Boolean    @default(false)
@@ -173,7 +177,7 @@ model Department {
 
 model ActionPlan {
   id            String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  criticalId    Int
+  criticalId    Int       @unique
   departmentId  Int
   from          String    @db.VarChar(100)
   to            String    @db.VarChar(100)
