@@ -1,5 +1,5 @@
 import express from "express"
-import { getAdminUser, getAllDepartments, testAdmin, getAllNotifications } from "../../../controllers/admin/admin-controller"
+import { getAdminUser, getAllDepartments, testAdmin, getAllNotifications, generateAINotes } from "../../../controllers/admin/admin-controller"
 import { setMaintenance } from "../../../controllers/admin/system-contorller"
 import { getDailyAttendance, getCheckInHours, getAttendanceOverView } from "../../../controllers/admin/attendance-controller"
 import { getMoodOverview, getSenitmentsComparison, getLeaderboards, getAllCriticalEmps, getAllWatchlistEmps } from "../../../controllers/admin/sentiments-controller"
@@ -28,6 +28,8 @@ router.get("/attendance-overview", getAttendanceOverView)
 
 //* AI-Analysis
 router.post("/ai-analysis", generateAIAnalysis)
+
+router.post("/generate-notes", generateAINotes)
 
 
 export default router
