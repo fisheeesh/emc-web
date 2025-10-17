@@ -1,14 +1,23 @@
 import CommonFilter from "@/components/shared/common-filter";
+import CustomBadge from "@/components/shared/custom-badge";
 import LocalSearch from "@/components/shared/local-search";
 import TableSkeleton from "@/components/shared/table-skeleton";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Dialog, DialogTrigger } from "@/components/ui/dialog";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import Empty from "@/components/ui/empty";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { PRIORITY, RSTATUS, RType, TSFILTER } from "@/lib/constants";
-// import DetailsModal from "../../modals/details-modal";
 import { formatId } from "@/lib/utils";
+import { FaListCheck } from "react-icons/fa6";
+import { GrMoreVertical } from "react-icons/gr";
+import { RiDeleteBin5Line } from "react-icons/ri";
+import CustomActionBadge from "../custom-action-badge";
+import { ImFilePdf } from "react-icons/im";
+import { useState } from "react";
+import { Dialog } from "@/components/ui/dialog";
+import useDeleteActionPlan from "@/hooks/action-plans/use-delete-action-plan";
+import ConfirmModal from "@/components/modals/confirm-modal";
 
 interface Props {
     data: ActionPlan[]
@@ -21,6 +30,10 @@ interface Props {
 }
 
 export default function ActionsTable({ data, status, error, isFetchingNextPage, fetchNextPage, hasNextPage }: Props) {
+    const [editingPlan, setEditingPlan] = useState<ActionPlan | null>(null);
+    const [delPlan, setDelPlan] = useState<ActionPlan | null>(null);
+    const { deleteActionPlan, deletingActionPlan } = useDeleteActionPlan()
+
     return (
         <Card className="rounded-md flex flex-col gap-5">
             <CardHeader className="space-y-2">
@@ -68,6 +81,7 @@ export default function ActionsTable({ data, status, error, isFetchingNextPage, 
                             <TableHead className="whitespace-nowrap font-semibold">Type</TableHead>
                             <TableHead className="whitespace-nowrap font-semibold">Status</TableHead>
                             <TableHead className="whitespace-nowrap font-semibold">Due Date</TableHead>
+                            <TableHead className="whitespace-nowrap font-semibold">Resolved At</TableHead>
                             <TableHead className="whitespace-nowrap text-center font-semibold">Actions</TableHead>
                         </TableRow>
                     </TableHeader>
@@ -89,40 +103,95 @@ export default function ActionsTable({ data, status, error, isFetchingNextPage, 
                                         data.map((action) => (
                                             <TableRow key={action.id}>
                                                 <TableCell className="py-6">
-                                                    <span className="whitespace-nowrap">{formatId(action.id)}</span>
+                                                    <span className="whitespace-nowrap font-en">{formatId(action.id)}</span>
                                                 </TableCell>
                                                 <TableCell>
                                                     <span className="whitespace-nowrap">{action.department.name}</span>
                                                 </TableCell>
                                                 <TableCell>
-                                                    <span className="whitespace-nowrap">{"HI"}</span>
+                                                    <span className="whitespace-nowrap">{action.criticalEmployee.employee.fullName}</span>
                                                 </TableCell>
                                                 <TableCell>
-                                                    <span className="whitespace-nowrap">{action.priority}</span>
+                                                    <CustomBadge
+                                                        status={action.priority.toLowerCase() as "high" | "medium" | "low"}
+                                                    />
                                                 </TableCell>
                                                 <TableCell>
-                                                    <span className="whitespace-nowrap">{action.type}</span>
+                                                    <CustomActionBadge
+                                                        value={action.type.toLowerCase() as BadgeType}
+                                                    />
                                                 </TableCell>
                                                 <TableCell>
-                                                    <span className="whitespace-nowrap">{action.status}</span>
+                                                    <CustomActionBadge
+                                                        value={action.status.toLowerCase() as BadgeType}
+                                                    />
                                                 </TableCell>
                                                 <TableCell>
                                                     <span className="whitespace-nowrap font-en">{action.dueDate}</span>
                                                 </TableCell>
-                                                <TableCell className="space-x-2 text-center">
-                                                    {/* Details Dialog */}
-                                                    <Dialog>
-                                                        <DialogTrigger asChild>
-                                                            <Button variant='outline' className="cursor-pointer">
-                                                                Details
+                                                <TableCell>
+                                                    <span className="whitespace-nowrap font-en">{action.criticalEmployee.resovledAt ?? '—'}</span>
+                                                </TableCell>
+                                                <TableCell>
+                                                    <DropdownMenu>
+                                                        <DropdownMenuTrigger asChild>
+                                                            <Button size='icon' variant='ghost' className="cursor-pointer">
+                                                                <GrMoreVertical className="size-4" />
                                                             </Button>
-                                                        </DialogTrigger>
-                                                        {/* <DetailsModal employee={emp} /> */}
-                                                    </Dialog>
+                                                        </DropdownMenuTrigger>
+                                                        <DropdownMenuContent className="w-35" align="end" forceMount>
+                                                            <DropdownMenuGroup>
+                                                                <DropdownMenuItem asChild className="cursor-pointer">
+                                                                    <Button
+                                                                        size='icon'
+                                                                        variant='ghost'
+                                                                        className="w-full cursor-pointer flex justify-start gap-2 px-1.5"
+                                                                        onClick={() => setEditingPlan(action)}
+                                                                    >
+                                                                        <FaListCheck className="text-black dark:text-white" />
+                                                                        Check Details
+                                                                    </Button>
+                                                                </DropdownMenuItem>
+                                                                <DropdownMenuItem asChild className="cursor-pointer">
+                                                                    <Button
+                                                                        size='icon'
+                                                                        variant='ghost'
+                                                                        className="w-full cursor-pointer flex justify-start gap-2 px-1.5"
+                                                                    >
+                                                                        <ImFilePdf className="text-black dark:text-white" />
+                                                                        Export PDF
+                                                                    </Button>
+                                                                </DropdownMenuItem>
+                                                                <DropdownMenuItem asChild className="cursor-pointer">
+                                                                    <Button
+                                                                        size='icon'
+                                                                        variant='ghost'
+                                                                        className="w-full cursor-pointer flex text-red-600! justify-start gap-2 px-1.5"
+                                                                        onClick={() => setDelPlan(action)}
+                                                                    >
+                                                                        <RiDeleteBin5Line className="text-red-600" />
+                                                                        Delete
+                                                                    </Button>
+                                                                </DropdownMenuItem>
+                                                            </DropdownMenuGroup>
+                                                        </DropdownMenuContent>
+                                                    </DropdownMenu>
                                                 </TableCell>
                                             </TableRow>
                                         ))
                                     }
+                                    <Dialog open={!!editingPlan} onOpenChange={(o) => !o && setEditingPlan(null)}>
+
+                                    </Dialog>
+                                    <Dialog open={!!delPlan} onOpenChange={(o) => !o && setDelPlan(null)}>
+                                        {delPlan && <ConfirmModal
+                                            title="Delete Action Plan Confirmation."
+                                            description={`Are you sure you want to delete this action plan? This action cannot be undone.`}
+                                            isLoading={deletingActionPlan}
+                                            loadingLabel="Deleting..."
+                                            onConfirm={() => deleteActionPlan(delPlan.id)}
+                                        />}
+                                    </Dialog>
                                 </TableBody>
                     }
                 </Table>

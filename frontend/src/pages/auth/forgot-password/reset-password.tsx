@@ -1,5 +1,5 @@
 import { ResetPasswordForm } from "@/components/auth/reset-password-form"
-import useTitle from "@/hooks/use-title"
+import useTitle from "@/hooks/ui/use-title"
 
 export default function ResetPassword() {
     useTitle("Forget Password")

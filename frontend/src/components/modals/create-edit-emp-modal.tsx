@@ -11,8 +11,8 @@ import { useRef, useState } from "react";
 import { FaUserPen, FaUserPlus } from "react-icons/fa6"
 import Spinner from "../shared/spinner";
 import { Eye, EyeOff } from "lucide-react";
-import useEditEmp from "@/hooks/use-edit-emp";
-import useCreateEmp from "@/hooks/use-create-emp";
+import useEditEmp from "@/hooks/emps/use-edit-emp";
+import useCreateEmp from "@/hooks/emps/use-create-emp";
 
 interface CreateEditUserModalProps<T extends z.ZodType<any, any, any>> {
     formType: "CREATE" | "EDIT",

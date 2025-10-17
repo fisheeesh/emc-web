@@ -10,7 +10,7 @@ import { IoSparklesOutline } from "react-icons/io5";
 import { Button } from "../ui/button";
 import { Loader2 } from "lucide-react";
 import { DialogClose } from "@radix-ui/react-dialog";
-import useGenerateAIAnalysis from "@/hooks/use-generate-ai-analysis";
+import useGenerateAIAnalysis from "@/hooks/ai/use-generate-ai-analysis";
 import { toast } from "sonner";
 
 interface Props {

@@ -10,6 +10,7 @@ import { Dialog } from "@/components/ui/dialog";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import Empty from "@/components/ui/empty";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import useDeleteCriticalEmp from "@/hooks/emps/use-delete-critical-emp";
 import { IMG_URL } from "@/lib/constants";
 import { getInitialName } from "@/lib/utils";
 import { useState } from "react";
@@ -31,6 +32,8 @@ export default function CriticalTable({ data, status, error, isFetchingNextPage,
     const [viewAnalysis, setViewAnalysis] = useState<CriticalEmployee | null>(null);
     const [viewAction, setViewAction] = useState<CriticalEmployee | null>(null);
     const [deleteCEmp, setDeleteCEmp] = useState<CriticalEmployee | null>(null);
+
+    const { deleteCriticalEmp, deletingCriticalEmp } = useDeleteCriticalEmp()
 
     return (
         <Card className="rounded-md border-destructive border-2 flex flex-col gap-5">
@@ -134,7 +137,7 @@ export default function CriticalTable({ data, status, error, isFetchingNextPage,
                                                                         className="w-full cursor-pointer text-red-600! flex justify-start gap-2 px-1.5"
                                                                         onClick={() => setDeleteCEmp(emp)}
                                                                     >
-                                                                        <RiDeleteBin5Line className=" hover:text-red-600" />
+                                                                        <RiDeleteBin5Line className="hover:text-red-600" />
                                                                         Delete
                                                                     </Button>
                                                                 </DropdownMenuItem>
@@ -167,11 +170,11 @@ export default function CriticalTable({ data, status, error, isFetchingNextPage,
                                     </Dialog>
                                     <Dialog open={!!deleteCEmp} onOpenChange={(o) => !o && setDeleteCEmp(null)}>
                                         {deleteCEmp && <ConfirmModal
-                                            title="Delete Critical Employee Information Confirmation."
+                                            title="Delete Critical Employee Info Confirmation."
                                             description={`Are you sure you want to delete this critical employee information? This action cannot be undone.`}
-                                            isLoading={false}
+                                            isLoading={deletingCriticalEmp}
                                             loadingLabel="Deleting..."
-                                            onConfirm={() => console.log('hi')}
+                                            onConfirm={() => deleteCriticalEmp(deleteCEmp.id)}
                                         />}
                                     </Dialog>
                                 </TableBody>

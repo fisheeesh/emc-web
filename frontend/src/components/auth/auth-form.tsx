@@ -10,7 +10,7 @@ import Spinner from '../shared/spinner';
 import { Button } from "../ui/button";
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "../ui/form";
 import { Input } from "../ui/input";
-import useError from "@/hooks/use-error";
+import useError from "@/hooks/ui/use-error";
 
 interface AuthFormProps<T extends z.ZodType<any, any, any>> {
     formType: "LOGIN" | "REGISTER",

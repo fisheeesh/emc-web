@@ -1,5 +1,5 @@
 import { VerifyOTPForm } from "@/components/auth/verify-otp-form"
-import useTitle from "@/hooks/use-title"
+import useTitle from "@/hooks/ui/use-title"
 
 export default function VerifyOTP() {
     useTitle("Forget Password")

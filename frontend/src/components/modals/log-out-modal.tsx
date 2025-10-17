@@ -7,7 +7,7 @@ import {
     DialogHeader,
     DialogTitle
 } from "@/components/ui/dialog"
-import useLogout from "@/hooks/use-log-out"
+import useLogout from "@/hooks/ui/use-log-out"
 import Spinner from "../shared/spinner"
 export default function LogoutModal() {
     const { logoutUser, isLoading } = useLogout()

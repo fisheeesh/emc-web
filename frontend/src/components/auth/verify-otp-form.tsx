@@ -16,7 +16,7 @@ import {
     InputOTPSeparator,
     InputOTPSlot,
 } from "@/components/ui/input-otp"
-import useError from "@/hooks/use-error"
+import useError from "@/hooks/ui/use-error"
 import { cn } from "@/lib/utils"
 import { OTPSchema } from "@/lib/validators"
 import { REGEXP_ONLY_DIGITS } from "input-otp"

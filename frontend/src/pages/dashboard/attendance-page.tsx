@@ -3,7 +3,7 @@ import CheckInHourBarChart from "@/components/dashboard/charts/check-in-hour-bar
 import DailyAttendanceChart from "@/components/dashboard/charts/daily-attendance-chart";
 import DisplayCard from "@/components/dashboard/display-card";
 import AttendanceTable from "@/components/dashboard/tables/attendance-table";
-import useTitle from "@/hooks/use-title";
+import useTitle from "@/hooks/ui/use-title";
 import useUserStore from "@/store/user-store";
 import { useInfiniteQuery, useSuspenseQuery } from "@tanstack/react-query";
 import { BarElement, CategoryScale, Chart as ChartJS, Legend, LinearScale, Tooltip } from "chart.js";

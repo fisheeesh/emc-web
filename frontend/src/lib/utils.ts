@@ -29,5 +29,5 @@ export const YEARS = Array.from({ length: 6 }, (_, i) => {
 })
 
 export function formatId(id: string) {
-  return `..${id.substring(id.length - 6)}`;
+  return `..${id.substring(id.length - 8)}`;
 }

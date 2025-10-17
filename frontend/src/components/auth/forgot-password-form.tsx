@@ -1,4 +1,4 @@
-import useError from "@/hooks/use-error";
+import useError from "@/hooks/ui/use-error";
 import { cn } from "@/lib/utils";
 import { RegisterSchema } from "@/lib/validators";
 import { zodResolver } from "@hookform/resolvers/zod";

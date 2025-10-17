@@ -20,7 +20,7 @@ import {
     PopoverContent,
     PopoverTrigger,
 } from "@/components/ui/popover";
-import useGenerateAIRecommendation from "@/hooks/use-generate-ai-recommendation";
+import useGenerateAIRecommendation from "@/hooks/ai/use-generate-ai-recommendation";
 import { cn } from "@/lib/utils";
 import { actionFormSchema } from "@/lib/validators";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -37,7 +37,8 @@ import Spinner from "../shared/spinner";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
-import useCreateActionPlan from "@/hooks/use-create-action-plan";
+import useCreateActionPlan from "@/hooks/action-plans/use-create-action-plan";
+import useUserStore from "@/store/user-store";
 
 type QuickAction = {
     name: string;
@@ -68,6 +69,7 @@ export default function ActionModal({ employee, onClose }: Props) {
     const [open, setOpen] = React.useState(false)
     const { generateRecommendation, generating } = useGenerateAIRecommendation()
     const { createActionPlan, creatingActionPlan } = useCreateActionPlan()
+    const { user } = useUserStore()
 
     const actionNotesEditorRef = useRef<MDXEditorMethods>(null);
     const followUpNotesEditorRef = useRef<MDXEditorMethods>(null);
@@ -119,6 +121,7 @@ export default function ActionModal({ employee, onClose }: Props) {
         createActionPlan({
             criticalEmpId: employee.id,
             depId: employee.departmentId,
+            contact: user!.email,
             quickAction: values.quickAction,
             actionType: values.actionType,
             priority: values.priority,

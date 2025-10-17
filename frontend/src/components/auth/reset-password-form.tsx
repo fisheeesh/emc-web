@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import useError from "@/hooks/use-error"
+import useError from "@/hooks/ui/use-error"
 import { cn } from "@/lib/utils"
 import { ConfirmPasswordSchema } from "@/lib/validators"
 import { zodResolver } from "@hookform/resolvers/zod"

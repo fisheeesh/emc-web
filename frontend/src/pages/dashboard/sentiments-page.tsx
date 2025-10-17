@@ -4,7 +4,7 @@ import SentimentsComparisonChart from "@/components/dashboard/charts/sentiments-
 import CriticalTable from "@/components/dashboard/tables/critical-table";
 import LeaderBoardTable from "@/components/dashboard/tables/leaderboard-table";
 import WatchListTable from "@/components/dashboard/tables/watchlist-table";
-import useTitle from "@/hooks/use-title";
+import useTitle from "@/hooks/ui/use-title";
 import useFilterStore from "@/store/filter-store";
 import useNotiStore from "@/store/noti-store";
 import useUserStore from "@/store/user-store";

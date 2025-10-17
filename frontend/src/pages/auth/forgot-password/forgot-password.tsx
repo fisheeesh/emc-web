@@ -1,5 +1,5 @@
 import ForgetPasswordForm from "@/components/auth/forgot-password-form"
-import useTitle from "@/hooks/use-title"
+import useTitle from "@/hooks/ui/use-title"
 
 export default function ForgetPassword() {
     useTitle("Forget Password")

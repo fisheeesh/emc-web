@@ -3,7 +3,7 @@ import { ChartAreaInteractive } from "@/components/dashboard/charts/chart-intera
 import { SectionCards } from "@/components/dashboard/section-cards"
 import ActionsTable from "@/components/dashboard/tables/actions-table"
 import EmpTables from "@/components/dashboard/tables/emp-tables"
-import useTitle from "@/hooks/use-title"
+import useTitle from "@/hooks/ui/use-title"
 import { useInfiniteQuery } from "@tanstack/react-query"
 import { useSearchParams } from "react-router"
 

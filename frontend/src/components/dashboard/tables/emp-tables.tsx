@@ -18,10 +18,11 @@ import {
 } from "@/components/ui/dropdown-menu";
 import Empty from "@/components/ui/empty";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import useDeleteEmp from "@/hooks/use-delete-emp";
+import useDeleteEmp from "@/hooks/emps/use-delete-emp";
 import { ACC_FILTER, EMOTION_FILTER, IMG_URL, JOBS_FILTER, ROLES_FILTER, TSFILTER } from "@/lib/constants";
 import { getInitialName } from "@/lib/utils";
 import { createEmpSchema, updateEmpSchema } from "@/lib/validators";
+import moment from "moment";
 import { useState } from "react";
 import { BsEye } from "react-icons/bs";
 import { GrMoreVertical } from "react-icons/gr";
@@ -175,7 +176,7 @@ export default function EmpTables({ data, status, error, isFetchingNextPage, fet
                                                     <CustomBadge status={emp.status as "positive" | "neutral" | "negative" | "critical"} />
                                                 </TableCell>
                                                 <TableCell>
-                                                    <span className="whitespace-nowrap">{emp.lastCritical ?? "NULL"}</span>
+                                                    <span className="whitespace-nowrap font-en">{emp.lastCritical ? moment(emp.lastCritical).format('MMMM Do YYYY') : '—'}</span>
                                                 </TableCell>
                                                 <TableCell>
                                                     <span className="whitespace-nowrap font-en">{emp.createdAt}</span>
@@ -215,7 +216,7 @@ export default function EmpTables({ data, status, error, isFetchingNextPage, fet
                                                                     <Button
                                                                         size='icon'
                                                                         variant='ghost'
-                                                                        className="w-full cursor-pointer flex text-red-600 justify-start gap-2 px-1.5"
+                                                                        className="w-full cursor-pointer flex text-red-600! justify-start gap-2 px-1.5"
                                                                         onClick={() => setDelEmp(emp)}
                                                                     >
                                                                         <RiDeleteBin5Line className="text-red-600" />

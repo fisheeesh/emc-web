@@ -105,24 +105,24 @@ export const EMOTION_FILTER = [
 
 export const PRIORITY = [
     { name: "All Priority", value: "all" },
-    { name: "High", value: "high" },
-    { name: "Medium", value: "medium" },
-    { name: "Low", value: "low" }
+    { name: "High", value: "HIGH" },
+    { name: "Medium", value: "MEDIUM" },
+    { name: "Low", value: "LOW" }
 ]
 
 export const RSTATUS = [
     { name: "All Status", value: "all" },
-    { name: "Pending", value: "pending" },
-    { name: "Approved", value: "approved" },
-    { name: "Rejected", value: "rejected" }
+    { name: "Pending", value: "PENDING" },
+    { name: "Approved", value: "APPROVED" },
+    { name: "Rejected", value: "REJECTED" }
 ]
 
 export const RType = [
     { name: "All Type", value: "all" },
-    { name: "Pending", value: "pending" },
-    { name: "Processing", value: "processing" },
-    { name: "Completed", value: "completed" },
-    { name: "Failed", value: "failed" }
+    { name: "Pending", value: "PENDING" },
+    { name: "Processing", value: "PROCESSING" },
+    { name: "Completed", value: "COMPLETED" },
+    { name: "Failed", value: "FAILED" }
 ]
 
 export const LEADERBOARD = [
