@@ -2,7 +2,7 @@ import express from "express"
 import { createActionPlan, getAdminUser, getAllDepartments, getAllNotifications, testAdmin } from "../../../controllers/admin/admin-controller"
 import { generateAIAnalysis, generateAIRecommendation } from "../../../controllers/admin/ai-controller"
 import { getAttendanceOverView, getCheckInHours, getDailyAttendance } from "../../../controllers/admin/attendance-controller"
-import { getAllCriticalEmps, getAllWatchlistEmps, getLeaderboards, getMoodOverview, getSenitmentsComparison } from "../../../controllers/admin/sentiments-controller"
+import { deleteCriticalEmpById, getAllCriticalEmps, getAllWatchlistEmps, getLeaderboards, getMoodOverview, getSenitmentsComparison } from "../../../controllers/admin/sentiments-controller"
 import { setMaintenance } from "../../../controllers/admin/system-contorller"
 
 const router = express.Router()
@@ -19,6 +19,7 @@ router.get("/admin-user", getAdminUser)
 router.get("/leaderboards", getLeaderboards)
 router.get("/notifications", getAllNotifications)
 router.get("/critical-emps", getAllCriticalEmps)
+router.delete("/critical-emps", deleteCriticalEmpById)
 router.get("/watchlist-emps", getAllWatchlistEmps)
 
 //* Attendance routes
