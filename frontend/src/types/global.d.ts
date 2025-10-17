@@ -119,6 +119,12 @@ interface ActionPlan {
         id: number,
         name: string
     },
+    criticalEmployee: {
+        employee: {
+            fullName: string,
+        },
+        resovledAt: string
+    },
     priority: string,
     status: string,
     type: string,
@@ -131,3 +137,11 @@ interface ActionPlan {
     followUpNotes: string,
     suggestions: string,
 }
+
+type BadgeType =
+    | 'pending'
+    | 'processing'
+    | 'completed'
+    | 'failed'
+    | 'approved'
+    | 'rejected';
