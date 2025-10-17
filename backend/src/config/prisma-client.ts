@@ -69,6 +69,16 @@ export const prisma = new PrismaClient().$extends({
                 }
             }
         },
+        actionPlan: {
+            dueDate: {
+                needs: { dueDate: true },
+                compute(actionPlan) {
+                    return actionPlan.dueDate.toLocaleDateString("en-US", {
+                        year: "numeric", month: "long", day: "numeric"
+                    })
+                }
+            }
+        },
         criticalEmployee: {
             createdAt: {
                 needs: { createdAt: true },
