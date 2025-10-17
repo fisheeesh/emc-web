@@ -77,6 +77,7 @@ export const getAllNotifications = async (req: CustomRequest, res: Response, nex
 export const createActionPlan = [
     body("criticalEmpId", "Critical Employee Id is required").isInt({ gt: 0 }),
     body("depId", "Department Id is required").isInt({ gt: 0 }),
+    body("contact", "Contact is required").trim().notEmpty().escape(),
     body("quickAction", "Invalid Quick Action").trim().optional().escape(),
     body("actionType", "Action Type is requied").trim().notEmpty().escape(),
     body("priority", "Priority is required").trim().notEmpty().escape(),
@@ -96,7 +97,7 @@ export const createActionPlan = [
         const emp = await getEmployeeById(empId!)
         checkEmployeeIfNotExits(emp)
 
-        const { criticalEmpId, depId, quickAction, actionType, priority, assignTo, dueDate, actionNotes, followUpNotes } = req.body
+        const { criticalEmpId, depId, contact, quickAction, actionType, priority, assignTo, dueDate, actionNotes, followUpNotes } = req.body
 
         //* Get the critical employee record
         const criticalEmp = await prisma.criticalEmployee.findUnique({
@@ -139,6 +140,7 @@ export const createActionPlan = [
                 data: {
                     criticalId: criticalEmpId,
                     departmentId: depId,
+                    contact,
                     actionType,
                     priority,
                     assignTo,

@@ -1,12 +1,13 @@
+import { endOfDay, startOfDay, subDays } from "date-fns";
 import { NextFunction, Request, Response } from "express";
-import { query } from "express-validator";
-import { getEmployeeById } from "../../services/auth-services";
-import { checkEmployeeIfNotExits } from "../../utils/check";
-import { startOfDay, subDays, endOfDay } from "date-fns";
-import { getMoodPercentages, getSentimentsComparisonData } from "../../services/emotion-check-in-services";
+import { body, query, validationResult } from "express-validator";
 import { Prisma } from "../../../generated/prisma";
+import { errorCodes } from "../../config/error-codes";
 import { prisma } from "../../config/prisma-client";
+import { getEmployeeById } from "../../services/auth-services";
 import { getAllCriticalInfinite, getAllWatchlistInfinite } from "../../services/critical-services";
+import { getMoodPercentages, getSentimentsComparisonData } from "../../services/emotion-check-in-services";
+import { checkEmployeeIfNotExits, createHttpErrors } from "../../utils/check";
 
 interface CustomRequest extends Request {
     employeeId?: number
@@ -258,6 +259,57 @@ export const getAllCriticalEmps = [
             nextCursor,
             prevCursor: lastCursor || undefined,
             data: criticalEmps
+        })
+    }
+]
+
+export const deleteCriticalEmpById = [
+    body("id", "Critical Employee Id is required").isInt({ gt: 0 }),
+    async (req: CustomRequest, res: Response, next: NextFunction) => {
+        const errors = validationResult(req).array({ onlyFirstError: true })
+        if (errors.length > 0)
+            next(createHttpErrors({
+                message: errors[0].msg,
+                status: 400,
+                code: errorCodes.invalid
+            }))
+
+        const empId = req.employeeId
+        const emp = await getEmployeeById(empId!)
+        checkEmployeeIfNotExits(emp)
+
+        const { id } = req.body
+
+        const cEmp = await prisma.criticalEmployee.findUnique({
+            where: { id },
+            select: {
+                employee: {
+                    select: {
+                        departmentId: true
+                    }
+                }
+            }
+        })
+
+        if (!cEmp) return next(createHttpErrors({
+            message: "Critical employee record not found.",
+            status: 404,
+            code: errorCodes.notFound
+        }))
+
+        if (emp?.departmentId !== cEmp.employee.departmentId) return next(createHttpErrors({
+            message: "You are not allowed to delete critical employee's information from other department.",
+            status: 403,
+            code: errorCodes.forbidden
+        }))
+
+        // const deletedCEmp = await prisma.criticalEmployee.delete({
+        //     where: { id }
+        // })
+
+        res.status(200).json({
+            message: "Successfully deleted Critical Employee's Information",
+            // cEmpId: deletedCEmp.id
         })
     }
 ]
