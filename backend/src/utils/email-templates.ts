@@ -408,3 +408,35 @@ export const request_body = (cEmpName: string, adminName: string, depName: strin
                 <p style="color: #9ca3af; font-size: 12px;">This is an automated notification from the Employee Wellbeing Management System.</p>
             </div>
         `
+
+export const response_subject = (empName: string, status: string) => {
+    if (status === 'APPROVED') return `✅ Action Plan Approved - ${empName}`
+    if (status === 'REJECTED') return `❌ Action Plan Rejected - ${empName}`
+}
+
+export const response_body = (empName: string, status: string) => {
+    if (status === 'APPROVED') return `
+<h2>Action Plan Approved</h2>
+<p>Great news! Your action plan for critical employee <strong>${empName}</strong> has been approved by upper management.</p>
+<p>You can now proceed with implementing the action plan. If you have any questions or need support during the implementation, feel free to reach out to the HR department.</p>
+<p><strong>Next Steps:</strong></p>
+<ul>
+    <li>Review the approved action plan details</li>
+    <li>Begin implementation as per the timeline</li>
+    <li>Monitor progress regularly</li>
+</ul>
+<p>Best regards,<br/>HR Management Team</p>
+`
+    if (status === 'REJECTED') return `
+<h2>Action Plan Update Required</h2>
+<p>We regret to inform you that your action plan for critical employee <strong>${empName}</strong> has been rejected.</p>
+<p><strong>What to do next:</strong></p>
+<ul>
+    <li>Contact the HR department for detailed feedback</li>
+    <li>Review the concerns raised</li>
+    <li>Revise and resubmit your action plan</li>
+</ul>
+<p>Please don't hesitate to reach out to HR for guidance on improving your action plan.</p>
+<p>Best regards,<br/>HR Management Team</p>
+    `
+}

@@ -104,3 +104,14 @@ export function roundToHour(date: Date): string {
 
     return `${String(h).padStart(2, '0')}:00`;
 }
+
+export const getNotificationContent = (status: string, empName: string) => {
+    switch (status.toUpperCase()) {
+        case 'APPROVED':
+            return `Your action plan for critical employee - ${empName} has been approved by upper management. You can now proceed with the process! Keep up the great work! 💪`;
+        case 'REJECTED':
+            return `Sorry, your action plan for critical employee - ${empName} has been rejected. Please contact the HR department for more information and guidance.`;
+        default:
+            return `Your action plan for critical employee - ${empName} has been updated to ${status}.`;
+    }
+}
