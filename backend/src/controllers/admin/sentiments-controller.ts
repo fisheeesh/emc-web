@@ -87,11 +87,9 @@ export const getLeaderboards = [
             ] as Prisma.EmployeeWhereInput[]
         } : {}
 
-        const now = new Date()
-        const start = startOfDay(subDays(now, +duration - 1))
-        const end = endOfDay(now)
+        const isAllTime = duration === 'all'
 
-        //* Fetch employees with their check-ins within the duration
+        //* Fetch employees with conditional check-ins query
         const employees = await prisma.employee.findMany({
             where: {
                 departmentId:
@@ -108,12 +106,13 @@ export const getLeaderboards = [
                 avatar: true,
                 firstName: true,
                 streak: true,
+                points: true,
                 department: true,
-                checkIns: {
+                checkIns: isAllTime ? false : {
                     where: {
                         createdAt: {
-                            gte: start,
-                            lte: end
+                            gte: startOfDay(subDays(new Date(), +duration - 1)),
+                            lte: endOfDay(new Date())
                         }
                     },
                     select: {
@@ -123,11 +122,13 @@ export const getLeaderboards = [
             }
         })
 
-        //* Calculate points from check-ins for the duration
+        //* Calculate points based on filter type
         const results = employees.map(employee => {
-            const periodPoints = employee.checkIns.reduce((sum, checkIn) => {
-                return sum + (checkIn.points ? Number(checkIn.points) : 0)
-            }, 0)
+            const periodPoints = isAllTime
+                ? employee.points
+                : employee.checkIns.reduce((sum, checkIn) => {
+                    return sum + (checkIn.points ? Number(checkIn.points) : 0)
+                }, 0)
 
             return {
                 fullName: employee.fullName,
