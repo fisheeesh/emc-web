@@ -9,6 +9,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { IMG_URL } from "@/lib/constants";
 import { getInitialName } from "@/lib/utils";
 // import DetailsModal from "../../modals/details-modal";
+import { GiBinoculars } from "react-icons/gi";
 
 interface Props {
     data: WatchlistEmployee[]
@@ -25,7 +26,10 @@ export default function WatchListTable({ data, status, error, isFetchingNextPage
         <Card className="rounded-md border-yellow-500 border-2 flex flex-col gap-5">
             <CardHeader className="flex flex-col md:flex-row gap-3 md:gap-0 justify-between">
                 <div className="flex flex-col items-start gap-2 tracking-wide">
-                    <CardTitle className="text-xl md:text-2xl text-yellow-600">WatchList Employees</CardTitle>
+                    <CardTitle className="text-xl md:text-2xl text-yellow-600 flex items-center gap-2">
+                        <GiBinoculars />
+                        WatchList Employees
+                    </CardTitle>
                     <CardDescription>Employees moved from critical status after intervention, now under ongoing observation for stability</CardDescription>
                 </div>
                 <LocalSearch filterValue="wKw" />

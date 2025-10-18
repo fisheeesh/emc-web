@@ -3,6 +3,7 @@ import gold from "@/assets/gold-medal.svg";
 import silver from "@/assets/silver-medal.svg";
 import CommonFilter from "@/components/shared/common-filter";
 import LocalSearch from "@/components/shared/local-search";
+import StreakFireIcon from "@/components/shared/streak-fire-icon";
 import TableSkeleton from "@/components/shared/table-skeleton";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -11,6 +12,7 @@ import Empty from "@/components/ui/empty";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { IMG_URL, LEADERBOARD_FILTER } from "@/lib/constants";
 import { getInitialName } from "@/lib/utils";
+import { GiChampions } from "react-icons/gi";
 import { MdOutlineEmail } from "react-icons/md";
 
 interface Props {
@@ -58,7 +60,10 @@ export default function LeaderBoardTable({ data, isLoading }: Props) {
             <CardHeader className="space-y-2">
                 <div className="flex flex-col xl:flex-row gap-3 xl:gap-0 justify-between">
                     <div className="flex flex-col items-start gap-2 tracking-wide">
-                        <CardTitle className="text-xl md:text-2xl">Wellbeing Champions Leaderboard</CardTitle>
+                        <CardTitle className="text-xl md:text-2xl flex items-center gap-2">
+                            <GiChampions />
+                            Wellbeing Champions Leaderboard
+                        </CardTitle>
                         <CardDescription>
                             Top <span className="font-en">7</span> employees excelling in mental health and wellbeing initiatives - celebrating those who prioritize their wellness journey
                         </CardDescription>
@@ -113,7 +118,10 @@ export default function LeaderBoardTable({ data, isLoading }: Props) {
                                                 <span className="whitespace-nowrap font-en">{emp.points}</span>
                                             </TableCell>
                                             <TableCell className="text-center">
-                                                <span className="whitespace-nowrap font-en">{!emp.streak ? '—' : emp.streak}</span>
+                                                {!emp.streak ?
+                                                    <span className="whitespace-nowrap font-en text-gray-400">—</span>
+                                                    : <StreakFireIcon value={emp.streak} />
+                                                }
                                             </TableCell>
                                             <TableCell className="text-center">
                                                 <Button size='icon' className="p-2 rounded-full bg-muted dark:text-white text-black cursor-pointer hover:bg-gray-200 dark:hover:bg-slate-700">

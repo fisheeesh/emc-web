@@ -13,6 +13,7 @@ import Empty from "@/components/ui/empty";
 import TableSkeleton from "@/components/shared/table-skeleton";
 import { getInitialName } from "@/lib/utils";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import { BsCalendar2Check } from "react-icons/bs";
 
 interface Props {
     data: AttendanceOverviewData[]
@@ -30,7 +31,10 @@ export default function AttendanceTable({ data, status, error, isFetchingNextPag
         <Card className="rounded-md flex flex-col gap-5">
             <CardHeader className="flex flex-col gap-3 ">
                 <div className="flex flex-col items-start gap-2 tracking-wide">
-                    <CardTitle className="text-xl md:text-2xl">Attendance Overview</CardTitle>
+                    <CardTitle className="text-xl md:text-2xl flex items-center gap-2">
+                        <BsCalendar2Check />
+                        Attendance Overview
+                    </CardTitle>
                     <CardDescription className="line-clamp-1">Select a date to view employee attendance records</CardDescription>
                 </div>
                 <div className="flex flex-col md:flex-row w-full md:items-center gap-2">

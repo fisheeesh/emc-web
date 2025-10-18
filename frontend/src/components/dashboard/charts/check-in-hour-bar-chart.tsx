@@ -1,13 +1,14 @@
 import CustomCalendar from "@/components/shared/custom-calendar";
+import { useTheme } from "@/components/shared/theme-provider";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { MONTHS, YEARS } from "@/lib/utils";
 import type { ChartOptions } from "chart.js";
 import { useState } from "react";
 import { Bar } from "react-chartjs-2";
+import { MdAccessTime } from "react-icons/md";
 import MonthYearSelector from "../month-year-selector";
-import { MONTHS, YEARS } from "@/lib/utils";
-import { useTheme } from "@/components/shared/theme-provider";
 
 export default function CheckInHourBarChart({ data }: { data: CheckInHoursData[] }) {
     const { theme } = useTheme()
@@ -71,7 +72,10 @@ export default function CheckInHourBarChart({ data }: { data: CheckInHoursData[]
         <Card className="rounded-md flex flex-col gap-5">
             <CardHeader className="flex items-center justify-between flex-col md:flex-row gap-2">
                 <div className="w-full lg:w-2/4">
-                    <CardTitle className="text-xl md:text-2xl">Check-in Hours</CardTitle>
+                    <CardTitle className="text-xl md:text-2xl flex items-center gap-2">
+                        <MdAccessTime />
+                        Check-in Hours
+                    </CardTitle>
                     <CardDescription>Track the busiest check-in times across different periods</CardDescription>
                 </div>
                 <div className="flex items-center gap-3 w-full lg:w-1/4 md:px-5">

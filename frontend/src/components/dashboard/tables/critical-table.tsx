@@ -1,6 +1,6 @@
 import ActionModal from "@/components/modals/action-modal";
+import AIAnalysisModal from "@/components/modals/analysis-modal";
 import ConfirmModal from "@/components/modals/confirm-modal";
-import DetailsModal from "@/components/modals/details-modal";
 import LocalSearch from "@/components/shared/local-search";
 import TableSkeleton from "@/components/shared/table-skeleton";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -17,6 +17,7 @@ import { useState } from "react";
 import { GrMoreVertical, GrNotes } from "react-icons/gr";
 import { IoSparklesOutline } from "react-icons/io5";
 import { RiDeleteBin5Line } from "react-icons/ri";
+import { MdOutlineSick } from "react-icons/md";
 
 interface Props {
     data: CriticalEmployee[]
@@ -39,7 +40,10 @@ export default function CriticalTable({ data, status, error, isFetchingNextPage,
         <Card className="rounded-md border-destructive border-2 flex flex-col gap-5">
             <CardHeader className="flex flex-col md:flex-row gap-3 md:gap-0 justify-between">
                 <div className="flex flex-col items-start gap-2 tracking-wide">
-                    <CardTitle className="text-xl md:text-2xl text-destructive">Critical Mood Table</CardTitle>
+                    <CardTitle className="text-xl md:text-2xl text-destructive flex items-center gap-2">
+                        <MdOutlineSick />
+                        Critical Mood Table
+                    </CardTitle>
                     <CardDescription>Employees whose average sentiment score lower than particular points will be shown here</CardDescription>
                 </div>
                 <LocalSearch filterValue="cKw" />
@@ -149,10 +153,11 @@ export default function CriticalTable({ data, status, error, isFetchingNextPage,
                                         ))
                                     }
                                     <Dialog open={!!viewAnalysis} onOpenChange={(o) => !o && setViewAnalysis(null)}>
-                                        {viewAnalysis && <DetailsModal
+                                        {viewAnalysis && <AIAnalysisModal
                                             empName={viewAnalysis.employee.fullName}
                                             analysis={viewAnalysis.analysis}
                                             criticalEmpId={viewAnalysis.id}
+                                            canRegenerate={viewAnalysis.actionPlan ? false : true}
                                         />}
                                     </Dialog>
                                     <Dialog open={!!viewAction} onOpenChange={(o) => !o && setViewAction(null)}>
@@ -165,6 +170,7 @@ export default function CriticalTable({ data, status, error, isFetchingNextPage,
                                                 score: viewAction.emotionScore,
                                                 contact: viewAction.employee.email
                                             }}
+                                            action={viewAction.actionPlan}
                                             onClose={() => setViewAction(null)}
                                         />}
                                     </Dialog>

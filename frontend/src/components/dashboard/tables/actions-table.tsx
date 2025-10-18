@@ -1,24 +1,25 @@
+import ActionDetailsModal from "@/components/modals/action-details-modal";
+import ConfirmModal from "@/components/modals/confirm-modal";
 import CommonFilter from "@/components/shared/common-filter";
 import CustomBadge from "@/components/shared/custom-badge";
 import LocalSearch from "@/components/shared/local-search";
 import TableSkeleton from "@/components/shared/table-skeleton";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Dialog } from "@/components/ui/dialog";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import Empty from "@/components/ui/empty";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import useDeleteActionPlan from "@/hooks/action-plans/use-delete-action-plan";
 import { PRIORITY, RSTATUS, RType, TSFILTER } from "@/lib/constants";
 import { formatId } from "@/lib/utils";
+import { useState } from "react";
 import { FaListCheck } from "react-icons/fa6";
+import { GoFileSymlinkFile } from "react-icons/go";
 import { GrMoreVertical } from "react-icons/gr";
+import { ImFilePdf } from "react-icons/im";
 import { RiDeleteBin5Line } from "react-icons/ri";
 import CustomActionBadge from "../custom-action-badge";
-import { ImFilePdf } from "react-icons/im";
-import { useState } from "react";
-import { Dialog } from "@/components/ui/dialog";
-import useDeleteActionPlan from "@/hooks/action-plans/use-delete-action-plan";
-import ConfirmModal from "@/components/modals/confirm-modal";
-import ActionDetailsModal from "@/components/modals/action-details-modal";
 
 interface Props {
     data: ActionPlan[]
@@ -40,7 +41,10 @@ export default function ActionsTable({ data, status, error, isFetchingNextPage, 
             <CardHeader className="space-y-2">
                 <div className="flex flex-col xl:flex-row gap-3 xl:gap-0 justify-between">
                     <div className="flex flex-col items-start gap-2 tracking-wide">
-                        <CardTitle className="text-xl md:text-2xl">Requested Actions</CardTitle>
+                        <CardTitle className="text-xl md:text-2xl flex items-center gap-2">
+                            <GoFileSymlinkFile />
+                            Requested Actions
+                        </CardTitle>
                         <CardDescription>
                             Review and monitor action plans submitted by department managers and HR to support employee wellbeing
                         </CardDescription>
