@@ -87,7 +87,8 @@ interface CriticalEmployee {
         email: string,
         lastCritical: string
     },
-    analysis: Analysis
+    analysis: Analysis,
+    actionPlan: ActionPlan
     createdAt: string,
 }
 

@@ -60,6 +60,7 @@ export const OVERVIEW_FILTER = [
 ]
 
 export const LEADERBOARD_FILTER = [
+    { name: "All Time", value: "all" },
     { name: 'For This Month', value: '30' },
     { name: 'For This Week', value: '7' },
 ]
