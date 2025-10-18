@@ -20,25 +20,29 @@ import {
     PopoverContent,
     PopoverTrigger,
 } from "@/components/ui/popover";
+import useCreateActionPlan from "@/hooks/action-plans/use-create-action-plan";
 import useGenerateAIRecommendation from "@/hooks/ai/use-generate-ai-recommendation";
 import { cn } from "@/lib/utils";
 import { actionFormSchema } from "@/lib/validators";
+import useUserStore from "@/store/user-store";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { type MDXEditorMethods } from "@mdxeditor/editor";
-import { AlertTriangle, ChevronDownIcon, Calendar as ICalendar, Mail, MessageSquare, Phone } from "lucide-react";
+import { AlertTriangle, Calendar as CalendarIcon, CheckCircle2, ChevronDownIcon, Clock, Download, Mail, MessageSquare, Phone, User } from "lucide-react";
 import React, { useRef } from "react";
 import { useForm, type SubmitHandler } from "react-hook-form";
+import { FaRegThumbsUp } from "react-icons/fa";
 import { LiaBrainSolid } from "react-icons/lia";
-import { MdAdminPanelSettings } from "react-icons/md";
+import { MdAdminPanelSettings, MdEventNote, MdFlag } from "react-icons/md";
 import { toast } from "sonner";
 import type z from "zod";
+import CustomActionBadge from "../dashboard/custom-action-badge";
 import Editor from "../editor";
+import Preview from "../editor/preview";
+import CustomBadge from "../shared/custom-badge";
 import Spinner from "../shared/spinner";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
-import useCreateActionPlan from "@/hooks/action-plans/use-create-action-plan";
-import useUserStore from "@/store/user-store";
 
 type QuickAction = {
     name: string;
@@ -47,9 +51,9 @@ type QuickAction = {
 }
 
 const QUICK_ACTIONS: QuickAction[] = [
-    { name: "Schedule one-on-one Call", value: " Schedule 1-on-1 Call", icon: <Phone size={18} /> },
-    { name: "Send Check-in Email", value: " Send Check-in Email", icon: <Mail size={18} /> },
-    { name: "Book HR Meeting", value: " Book HR Meeting", icon: <ICalendar size={18} /> },
+    { name: "Schedule one-on-one Call", value: "Schedule 1-on-1 Call", icon: <Phone size={18} /> },
+    { name: "Send Check-in Email", value: "Send Check-in Email", icon: <Mail size={18} /> },
+    { name: "Book HR Meeting", value: "Book HR Meeting", icon: <CalendarIcon size={18} /> },
     { name: "Send Supportive Message", value: "Send Supportive Message", icon: <MessageSquare size={18} /> },
 ]
 
@@ -62,10 +66,11 @@ interface Props {
         contact: string,
         score: number
     },
+    action?: ActionPlan
     onClose?: () => void;
 }
 
-export default function ActionModal({ employee, onClose }: Props) {
+export default function ActionModal({ employee, action, onClose }: Props) {
     const [open, setOpen] = React.useState(false)
     const { generateRecommendation, generating } = useGenerateAIRecommendation()
     const { createActionPlan, creatingActionPlan } = useCreateActionPlan()
@@ -92,12 +97,10 @@ export default function ActionModal({ employee, onClose }: Props) {
             const res = await generateRecommendation({ criticalEmpId: employee.id })
 
             if (res?.success && res?.data) {
-                //* Use the editor ref to set markdown directly
                 if (actionNotesEditorRef.current) {
                     actionNotesEditorRef.current.setMarkdown(res.data)
                 }
 
-                //* Also update the form value
                 form.setValue('actionNotes', res.data)
                 form.trigger('actionNotes')
 
@@ -139,6 +142,183 @@ export default function ActionModal({ employee, onClose }: Props) {
 
     const isWorking = form.formState.isSubmitting || creatingActionPlan
 
+    if (action) {
+        return (
+            <DialogContent className="w-full mx-auto max-h-[95vh] overflow-visible sm:max-w-[1200px] lg:px-8">
+                <div className="max-h-[calc(90vh-2rem)] overflow-y-auto no-scrollbar">
+                    <DialogHeader className="flex flex-col md:flex-row items-start justify-between space-y-0 pb-5 border-b">
+                        <div className="space-y-1.5">
+                            <DialogTitle className="text-lg md:text-xl font-bold flex items-center gap-2">
+                                <CheckCircle2 className="text-green-600 size-5 md:size-7" />
+                                Action Plan Details - {employee?.name || 'Employee'}
+                            </DialogTitle>
+                            <DialogDescription className="text-xs md:text-sm">
+                                View the action plan created for this employee's wellbeing support.
+                            </DialogDescription>
+                        </div>
+                        <Button
+                            variant="outline"
+                            size="icon"
+                            className="cursor-pointer shrink-0 mr-5"
+                            onClick={() => console.log('Download PDF clicked')}
+                        >
+                            <Download className="h-4 w-4" />
+                        </Button>
+                    </DialogHeader>
+
+                    {/* Employee Info Card */}
+                    <div className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-950/30 dark:to-indigo-950/30 border border-blue-200 dark:border-blue-800 rounded-lg p-4 mt-4">
+                        <div className="flex items-center gap-2 mb-3">
+                            <User className="text-blue-600" size={20} />
+                            <h3 className="font-semibold text-blue-900 dark:text-blue-100">Employee Information</h3>
+                        </div>
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+                            <div>
+                                <span className="font-medium text-gray-700 dark:text-gray-300">Name:</span>
+                                <span className="ml-2">{employee?.name}</span>
+                            </div>
+                            <div>
+                                <span className="font-medium text-gray-700 dark:text-gray-300">Department:</span>
+                                <span className="ml-2">{employee?.department}</span>
+                            </div>
+                            <div>
+                                <span className="font-medium text-gray-700 dark:text-gray-300">Emotion Score:</span>
+                                <span className="text-red-600 font-bold ml-2 font-en">{employee?.score}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Action Plan Details */}
+                    <div className="mt-6 space-y-6">
+                        {/* Quick Action & Status Row */}
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            {/* Quick Action */}
+                            <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4 shadow-sm">
+                                <div className="flex items-center gap-2 mb-2">
+                                    <MessageSquare className="text-purple-600" size={18} />
+                                    <h4 className="font-semibold text-sm text-gray-700 dark:text-gray-300">Quick Action</h4>
+                                </div>
+                                <span className="font-medium">{action.quickAction ?? "Not Specified"}</span>
+                            </div>
+
+                            {/* Status */}
+                            <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4 shadow-sm">
+                                <div className="flex items-center gap-2 mb-2">
+                                    <CheckCircle2 className="text-green-600" size={18} />
+                                    <h4 className="font-semibold text-sm text-gray-700 dark:text-gray-300">Status</h4>
+                                </div>
+                                <div className="text-base font-medium">
+                                    <CustomActionBadge value={action.status.toLowerCase() as "approved" | "pending" | "rejected"} />
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Action Type & Priority Row */}
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            {/* Action Type */}
+                            <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4 shadow-sm">
+                                <div className="flex items-center gap-2 mb-2">
+                                    <MdEventNote className="text-blue-600" size={18} />
+                                    <h4 className="font-semibold text-sm text-gray-700 dark:text-gray-300">Action Type</h4>
+                                </div>
+                                <p className="text-base">{action.actionType}</p>
+                            </div>
+
+                            {/* Priority */}
+                            <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4 shadow-sm">
+                                <div className="flex items-center gap-2 mb-2">
+                                    <MdFlag className="text-orange-600" size={18} />
+                                    <h4 className="font-semibold text-sm text-gray-700 dark:text-gray-300">Priority</h4>
+                                </div>
+                                <div>
+                                    <CustomBadge status={action.priority.toLowerCase() as "high" | "medium" | "low"} />
+                                </div>
+                            </div>
+
+                            {/* Type Badge */}
+                            <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4 shadow-sm">
+                                <div className="flex items-center gap-2 mb-2">
+                                    <Clock className="text-indigo-600" size={18} />
+                                    <h4 className="font-semibold text-sm text-gray-700 dark:text-gray-300">Type</h4>
+                                </div>
+                                <div>
+                                    <CustomActionBadge value={action.type.toLowerCase() as "pending" | "processing" | "completed"} />
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Assign To & Due Date Row */}
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4 shadow-sm">
+                                <div className="flex items-center gap-2 mb-2">
+                                    <User className="text-teal-600" size={18} />
+                                    <h4 className="font-semibold text-sm text-gray-700 dark:text-gray-300">Assigned To</h4>
+                                </div>
+                                <p className="text-base">{action.assignTo}</p>
+                            </div>
+
+                            <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4 shadow-sm">
+                                <div className="flex items-center gap-2 mb-2">
+                                    <CalendarIcon className="text-red-600" size={18} />
+                                    <h4 className="font-semibold text-sm text-gray-700 dark:text-gray-300">Due Date</h4>
+                                </div>
+                                <p className="text-base font-en">{action.dueDate}</p>
+                            </div>
+                        </div>
+
+                        {/* Action Notes */}
+                        <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-5 shadow-sm">
+                            <h4 className="font-semibold text-base mb-3 flex items-center gap-2">
+                                <MdEventNote className="text-blue-600" size={20} />
+                                Action Notes
+                            </h4>
+                            <div className="prose dark:prose-invert max-w-none">
+                                <Preview content={action.actionNotes} />
+                            </div>
+                        </div>
+
+                        {/* Follow-up Notes */}
+                        <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-5 shadow-sm">
+                            <h4 className="font-semibold text-base mb-3 flex items-center gap-2">
+                                <Clock className="text-indigo-600" size={20} />
+                                Follow-up Instructions
+                            </h4>
+                            <div className="prose dark:prose-invert max-w-none">
+                                <Preview content={action.followUpNotes} />
+                            </div>
+                        </div>
+
+                        {/* Suggestions */}
+                        {action.suggestions && (
+                            <div className="bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 rounded-lg p-5 shadow-sm">
+                                <h4 className="font-semibold text-base mb-3 flex items-center gap-2">
+                                    <FaRegThumbsUp className="text-amber-600" size={20} />
+                                    Additional Suggestions from Upper Mangement
+                                </h4>
+                                {action.suggestions ? <div className="prose dark:prose-invert max-w-none">
+                                    <Preview content={action.suggestions} />
+                                </div> : <span className="italic text-muted-foreground">Not Yet</span>}
+                            </div>
+                        )}
+                    </div>
+
+                    <div className="flex justify-end items-center gap-3 border-t pt-6 pb-2 mt-6">
+                        <DialogClose asChild>
+                            <Button type="button" variant="outline" className="min-h-[44px] cursor-pointer">
+                                Close
+                            </Button>
+                        </DialogClose>
+                        {action.type !== 'COMPLETED' && <Button disabled={false} type="submit" className="bg-green-600 hover:bg-green-500 text-white min-h-[44px] cursor-pointer">
+                            <Spinner isLoading={false} label="Saving...">
+                                Mark as Completed
+                            </Spinner>
+                        </Button>}
+                    </div>
+                </div>
+            </DialogContent>
+        );
+    }
+
     return (
         <DialogContent className="w-full mx-auto max-h-[95vh] overflow-visible sm:max-w-[1200px] lg:px-8">
             <div className="max-h-[calc(90vh-2rem)] overflow-y-auto no-scrollbar">
@@ -152,28 +332,27 @@ export default function ActionModal({ employee, onClose }: Props) {
                     </DialogDescription>
                 </DialogHeader>
 
+                <div className="bg-red-50 border border-red-200 rounded-lg p-4 mt-4">
+                    <div className="flex items-center gap-2 mb-3">
+                        <AlertTriangle className="text-red-600" size={20} />
+                        <h3 className="font-semibold text-red-800">Employee Status</h3>
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm text-black">
+                        <div>
+                            <span className="font-medium">Name:</span> {employee?.name}
+                        </div>
+                        <div>
+                            <span className="font-medium">Department:</span> {employee?.department}
+                        </div>
+                        <div>
+                            <span className="font-medium">Emotion Score:</span>
+                            <span className="text-red-600 font-bold ml-1 font-en">{employee?.score}</span>
+                        </div>
+                    </div>
+                </div>
+
                 <Form {...form}>
                     <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 mt-4">
-                        {/* Employee Info Summary */}
-                        <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-                            <div className="flex items-center gap-2 mb-3">
-                                <AlertTriangle className="text-red-600" size={20} />
-                                <h3 className="font-semibold text-red-800">Employee Status</h3>
-                            </div>
-                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm text-black">
-                                <div>
-                                    <span className="font-medium">Name:</span> {employee?.name}
-                                </div>
-                                <div>
-                                    <span className="font-medium">Department:</span> {employee?.department}
-                                </div>
-                                <div>
-                                    <span className="font-medium">Emotion Score:</span>
-                                    <span className="text-red-600 font-bold ml-1 font-en">{employee?.score}</span>
-                                </div>
-                            </div>
-                        </div>
-
                         {/* Quick Actions */}
                         <FormField
                             control={form.control}
