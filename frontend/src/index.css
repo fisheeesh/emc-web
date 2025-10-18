@@ -457,9 +457,45 @@ code {
 }
 
 .prose th {
-  @apply border px-3 py-2 bg-gray-100 dark:bg-gray-800
+  @apply border px-3 py-2 bg-gray-100 dark:bg-gray-800;
+  vertical-align: top;
 }
 
 .prose td {
   @apply border px-3 py-2;
+  vertical-align: top;
+}
+
+/* Fix table column widths - prevent wrapping in first two columns */
+.markdown table {
+  @apply w-full border-collapse border border-gray-300 dark:border-gray-700 text-gray-900 dark:text-gray-100;
+  table-layout: fixed;
+}
+
+.markdown th:nth-child(1),
+.markdown td:nth-child(1) {
+  width: 12%;
+  font-family: 'Lato', sans-serif;
+}
+
+.markdown th:nth-child(2),
+.markdown td:nth-child(2) {
+  width: 35%;
+  min-width: 200px;
+}
+
+.markdown th:nth-child(3),
+.markdown td:nth-child(3) {
+  width: 53%;
+}
+
+.markdown mark {
+  background-color: #fff176;
+  color: inherit;
+  padding: 0.1em 0.25em;
+  border-radius: 3px;
+}
+
+.dark .markdown mark {
+  background-color: #f7d94c;
 }
