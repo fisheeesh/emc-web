@@ -18,6 +18,7 @@ import { useState } from "react";
 import { Dialog } from "@/components/ui/dialog";
 import useDeleteActionPlan from "@/hooks/action-plans/use-delete-action-plan";
 import ConfirmModal from "@/components/modals/confirm-modal";
+import ActionDetailsModal from "@/components/modals/action-details-modal";
 
 interface Props {
     data: ActionPlan[]
@@ -181,7 +182,10 @@ export default function ActionsTable({ data, status, error, isFetchingNextPage, 
                                         ))
                                     }
                                     <Dialog open={!!editingPlan} onOpenChange={(o) => !o && setEditingPlan(null)}>
-
+                                        {editingPlan && <ActionDetailsModal
+                                            action={editingPlan}
+                                            onClose={() => setEditingPlan(null)}
+                                        />}
                                     </Dialog>
                                     <Dialog open={!!delPlan} onOpenChange={(o) => !o && setDelPlan(null)}>
                                         {delPlan && <ConfirmModal

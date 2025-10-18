@@ -160,6 +160,7 @@ export const updateActionPlan = [
     body("id", "Action Plan Id is required").isString().trim().notEmpty().escape(),
     body("suggestions", "Suggestions is required.").trim().notEmpty(),
     body("status", "Status is required").trim().notEmpty().escape(),
+    body("emailType", "Email Type is required").trim().notEmpty().escape(),
     async (req: CustomRequest, res: Response, next: NextFunction) => {
         const errors = validationResult(req).array({ onlyFirstError: true })
         if (errors.length > 0) return next(createHttpErrors({
@@ -171,7 +172,7 @@ export const updateActionPlan = [
         const emp = req.employee
         checkEmployeeIfNotExits(emp)
 
-        const { id, suggestions, status } = req.body
+        const { id, suggestions, status, emailType } = req.body
 
         const actionPlan = await prisma.actionPlan.findUnique({
             where: { id },
@@ -201,7 +202,8 @@ export const updateActionPlan = [
                 where: { id },
                 data: {
                     suggestions,
-                    status: status as RStatus
+                    status: status as RStatus,
+                    type: "PROCESSING"
                 }
             })
 

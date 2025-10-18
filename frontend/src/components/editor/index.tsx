@@ -1,8 +1,10 @@
 import {
+    AdmonitionDirectiveDescriptor,
     BlockTypeSelect,
     BoldItalicUnderlineToggles,
     ConditionalContents,
     diffSourcePlugin,
+    directivesPlugin,
     headingsPlugin,
     HighlightToggle,
     imagePlugin,
@@ -21,13 +23,11 @@ import {
     thematicBreakPlugin,
     toolbarPlugin,
     UndoRedo,
-    directivesPlugin,
-    AdmonitionDirectiveDescriptor,
     type MDXEditorMethods
 } from "@mdxeditor/editor";
 import '@mdxeditor/editor/style.css';
-import "./dark-editor.css";
 import { forwardRef } from "react";
+import "./dark-editor.css";
 
 interface EditorProps {
     value?: string;

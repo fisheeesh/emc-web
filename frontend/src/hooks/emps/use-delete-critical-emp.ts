@@ -1,4 +1,5 @@
 import api from "@/api"
+import queryClient from "@/api/query"
 import { useMutation } from "@tanstack/react-query"
 import { toast } from "sonner"
 
@@ -10,6 +11,7 @@ const useDeleteCriticalEmp = () => {
             return res.data
         },
         onSuccess: async () => {
+            queryClient.invalidateQueries({ queryKey: ["critical", "infinite"], exact: false })
             toast.success("Success", {
                 description: `Critical Employee has been deleted successfully.`
             })

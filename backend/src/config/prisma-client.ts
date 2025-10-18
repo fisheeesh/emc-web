@@ -40,12 +40,18 @@ export const prisma = new PrismaClient().$extends({
         notification: {
             createdAt: {
                 needs: { createdAt: true },
-                compute(employee) {
-                    return employee.createdAt.toLocaleDateString("en-US", {
+                compute(notification) {
+                    return notification.createdAt.toLocaleDateString("en-US", {
                         year: "numeric", month: "long", day: "numeric"
                     })
                 }
-            }
+            },
+            avatar: {
+                needs: { avatar: true, },
+                compute(notification) {
+                    return `/optimizes/${notification.avatar?.split(".")[0]}.webp`
+                }
+            },
         },
         emotionCheckIn: {
             checkInTime: {

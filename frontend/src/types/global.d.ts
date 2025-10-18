@@ -125,6 +125,7 @@ interface ActionPlan {
         },
         resovledAt: string
     },
+    contact: string,
     priority: string,
     status: string,
     type: string,

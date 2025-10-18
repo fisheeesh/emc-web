@@ -63,6 +63,7 @@ export const updateEmpSchema = createEmpSchema.omit({ email: true, password: tru
 
 const ACTION_TYPES = ["One-on-One Meeting", "Email Follow-up", "Workload Review", "Mental Health Support", "Team Support"] as const
 const PRIORITY = ["HIGH", "MEDIUM", "LOW"] as const
+const STATUS = ["PENDING", "APPROVED", "REJECTED"] as const
 
 export const actionFormSchema = z.object({
     quickAction: z.string().optional(),
@@ -72,4 +73,12 @@ export const actionFormSchema = z.object({
     dueDate: z.string().min(1, { message: "Due Date is required" }),
     actionNotes: z.string().min(30, { message: "Action notes must be at least thirty characters long." }),
     followUpNotes: z.string().min(30, { message: "Action notes must be at least thirty characters long." }),
+})
+
+export const updateActionFormSchema = z.object({
+    status: z.enum(STATUS, { message: "Status is required" }),
+    suggestions: z.string().min(5, { message: "Action notes must be at least five characters long." }),
+}).refine(data => data.status !== "PENDING", {
+    message: "Status must be either Approved or Rejected",
+    path: ["status"]
 })

@@ -56,7 +56,7 @@ export const getAllNotifications = async (req: CustomRequest, res: Response, nex
 
     const isSAdmin = emp!.role === 'SUPERADMIN'
 
-    const results = await prismaClient.notification.findMany({
+    const results = await prisma.notification.findMany({
         where: isSAdmin
             ? { toSAdmin: true }
             : {
