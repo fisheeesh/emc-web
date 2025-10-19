@@ -15,6 +15,10 @@ model Employee {
   phone           String?            @unique @db.VarChar(15)
   password        String
   email           String             @unique @db.VarChar(100)
+  birthdate       DateTime?
+  gender          Gender             @default(MALE)
+  workStyle       WorkStyle          @default(ONSITE)
+  country         String?
   position        String?
   points          BigInt?            @default(1000)
   streak          Int?
@@ -288,5 +292,19 @@ enum NotifType {
   CRITICAL
   REQUEST
   RESPONSE
+  UPDATE
   NORMAL
+}
+
+enum WorkStyle {
+  REMOTE
+  ONSITE
+  HYBRID
+  WFH
+}
+
+enum Gender {
+  MALE
+  FEMALE
+  PREFER_NOT_TO_SAY
 }

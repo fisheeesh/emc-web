@@ -22,6 +22,16 @@ export const prisma = new PrismaClient().$extends({
                     return getStatusFromScore(+employee.avgScore);
                 }
             },
+            age: {
+                needs: { birthdate: true },
+                compute(employee) {
+                    if (employee.birthdate == null) return null;
+                    const birthDate = new Date(employee.birthdate);
+                    const ageDifMs = Date.now() - birthDate.getTime();
+                    const ageDate = new Date(ageDifMs);
+                    return Math.abs(ageDate.getUTCFullYear() - 1970);
+                }
+            },
             points: {
                 needs: { points: true },
                 compute(employee) {
@@ -38,14 +48,6 @@ export const prisma = new PrismaClient().$extends({
             }
         },
         notification: {
-            createdAt: {
-                needs: { createdAt: true },
-                compute(notification) {
-                    return notification.createdAt.toLocaleDateString("en-US", {
-                        year: "numeric", month: "long", day: "numeric"
-                    })
-                }
-            },
             avatar: {
                 needs: { avatar: true, },
                 compute(notification) {
@@ -83,6 +85,16 @@ export const prisma = new PrismaClient().$extends({
                         year: "numeric", month: "long", day: "numeric"
                     })
                 }
+            },
+            completedAt: {
+                needs: { completedAt: true },
+                compute(actionPlan) {
+                    return actionPlan.completedAt
+                        ? actionPlan.completedAt.toLocaleDateString("en-US", {
+                            year: "numeric", month: "long", day: "numeric"
+                        })
+                        : null
+                }
             }
         },
         criticalEmployee: {
@@ -92,6 +104,14 @@ export const prisma = new PrismaClient().$extends({
                     return criticalEmployee.createdAt.toLocaleDateString("en-US", {
                         year: "numeric", month: "long", day: "numeric"
                     })
+                }
+            },
+            resolvedAt: {
+                needs: { resolvedAt: true },
+                compute(criticalEmployee) {
+                    return criticalEmployee.resolvedAt ? criticalEmployee.resolvedAt.toLocaleDateString("en-US", {
+                        year: "numeric", month: "long", day: "numeric"
+                    }) : null
                 }
             }
         }
