@@ -1,18 +1,22 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
-import { Button } from "../ui/button";
-import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from "../ui/form";
-import { Input } from "../ui/input";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm, type ControllerRenderProps, type DefaultValues, type Path, type SubmitHandler } from "react-hook-form";
-import z from "zod";
-import { useRef, useState } from "react";
-import { FaUserPen, FaUserPlus } from "react-icons/fa6"
-import Spinner from "../shared/spinner";
-import { Eye, EyeOff } from "lucide-react";
-import useEditEmp from "@/hooks/emps/use-edit-emp";
+import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import useCreateEmp from "@/hooks/emps/use-create-emp";
+import useEditEmp from "@/hooks/emps/use-edit-emp";
+import { cn } from "@/lib/utils";
+import useCountryStore from "@/store/country-store";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { ChevronDownIcon, Eye, EyeOff } from "lucide-react";
+import { useRef, useState } from "react";
+import { useForm, type ControllerRenderProps, type DefaultValues, type Path, type SubmitHandler } from "react-hook-form";
+import { FaUserPen, FaUserPlus } from "react-icons/fa6";
+import z from "zod";
+import Spinner from "../shared/spinner";
+import { Button } from "../ui/button";
+import { Calendar } from "../ui/calendar";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "../ui/form";
+import { Input } from "../ui/input";
+import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 
 interface CreateEditUserModalProps<T extends z.ZodType<any, any, any>> {
     formType: "CREATE" | "EDIT",
@@ -33,10 +37,12 @@ export default function CreateEditEmpModal<T extends z.ZodType<any, any, any>>({
     const fileInputRef = useRef<HTMLInputElement>(null)
     type FormData = z.infer<T>
 
+    const { countries } = useCountryStore()
     const { createEmp, creatingEmp } = useCreateEmp();
     const { editEmp, editingEmp } = useEditEmp()
 
     const [showPassword, setShowPassword] = useState(false);
+    const [open, setOpen] = useState(false)
     const [selectedFileName, setSelectedFileName] = useState<string>("No file chosen");
 
     const form = useForm({
@@ -54,6 +60,10 @@ export default function CreateEditEmpModal<T extends z.ZodType<any, any, any>>({
         formData.append("role", values.role)
         formData.append('jobType', values.jobType)
         formData.append("department", values.department)
+        formData.append("gender", values.gender)
+        formData.append("birthdate", values.birthdate)
+        formData.append("workStyle", values.workStyle)
+        formData.append("country", values.country)
 
         //* Check if a file was selected
         if (fileInputRef.current?.files?.[0]) {
@@ -90,7 +100,7 @@ export default function CreateEditEmpModal<T extends z.ZodType<any, any, any>>({
     const isWorking = form.formState.isSubmitting || creatingEmp || editingEmp
 
     return (
-        <DialogContent className="w-full mx-auto max-h-[90vh] overflow-y-auto sm:max-w-[800px] no-scrollbar" {...props}>
+        <DialogContent className="w-full mx-auto max-h-[95vh] overflow-y-auto sm:max-w-[800px] no-scrollbar" {...props}>
             <DialogHeader>
                 <DialogTitle className="text-xl font-bold flex items-center gap-2">
                     {formType === 'CREATE' ? <FaUserPlus /> : <FaUserPen />}
@@ -152,7 +162,7 @@ export default function CreateEditEmpModal<T extends z.ZodType<any, any, any>>({
                                                                 </SelectContent>
                                                             </Select>
                                                         ) :
-                                                            field.name === "jobType" ? (
+                                                            field.name === "gender" ? (
                                                                 <Select
                                                                     onValueChange={field.onChange}
                                                                     defaultValue={field.value}
@@ -161,59 +171,151 @@ export default function CreateEditEmpModal<T extends z.ZodType<any, any, any>>({
                                                                         <SelectValue placeholder="Select role" />
                                                                     </SelectTrigger>
                                                                     <SelectContent>
-                                                                        <SelectItem value="FULLTIME">Full-Time</SelectItem>
-                                                                        <SelectItem value="PARTTIME">Part-Time</SelectItem>
-                                                                        <SelectItem value="CONTRACT">Contract</SelectItem>
-                                                                        <SelectItem value="INTERNSHIP">Internship</SelectItem>
+                                                                        <SelectItem value="MALE">Male</SelectItem>
+                                                                        <SelectItem value="FEMALE">Female</SelectItem>
+                                                                        <SelectItem value="PREFER_NOT_TO_SAY">Prefer not to say</SelectItem>
                                                                     </SelectContent>
                                                                 </Select>
                                                             ) :
-                                                                field.name === "avatar" ? (
-                                                                    <div className="w-full">
-                                                                        <label className="inline-block text-white font-medium px-4 py-1.5 rounded-md cursor-pointer transition bg-brand hover:bg-own-hover">
-                                                                            Choose File
-                                                                            <Input
-                                                                                ref={fileInputRef}
-                                                                                disabled={isWorking}
-                                                                                accept="image/*"
-                                                                                type="file"
-                                                                                className="hidden"
-                                                                                onChange={() => {
-                                                                                    //* Set the actual File object as the value for the image field
-                                                                                    const file = fileInputRef.current?.files?.[0] ?? null;
-                                                                                    form.setValue('image' as Path<FormData>, file as any);
+                                                                field.name === "workStyle" ? (
+                                                                    <Select
+                                                                        onValueChange={field.onChange}
+                                                                        defaultValue={field.value}
+                                                                    >
+                                                                        <SelectTrigger className="min-h-[44px] w-full">
+                                                                            <SelectValue placeholder="Select role" />
+                                                                        </SelectTrigger>
+                                                                        <SelectContent>
+                                                                            <SelectItem value="ONSITE">Onsite</SelectItem>
+                                                                            <SelectItem value="REMOTE">Remote</SelectItem>
+                                                                            <SelectItem value="HYBRID">Hybrid</SelectItem>
+                                                                            <SelectItem value="WFH">Work From Home</SelectItem>
+                                                                        </SelectContent>
+                                                                    </Select>
+                                                                ) :
+                                                                    field.name === "country" ? (
+                                                                        <Select
+                                                                            onValueChange={field.onChange}
+                                                                            defaultValue={field.value}
+                                                                        >
+                                                                            <SelectTrigger className="min-h-[44px] w-full">
+                                                                                <SelectValue placeholder="Select role" />
+                                                                            </SelectTrigger>
+                                                                            <SelectContent className="w-full max-h-[350px]">
+                                                                                <SelectGroup>
+                                                                                    {countries ? (
+                                                                                        countries.map((country: Filter) => (
+                                                                                            <SelectItem
+                                                                                                key={country.name}
+                                                                                                value={country.value}
+                                                                                                className="px-4 py-3"
+                                                                                            >
+                                                                                                {country.name}
+                                                                                            </SelectItem>
+                                                                                        ))
+                                                                                    ) : (
+                                                                                        <SelectItem value="No results found">No results found</SelectItem>
+                                                                                    )}
+                                                                                </SelectGroup>
+                                                                            </SelectContent>
+                                                                        </Select>
+                                                                    ) :
+                                                                        field.name === "birthdate" ? (
+                                                                            <Popover open={open} onOpenChange={setOpen}>
+                                                                                <PopoverTrigger asChild>
+                                                                                    <FormControl>
+                                                                                        <Button
+                                                                                            disabled={isWorking}
+                                                                                            variant="outline"
+                                                                                            className={cn(
+                                                                                                "min-h-[48px] w-full justify-between font-normal",
+                                                                                                !field.value ? "text-muted-foreground font-raleway" : "font-en",
+                                                                                            )}
+                                                                                        >
+                                                                                            {field.value ? new Date(field.value).toLocaleDateString() : "Select date"}
+                                                                                            <ChevronDownIcon className="h-4 w-4 opacity-50" />
+                                                                                        </Button>
+                                                                                    </FormControl>
+                                                                                </PopoverTrigger>
+                                                                                <PopoverContent className="w-auto overflow-hidden p-0" align="start">
+                                                                                    <Calendar
+                                                                                        disabled={isWorking}
+                                                                                        className="font-en"
+                                                                                        mode="single"
+                                                                                        selected={field.value ? new Date(field.value) : undefined}
+                                                                                        onSelect={(selectedDate) => {
+                                                                                            if (selectedDate) {
+                                                                                                field.onChange(selectedDate.toISOString())
+                                                                                            }
+                                                                                            setOpen(false)
+                                                                                        }}
+                                                                                        captionLayout="dropdown"
+                                                                                    />
+                                                                                </PopoverContent>
+                                                                            </Popover>
+                                                                        ) :
+                                                                            field.name === "jobType" ? (
+                                                                                <Select
+                                                                                    onValueChange={field.onChange}
+                                                                                    defaultValue={field.value}
+                                                                                >
+                                                                                    <SelectTrigger className="min-h-[44px] w-full">
+                                                                                        <SelectValue placeholder="Select role" />
+                                                                                    </SelectTrigger>
+                                                                                    <SelectContent>
+                                                                                        <SelectItem value="FULLTIME">Full-Time</SelectItem>
+                                                                                        <SelectItem value="PARTTIME">Part-Time</SelectItem>
+                                                                                        <SelectItem value="CONTRACT">Contract</SelectItem>
+                                                                                        <SelectItem value="INTERNSHIP">Internship</SelectItem>
+                                                                                    </SelectContent>
+                                                                                </Select>
+                                                                            ) :
+                                                                                field.name === "avatar" ? (
+                                                                                    <div className="w-full">
+                                                                                        <label className="inline-block text-white font-medium px-4 py-1.5 rounded-md cursor-pointer transition bg-brand hover:bg-own-hover">
+                                                                                            Choose File
+                                                                                            <Input
+                                                                                                ref={fileInputRef}
+                                                                                                disabled={isWorking}
+                                                                                                accept="image/*"
+                                                                                                type="file"
+                                                                                                className="hidden"
+                                                                                                onChange={() => {
+                                                                                                    //* Set the actual File object as the value for the image field
+                                                                                                    const file = fileInputRef.current?.files?.[0] ?? null;
+                                                                                                    form.setValue('image' as Path<FormData>, file as any);
 
-                                                                                    //* Update the selected file name
-                                                                                    setSelectedFileName(file ? file.name : "No file chosen");
-                                                                                }}
-                                                                            />
-                                                                        </label>
-                                                                        <span className="ml-3 text-sm">
-                                                                            {selectedFileName}
-                                                                        </span>
-                                                                    </div>
-                                                                ) : (
-                                                                    <div className="relative">
-                                                                        <Input
-                                                                            className={`min-h-[44px] placeholder:font-raleway ${field.name === 'password' || field.name === 'phone' ? 'font-en' : ''}`}
-                                                                            placeholder={`Enter ${field.name}`}
-                                                                            disabled={isWorking}
-                                                                            type={field.name === 'password' ? showPassword ? 'text' : 'password' : 'text'}
-                                                                            {...field}
-                                                                        />
-                                                                        {(field.name === 'password' || field.name === 'confirmPassword') && (
-                                                                            <button
-                                                                                type="button"
-                                                                                onClick={() =>
-                                                                                    setShowPassword(prev => !prev)
-                                                                                }
-                                                                                className="absolute cursor-pointer right-3 top-3.5 text-muted-foreground"
-                                                                            >
-                                                                                {showPassword ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
-                                                                            </button>
-                                                                        )}
-                                                                    </div>
-                                                                )}
+                                                                                                    //* Update the selected file name
+                                                                                                    setSelectedFileName(file ? file.name : "No file chosen");
+                                                                                                }}
+                                                                                            />
+                                                                                        </label>
+                                                                                        <span className="ml-3 text-sm">
+                                                                                            {selectedFileName}
+                                                                                        </span>
+                                                                                    </div>
+                                                                                ) : (
+                                                                                    <div className="relative">
+                                                                                        <Input
+                                                                                            className={`min-h-[44px] placeholder:font-raleway ${field.name === 'password' || field.name === 'phone' ? 'font-en' : ''}`}
+                                                                                            placeholder={`Enter ${field.name}`}
+                                                                                            disabled={isWorking}
+                                                                                            type={field.name === 'password' ? showPassword ? 'text' : 'password' : 'text'}
+                                                                                            {...field}
+                                                                                        />
+                                                                                        {(field.name === 'password' || field.name === 'confirmPassword') && (
+                                                                                            <button
+                                                                                                type="button"
+                                                                                                onClick={() =>
+                                                                                                    setShowPassword(prev => !prev)
+                                                                                                }
+                                                                                                className="absolute cursor-pointer right-3 top-3.5 text-muted-foreground"
+                                                                                            >
+                                                                                                {showPassword ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
+                                                                                            </button>
+                                                                                        )}
+                                                                                    </div>
+                                                                                )}
                                             </FormControl>
                                             <FormMessage />
                                         </FormItem>
