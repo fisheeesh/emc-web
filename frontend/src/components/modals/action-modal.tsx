@@ -43,6 +43,8 @@ import Spinner from "../shared/spinner";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
+import useMarkAsCompleted from "@/hooks/action-plans/use-mark-as-completed";
+import { GiGlassCelebration } from "react-icons/gi";
 
 type QuickAction = {
     name: string;
@@ -74,6 +76,7 @@ export default function ActionModal({ employee, action, onClose }: Props) {
     const [open, setOpen] = React.useState(false)
     const { generateRecommendation, generating } = useGenerateAIRecommendation()
     const { createActionPlan, creatingActionPlan } = useCreateActionPlan()
+    const { markAsCompleted, updatingAction } = useMarkAsCompleted()
     const { user } = useUserStore()
 
     const actionNotesEditorRef = useRef<MDXEditorMethods>(null);
@@ -135,6 +138,14 @@ export default function ActionModal({ employee, action, onClose }: Props) {
         }, {
             onSettled: () => {
                 form.reset()
+                onClose?.()
+            }
+        })
+    }
+
+    const onMarkAsCompleted = (actionPlanId: string) => {
+        markAsCompleted(actionPlanId, {
+            onSettled: () => {
                 onClose?.()
             }
         })
@@ -248,7 +259,7 @@ export default function ActionModal({ employee, action, onClose }: Props) {
                         </div>
 
                         {/* Assign To & Due Date Row */}
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                             <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4 shadow-sm">
                                 <div className="flex items-center gap-2 mb-2">
                                     <User className="text-teal-600" size={18} />
@@ -263,6 +274,14 @@ export default function ActionModal({ employee, action, onClose }: Props) {
                                     <h4 className="font-semibold text-sm text-gray-700 dark:text-gray-300">Due Date</h4>
                                 </div>
                                 <p className="text-base font-en">{action.dueDate}</p>
+                            </div>
+
+                            <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4 shadow-sm">
+                                <div className="flex items-center gap-2 mb-2">
+                                    <GiGlassCelebration className="text-amber-600" size={18} />
+                                    <h4 className="font-semibold text-sm text-gray-700 dark:text-gray-300">Completed At</h4>
+                                </div>
+                                <p className="text-base font-en">{action.completedAt ?? "Not Yet"}</p>
                             </div>
                         </div>
 
@@ -302,17 +321,34 @@ export default function ActionModal({ employee, action, onClose }: Props) {
                         )}
                     </div>
 
-                    <div className="flex justify-end items-center gap-3 border-t pt-6 pb-2 mt-6">
+                    <div className="flex flex-col md:flex-row justify-between items-center gap-3 border-t pt-6 pb-2 mt-6">
+                        {
+                            action.type === 'PROCESSING' ?
+                                <p className="italic text-amber-600 text-sm md:text-base text-center">
+                                    Note: Take necessary steps to complete this action plan.
+                                </p>
+                                : action.type === 'REJECTED' ? <p className="italic text-sm md:text-base text-red-600 text-center">
+                                    Note: This action plan has been rejected. <br className="block md:hidden" /> Please review and take necessary steps.
+                                </p>
+                                    : <p className="italic text-sm md:text-base text-green-600 text-center">
+                                        Note: This action plan has been completed.
+                                    </p>
+                        }
                         <DialogClose asChild>
                             <Button type="button" variant="outline" className="min-h-[44px] cursor-pointer">
                                 Close
                             </Button>
                         </DialogClose>
-                        {action.type !== 'COMPLETED' && <Button disabled={false} type="submit" className="bg-green-600 hover:bg-green-500 text-white min-h-[44px] cursor-pointer">
-                            <Spinner isLoading={false} label="Saving...">
-                                Mark as Completed
-                            </Spinner>
-                        </Button>}
+                        {action.type === 'PROCESSING' &&
+                            <Button
+                                onClick={() => onMarkAsCompleted(action.id)}
+                                disabled={updatingAction}
+                                type="button"
+                                className="bg-green-600 hover:bg-green-500 text-white min-h-[44px] cursor-pointer">
+                                <Spinner isLoading={updatingAction} label="Saving...">
+                                    Mark as Completed
+                                </Spinner>
+                            </Button>}
                     </div>
                 </div>
             </DialogContent>
@@ -570,17 +606,20 @@ export default function ActionModal({ employee, action, onClose }: Props) {
                             />
                         </div>
 
-                        <div className="flex justify-end items-center gap-3 border-t pt-6 pb-2">
-                            <DialogClose asChild>
-                                <Button disabled={isWorking} type="button" variant="outline" className="min-h-[44px] cursor-pointer">
-                                    Cancel
+                        <div className="flex flex-col md:flex-row justify-between items-center gap-2">
+                            <p className="text-muted-foreground italic text-sm md:text-base">Note: Once created, this action plan cannot be modified.</p>
+                            <div className="flex items-center gap-3 border-t pt-6 pb-2">
+                                <DialogClose asChild>
+                                    <Button disabled={isWorking} type="button" variant="outline" className="min-h-[44px] cursor-pointer">
+                                        Cancel
+                                    </Button>
+                                </DialogClose>
+                                <Button disabled={isWorking} type="submit" className="bg-blue-600 hover:bg-blue-700 text-white min-h-[44px] cursor-pointer">
+                                    <Spinner isLoading={isWorking} label="Submitting...">
+                                        Create Action Plan
+                                    </Spinner>
                                 </Button>
-                            </DialogClose>
-                            <Button disabled={isWorking} type="submit" className="bg-blue-600 hover:bg-blue-700 text-white min-h-[44px] cursor-pointer">
-                                <Spinner isLoading={isWorking} label="Submitting...">
-                                    Create Action Plan
-                                </Spinner>
-                            </Button>
+                            </div>
                         </div>
                     </form>
                 </Form>
