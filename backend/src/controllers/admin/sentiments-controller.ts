@@ -1,7 +1,7 @@
 import { endOfDay, startOfDay, subDays } from "date-fns";
 import { NextFunction, Request, Response } from "express";
 import { body, query, validationResult } from "express-validator";
-import { Prisma } from "../../../generated/prisma";
+import { Prisma, PrismaClient } from "../../../generated/prisma";
 import { errorCodes } from "../../config/error-codes";
 import { prisma } from "../../config/prisma-client";
 import { getEmployeeById } from "../../services/auth-services";
@@ -12,6 +12,8 @@ import { checkEmployeeIfNotExits, createHttpErrors } from "../../utils/check";
 interface CustomRequest extends Request {
     employeeId?: number
 }
+
+const prismaClient = new PrismaClient()
 
 export const getMoodOverview = [
     query("dep", "Invalid Department.").trim().escape().optional(),
@@ -304,13 +306,13 @@ export const deleteCriticalEmpById = [
             code: errorCodes.forbidden
         }))
 
-        // const deletedCEmp = await prisma.criticalEmployee.delete({
-        //     where: { id }
-        // })
+        const deletedCEmp = await prisma.criticalEmployee.delete({
+            where: { id }
+        })
 
         res.status(200).json({
             message: "Successfully deleted Critical Employee's Information",
-            // cEmpId: deletedCEmp.id
+            cEmpId: deletedCEmp.id
         })
     }
 ]
@@ -356,25 +358,97 @@ export const getAllWatchlistEmps = [
                 avatar: true,
                 email: true,
                 department: true,
+                avgScore: true,
+                lastCritical: true,
+                criticalTimes: {
+                    take: 1,
+                    orderBy: {
+                        createdAt: 'desc'
+                    },
+                    select: {
+                        actionPlan: true
+                    }
+                }
             },
             orderBy: {
                 createdAt: ts
             }
         }
 
-        const watchlistEmps = await getAllWatchlistInfinite(options)
+        const watchlistEmps = await getAllWatchlistInfinite(options) as any[]
 
-        const hasNextPage = watchlistEmps!.length > +limit
-        if (hasNextPage) watchlistEmps.pop()
+        //* Transform the data to flatten the actionPlan
+        const transformedEmps = watchlistEmps.map(emp => ({
+            id: emp.id,
+            fullName: emp.fullName,
+            avatar: emp.avatar,
+            email: emp.email,
+            department: emp.department,
+            avgScore: emp.avgScore,
+            lastCritical: emp.lastCritical,
+            actionPlan: emp.criticalTimes?.[0]?.actionPlan || null
+        }))
 
-        const nextCursor = hasNextPage ? watchlistEmps[watchlistEmps.length - 1].id : null
+        const hasNextPage = transformedEmps.length > +limit
+        if (hasNextPage) transformedEmps.pop()
+
+        const nextCursor = hasNextPage ? transformedEmps[transformedEmps.length - 1].id : null
 
         res.status(200).json({
             message: "Here is all watchlist employees data",
             hasNextPage,
             nextCursor,
             prevCursor: lastCursor || undefined,
-            data: watchlistEmps
+            data: transformedEmps
+        })
+    }
+]
+
+export const deleteWatchlistEmpById = [
+    body("id", "Watchlist Employee Id is required").isInt({ gt: 0 }),
+    async (req: CustomRequest, res: Response, next: NextFunction) => {
+        const errors = validationResult(req).array({ onlyFirstError: true })
+        if (errors.length > 0)
+            next(createHttpErrors({
+                message: errors[0].msg,
+                status: 400,
+                code: errorCodes.invalid
+            }))
+
+        const empId = req.employeeId
+        const emp = await getEmployeeById(empId!)
+        checkEmployeeIfNotExits(emp)
+
+        const { id } = req.body
+
+        const wEmp = await prismaClient.employee.findUnique({
+            where: { id },
+            select: {
+                departmentId: true,
+                status: true
+            }
+        })
+
+        if (!wEmp || wEmp.status !== 'WATCHLIST') return next(createHttpErrors({
+            message: "Watchlist employee record not found.",
+            status: 404,
+            code: errorCodes.notFound
+        }))
+
+        if (emp?.departmentId !== wEmp.departmentId) return next(createHttpErrors({
+            message: "You are not allowed to delete watchlist employee's information from other department.",
+            status: 403,
+            code: errorCodes.forbidden
+        }))
+
+        const updatedEmp = await prisma.employee.update({
+            where: { id },
+            data: { status: 'NORMAL' }
+        })
+
+        res.status(200).json({
+            message: "Successfully deleted Watchlist Employee's Information",
+            empId: updatedEmp.id
         })
     }
 ]
