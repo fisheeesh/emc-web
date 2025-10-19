@@ -1,8 +1,8 @@
 import express from "express"
-import { createActionPlan, getAdminUser, getAllDepartments, getAllNotifications, testAdmin } from "../../../controllers/admin/admin-controller"
-import { generateAIAnalysis, generateAIRecommendation } from "../../../controllers/admin/ai-controller"
+import { createActionPlan, getAdminUser, getAllDepartments, getAllNotifications, markAsCompletedActionPlan, testAdmin } from "../../../controllers/admin/admin-controller"
+import { generateAIAnalysis, generateAIRecommendation, regenerateAIAnalysis } from "../../../controllers/admin/ai-controller"
 import { getAttendanceOverView, getCheckInHours, getDailyAttendance } from "../../../controllers/admin/attendance-controller"
-import { deleteCriticalEmpById, getAllCriticalEmps, getAllWatchlistEmps, getLeaderboards, getMoodOverview, getSenitmentsComparison } from "../../../controllers/admin/sentiments-controller"
+import { deleteCriticalEmpById, deleteWatchlistEmpById, getAllCriticalEmps, getAllWatchlistEmps, getLeaderboards, getMoodOverview, getSenitmentsComparison } from "../../../controllers/admin/sentiments-controller"
 import { setMaintenance } from "../../../controllers/admin/system-contorller"
 
 const router = express.Router()
@@ -21,6 +21,7 @@ router.get("/notifications", getAllNotifications)
 router.get("/critical-emps", getAllCriticalEmps)
 router.delete("/critical-emps", deleteCriticalEmpById)
 router.get("/watchlist-emps", getAllWatchlistEmps)
+router.delete("/watchlist-emps", deleteWatchlistEmpById)
 
 //* Attendance routes
 router.get("/daily-attendance", getDailyAttendance)
@@ -29,10 +30,12 @@ router.get("/attendance-overview", getAttendanceOverView)
 
 //* AI routes
 router.post("/ai-analysis", generateAIAnalysis)
+router.post("/regenerate-ai-analysis", regenerateAIAnalysis)
 router.post("/generate-recommendation", generateAIRecommendation)
 
 //* Action Plans
 router.post("/action-plans", createActionPlan)
+router.patch("/action-plans", markAsCompletedActionPlan)
 
 
 export default router

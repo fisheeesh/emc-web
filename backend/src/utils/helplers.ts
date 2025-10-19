@@ -105,7 +105,11 @@ export function roundToHour(date: Date): string {
     return `${String(h).padStart(2, '0')}:00`;
 }
 
-export const getNotificationContent = (status: string, empName: string) => {
+export const getNotificationContent = (status: string, empName: string, emailType: string) => {
+    if (emailType === 'UPDATE') {
+        return `Additional suggestions have been added to the action plan for critical employee - ${empName}. Please review the updated recommendations.`;
+    }
+
     switch (status.toUpperCase()) {
         case 'APPROVED':
             return `Your action plan for critical employee - ${empName} has been approved by upper management. You can now proceed with the process! Keep up the great work! 💪`;

@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from "express"
 import { body, query, validationResult } from "express-validator"
-import { AccType, JobType, Prisma, Role } from "../../../generated/prisma"
+import { AccType, JobType, Prisma, Role, Gender, WorkStyle } from "../../../generated/prisma"
 import { errorCodes } from "../../config/error-codes"
 import { ImageQueue } from "../../jobs/queues/image-queue"
 import { createEmployeeWithOTP, getEmployeeByEmail, getEmployeeById } from "../../services/auth-services"
@@ -34,6 +34,20 @@ export const createNewEmployee = [
             }
             return true
         }),
+    body("gender", "Gender is required.").trim().notEmpty().escape()
+        .custom(value => {
+            if (!Object.values(Gender).includes(value as Gender)) {
+                throw new Error("Invalid Gender.")
+            }
+            return true
+        }),
+    body("workStyle", "Work Style is required.").trim().notEmpty().escape()
+        .custom(value => {
+            if (!Object.values(WorkStyle).includes(value as WorkStyle)) {
+                throw new Error("Invalid Work Style.")
+            }
+            return true
+        }),
     body("jobType", "Job Type is required.").trim().notEmpty().escape()
         .custom(value => {
             if (!Object.values(JobType).includes(value as JobType)) {
@@ -42,6 +56,8 @@ export const createNewEmployee = [
             return true
         }),
     body("department", "Department is required.").trim().notEmpty().escape(),
+    body("country", "Country is required.").trim().notEmpty().escape(),
+    body("birthdate", "Birth Date is required.").trim().notEmpty().escape(),
     async (req: CustomRequest, res: Response, next: NextFunction) => {
         const errors = validationResult(req).array({ onlyFirstError: true })
         if (errors.length > 0) {
@@ -55,7 +71,7 @@ export const createNewEmployee = [
             }))
         }
 
-        const { firstName, lastName, phone, email, password, position, department, role, jobType } = req.body
+        const { firstName, lastName, phone, email, password, position, department, role, jobType, gender, workStyle, country, birthdate } = req.body
 
         const emp = req.employee
         checkEmployeeIfNotExits(emp)
@@ -97,6 +113,10 @@ export const createNewEmployee = [
             role,
             jobType,
             department,
+            gender,
+            workStyle,
+            country,
+            birthdate,
             rndToken: token,
             avatar: req.file?.filename
         }
@@ -195,6 +215,11 @@ export const getAllEmployeesInfinite = [
                 position: true,
                 accType: true,
                 jobType: true,
+                gender: true,
+                birthdate: true,
+                workStyle: true,
+                country: true,
+                age: true,
                 role: true,
                 avatar: true,
                 createdAt: true,
@@ -239,6 +264,20 @@ export const updateEmployeeData = [
             }
             return true
         }),
+    body("gender", "Gender is required.").trim().notEmpty().escape()
+        .custom(value => {
+            if (!Object.values(Gender).includes(value as Gender)) {
+                throw new Error("Invalid Gender.")
+            }
+            return true
+        }),
+    body("workStyle", "Work Style is required.").trim().notEmpty().escape()
+        .custom(value => {
+            if (!Object.values(WorkStyle).includes(value as WorkStyle)) {
+                throw new Error("Invalid Work Style.")
+            }
+            return true
+        }),
     body("jobType", "Job Type is required.").trim().notEmpty().escape()
         .custom(value => {
             if (!Object.values(JobType).includes(value as JobType)) {
@@ -254,6 +293,8 @@ export const updateEmployeeData = [
             return true
         }),
     body("department", "Department is required.").trim().notEmpty().escape(),
+    body("country", "Country is required.").trim().notEmpty().escape(),
+    body("birthdate", "Birth Date is required.").trim().notEmpty().escape(),
     async (req: CustomRequest, res: Response, next: NextFunction) => {
         const errors = validationResult(req).array({ onlyFirstError: true })
         if (errors.length > 0) {
@@ -270,7 +311,7 @@ export const updateEmployeeData = [
         const sEmp = req.employee
         checkEmployeeIfNotExits(sEmp)
 
-        const { id, firstName, lastName, phone, position, role, jobType, accType, department } = req.body
+        const { id, firstName, lastName, phone, position, role, jobType, accType, department, country, birthdate, workStyle, gender } = req.body
 
         const emp = await getEmployeeById(+id)
 
@@ -291,6 +332,10 @@ export const updateEmployeeData = [
             phone,
             position,
             role,
+            workStyle,
+            gender,
+            country,
+            birthdate,
             jobType,
             accType,
             department,

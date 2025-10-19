@@ -1,22 +1,22 @@
 import { PrismaClient } from "../../generated/prisma";
 import jwt from 'jsonwebtoken'
 
-const prisma = new PrismaClient()
+const prismaClient = new PrismaClient()
 
 export const getEmployeeByEmail = async (email: string) => {
-    return await prisma.employee.findUnique({
+    return await prismaClient.employee.findUnique({
         where: { email }
     })
 }
 
 export const getEmployeeById = async (id: number) => {
-    return await prisma.employee.findUnique({
+    return await prismaClient.employee.findUnique({
         where: { id }
     })
 }
 
 export const createEmployeeWithOTP = async (empData: any, otpData: any) => {
-    return await prisma.$transaction(async (tx) => {
+    return await prismaClient.$transaction(async (tx) => {
         const data = {
             ...empData,
             department: {
@@ -59,32 +59,32 @@ export const createEmployee = async (empData: any) => {
             }
         }
     }
-    return await prisma.employee.create({
+    return await prismaClient.employee.create({
         data
     })
 }
 
 export const updateEmployeeData = async (id: number, data: any) => {
-    return await prisma.employee.update({
+    return await prismaClient.employee.update({
         where: { id },
         data
     })
 }
 
 export const getOTPRowByEmail = async (email: string) => {
-    return await prisma.otp.findUnique({
+    return await prismaClient.otp.findUnique({
         where: { email }
     })
 }
 
 export const createOTP = async (data: any) => {
-    return await prisma.otp.create({
+    return await prismaClient.otp.create({
         data
     })
 }
 
 export const updateOTP = async (id: number, data: any) => {
-    return await prisma.otp.update({
+    return await prismaClient.otp.update({
         where: { id },
         data
     })

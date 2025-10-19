@@ -405,16 +405,42 @@ export const request_body = (cEmpName: string, adminName: string, depName: strin
                 
                 <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 30px 0;">
                 
-                <p style="color: #9ca3af; font-size: 12px;">This is an automated notification from the Employee Wellbeing Management System.</p>
+                <p style="color: #9ca3af; font-size: 12px;">This is an automated notification from the Employee Wellbeing Management & Emotion Check-in System.</p>
             </div>
         `
 
-export const response_subject = (empName: string, status: string) => {
-    if (status === 'APPROVED') return `✅ Action Plan Approved - ${empName}`
-    if (status === 'REJECTED') return `❌ Action Plan Rejected - ${empName}`
+export const response_subject = (empName: string, status: string, emailType: string) => {
+    if (emailType === 'UPDATE') {
+        return `📝 Action Plan Updated - Additional Suggestions for ${empName}`;
+    }
+    if (status === 'APPROVED') return `✅ Action Plan Approved - ${empName}`;
+    if (status === 'REJECTED') return `❌ Action Plan Rejected - ${empName}`;
 }
 
-export const response_body = (empName: string, status: string) => {
+export const response_body = (empName: string, status: string, emailType: string) => {
+    if (emailType === 'UPDATE') {
+        return `
+<h2>Action Plan Update - Additional Suggestions</h2>
+<p>Upper management has added further suggestions to the action plan for critical employee <strong>${empName}</strong>.</p>
+<p><strong>What's changed:</strong></p>
+<ul>
+    <li>New recommendations have been added</li>
+    <li>Please review the updated suggestions carefully</li>
+    <li>Consider incorporating these changes into your implementation</li>
+</ul>
+<p><strong>Next Steps:</strong></p>
+<ul>
+    <li>Log in to review the additional suggestions</li>
+    <li>Adjust your action plan accordingly</li>
+    <li>Reach out to HR if you need clarification</li>
+</ul>
+<p>Thank you for your continued dedication to employee development.</p>
+<p>Best regards,<br/>HR Management Team</p>
+<hr style="border: none; border-top: 1px solid #e5e7eb; margin: 30px 0;">
+<p style="color: #9ca3af; font-size: 12px;">This is an automated notification from the Employee Wellbeing Management & Emotion Check-in System.</p>
+        `;
+    }
+
     if (status === 'APPROVED') return `
 <h2>Action Plan Approved</h2>
 <p>Great news! Your action plan for critical employee <strong>${empName}</strong> has been approved by upper management.</p>
@@ -426,7 +452,10 @@ export const response_body = (empName: string, status: string) => {
     <li>Monitor progress regularly</li>
 </ul>
 <p>Best regards,<br/>HR Management Team</p>
-`
+<hr style="border: none; border-top: 1px solid #e5e7eb; margin: 30px 0;">
+<p style="color: #9ca3af; font-size: 12px;">This is an automated notification from the Employee Wellbeing Management & Emotion Check-in System.</p>
+    `;
+
     if (status === 'REJECTED') return `
 <h2>Action Plan Update Required</h2>
 <p>We regret to inform you that your action plan for critical employee <strong>${empName}</strong> has been rejected.</p>
@@ -438,5 +467,27 @@ export const response_body = (empName: string, status: string) => {
 </ul>
 <p>Please don't hesitate to reach out to HR for guidance on improving your action plan.</p>
 <p>Best regards,<br/>HR Management Team</p>
-    `
+<hr style="border: none; border-top: 1px solid #e5e7eb; margin: 30px 0;">
+<p style="color: #9ca3af; font-size: 12px;">This is an automated notification from the Employee Wellbeing Management & Emotion Check-in System.</p>
+    `;
+}
+
+export const completion_subject = (empName: string) => {
+    return `✅ Action Plan Completed - ${empName}`;
+}
+
+export const completion_body = (empName: string, responsibleHR: string) => {
+    return `
+<h2>Action Plan Completed</h2>
+<p>The action plan for critical employee <strong>${empName}</strong> has been successfully completed by <strong>${responsibleHR}</strong>.</p>
+<p><strong>Summary:</strong></p>
+<ul>
+    <li>All approved actions have been implemented</li>
+    <li>Necessary interventions have been completed</li>
+    <li>Employee engagement process finalized</li>
+</ul>
+<p>You can now review the completion status in the system.</p>
+<hr style="border: none; border-top: 1px solid #e5e7eb; margin: 30px 0;">
+<p style="color: #9ca3af; font-size: 12px;">This is an automated notification from the Employee Wellbeing Management & Emotion Check-in System.</p>
+    `;
 }

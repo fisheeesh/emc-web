@@ -38,6 +38,8 @@ export const ConfirmPasswordSchema = z.object({
 
 const EMP_ROLES = ["EMPLOYEE", "ADMIN", "SUPERADMIN"] as const;
 const EMP_JOB_TYPES = ["FULLTIME", "PARTTIME", "CONTRACT", "INTERNSHIP"] as const;
+const WORKSTYLES = ["ONSITE", "REMOTE", "HYBRID", "WFH"] as const;
+const GENDER = ["MALE", "FEMALE", "PERFER_NOT_TO_SAY"] as const;
 
 export const createEmpSchema = z.object({
     email: z.string()
@@ -53,6 +55,10 @@ export const createEmpSchema = z.object({
     department: z.string().min(1, { message: "Department is required" }),
     position: z.string().min(1, { message: "Position is required" }),
     role: z.enum(EMP_ROLES, { message: "Role is required" }),
+    gender: z.enum(GENDER, { message: "Gender is required" }),
+    birthdate: z.string().min(1, { message: "Birthdate is required" }),
+    workStyle: z.enum(WORKSTYLES, { message: "Work style is required" }),
+    country: z.string().min(1, { message: "Country is required" }),
     jobType: z.enum(EMP_JOB_TYPES, { message: "Job type is required" }),
     avatar: z.any().optional(),
 });
