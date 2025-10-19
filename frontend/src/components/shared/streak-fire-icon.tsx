@@ -1,26 +1,16 @@
-import Lottie from 'lottie-react'
-import fire from '@/assets/lottie/fire.json';
+import { BsFire } from "react-icons/bs";
 
-export default function StreakFireIcon({ value }: { value: number }) {
+interface Props {
+    value: number;
+}
+
+export default function StreakFireIcon({ value }: Props) {
     return (
-        <div className="relative inline-flex items-center justify-center w-[60px] h-[60px]">
-            <Lottie
-                autoplay
-                loop
-                animationData={fire}
-                style={{
-                    height: '60px',
-                    width: '60px',
-                    position: 'absolute',
-                    top: 0,
-                    left: 0
-                }}
-            />
-            <div className="absolute top-9 flex items-center justify-center z-10 pb-1">
-                <span className="font-bold text-white text-sm font-en drop-shadow-[0_2px_10px_rgba(0,0,0,1)] [text-shadow:_0_1px_4px_rgb(0_0_0_/_100%),_0_2px_8px_rgb(0_0_0_/_80%)]">
-                    {value}
-                </span>
-            </div>
+        <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-gradient-to-br from-orange-100 to-red-100 dark:from-orange-950/30 dark:to-red-950/30 border border-orange-300 dark:border-orange-700 shadow-sm">
+            <BsFire className="text-orange-500 dark:text-orange-400 text-base animate-pulse" />
+            <span className="text-xs font-bold text-orange-700 dark:text-orange-300 font-en">
+                {value}
+            </span>
         </div>
-    )
+    );
 }

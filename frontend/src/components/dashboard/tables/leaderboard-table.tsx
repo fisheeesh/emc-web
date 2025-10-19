@@ -61,8 +61,10 @@ export default function LeaderBoardTable({ data, isLoading }: Props) {
                 <div className="flex flex-col xl:flex-row gap-3 xl:gap-0 justify-between">
                     <div className="flex flex-col items-start gap-2 tracking-wide">
                         <CardTitle className="text-xl md:text-2xl flex items-center gap-2">
-                            <GiChampions />
-                            Wellbeing Champions Leaderboard
+                            <GiChampions className="text-[26px] text-amber-500 drop-shadow-[0_2px_4px_rgba(245,158,11,0.4)]" />
+                            <span className="bg-gradient-to-r from-yellow-600 via-amber-500 to-orange-600 bg-clip-text text-transparent font-bold">
+                                Wellbeing Champions Leaderboard
+                            </span>
                         </CardTitle>
                         <CardDescription>
                             Top <span className="font-en">7</span> employees excelling in mental health and wellbeing initiatives - celebrating those who prioritize their wellness journey
