@@ -6,7 +6,7 @@ import TableSkeleton from "@/components/shared/table-skeleton";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Dialog } from "@/components/ui/dialog";
+import { Dialog, DialogTrigger } from "@/components/ui/dialog";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import Empty from "@/components/ui/empty";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -32,7 +32,6 @@ interface Props {
 export default function CriticalTable({ data, status, error, isFetchingNextPage, fetchNextPage, hasNextPage }: Props) {
     const [viewAnalysis, setViewAnalysis] = useState<CriticalEmployee | null>(null);
     const [viewAction, setViewAction] = useState<CriticalEmployee | null>(null);
-    const [deleteCEmp, setDeleteCEmp] = useState<CriticalEmployee | null>(null);
 
     const { deleteCriticalEmp, deletingCriticalEmp } = useDeleteCriticalEmp()
 
@@ -135,15 +134,25 @@ export default function CriticalTable({ data, status, error, isFetchingNextPage,
                                                                     </Button>
                                                                 </DropdownMenuItem>
                                                                 <DropdownMenuItem asChild className="cursor-pointer">
-                                                                    <Button
-                                                                        size='icon'
-                                                                        variant='ghost'
-                                                                        className="w-full cursor-pointer text-red-600! flex justify-start gap-2 px-1.5"
-                                                                        onClick={() => setDeleteCEmp(emp)}
-                                                                    >
-                                                                        <RiDeleteBin5Line className="hover:text-red-600" />
-                                                                        Delete
-                                                                    </Button>
+                                                                    <Dialog>
+                                                                        <DialogTrigger asChild>
+                                                                            <Button
+                                                                                size='icon'
+                                                                                variant='ghost'
+                                                                                className="w-full cursor-pointer text-red-600! flex justify-start gap-2 px-1.5"
+                                                                            >
+                                                                                <RiDeleteBin5Line className="hover:text-red-600" />
+                                                                                Delete
+                                                                            </Button>
+                                                                        </DialogTrigger>
+                                                                        <ConfirmModal
+                                                                            title="Delete Critical Employee Info Confirmation."
+                                                                            description={`Are you sure you want to delete this critical employee information? This action cannot be undone.`}
+                                                                            isLoading={deletingCriticalEmp}
+                                                                            loadingLabel="Deleting..."
+                                                                            onConfirm={() => deleteCriticalEmp(emp.id)}
+                                                                        />
+                                                                    </Dialog>
                                                                 </DropdownMenuItem>
                                                             </DropdownMenuGroup>
                                                         </DropdownMenuContent>
@@ -172,15 +181,6 @@ export default function CriticalTable({ data, status, error, isFetchingNextPage,
                                             }}
                                             action={viewAction.actionPlan}
                                             onClose={() => setViewAction(null)}
-                                        />}
-                                    </Dialog>
-                                    <Dialog open={!!deleteCEmp} onOpenChange={(o) => !o && setDeleteCEmp(null)}>
-                                        {deleteCEmp && <ConfirmModal
-                                            title="Delete Critical Employee Info Confirmation."
-                                            description={`Are you sure you want to delete this critical employee information? This action cannot be undone.`}
-                                            isLoading={deletingCriticalEmp}
-                                            loadingLabel="Deleting..."
-                                            onConfirm={() => deleteCriticalEmp(deleteCEmp.id)}
                                         />}
                                     </Dialog>
                                 </TableBody>

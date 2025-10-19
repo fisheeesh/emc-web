@@ -6,7 +6,7 @@ import LocalSearch from "@/components/shared/local-search";
 import TableSkeleton from "@/components/shared/table-skeleton";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Dialog } from "@/components/ui/dialog";
+import { Dialog, DialogTrigger } from "@/components/ui/dialog";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import Empty from "@/components/ui/empty";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -33,7 +33,6 @@ interface Props {
 
 export default function ActionsTable({ data, status, error, isFetchingNextPage, fetchNextPage, hasNextPage }: Props) {
     const [editingPlan, setEditingPlan] = useState<ActionPlan | null>(null);
-    const [delPlan, setDelPlan] = useState<ActionPlan | null>(null);
     const { deleteActionPlan, deletingActionPlan } = useDeleteActionPlan()
 
     return (
@@ -168,15 +167,25 @@ export default function ActionsTable({ data, status, error, isFetchingNextPage, 
                                                                     </Button>
                                                                 </DropdownMenuItem>
                                                                 <DropdownMenuItem asChild className="cursor-pointer">
-                                                                    <Button
-                                                                        size='icon'
-                                                                        variant='ghost'
-                                                                        className="w-full cursor-pointer flex text-red-600! justify-start gap-2 px-1.5"
-                                                                        onClick={() => setDelPlan(action)}
-                                                                    >
-                                                                        <RiDeleteBin5Line className="text-red-600" />
-                                                                        Delete
-                                                                    </Button>
+                                                                    <Dialog>
+                                                                        <DialogTrigger asChild>
+                                                                            <Button
+                                                                                size='icon'
+                                                                                variant='ghost'
+                                                                                className="w-full cursor-pointer flex text-red-600! justify-start gap-2 px-1.5"
+                                                                            >
+                                                                                <RiDeleteBin5Line className="text-red-600" />
+                                                                                Delete
+                                                                            </Button>
+                                                                        </DialogTrigger>
+                                                                        <ConfirmModal
+                                                                            title="Delete Action Plan Confirmation."
+                                                                            description={`Are you sure you want to delete this action plan? This action cannot be undone.`}
+                                                                            isLoading={deletingActionPlan}
+                                                                            loadingLabel="Deleting..."
+                                                                            onConfirm={() => deleteActionPlan(action.id)}
+                                                                        />
+                                                                    </Dialog>
                                                                 </DropdownMenuItem>
                                                             </DropdownMenuGroup>
                                                         </DropdownMenuContent>
@@ -189,15 +198,6 @@ export default function ActionsTable({ data, status, error, isFetchingNextPage, 
                                         {editingPlan && <ActionDetailsModal
                                             action={editingPlan}
                                             onClose={() => setEditingPlan(null)}
-                                        />}
-                                    </Dialog>
-                                    <Dialog open={!!delPlan} onOpenChange={(o) => !o && setDelPlan(null)}>
-                                        {delPlan && <ConfirmModal
-                                            title="Delete Action Plan Confirmation."
-                                            description={`Are you sure you want to delete this action plan? This action cannot be undone.`}
-                                            isLoading={deletingActionPlan}
-                                            loadingLabel="Deleting..."
-                                            onConfirm={() => deleteActionPlan(delPlan.id)}
                                         />}
                                     </Dialog>
                                 </TableBody>

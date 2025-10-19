@@ -10,10 +10,11 @@ import { useRef } from "react";
 import { useForm, type SubmitHandler } from "react-hook-form";
 import { AiOutlineIdcard } from "react-icons/ai";
 import { FaRegBuilding, FaRegSadTear, FaRegThumbsUp } from "react-icons/fa";
+import { GiGlassCelebration } from "react-icons/gi";
 import { IoMdHelpCircleOutline } from "react-icons/io";
 import { IoPersonOutline } from "react-icons/io5";
 import { LuFlagTriangleRight } from "react-icons/lu";
-import { MdEventNote, MdOutlineAddReaction, MdOutlineCalendarMonth, MdOutlineMailOutline, MdOutlineStars } from "react-icons/md";
+import { MdOutlineAddReaction, MdOutlineCalendarMonth, MdOutlineMailOutline, MdOutlineStars } from "react-icons/md";
 import z from "zod";
 import CustomActionBadge from "../dashboard/custom-action-badge";
 import Editor from "../editor";
@@ -38,11 +39,15 @@ export default function ActionDetailsModal({ action, onClose }: { action: Action
     })
 
     const onSubmit: SubmitHandler<z.infer<typeof updateActionFormSchema>> = async (values) => {
+        let emailType;
+        if (action.suggestions) emailType = "UPDATE"
+        else emailType = "RESPONSE"
+
         updateActionPlan({
             id: action.id,
             suggestions: values.suggestions,
             status: values.status,
-            emailType: "RESPONSE"
+            emailType: emailType as "RESPONSE" | "UPDATE"
         }, {
             onSettled: () => {
                 form.reset()
@@ -80,10 +85,10 @@ export default function ActionDetailsModal({ action, onClose }: { action: Action
                     {/* Victim */}
                     <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4 shadow-sm">
                         <div className="flex items-center gap-2 mb-2">
-                            <FaRegSadTear className="text-red-600" size={18} />
-                            <h4 className="font-semibold text-sm text-gray-700 dark:text-gray-300">Employee</h4>
+                            <MdOutlineAddReaction className="text-green-600" size={18} />
+                            <h4 className="font-semibold text-sm text-gray-700 dark:text-gray-300">Quick Action</h4>
                         </div>
-                        <p className="text-sm text-gray-600 dark:text-gray-400">{action.criticalEmployee.employee.fullName}</p>
+                        <p className="text-sm text-gray-600 dark:text-gray-400">{action.quickAction}</p>
                     </div>
 
                     {/* Department */}
@@ -98,10 +103,10 @@ export default function ActionDetailsModal({ action, onClose }: { action: Action
                     {/* Assign To */}
                     <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4 shadow-sm">
                         <div className="flex items-center gap-2 mb-2">
-                            <IoPersonOutline className="text-teal-600" size={18} />
-                            <h4 className="font-semibold text-sm text-gray-700 dark:text-gray-300">Assigned To</h4>
+                            <FaRegSadTear className="text-red-600" size={18} />
+                            <h4 className="font-semibold text-sm text-gray-700 dark:text-gray-300">Employee</h4>
                         </div>
-                        <p className="text-sm text-gray-600 dark:text-gray-400">{action.assignTo}</p>
+                        <p className="text-sm text-gray-600 dark:text-gray-400">{action.criticalEmployee.employee.fullName}</p>
                     </div>
 
                     {/* Contact */}
@@ -116,10 +121,10 @@ export default function ActionDetailsModal({ action, onClose }: { action: Action
                     {/* Priority */}
                     <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4 shadow-sm">
                         <div className="flex items-center gap-2 mb-2">
-                            <MdOutlineStars className="text-orange-600" size={18} />
-                            <h4 className="font-semibold text-sm text-gray-700 dark:text-gray-300">Priority</h4>
+                            <IoPersonOutline className="text-teal-600" size={18} />
+                            <h4 className="font-semibold text-sm text-gray-700 dark:text-gray-300">Assigned To</h4>
                         </div>
-                        <CustomBadge status={action.priority.toLowerCase() as "high" | "medium" | "low"} />
+                        <p className="text-sm text-gray-600 dark:text-gray-400">{action.assignTo}</p>
                     </div>
 
                     {/* Type */}
@@ -134,26 +139,33 @@ export default function ActionDetailsModal({ action, onClose }: { action: Action
                     {/* Due Date */}
                     <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4 shadow-sm">
                         <div className="flex items-center gap-2 mb-2">
+                            <MdOutlineStars className="text-orange-600" size={18} />
+                            <h4 className="font-semibold text-sm text-gray-700 dark:text-gray-300">Priority</h4>
+                        </div>
+                        <CustomBadge status={action.priority.toLowerCase() as "high" | "medium" | "low"} />
+                    </div>
+
+                    {/* Quick Action */}
+                    <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4 shadow-sm">
+                        <div className="flex items-center gap-2 mb-2">
                             <MdOutlineCalendarMonth className="text-rose-600" size={18} />
                             <h4 className="font-semibold text-sm text-gray-700 dark:text-gray-300">Due Date</h4>
                         </div>
                         <p className="text-sm font-en text-gray-600 dark:text-gray-400">{action.dueDate}</p>
                     </div>
-
-                    {/* Quick Action */}
-                    <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4 shadow-sm md:col-span-2">
+                    <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4 shadow-sm">
                         <div className="flex items-center gap-2 mb-2">
-                            <MdOutlineAddReaction className="text-green-600" size={18} />
-                            <h4 className="font-semibold text-sm text-gray-700 dark:text-gray-300">Quick Action</h4>
+                            <GiGlassCelebration className="text-amber-600" size={18} />
+                            <h4 className="font-semibold text-sm text-gray-700 dark:text-gray-300">Completed At</h4>
                         </div>
-                        <p className="text-sm text-gray-600 dark:text-gray-400">{action.quickAction}</p>
+                        <p className="text-sm font-en text-gray-600 dark:text-gray-400">{action.completedAt ?? "Not Yet"}</p>
                     </div>
                 </div>
 
                 {/* Action Notes */}
                 <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-5 shadow-sm mb-6">
                     <h4 className="font-semibold text-base mb-3 flex items-center gap-2">
-                        <MdEventNote className="text-blue-600" size={20} />
+                        <GiGlassCelebration className="text-amber-600" size={18} />
                         Action Notes
                     </h4>
                     <div className="prose dark:prose-invert max-w-none">
@@ -230,15 +242,15 @@ export default function ActionDetailsModal({ action, onClose }: { action: Action
                                 />
                                 <DialogFooter className="mt-6 pt-5 border-t flex justify-end gap-3">
                                     <DialogClose asChild>
-                                        <Button variant='outline' className="cursor-pointer min-h-[44px]">
+                                        <Button disabled={isWorking} variant='outline' className="cursor-pointer min-h-[44px]">
                                             Close
                                         </Button>
                                     </DialogClose>
-                                    <Button disabled={isWorking} type="submit" className="bg-blue-600 hover:bg-blue-700 text-white min-h-[44px] cursor-pointer">
+                                    {action.type !== 'COMPLETED' && <Button disabled={isWorking} type="submit" className="bg-blue-600 hover:bg-blue-700 text-white min-h-[44px] cursor-pointer">
                                         <Spinner isLoading={isWorking} label="Saving...">
                                             Save Changes
                                         </Spinner>
-                                    </Button>
+                                    </Button>}
                                 </DialogFooter>
                             </form>
                         </Form>

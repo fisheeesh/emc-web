@@ -44,7 +44,6 @@ export default function EmpTables({ data, status, error, isFetchingNextPage, fet
     const [createOpen, setCreateOpen] = useState(false);
     const [editingEmp, setEditingEmp] = useState<Employee | null>(null);
     const [viewEmp, setViewEmp] = useState<Employee | null>(null);
-    const [delEmp, setDelEmp] = useState<Employee | null>(null);
     const { deleteEmp, deletingEmp } = useDeleteEmp()
 
     return (
@@ -74,6 +73,10 @@ export default function EmpTables({ data, status, error, isFetchingNextPage, fet
                                     department: "",
                                     position: "",
                                     role: "EMPLOYEE",
+                                    gender: "MALE",
+                                    birthdate: "",
+                                    workStyle: "ONSITE",
+                                    country: "Thailand",
                                     jobType: "FULLTIME",
                                     avatar: undefined,
                                 }}
@@ -213,15 +216,25 @@ export default function EmpTables({ data, status, error, isFetchingNextPage, fet
                                                                     </Button>
                                                                 </DropdownMenuItem>
                                                                 <DropdownMenuItem asChild className="cursor-pointer">
-                                                                    <Button
-                                                                        size='icon'
-                                                                        variant='ghost'
-                                                                        className="w-full cursor-pointer flex text-red-600! justify-start gap-2 px-1.5"
-                                                                        onClick={() => setDelEmp(emp)}
-                                                                    >
-                                                                        <RiDeleteBin5Line className="text-red-600" />
-                                                                        Delete
-                                                                    </Button>
+                                                                    <Dialog>
+                                                                        <DialogTrigger asChild>
+                                                                            <Button
+                                                                                size='icon'
+                                                                                variant='ghost'
+                                                                                className="w-full cursor-pointer flex text-red-600! justify-start gap-2 px-1.5"
+                                                                            >
+                                                                                <RiDeleteBin5Line className="text-red-600" />
+                                                                                Delete
+                                                                            </Button>
+                                                                        </DialogTrigger>
+                                                                        <ConfirmModal
+                                                                            title="Delete Employee Confirmation."
+                                                                            description={`Are you sure you want to delete this employee? This action cannot be undone.`}
+                                                                            isLoading={deletingEmp}
+                                                                            loadingLabel="Deleting..."
+                                                                            onConfirm={() => deleteEmp(emp.id)}
+                                                                        />
+                                                                    </Dialog>
                                                                 </DropdownMenuItem>
                                                             </DropdownMenuGroup>
                                                         </DropdownMenuContent>
@@ -244,22 +257,17 @@ export default function EmpTables({ data, status, error, isFetchingNextPage, fet
                                                 role: editingEmp.role as "EMPLOYEE" | "ADMIN" | "SUPERADMIN",
                                                 jobType: editingEmp.jobType as "FULLTIME" | "PARTTIME" | "CONTRACT" | "INTERNSHIP",
                                                 accType: editingEmp.accType as "ACTIVE" | "FREEZE",
+                                                gender: "MALE",
+                                                birthdate: "",
+                                                workStyle: "ONSITE",
+                                                country: "Thailand",
                                                 avatar: undefined,
                                             }}
                                             onClose={() => setEditingEmp(null)}
                                         />}
                                     </Dialog>
                                     <Dialog open={!!viewEmp} onOpenChange={(o) => !o && setViewEmp(null)}>
-                                        {viewEmp && <EmpDetailsModal />}
-                                    </Dialog>
-                                    <Dialog open={!!delEmp} onOpenChange={(o) => !o && setDelEmp(null)}>
-                                        {delEmp && <ConfirmModal
-                                            title="Delete Employee Confirmation."
-                                            description={`Are you sure you want to delete this employee? This action cannot be undone.`}
-                                            isLoading={deletingEmp}
-                                            loadingLabel="Deleting..."
-                                            onConfirm={() => deleteEmp(delEmp.id)}
-                                        />}
+                                        {viewEmp && <EmpDetailsModal employee={viewEmp} />}
                                     </Dialog>
                                 </TableBody>
                     }

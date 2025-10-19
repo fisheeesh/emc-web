@@ -1,15 +1,22 @@
+import ActionModal from "@/components/modals/action-modal";
+import ConfirmModal from "@/components/modals/confirm-modal";
 import LocalSearch from "@/components/shared/local-search";
 import TableSkeleton from "@/components/shared/table-skeleton";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogTrigger } from "@/components/ui/dialog";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import Empty from "@/components/ui/empty";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { IMG_URL } from "@/lib/constants";
 import { getInitialName } from "@/lib/utils";
-// import DetailsModal from "../../modals/details-modal";
+import { useState } from "react";
 import { GiBinoculars } from "react-icons/gi";
+import { GrMoreVertical, GrNotes } from "react-icons/gr";
+import { RiDeleteBin5Line } from "react-icons/ri";
+import { MdHistory } from "react-icons/md";
+import useDeleteWatchlistEmp from "@/hooks/emps/use-delete-watchlist-emp";
 
 interface Props {
     data: WatchlistEmployee[]
@@ -22,6 +29,9 @@ interface Props {
 }
 
 export default function WatchListTable({ data, status, error, isFetchingNextPage, fetchNextPage, hasNextPage }: Props) {
+    const [viewAction, setViewAction] = useState<WatchlistEmployee | null>(null);
+    const { deleteWatchlistEmp, deletingWatchlistEmp } = useDeleteWatchlistEmp()
+
     return (
         <Card className="rounded-md border-yellow-500 border-2 flex flex-col gap-5">
             <CardHeader className="flex flex-col md:flex-row gap-3 md:gap-0 justify-between">
@@ -79,22 +89,81 @@ export default function WatchListTable({ data, status, error, isFetchingNextPage
                                                     <span className="whitespace-nowrap">{emp.email}</span>
                                                 </TableCell>
                                                 <TableCell className="text-center">
-                                                    <span className="whitespace-nowrap font-en">{0}</span>
+                                                    <span className="whitespace-nowrap font-en">{emp.avgScore}</span>
                                                 </TableCell>
-                                                <TableCell className="space-x-2 text-center">
-                                                    {/* Details Dialog */}
-                                                    <Dialog>
-                                                        <DialogTrigger asChild>
-                                                            <Button variant='outline' className="cursor-pointer">
-                                                                Details
+                                                <TableCell className="text-center">
+                                                    <DropdownMenu>
+                                                        <DropdownMenuTrigger asChild>
+                                                            <Button size='icon' variant='ghost' className="cursor-pointer">
+                                                                <GrMoreVertical className="size-4" />
                                                             </Button>
-                                                        </DialogTrigger>
-                                                        {/* <DetailsModal employee={emp} /> */}
-                                                    </Dialog>
+                                                        </DropdownMenuTrigger>
+                                                        <DropdownMenuContent className="w-30" align="end" forceMount>
+                                                            <DropdownMenuGroup>
+                                                                <DropdownMenuItem asChild className="cursor-pointer">
+                                                                    <Button
+                                                                        size='icon'
+                                                                        variant='ghost'
+                                                                        className="w-full cursor-pointer flex justify-start gap-2 px-1.5"
+                                                                        onClick={() => setViewAction(emp)}
+                                                                    >
+                                                                        <GrNotes className="text-black dark:text-white" />
+                                                                        Taken Action
+                                                                    </Button>
+                                                                </DropdownMenuItem>
+                                                                <DropdownMenuItem asChild className="cursor-pointer">
+                                                                    <Button
+                                                                        size='icon'
+                                                                        variant='ghost'
+                                                                        className="w-full cursor-pointer flex justify-start gap-2 px-1.5"
+                                                                        onClick={() => setViewAction(emp)}
+                                                                    >
+                                                                        <MdHistory className="text-black dark:text-white" />
+                                                                        History
+                                                                    </Button>
+                                                                </DropdownMenuItem>
+                                                                <DropdownMenuItem asChild className="cursor-pointer">
+                                                                    <Dialog>
+                                                                        <DialogTrigger asChild>
+                                                                            <Button
+                                                                                size='icon'
+                                                                                variant='ghost'
+                                                                                className="w-full cursor-pointer text-red-600! flex justify-start gap-2 px-1.5"
+                                                                            >
+                                                                                <RiDeleteBin5Line className="hover:text-red-600" />
+                                                                                Delete
+                                                                            </Button>
+                                                                        </DialogTrigger>
+                                                                        <ConfirmModal
+                                                                            title="Delete Watchlist Employee Info Confirmation."
+                                                                            description={`Are you sure you want to delete this watchlist employee information? This action cannot be undone.`}
+                                                                            isLoading={deletingWatchlistEmp}
+                                                                            loadingLabel="Deleting..."
+                                                                            onConfirm={() => deleteWatchlistEmp(emp.id)}
+                                                                        />
+                                                                    </Dialog>
+                                                                </DropdownMenuItem>
+                                                            </DropdownMenuGroup>
+                                                        </DropdownMenuContent>
+                                                    </DropdownMenu>
                                                 </TableCell>
                                             </TableRow>
                                         ))
                                     }
+                                    <Dialog open={!!viewAction} onOpenChange={(o) => !o && setViewAction(null)}>
+                                        {viewAction && <ActionModal
+                                            employee={{
+                                                id: viewAction.id,
+                                                name: viewAction.fullName,
+                                                department: viewAction.department.name,
+                                                departmentId: viewAction.department.id,
+                                                score: viewAction.avgScore,
+                                                contact: viewAction.email
+                                            }}
+                                            action={viewAction.actionPlan}
+                                            onClose={() => setViewAction(null)}
+                                        />}
+                                    </Dialog>
                                 </TableBody>
                     }
                 </Table>
