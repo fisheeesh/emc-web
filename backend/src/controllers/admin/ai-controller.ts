@@ -135,6 +135,59 @@ export const generateAIAnalysis = [
     }
 ]
 
+export const regenerateAIAnalysis = [
+    body("criticalEmpId", "Critical Employee Id is required.").isInt({ gt: 0 }),
+    async (req: CustomRequest, res: Response, next: NextFunction) => {
+        const errors = validationResult(req).array({ onlyFirstError: true })
+        if (errors.length) return next(createHttpErrors({
+            message: errors[0].msg,
+            status: 400,
+            code: errorCodes.invalid
+        }))
+
+        const empId = req.employeeId
+        const emp = await getEmployeeById(empId!)
+        checkEmployeeIfNotExits(emp)
+
+        const { criticalEmpId } = req.body
+
+        //* Find and delete existing analysis for the critical employee instance
+        const existingAnalysis = await prisma.aIAnalysis.findUnique({
+            where: { criticalId: criticalEmpId },
+            select: {
+                id: true,
+                critical: {
+                    select: {
+                        actionPlan: {
+                            select: { id: true }
+                        }
+                    }
+                }
+            }
+        })
+
+        if (!existingAnalysis) return next(createHttpErrors({
+            message: "No existing AI analysis found to regenerate.",
+            status: 404,
+            code: errorCodes.notFound
+        }))
+
+        if (existingAnalysis && existingAnalysis.critical.actionPlan) return next(createHttpErrors({
+            message: "Cannot regenerate analysis as an action plan has already been created for this critical employee instance.",
+            status: 400,
+            code: errorCodes.invalid
+        }))
+
+        await prisma.aIAnalysis.delete({
+            where: { id: existingAnalysis.id }
+        })
+
+        //* Proceed to generate new analysis
+        req.body.criticalEmpId = criticalEmpId
+        return generateAIAnalysis[1](req, res, next)
+    }
+]
+
 export const generateAIRecommendation = [
     body("criticalEmpId", "Critical Employee Id is required.").isInt({ gt: 0 }),
     async (req: CustomRequest, res: Response, next: NextFunction) => {
