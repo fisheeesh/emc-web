@@ -13,6 +13,8 @@ import { IoSparklesOutline } from "react-icons/io5";
 import { RiRefreshLine } from "react-icons/ri";
 import { toast } from "sonner";
 import { Button } from "../ui/button";
+import useRegenerateAIAnalysis from "@/hooks/ai/use-regenerate-ai-analysis";
+import queryClient from "@/api/query";
 
 interface Props {
     analysis?: Analysis;
@@ -24,45 +26,106 @@ interface Props {
 export default function AIAnalysisModal({ analysis: initialAnalysis, empName, criticalEmpId, canRegenerate }: Props) {
     const [analysis, setAnalysis] = useState<Analysis | undefined>(initialAnalysis);
     const [progress, setProgress] = useState(0);
-    const { generateAnalysis, generating } = useGenerateAIAnalysis();
+    const [isGenerating, setIsGenerating] = useState(false);
+    const [isRegenerating, setIsRegenerating] = useState(false);
+    const { generateAnalysis } = useGenerateAIAnalysis();
+    const { regenerateAnalysis, regenerating } = useRegenerateAIAnalysis();
 
     const handleGenerateAnalysis = async () => {
+        setIsGenerating(true);
         setProgress(0);
+        let isApiComplete = false;
 
-        //* Start progress
+        //* Start progress simulation
         const interval = setInterval(() => {
             setProgress((prev) => {
-                if (prev >= 90) {
-                    return prev;
+                // If API is done, jump to 100%
+                if (isApiComplete) {
+                    clearInterval(interval);
+                    return 100;
                 }
-                return prev + 5;
+
+                // Otherwise keep incrementing but never reach 100%
+                if (prev >= 95) {
+                    return 95; // Stay at 95% until API completes
+                }
+                return prev + 15; // Increase by 15% each second
             });
         }, 1000);
 
         try {
             const response = await generateAnalysis({ criticalEmpId });
 
-            //* Complete progress
-            clearInterval(interval);
-            setProgress(100);
+            //* Mark API as complete - this will trigger progress to jump to 100%
+            isApiComplete = true;
 
-            //* Wait a moment to show 100%
+            //* Wait for progress bar to reach 100%, then show analysis
             setTimeout(() => {
+                clearInterval(interval);
                 setAnalysis(response.data);
+                queryClient.invalidateQueries({ queryKey: ["critical", "infinite"], exact: false })
                 setProgress(0);
+                setIsGenerating(false);
                 toast.success('Success', {
                     description: "AI-Analysis generated successfully.",
                 });
-            }, 500);
+            }, 1200); // Wait 1.2s to show 100% and let animation complete
         } catch (error) {
             clearInterval(interval);
             setProgress(0);
+            setIsGenerating(false);
         }
     };
 
+    const handleRegenerateAnalysis = async () => {
+        setIsRegenerating(true);
+        setProgress(0);
+        let isApiComplete = false;
+
+        //* Start progress simulation
+        const interval = setInterval(() => {
+            setProgress((prev) => {
+                if (isApiComplete) {
+                    clearInterval(interval);
+                    return 100;
+                }
+
+                if (prev >= 95) {
+                    return 95;
+                }
+                return prev + 15;
+            });
+        }, 1000);
+
+        try {
+            const response = await regenerateAnalysis({ criticalEmpId });
+
+            //* Mark API as complete
+            isApiComplete = true;
+
+            //* Wait for progress bar to reach 100%, then show updated analysis
+            setTimeout(() => {
+                clearInterval(interval);
+                setAnalysis(response.data);
+                queryClient.invalidateQueries({ queryKey: ["critical", "infinite"], exact: false })
+                setProgress(0);
+                setIsRegenerating(false);
+                toast.success('Success', {
+                    description: "AI-Analysis regenerated successfully.",
+                });
+            }, 1200);
+        } catch (error) {
+            clearInterval(interval);
+            setProgress(0);
+            setIsRegenerating(false);
+        }
+    };
+
+    const showProgressBar = isGenerating || isRegenerating;
+
     return (
         <DialogContent className="w-full mx-auto max-h-[95vh] overflow-y-auto sm:max-w-[1024px] no-scrollbar">
-            {!analysis && !generating ? (
+            {!analysis && !showProgressBar ? (
                 <div className="min-h-[500px] flex flex-col items-center justify-center p-8">
                     <div className="relative mb-8">
                         {/* Animated rings */}
@@ -87,7 +150,7 @@ export default function AIAnalysisModal({ analysis: initialAnalysis, empName, cr
                         Unlock AI-Powered Insights
                     </h3>
                     <p className="text-center text-muted-foreground max-w-md mb-6">
-                        Generate a comprehensive emotional analysis for {empName} using advanced AI.
+                        Generate a comprehensive emotional analysis for <br /><span className="font-semibold text-foreground">{empName}</span> using advanced AI.
                         Get actionable insights and personalized recommendations.
                     </p>
 
@@ -106,7 +169,7 @@ export default function AIAnalysisModal({ analysis: initialAnalysis, empName, cr
                         </div>
                     </div>
                 </div>
-            ) : !analysis && generating ? (
+            ) : showProgressBar ? (
                 <div className="min-h-[500px] flex flex-col items-center justify-center p-8">
                     <div className="relative mb-8">
                         {/* Spinning gradient ring */}
@@ -119,11 +182,12 @@ export default function AIAnalysisModal({ analysis: initialAnalysis, empName, cr
 
                     <h3 className="text-2xl font-bold bg-gradient-to-r from-purple-400 via-pink-500 to-blue-500 bg-clip-text text-transparent mb-3 flex items-center gap-2">
                         <IoSparklesOutline className="text-pink-500 animate-pulse" />
-                        Generating AI Analysis
+                        {isRegenerating ? 'Regenerating AI Analysis' : 'Generating AI Analysis'}
                     </h3>
 
                     <p className="text-center text-muted-foreground max-w-md mb-6">
-                        Creating comprehensive emotional analysis for <span className="font-semibold text-foreground">{empName}</span>
+                        {isRegenerating ? 'Creating fresh' : 'Creating'} comprehensive emotional analysis for <br />
+                        <span className="font-semibold text-foreground">{empName}</span>
                     </p>
 
                     {/* Progress bar */}
@@ -229,22 +293,27 @@ export default function AIAnalysisModal({ analysis: initialAnalysis, empName, cr
                         </div>
                     </div>
 
-                    <div className="mt-5 pt-5 border-t flex justify-end">
-                        {
-                            canRegenerate ?
-                                <Button
-                                    className="flex items-center gap-2 cursor-pointer bg-gradient-to-r from-purple-500 via-pink-500 to-blue-500 hover:from-purple-600 hover:via-pink-600 hover:to-blue-600">
-
-                                    <RiRefreshLine />
-                                    Re-Generate
-                                </Button>
-                                : <DialogClose asChild>
-                                    <Button variant='outline' className="cursor-pointer">
-                                        Close
+                    {
+                        analysis && !showProgressBar &&
+                        <div className="mt-5 pt-5 border-t flex justify-end">
+                            {
+                                canRegenerate ?
+                                    <Button
+                                        type="button"
+                                        disabled={regenerating}
+                                        onClick={handleRegenerateAnalysis}
+                                        className="flex text-white items-center gap-2 cursor-pointer bg-gradient-to-r from-purple-500 via-pink-500 to-blue-500 hover:from-purple-600 hover:via-pink-600 hover:to-blue-600">
+                                        <RiRefreshLine />
+                                        Re-Generate
                                     </Button>
-                                </DialogClose>
-                        }
-                    </div>
+                                    : <DialogClose asChild>
+                                        <Button variant='outline' className="cursor-pointer">
+                                            Close
+                                        </Button>
+                                    </DialogClose>
+                            }
+                        </div>
+                    }
                 </>
             )}
         </DialogContent>
