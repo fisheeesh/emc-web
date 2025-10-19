@@ -91,6 +91,7 @@ export const getAllActionPlans = [
                 type: true,
                 createdAt: true,
                 dueDate: true,
+                completedAt: true,
                 assignTo: true,
                 actionType: true,
                 quickAction: true,
@@ -146,12 +147,13 @@ export const deleteActionPlanById = [
             code: errorCodes.notFound
         }))
 
-        // const delActionPlan = await prisma.actionPlan.delete({
-        //     where: { id }
-        // })
+        const delActionPlan = await prisma.actionPlan.delete({
+            where: { id }
+        })
 
         res.status(200).json({
-            message: "Successfully deleted action plan"
+            message: "Successfully deleted action plan",
+            planId: delActionPlan.id
         })
     }
 ]
@@ -188,6 +190,7 @@ export const updateActionPlan = [
                     }
                 },
                 contact: true,
+                type: true,
             }
         })
 
@@ -195,6 +198,12 @@ export const updateActionPlan = [
             message: "There is no action plan with provided Id.",
             status: 404,
             code: errorCodes.notFound
+        }))
+
+        if (actionPlan.type === 'COMPLETED') return next(createHttpErrors({
+            message: "You cannot update completed action plan.",
+            status: 400,
+            code: errorCodes.invalid
         }))
 
         await prisma.$transaction(async (tx) => {
@@ -210,16 +219,16 @@ export const updateActionPlan = [
             await tx.notification.create({
                 data: {
                     avatar: emp!.avatar! ?? "",
-                    type: 'RESPONSE',
-                    content: getNotificationContent(status, actionPlan.criticalEmployee.employee.fullName),
+                    type: emailType,
+                    content: getNotificationContent(status, actionPlan.criticalEmployee.employee.fullName, emailType),
                     departmentId: actionPlan.criticalEmployee.departmentId
                 }
             })
         })
 
         await EmailQueue.add('notify-email', {
-            subject: response_subject(actionPlan.criticalEmployee.employee.fullName, status),
-            body: response_body(actionPlan.criticalEmployee.employee.fullName, status)
+            subject: response_subject(actionPlan.criticalEmployee.employee.fullName, status, emailType),
+            body: response_body(actionPlan.criticalEmployee.employee.fullName, status, emailType)
         })
 
         res.status(200).json({
