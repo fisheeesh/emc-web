@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { superApi } from "@/api"
+import queryClient from "@/api/query";
 import { useMutation } from "@tanstack/react-query"
 import { toast } from "sonner"
 
@@ -24,6 +25,7 @@ const useCreateActionPlan = () => {
             return res.data
         },
         onSuccess: async () => {
+            queryClient.invalidateQueries({ queryKey: ["critical", "infinite"], exact: false })
             toast.success('Success', {
                 description: "Action plan submitted. Awaiting Upper Management approval."
             });

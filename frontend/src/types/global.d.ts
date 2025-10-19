@@ -35,6 +35,11 @@ interface Employee {
     phone: string,
     email: string,
     accType: string,
+    gender: string,
+    birthdate: string,
+    workStyle: string,
+    country: string,
+    age: number,
     role: string,
     avatar: string,
     createdAt: string,
@@ -101,6 +106,8 @@ interface WatchlistEmployee {
         id: number,
         name: string
     },
+    avgScore: number,
+    actionPlan: ActionPlan,
 }
 
 interface Analysis {
@@ -132,6 +139,7 @@ interface ActionPlan {
     type: string,
     createdAt: string,
     dueDate: string,
+    completedAt: string | null,
     assignTo: string,
     actionType: string,
     quickAction: string,
@@ -147,3 +155,10 @@ type BadgeType =
     | 'failed'
     | 'approved'
     | 'rejected';
+
+interface Country {
+    name: string,
+    flag: string,
+    iso2: string,
+    iso3: string
+}

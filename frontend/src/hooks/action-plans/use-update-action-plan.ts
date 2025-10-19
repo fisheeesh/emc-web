@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { superApi } from "@/api"
+import queryClient from "@/api/query"
 import { useMutation } from "@tanstack/react-query"
 import { toast } from "sonner"
 
@@ -7,7 +8,7 @@ interface UpdateActionPlanPayload {
     id: string,
     suggestions: string,
     status: string,
-    emailType: string
+    emailType: "RESPONSE" | "UPDATE"
 }
 
 const useUpdateActionPlan = () => {
@@ -18,6 +19,7 @@ const useUpdateActionPlan = () => {
             return res.data
         },
         onSuccess: async () => {
+            queryClient.invalidateQueries({ queryKey: ["action-plans", "infinite"], exact: false })
             toast.success('Success', {
                 description: "Saved changes and send back to responsible HR"
             });

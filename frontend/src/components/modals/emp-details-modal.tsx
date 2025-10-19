@@ -1,31 +1,31 @@
 import { Button } from '@/components/ui/button';
 import { DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { IMG_URL } from '@/lib/constants';
+import { formatPhoneNumber, generateEmployeeId, getInitialName } from '@/lib/utils';
+import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { DialogClose } from '@radix-ui/react-dialog';
 import { Briefcase, Calendar, Globe, Heart, Mail, MapPin, MapPinned, Phone, User } from 'lucide-react';
 import { MdOutlineSick } from "react-icons/md";
 
-export default function EmpDetailsModal() {
+export default function EmpDetailsModal({ employee }: { employee: Employee }) {
 
     return (
         <DialogContent className="w-full mx-auto max-h-[90vh] overflow-visible sm:max-w-[1024px] lg:px-8">
             <div className="max-h-[calc(90vh-2rem)] overflow-y-auto no-scrollbar">
                 <DialogHeader className="flex flex-col gap-4 md:flex-row items-start justify-between">
                     <div className="flex gap-4">
-                        <div className="w-16 h-16 rounded-full bg-gray-300 flex justify-center overflow-hidden">
-                            <img
-                                src="https://api.dicebear.com/7.x/avataaars/svg?seed=John"
-                                alt="John Smith"
-                                className="w-full h-full object-cover"
-                            />
-                        </div>
+                        <Avatar className="size-16">
+                            <AvatarImage src={IMG_URL + employee.avatar} alt={employee.fullName} />
+                            <AvatarFallback>{getInitialName(employee.fullName)}</AvatarFallback>
+                        </Avatar>
                         <div className='items-start flex-col '>
-                            <DialogTitle className="text-2xl font-semibold">John Smith</DialogTitle>
-                            <p className="text-sm text-left text-gray-500 mt-1 font-en"># EMP-3726</p>
+                            <DialogTitle className="text-2xl font-semibold">{employee.fullName}</DialogTitle>
+                            <p className="text-sm text-left text-gray-500 mt-1 font-en">{generateEmployeeId(employee.id)}</p>
                         </div>
                     </div>
                     <div className='flex flex-col-reverse md:flex-row items-start md:items-center justify-center gap-2 md:gap-4'>
-                        <p className="text-xs text-gray-400 font-en">Added on 21-Dec-2024</p>
-                        <a href="mailto:example@ata-it-th.com">
+                        <p className="text-xs text-gray-400 font-en">Added on {employee.createdAt}</p>
+                        <a href={`mailto:${employee.email}`} target="_blank" rel="noopener noreferrer">
                             <Button className="bg-brand dark:text-white hover:bg-blue-600 cursor-pointer w-fit">
                                 <Mail className="w-4 h-4 mr-2" />
                                 Send email
@@ -41,7 +41,7 @@ export default function EmpDetailsModal() {
                         </div>
                         <div>
                             <p className="text-xs text-gray-500 mb-1">Employee status</p>
-                            <p className="font-semibold text-sm">Full time</p>
+                            <p className="font-semibold text-sm">{employee.jobType}</p>
                         </div>
                     </div>
 
@@ -51,7 +51,7 @@ export default function EmpDetailsModal() {
                         </div>
                         <div>
                             <p className="text-xs text-gray-500 mb-1">Job role</p>
-                            <p className="font-semibold text-sm">Marketing Manager</p>
+                            <p className="font-semibold text-sm">{employee.position}</p>
                         </div>
                     </div>
 
@@ -61,7 +61,7 @@ export default function EmpDetailsModal() {
                         </div>
                         <div>
                             <p className="text-xs text-gray-500 mb-1">Country</p>
-                            <p className="font-semibold text-sm">United States</p>
+                            <p className="font-semibold text-sm">{employee.country ?? "N/A"}</p>
                         </div>
                     </div>
 
@@ -71,7 +71,7 @@ export default function EmpDetailsModal() {
                         </div>
                         <div>
                             <p className="text-xs text-gray-500 mb-1">Workplace</p>
-                            <p className="font-semibold text-sm">Onsite</p>
+                            <p className="font-semibold text-sm">{employee.workStyle ?? "Not Specified"}</p>
                         </div>
                     </div>
                 </div>
@@ -83,38 +83,32 @@ export default function EmpDetailsModal() {
                         <div className="flex items-center gap-3 py-2">
                             <Calendar className="w-5 h-5 text-gray-400" />
                             <span className="text-sm text-gray-500 w-32">Date of Birth</span>
-                            <span className="text-sm font-medium font-en">March 15, 1985</span>
-                            <span className="text-sm text-gray-500 ml-4 font-en">Age: 39</span>
+                            <span className="text-sm font-medium font-en">{employee.birthdate ?? "NULL"}</span>
+                            <span className="text-sm text-gray-500 ml-4 font-en">Age: {employee.age ?? "NULL"}</span>
                         </div>
 
                         <div className="flex items-center gap-3 py-2">
                             <User className="w-5 h-5 text-gray-400" />
                             <span className="text-sm text-gray-500 w-32">Gender</span>
-                            <span className="text-sm font-medium">Male</span>
+                            <span className="text-sm font-medium">{employee.gender ?? "fe"}</span>
                         </div>
 
                         <div className="flex items-center gap-3 py-2">
                             <MdOutlineSick className="w-5 h-5 text-gray-400" />
                             <span className="text-sm text-gray-500 w-32">Last Critical Time</span>
-                            <span className="text-sm font-medium">Null</span>
+                            <span className="text-sm font-medium">{employee.lastCritical ?? "NULL"}</span>
                         </div>
 
                         <div className="flex items-center gap-3 py-2">
                             <Phone className="w-5 h-5 text-gray-400" />
                             <span className="text-sm text-gray-500 w-32">Phone number</span>
-                            <span className="text-sm font-medium text-brand font-en">+1 213-555-7890</span>
+                            <span className="text-sm font-medium text-brand font-en">{formatPhoneNumber(employee.phone)}</span>
                         </div>
 
                         <div className="flex items-center gap-3 py-2">
                             <Mail className="w-5 h-5 text-gray-400" />
                             <span className="text-sm text-gray-500 w-32">Email</span>
-                            <span className="text-sm font-medium text-brand">john.smith@company.com</span>
-                        </div>
-
-                        <div className="flex items-center gap-3 py-2">
-                            <MapPin className="w-5 h-5 text-gray-400" />
-                            <span className="text-sm text-gray-500 w-32">Address</span>
-                            <span className="text-sm font-medium font-en">456 Oakwood Avenue, Los Angeles, CA, 90012</span>
+                            <span className="text-sm font-medium text-brand">{employee.email}</span>
                         </div>
                     </div>
                 </div>
