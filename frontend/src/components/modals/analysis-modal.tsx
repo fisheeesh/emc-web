@@ -39,17 +39,19 @@ export default function AIAnalysisModal({ analysis: initialAnalysis, empName, cr
         //* Start progress simulation
         const interval = setInterval(() => {
             setProgress((prev) => {
-                // If API is done, jump to 100%
+                //* If API is done, jump to 100%
                 if (isApiComplete) {
                     clearInterval(interval);
                     return 100;
                 }
 
-                // Otherwise keep incrementing but never reach 100%
+                //* Otherwise keep incrementing but never reach 100%
                 if (prev >= 95) {
-                    return 95; // Stay at 95% until API completes
+                    //* Stay at 95% until API completes
+                    return 95;
                 }
-                return prev + 15; // Increase by 15% each second
+                //* Increase by 15% each second
+                return prev + 15;
             });
         }, 1000);
 
@@ -69,7 +71,7 @@ export default function AIAnalysisModal({ analysis: initialAnalysis, empName, cr
                 toast.success('Success', {
                     description: "AI-Analysis generated successfully.",
                 });
-            }, 1200); // Wait 1.2s to show 100% and let animation complete
+            }, 1200)
         } catch (error) {
             clearInterval(interval);
             setProgress(0);

@@ -74,6 +74,45 @@ export const getAllNotifications = async (req: CustomRequest, res: Response, nex
     })
 }
 
+export const markAsReadNotification = [
+    body("id", "Notification Id is required").isInt().toInt(),
+    async (req: CustomRequest, res: Response, next: NextFunction) => {
+        const errors = validationResult(req).array({ onlyFirstError: true })
+        if (errors.length > 0) return next(createHttpErrors({
+            message: errors[0].msg,
+            status: 400,
+            code: errorCodes.invalid
+        }))
+
+        const empId = req.employeeId
+        const emp = await getEmployeeById(empId!)
+        checkEmployeeIfNotExits(emp)
+
+        const { id } = req.body
+
+        const notification = await prisma.notification.findUnique({
+            where: { id: Number(id) }
+        })
+
+        if (!notification) return next(createHttpErrors({
+            message: "There is no notification with provided Id.",
+            status: 404,
+            code: errorCodes.notFound
+        }))
+
+        await prisma.notification.update({
+            where: { id: Number(id) },
+            data: {
+                status: "READ"
+            }
+        })
+
+        res.status(200).json({
+            message: "Successfully marked as read notification"
+        })
+    }
+]
+
 export const createActionPlan = [
     body("criticalEmpId", "Critical Employee Id is required").isInt({ gt: 0 }),
     body("depId", "Department Id is required").isInt({ gt: 0 }),
