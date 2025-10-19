@@ -5,7 +5,7 @@ import { persist, createJSONStorage } from "zustand/middleware";
 interface Notification {
     id: number,
     content: string,
-    status: string,
+    status: "SENT" | "READ",
     avatar: string,
     type: string,
     createdAt: string
@@ -17,6 +17,7 @@ interface State {
 
 interface Action {
     setNotis: (notis: Notification[]) => void,
+    updateNotificationStatus: (id: number, status: "SENT" | "READ") => void,
     clearNotis: () => void
 }
 
@@ -30,6 +31,12 @@ const useNotiStore = create<State & Action>()(
             ...initialState,
             setNotis: (notis: Notification[]) => set(state => {
                 state.notifications = notis
+            }),
+            updateNotificationStatus: (id: number, status: "SENT" | "READ") => set(state => {
+                const notification = state.notifications.find(noti => noti.id === id)
+                if (notification) {
+                    notification.status = status
+                }
             }),
             clearNotis: () => set(initialState)
         })),
