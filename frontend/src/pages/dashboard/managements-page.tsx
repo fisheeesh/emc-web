@@ -1,8 +1,11 @@
 import { actionPlansQuery, empInfiniteQuery } from "@/api/super-admin-query"
-import { ChartAreaInteractive } from "@/components/dashboard/charts/chart-interactive"
 import { SectionCards } from "@/components/dashboard/section-cards"
 import ActionsTable from "@/components/dashboard/tables/actions-table"
 import EmpTables from "@/components/dashboard/tables/emp-tables"
+import { ActionPlanStatusChart } from "@/components/temp/actoin-plan-status"
+import { DepartmentHeatmap } from "@/components/temp/dep-heat-map"
+import { ResponseTimeChart } from "@/components/temp/response-time-chart"
+import { TopConcernsWordCloud } from "@/components/temp/top-concern-words"
 import useTitle from "@/hooks/ui/use-title"
 import { useInfiniteQuery } from "@tanstack/react-query"
 import { useSearchParams } from "react-router"
@@ -52,7 +55,7 @@ export default function ManagementsPage() {
         <section className="flex flex-col items-center justify-center w-full gap-3">
             <SectionCards />
             <div className="w-full">
-                <ChartAreaInteractive />
+                <DepartmentHeatmap />
             </div>
             <div className="w-full">
                 <EmpTables
@@ -75,6 +78,13 @@ export default function ManagementsPage() {
                     fetchNextPage={fetchActionNextPage}
                     hasNextPage={hasActionNextPage}
                 />
+            </div>
+            <div className="w-full">
+                <TopConcernsWordCloud />
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full">
+                <ResponseTimeChart />
+                <ActionPlanStatusChart />
             </div>
         </section>
     )
