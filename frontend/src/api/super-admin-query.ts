@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
+import axios from "axios";
 import { superApi } from "."
 import queryClient from "./query";
 
@@ -54,4 +55,15 @@ export const actionPlansQuery = (kw: string | null = null, dep: string | null = 
     initialPageParam: null,
     // @ts-expect-error ignore type check
     getNextPageParam: (lastPage, pages) => lastPage.nextCursor ?? undefined
+})
+
+const fetchCountries = async () => {
+    const res = await axios.get("https://restcountries.com/v2/all?fields=name,flag")
+
+    return res.data
+}
+
+export const countriesQuery = () => ({
+    queryKey: ['countries'],
+    queryFn: fetchCountries
 })

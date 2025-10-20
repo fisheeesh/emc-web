@@ -84,6 +84,7 @@ export default function CreateEditEmpModal<T extends z.ZodType<any, any, any>>({
         } else {
             formData.append("id", String(userId))
             formData.append("accType", values.accType)
+            // console.log(Object.fromEntries(formData))
 
             editEmp(formData, {
                 onSettled: () => {
@@ -100,7 +101,7 @@ export default function CreateEditEmpModal<T extends z.ZodType<any, any, any>>({
     const isWorking = form.formState.isSubmitting || creatingEmp || editingEmp
 
     return (
-        <DialogContent className="w-full mx-auto max-h-[95vh] overflow-y-auto sm:max-w-[800px] no-scrollbar" {...props}>
+        <DialogContent className="w-full mx-auto max-h-[95vh] overflow-y-auto sm:max-w-[850px] no-scrollbar" {...props}>
             <DialogHeader>
                 <DialogTitle className="text-xl font-bold flex items-center gap-2">
                     {formType === 'CREATE' ? <FaUserPlus /> : <FaUserPen />}

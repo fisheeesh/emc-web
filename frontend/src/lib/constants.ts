@@ -27,15 +27,15 @@ export const COMMON_DATAS: CommonData[] = [
     },
     {
         label: 'Neutral',
-        color: '#3b82f6'
+        color: '#a855f7',
     },
     {
         label: 'Negative',
-        color: '#eab308'
+        color: '#f97316',
     },
     {
         label: 'Critical',
-        color: '#dc2626'
+        color: '#ef4444'
     }
 ];
 

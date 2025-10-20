@@ -1,5 +1,43 @@
+import { PrismaClient } from "../../generated/prisma"
 import { prisma } from "../config/prisma-client"
 import { getEmotionRange } from "../utils/helplers"
+import jwt from 'jsonwebtoken'
+
+const prismaClient = new PrismaClient()
+
+export const createEmployeeWithOTP = async (empData: any, otpData: any) => {
+    return await prismaClient.$transaction(async (tx) => {
+        const data = {
+            ...empData,
+            department: {
+                connectOrCreate: {
+                    where: { name: empData.department },
+                    create: { name: empData.department }
+                }
+            }
+        }
+        const newEmp = await tx.employee.create({ data })
+
+        await tx.otp.create({
+            data: otpData
+        })
+
+        const refreshTokenPayload = { id: newEmp.id, email: newEmp.email, role: newEmp.role }
+
+        const refreshToken = jwt.sign(
+            refreshTokenPayload,
+            process.env.REFRESH_TOKEN_SECRET!,
+            { expiresIn: "30d" }
+        )
+
+        await tx.employee.update({
+            where: { id: newEmp.id },
+            data: { rndToken: refreshToken }
+        })
+
+        return newEmp
+    })
+}
 
 export const updateEmpDataById = async (id: number, empData: any) => {
     const data: any = {
@@ -7,6 +45,10 @@ export const updateEmpDataById = async (id: number, empData: any) => {
         lastName: empData.lastName,
         phone: empData.phone,
         role: empData.role,
+        country: empData.country,
+        birthdate: empData.birthdate,
+        workStyle: empData.workStyle,
+        gender: empData.gender,
         position: empData.position,
         jobType: empData.jobType,
         accType: empData.accType,

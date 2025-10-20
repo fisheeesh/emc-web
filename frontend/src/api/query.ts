@@ -3,7 +3,6 @@ import {
     QueryClient,
 } from '@tanstack/react-query'
 import api from '.'
-import axios from 'axios'
 
 const queryClient = new QueryClient({
     defaultOptions: {
@@ -199,17 +198,6 @@ export const watchlistQuery = (wKw: string | null = null, dep: string | null = n
     initialPageParam: null,
     // @ts-expect-error ignore type check
     getNextPageParam: (lastPage, pages) => lastPage.nextCursor ?? undefined
-})
-
-const fetchCountries = async () => {
-    const res = await axios.get("https://countriesnow.space/api/v0.1/countries/flag/images")
-
-    return res.data
-}
-
-export const countriesQuery = () => ({
-    queryKey: ['countries'],
-    queryFn: fetchCountries
 })
 
 export default queryClient

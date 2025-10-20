@@ -149,16 +149,16 @@ interface ActionPlan {
 }
 
 type BadgeType =
-    | 'pending'
-    | 'processing'
-    | 'completed'
-    | 'failed'
-    | 'approved'
-    | 'rejected';
+    //* Emotions & Priority
+    | 'positive' | 'neutral' | 'negative' | 'critical' | 'high' | 'medium' | 'low'
+    //* Roles, Account, Job Types
+    | 'EMPLOYEE' | 'ADMIN' | 'SUPERADMIN' | 'ACTIVE' | 'FREEZE'
+    | 'FULLTIME' | 'PARTTIME' | 'CONTRACT' | 'INTERNSHIP'
+    //* Action Status
+    | 'pending' | 'processing' | 'completed' | 'approved' | 'failed' | 'rejected';
 
 interface Country {
     name: string,
     flag: string,
-    iso2: string,
-    iso3: string
+    independent: boolean
 }
