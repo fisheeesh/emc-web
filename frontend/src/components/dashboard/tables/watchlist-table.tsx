@@ -17,6 +17,7 @@ import { GrMoreVertical, GrNotes } from "react-icons/gr";
 import { RiDeleteBin5Line } from "react-icons/ri";
 import { MdHistory } from "react-icons/md";
 import useDeleteWatchlistEmp from "@/hooks/emps/use-delete-watchlist-emp";
+import WathclistHistoryModal from "@/components/modals/wathlist-history-modal";
 
 interface Props {
     data: WatchlistEmployee[]
@@ -30,6 +31,7 @@ interface Props {
 
 export default function WatchListTable({ data, status, error, isFetchingNextPage, fetchNextPage, hasNextPage }: Props) {
     const [viewAction, setViewAction] = useState<WatchlistEmployee | null>(null);
+    const [viewHistory, setHistory] = useState<WatchlistEmployee | null>(null);
     const { deleteWatchlistEmp, deletingWatchlistEmp } = useDeleteWatchlistEmp()
 
     return (
@@ -116,7 +118,7 @@ export default function WatchListTable({ data, status, error, isFetchingNextPage
                                                                         size='icon'
                                                                         variant='ghost'
                                                                         className="w-full cursor-pointer flex justify-start gap-2 px-1.5"
-                                                                        onClick={() => setViewAction(emp)}
+                                                                        onClick={() => setHistory(emp)}
                                                                     >
                                                                         <MdHistory className="text-black dark:text-white" />
                                                                         History
@@ -163,6 +165,9 @@ export default function WatchListTable({ data, status, error, isFetchingNextPage
                                             action={viewAction.actionPlan}
                                             onClose={() => setViewAction(null)}
                                         />}
+                                    </Dialog>
+                                    <Dialog open={!!viewHistory} onOpenChange={(o) => !o && setHistory(null)}>
+                                        {viewHistory && <WathclistHistoryModal empName={viewHistory.fullName} />}
                                     </Dialog>
                                 </TableBody>
                     }

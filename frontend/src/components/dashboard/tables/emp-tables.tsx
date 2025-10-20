@@ -22,7 +22,7 @@ import useDeleteEmp from "@/hooks/emps/use-delete-emp";
 import { ACC_FILTER, EMOTION_FILTER, IMG_URL, JOBS_FILTER, ROLES_FILTER, TSFILTER } from "@/lib/constants";
 import { getInitialName } from "@/lib/utils";
 import { createEmpSchema, updateEmpSchema } from "@/lib/validators";
-import moment from "moment";
+import useUserStore from "@/store/user-store";
 import { useState } from "react";
 import { BsEye } from "react-icons/bs";
 import { GrMoreVertical } from "react-icons/gr";
@@ -41,6 +41,7 @@ interface Props {
 }
 
 export default function EmpTables({ data, status, error, isFetchingNextPage, fetchNextPage, hasNextPage }: Props) {
+    const { user } = useUserStore()
     const [createOpen, setCreateOpen] = useState(false);
     const [editingEmp, setEditingEmp] = useState<Employee | null>(null);
     const [viewEmp, setViewEmp] = useState<Employee | null>(null);
@@ -74,7 +75,7 @@ export default function EmpTables({ data, status, error, isFetchingNextPage, fet
                                     position: "",
                                     role: "EMPLOYEE",
                                     gender: "MALE",
-                                    birthdate: "",
+                                    birthdate: new Date().toString(),
                                     workStyle: "ONSITE",
                                     country: "Thailand",
                                     jobType: "FULLTIME",
@@ -121,13 +122,11 @@ export default function EmpTables({ data, status, error, isFetchingNextPage, fet
                         <TableRow>
                             <TableHead className="whitespace-nowrap font-semibold">Name</TableHead>
                             <TableHead className="whitespace-nowrap font-semibold">Position</TableHead>
-                            <TableHead className="whitespace-nowrap font-semibold">Email</TableHead>
                             <TableHead className="whitespace-nowrap font-semibold">Department</TableHead>
                             <TableHead className="whitespace-nowrap font-semibold">Role</TableHead>
                             <TableHead className="whitespace-nowrap font-semibold">Job Type</TableHead>
                             <TableHead className="whitespace-nowrap font-semibold">Acc. Type</TableHead>
                             <TableHead className="whitespace-nowrap font-semibold">Overall</TableHead>
-                            <TableHead className="whitespace-nowrap font-semibold">Last Critical Time</TableHead>
                             <TableHead className="whitespace-nowrap font-semibold">Joined At</TableHead>
                             <TableHead className="whitespace-nowrap text-center font-semibold">Actions</TableHead>
                         </TableRow>
@@ -161,25 +160,19 @@ export default function EmpTables({ data, status, error, isFetchingNextPage, fet
                                                     <span className="whitespace-nowrap">{emp.position}</span>
                                                 </TableCell>
                                                 <TableCell>
-                                                    <span className="whitespace-nowrap">{emp.email}</span>
-                                                </TableCell>
-                                                <TableCell>
                                                     <span className="whitespace-nowrap">{emp.department.name}</span>
                                                 </TableCell>
                                                 <TableCell>
-                                                    <span className="whitespace-nowrap">{emp.role}</span>
+                                                    <CustomBadge value={emp.role} />
                                                 </TableCell>
                                                 <TableCell>
-                                                    <span className="whitespace-nowrap">{emp.jobType}</span>
+                                                    <CustomBadge value={emp.jobType} />
                                                 </TableCell>
                                                 <TableCell>
-                                                    <span className="whitespace-nowrap">{emp.accType}</span>
+                                                    <CustomBadge value={emp.accType} />
                                                 </TableCell>
                                                 <TableCell>
-                                                    <CustomBadge status={emp.status as "positive" | "neutral" | "negative" | "critical"} />
-                                                </TableCell>
-                                                <TableCell>
-                                                    <span className="whitespace-nowrap font-en">{emp.lastCritical ? moment(emp.lastCritical).format('MMMM Do YYYY') : '—'}</span>
+                                                    <CustomBadge value={emp.status} />
                                                 </TableCell>
                                                 <TableCell>
                                                     <span className="whitespace-nowrap font-en">{emp.createdAt}</span>
@@ -215,7 +208,7 @@ export default function EmpTables({ data, status, error, isFetchingNextPage, fet
                                                                         Edit
                                                                     </Button>
                                                                 </DropdownMenuItem>
-                                                                <DropdownMenuItem asChild className="cursor-pointer">
+                                                                {user?.id !== emp.id && <DropdownMenuItem asChild className="cursor-pointer">
                                                                     <Dialog>
                                                                         <DialogTrigger asChild>
                                                                             <Button
@@ -235,7 +228,7 @@ export default function EmpTables({ data, status, error, isFetchingNextPage, fet
                                                                             onConfirm={() => deleteEmp(emp.id)}
                                                                         />
                                                                     </Dialog>
-                                                                </DropdownMenuItem>
+                                                                </DropdownMenuItem>}
                                                             </DropdownMenuGroup>
                                                         </DropdownMenuContent>
                                                     </DropdownMenu>

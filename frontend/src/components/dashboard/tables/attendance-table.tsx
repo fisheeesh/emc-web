@@ -96,7 +96,7 @@ export default function AttendanceTable({ data, status, error, isFetchingNextPag
                                                     <span className="whitespace-nowrap">{att.employee.jobType}</span>
                                                 </TableCell>
                                                 <TableCell>
-                                                    <CustomBadge status={att.status} />
+                                                    <CustomBadge value={att.status} />
                                                 </TableCell>
                                                 <TableCell>
                                                     <span className="whitespace-nowrap font-en">{att.checkInTime}</span>

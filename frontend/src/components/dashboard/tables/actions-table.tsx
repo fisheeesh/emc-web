@@ -19,7 +19,6 @@ import { GoFileSymlinkFile } from "react-icons/go";
 import { GrMoreVertical } from "react-icons/gr";
 import { ImFilePdf } from "react-icons/im";
 import { RiDeleteBin5Line } from "react-icons/ri";
-import CustomActionBadge from "../custom-action-badge";
 
 interface Props {
     data: ActionPlan[]
@@ -116,19 +115,13 @@ export default function ActionsTable({ data, status, error, isFetchingNextPage, 
                                                     <span className="whitespace-nowrap">{action.criticalEmployee.employee.fullName}</span>
                                                 </TableCell>
                                                 <TableCell>
-                                                    <CustomBadge
-                                                        status={action.priority.toLowerCase() as "high" | "medium" | "low"}
-                                                    />
+                                                    <CustomBadge value={action.priority} />
                                                 </TableCell>
                                                 <TableCell>
-                                                    <CustomActionBadge
-                                                        value={action.type.toLowerCase() as BadgeType}
-                                                    />
+                                                    <CustomBadge value={action.type} />
                                                 </TableCell>
                                                 <TableCell>
-                                                    <CustomActionBadge
-                                                        value={action.status.toLowerCase() as BadgeType}
-                                                    />
+                                                    <CustomBadge value={action.status} />
                                                 </TableCell>
                                                 <TableCell>
                                                     <span className="whitespace-nowrap font-en">{action.dueDate}</span>
