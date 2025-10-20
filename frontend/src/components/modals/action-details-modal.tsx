@@ -16,7 +16,6 @@ import { IoPersonOutline } from "react-icons/io5";
 import { LuFlagTriangleRight } from "react-icons/lu";
 import { MdOutlineAddReaction, MdOutlineCalendarMonth, MdOutlineMailOutline, MdOutlineStars } from "react-icons/md";
 import z from "zod";
-import CustomActionBadge from "../dashboard/custom-action-badge";
 import Editor from "../editor";
 import Preview from "../editor/preview";
 import CustomBadge from "../shared/custom-badge";
@@ -133,7 +132,7 @@ export default function ActionDetailsModal({ action, onClose }: { action: Action
                             <LuFlagTriangleRight className="text-indigo-600" size={18} />
                             <h4 className="font-semibold text-sm text-gray-700 dark:text-gray-300">Type</h4>
                         </div>
-                        <CustomActionBadge value={action.type.toLowerCase() as "pending" | "processing" | "completed"} />
+                        <CustomBadge value={action.type} />
                     </div>
 
                     {/* Due Date */}
@@ -142,7 +141,7 @@ export default function ActionDetailsModal({ action, onClose }: { action: Action
                             <MdOutlineStars className="text-orange-600" size={18} />
                             <h4 className="font-semibold text-sm text-gray-700 dark:text-gray-300">Priority</h4>
                         </div>
-                        <CustomBadge status={action.priority.toLowerCase() as "high" | "medium" | "low"} />
+                        <CustomBadge value={action.priority} />
                     </div>
 
                     {/* Quick Action */}

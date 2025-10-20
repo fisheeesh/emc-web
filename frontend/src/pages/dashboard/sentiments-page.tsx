@@ -1,4 +1,5 @@
-import { adminUserDataQuery, countriesQuery, criticalQuery, departmentsQuery, leaderboardsQuery, moodOverviewQuery, notificationQuery, sentimentsComparisonQuery, watchlistQuery } from "@/api/query";
+import { adminUserDataQuery, criticalQuery, departmentsQuery, leaderboardsQuery, moodOverviewQuery, notificationQuery, sentimentsComparisonQuery, watchlistQuery } from "@/api/query";
+import { countriesQuery } from "@/api/super-admin-query";
 import OverViewChart from "@/components/dashboard/charts/overview-chart";
 import SentimentsComparisonChart from "@/components/dashboard/charts/sentiments-comparison-chart";
 import CriticalTable from "@/components/dashboard/tables/critical-table";
@@ -80,7 +81,7 @@ export default function SentimentsDashboardPage() {
         }
 
         if (countriesData) {
-            setCountries(countriesData.data.map((country: Country) => ({
+            setCountries(countriesData.map((country: Country) => ({
                 name: country.name,
                 value: country.name
             })))

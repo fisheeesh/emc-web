@@ -35,7 +35,6 @@ import { LiaBrainSolid } from "react-icons/lia";
 import { MdAdminPanelSettings, MdEventNote, MdFlag } from "react-icons/md";
 import { toast } from "sonner";
 import type z from "zod";
-import CustomActionBadge from "../dashboard/custom-action-badge";
 import Editor from "../editor";
 import Preview from "../editor/preview";
 import CustomBadge from "../shared/custom-badge";
@@ -219,7 +218,7 @@ export default function ActionModal({ employee, action, onClose }: Props) {
                                     <h4 className="font-semibold text-sm text-gray-700 dark:text-gray-300">Status</h4>
                                 </div>
                                 <div className="text-base font-medium">
-                                    <CustomActionBadge value={action.status.toLowerCase() as "approved" | "pending" | "rejected"} />
+                                    <CustomBadge value={action.status} />
                                 </div>
                             </div>
                         </div>
@@ -242,7 +241,7 @@ export default function ActionModal({ employee, action, onClose }: Props) {
                                     <h4 className="font-semibold text-sm text-gray-700 dark:text-gray-300">Priority</h4>
                                 </div>
                                 <div>
-                                    <CustomBadge status={action.priority.toLowerCase() as "high" | "medium" | "low"} />
+                                    <CustomBadge value={action.priority} />
                                 </div>
                             </div>
 
@@ -253,7 +252,7 @@ export default function ActionModal({ employee, action, onClose }: Props) {
                                     <h4 className="font-semibold text-sm text-gray-700 dark:text-gray-300">Type</h4>
                                 </div>
                                 <div>
-                                    <CustomActionBadge value={action.type.toLowerCase() as "pending" | "processing" | "completed"} />
+                                    <CustomBadge value={action.type} />
                                 </div>
                             </div>
                         </div>
