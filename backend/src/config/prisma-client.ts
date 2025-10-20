@@ -38,6 +38,22 @@ export const prisma = new PrismaClient().$extends({
                     return Number(employee.points)
                 }
             },
+            birthdate: {
+                needs: { birthdate: true },
+                compute(employee) {
+                    return employee.birthdate ? employee.birthdate.toLocaleDateString("en-US", {
+                        year: "numeric", month: "long", day: "numeric"
+                    }) : null
+                }
+            },
+            lastCritical: {
+                needs: { lastCritical: true },
+                compute(employee) {
+                    return employee.lastCritical ? employee.lastCritical.toLocaleDateString("en-US", {
+                        year: "numeric", month: "long", day: "numeric"
+                    }) : null
+                }
+            },
             createdAt: {
                 needs: { createdAt: true },
                 compute(employee) {

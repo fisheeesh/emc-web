@@ -1,10 +1,10 @@
 import { NextFunction, Request, Response } from "express"
 import { body, query, validationResult } from "express-validator"
-import { AccType, JobType, Prisma, Role, Gender, WorkStyle } from "../../../generated/prisma"
+import { AccType, Gender, JobType, Prisma, Role, WorkStyle } from "../../../generated/prisma"
 import { errorCodes } from "../../config/error-codes"
 import { ImageQueue } from "../../jobs/queues/image-queue"
-import { createEmployeeWithOTP, getEmployeeByEmail, getEmployeeById } from "../../services/auth-services"
-import { deleteEmployeeById, getEmployeesInfiniteData, updateEmpDataById } from "../../services/emp-services"
+import { getEmployeeByEmail, getEmployeeById } from "../../services/auth-services"
+import { createEmployeeWithOTP, deleteEmployeeById, getEmployeesInfiniteData, updateEmpDataById } from "../../services/emp-services"
 import { checkEmployeeIfExits, checkEmployeeIfNotExits, checkUploadFile, createHttpErrors } from "../../utils/check"
 import { generateHashedValue, generateToken } from "../../utils/generate"
 import { removeFiles } from "../../utils/helplers"
@@ -251,7 +251,7 @@ export const getAllEmployeesInfinite = [
     }
 ]
 
-export const updateEmployeeData = [
+export const updateEmployeeInformation = [
     body("id", "EmpId is required.").isInt({ gt: 0 }),
     body("firstName", "First Name is required.").trim().notEmpty().escape(),
     body("lastName", "Last Name is required.").trim().notEmpty().escape(),
@@ -311,7 +311,7 @@ export const updateEmployeeData = [
         const sEmp = req.employee
         checkEmployeeIfNotExits(sEmp)
 
-        const { id, firstName, lastName, phone, position, role, jobType, accType, department, country, birthdate, workStyle, gender } = req.body
+        const { id, firstName, lastName, phone, position, role, gender, workStyle, jobType, accType, department, country, birthdate } = req.body
 
         const emp = await getEmployeeById(+id)
 
@@ -401,6 +401,12 @@ export const deleteEmployee = [
                 code: errorCodes.notFound
             }))
         }
+
+        if (emp.role === 'SUPERADMIN') return next(createHttpErrors({
+            message: "Cannot delete Super Admin account.",
+            status: 403,
+            code: errorCodes.forbidden
+        }))
 
         const deletedEmp = await deleteEmployeeById(+id)
 
