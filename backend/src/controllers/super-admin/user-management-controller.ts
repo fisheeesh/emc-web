@@ -227,6 +227,11 @@ export const getAllEmployeesInfinite = [
                 department: true,
                 status: true,
                 checkIns: true,
+                _count: {
+                    select: {
+                        criticalTimes: true
+                    }
+                }
             },
             orderBy: {
                 createdAt: ts

@@ -81,34 +81,52 @@ export default function EmpDetailsModal({ employee }: { employee: Employee }) {
                     <h3 className="text-lg font-semibold mb-4 border-b px-4 py-3">Personal Information</h3>
 
                     <div className="grid grid-cols-1 gap-4 px-4 pb-3">
-                        <div className="flex items-center gap-3 py-2">
-                            <Calendar className="w-5 h-5 text-gray-400" />
-                            <span className="text-sm text-gray-500 w-32">Date of Birth</span>
+                        <div className="flex items-center gap-8 py-2">
+                            <div className='flex items-center gap-4'>
+                                <Calendar className="w-5 h-5 text-gray-400" />
+                                <span className="text-sm text-gray-500 w-32">Date of Birth</span>
+                            </div>
                             <span className="text-sm font-medium font-en">{employee.birthdate ?? "NULL"}</span>
-                            <span className="text-sm text-gray-500 ml-4 font-en">Age: {employee.age ?? "NULL"}</span>
+                            <span className="text-sm text-gray-500 ml-4 font-en hidden md:block">Age: {employee.age ?? "NULL"}</span>
                         </div>
 
-                        <div className="flex items-center gap-3 py-2">
-                            <User className="w-5 h-5 text-gray-400" />
-                            <span className="text-sm text-gray-500 w-32">Gender</span>
+                        <div className="flex items-center gap-8 py-2">
+                            <div className='flex items-center gap-4'>
+                                <User className="w-5 h-5 text-gray-400" />
+                                <span className="text-sm text-gray-500 w-32">Gender</span>
+                            </div>
                             <span className="text-sm font-medium">{employee.gender ?? "fe"}</span>
                         </div>
 
-                        <div className="flex items-center gap-3 py-2">
-                            <MdOutlineSick className="w-5 h-5 text-gray-400" />
-                            <span className="text-sm text-gray-500 w-32">Last Critical Time</span>
+                        <div className="flex items-center gap-8 py-2">
+                            <div className='flex items-center gap-4'>
+                                <MdOutlineSick className="w-5 h-5 text-gray-400" />
+                                <span className="text-sm text-gray-500 w-32">Last Critical Time</span>
+                            </div>
                             <span className="text-sm font-medium font-en">{employee.lastCritical ?? "NULL"}</span>
                         </div>
 
-                        <div className="flex items-center gap-3 py-2">
-                            <Phone className="w-5 h-5 text-gray-400" />
-                            <span className="text-sm text-gray-500 w-32">Phone number</span>
+                        <div className="flex items-center gap-8 py-2">
+                            <div className='flex items-center gap-4'>
+                                <MdOutlineSick className="w-5 h-5 text-gray-400" />
+                                <span className="text-sm text-gray-500 w-32">Total Critical Times</span>
+                            </div>
+                            <span className="text-sm font-medium font-en">{employee._count.criticalTimes}</span>
+                        </div>
+
+                        <div className="flex items-center gap-8 py-2">
+                            <div className='flex items-center gap-4'>
+                                <Phone className="w-5 h-5 text-gray-400" />
+                                <span className="text-sm text-gray-500 w-32">Phone number</span>
+                            </div>
                             <span className="text-sm font-medium text-brand font-en">{formatPhoneNumber(employee.phone)}</span>
                         </div>
 
-                        <div className="flex items-center gap-3 py-2">
-                            <Mail className="w-5 h-5 text-gray-400" />
-                            <span className="text-sm text-gray-500 w-32">Email</span>
+                        <div className="flex items-center gap-8 py-2">
+                            <div className='flex items-center gap-4'>
+                                <Mail className="w-5 h-5 text-gray-400" />
+                                <span className="text-sm text-gray-500 w-32">Email</span>
+                            </div>
                             <span className="text-sm font-medium text-brand">{employee.email}</span>
                         </div>
                     </div>

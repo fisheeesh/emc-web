@@ -45,6 +45,9 @@ interface Employee {
     createdAt: string,
     lastCritical: string,
     status: string,
+    _count: {
+        criticalTimes: number
+    },
     department: {
         id: number,
         name: string
