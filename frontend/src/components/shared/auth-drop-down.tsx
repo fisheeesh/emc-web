@@ -48,7 +48,7 @@ export default function AuthDropdown() {
                             <p className="text-sm font-medium leading-none truncate">{user?.fullName}</p>
                             <p className="text-xs leading-none text-muted-foreground truncate">{user?.email}</p>
                         </div>
-                        <CustomBadge value={user!.role} />
+                        <CustomBadge value={user?.role as string} />
                     </DropdownMenuLabel>
                     <DropdownMenuGroup>
                         <DropdownMenuItem asChild className="cursor-pointer">

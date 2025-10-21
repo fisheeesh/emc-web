@@ -491,7 +491,7 @@ code {
 
 .markdown mark {
   background-color: #fff176;
-  color: inherit;
+  color: #000000;
   padding: 0.1em 0.25em;
   border-radius: 3px;
 }
