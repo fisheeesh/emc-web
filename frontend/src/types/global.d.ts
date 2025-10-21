@@ -216,3 +216,9 @@ interface SummaryData {
         trend: 'up' | 'down';
     };
 }
+
+interface ActionPlanStatus {
+    status: string,
+    count: number
+    fill: string
+}

@@ -15,13 +15,6 @@ import {
     ChartTooltipContent,
 } from "@/components/ui/chart"
 
-// Dummy data for action plan statuses
-const chartData = [
-    { status: "pending", count: 12, fill: "var(--color-pending)" },
-    { status: "approved", count: 28, fill: "var(--color-approved)" },
-    { status: "rejected", count: 5, fill: "var(--color-rejected)" },
-]
-
 const chartConfig = {
     count: {
         label: "Action Plans",
@@ -40,13 +33,13 @@ const chartConfig = {
     },
 } satisfies ChartConfig
 
-export function ActionPlanStatusChart() {
+export function ActionPlanStatusChart({ chartData }: { chartData: ActionPlanStatus[] }) {
     const totalPlans = chartData.reduce((acc, curr) => acc + curr.count, 0)
 
     return (
         <Card className="flex flex-col">
             <CardHeader className="pb-0">
-                <CardTitle className="flex items-center gap-2">
+                <CardTitle className="text-xl md:text-2xl flex items-center gap-2">
                     <FileText className="size-5" />
                     Action Plan Status
                 </CardTitle>

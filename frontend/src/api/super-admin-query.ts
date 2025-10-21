@@ -70,6 +70,17 @@ export const summaryDataQuery = (dep: string | null = null) => ({
     queryFn: () => fetchSummaryData(dep)
 })
 
+const getActionPlanStatus = async () => {
+    const res = await superApi.get('/super-admin/action-plan-status')
+
+    return res.data
+}
+
+export const actionPlanStatusQuery = () => ({
+    queryKey: ['action-plan-status'],
+    queryFn: getActionPlanStatus
+})
+
 const fetchCountries = async () => {
     const res = await axios.get("https://restcountries.com/v2/all?fields=name,flag")
 
