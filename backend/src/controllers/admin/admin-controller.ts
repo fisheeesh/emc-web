@@ -271,6 +271,7 @@ export const markAsCompletedActionPlan = [
             await tx.criticalEmployee.update({
                 where: { id: actionPlan.criticalId },
                 data: {
+                    isResolved: true,
                     resolvedAt: new Date()
                 }
             })
