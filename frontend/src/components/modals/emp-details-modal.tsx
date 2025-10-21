@@ -11,7 +11,7 @@ import AttendanceTimeSection from '../shared/attendance-time-section';
 
 export default function EmpDetailsModal({ employee }: { employee: Employee }) {
     return (
-        <DialogContent className="w-full mx-auto max-h-[90vh] overflow-visible sm:max-w-[1024px] lg:px-8">
+        <DialogContent className="w-full mx-auto max-h-[90vh] overflow-visible sm:max-w-[1150px] lg:px-8">
             <div className="max-h-[calc(90vh-2rem)] overflow-y-auto no-scrollbar">
                 <DialogHeader className="flex flex-col gap-4 md:flex-row items-start justify-between">
                     <div className="flex gap-4">
@@ -114,9 +114,9 @@ export default function EmpDetailsModal({ employee }: { employee: Employee }) {
                     </div>
                 </div>
 
-                <EmpEmotionChart />
+                <EmpEmotionChart emotionChartData={employee.checkIns} />
 
-                <AttendanceTimeSection />
+                <AttendanceTimeSection data={employee.workSchedule} />
 
                 <DialogFooter className='py-5 border-t mt-5'>
                     <DialogClose>

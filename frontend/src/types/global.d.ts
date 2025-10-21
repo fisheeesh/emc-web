@@ -51,6 +51,25 @@ interface Employee {
     }
     position: string,
     jobType: string,
+    checkIns: CheckIn[],
+    workSchedule: WorkSchedule
+}
+
+interface WorkSchedule {
+    attendanceData: {
+        timeSlot: string,
+        count: number
+    }[],
+    averageCheckIn: string,
+    earliestCheckIn: string
+    latestCheckIn: string
+    mostCommonTime: string
+    totalCheckIns: number
+}
+
+interface CheckIn {
+    date: string,
+    emotion: string
 }
 
 interface AttendanceOverviewData {
@@ -108,6 +127,13 @@ interface WatchlistEmployee {
     },
     avgScore: number,
     actionPlan: ActionPlan,
+    emotionHistory: EmotionHistory[]
+}
+
+interface EmotionHistory {
+    date: string,
+    emotion: string,
+    value: number
 }
 
 interface Analysis {
