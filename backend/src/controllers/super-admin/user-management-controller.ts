@@ -225,7 +225,8 @@ export const getAllEmployeesInfinite = [
                 createdAt: true,
                 lastCritical: true,
                 department: true,
-                status: true
+                status: true,
+                checkIns: true,
             },
             orderBy: {
                 createdAt: ts
