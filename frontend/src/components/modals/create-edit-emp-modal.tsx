@@ -5,11 +5,13 @@ import useCreateEmp from "@/hooks/emps/use-create-emp";
 import useEditEmp from "@/hooks/emps/use-edit-emp";
 import { cn } from "@/lib/utils";
 import useCountryStore from "@/store/country-store";
+import useFilterStore from "@/store/filter-store";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ChevronDownIcon, Eye, EyeOff } from "lucide-react";
 import { useRef, useState } from "react";
 import { useForm, type ControllerRenderProps, type DefaultValues, type Path, type SubmitHandler } from "react-hook-form";
 import { FaUserPen, FaUserPlus } from "react-icons/fa6";
+import { GoArrowSwitch } from "react-icons/go";
 import z from "zod";
 import Spinner from "../shared/spinner";
 import { Button } from "../ui/button";
@@ -37,7 +39,9 @@ export default function CreateEditEmpModal<T extends z.ZodType<any, any, any>>({
     const fileInputRef = useRef<HTMLInputElement>(null)
     type FormData = z.infer<T>
 
+    const { filters } = useFilterStore()
     const { countries } = useCountryStore()
+    const [isCustomDepartment, setIsCustomDepartment] = useState(false);
     const { createEmp, creatingEmp } = useCreateEmp();
     const { editEmp, editingEmp } = useEditEmp()
 
@@ -271,52 +275,106 @@ export default function CreateEditEmpModal<T extends z.ZodType<any, any, any>>({
                                                                                     </SelectContent>
                                                                                 </Select>
                                                                             ) :
-                                                                                field.name === "avatar" ? (
-                                                                                    <div className="w-full">
-                                                                                        <label className="inline-block text-white font-medium px-4 py-1.5 rounded-md cursor-pointer transition bg-brand hover:bg-own-hover">
-                                                                                            Choose File
-                                                                                            <Input
-                                                                                                ref={fileInputRef}
-                                                                                                disabled={isWorking}
-                                                                                                accept="image/*"
-                                                                                                type="file"
-                                                                                                className="hidden"
-                                                                                                onChange={() => {
-                                                                                                    //* Set the actual File object as the value for the image field
-                                                                                                    const file = fileInputRef.current?.files?.[0] ?? null;
-                                                                                                    form.setValue('image' as Path<FormData>, file as any);
-
-                                                                                                    //* Update the selected file name
-                                                                                                    setSelectedFileName(file ? file.name : "No file chosen");
-                                                                                                }}
-                                                                                            />
-                                                                                        </label>
-                                                                                        <span className="ml-3 text-sm">
-                                                                                            {selectedFileName}
-                                                                                        </span>
-                                                                                    </div>
-                                                                                ) : (
+                                                                                field.name === "department" ? (
                                                                                     <div className="relative">
-                                                                                        <Input
-                                                                                            className={`min-h-[44px] placeholder:font-raleway ${field.name === 'password' || field.name === 'phone' ? 'font-en' : ''}`}
-                                                                                            placeholder={`Enter ${field.name}`}
-                                                                                            disabled={isWorking}
-                                                                                            type={field.name === 'password' ? showPassword ? 'text' : 'password' : 'text'}
-                                                                                            {...field}
-                                                                                        />
-                                                                                        {(field.name === 'password' || field.name === 'confirmPassword') && (
-                                                                                            <button
-                                                                                                type="button"
-                                                                                                onClick={() =>
-                                                                                                    setShowPassword(prev => !prev)
-                                                                                                }
-                                                                                                className="absolute cursor-pointer right-3 top-3.5 text-muted-foreground"
+                                                                                        {isCustomDepartment ? (
+                                                                                            <>
+                                                                                                <Input
+                                                                                                    className="min-h-[44px] placeholder:font-raleway pr-12"
+                                                                                                    placeholder="Enter department name"
+                                                                                                    disabled={isWorking}
+                                                                                                    value={field.value}
+                                                                                                    onChange={field.onChange}
+                                                                                                />
+                                                                                                <Button
+                                                                                                    size='sm'
+                                                                                                    type="button"
+                                                                                                    variant='outline'
+                                                                                                    onClick={() => {
+                                                                                                        setIsCustomDepartment(false);
+                                                                                                        field.onChange('');
+                                                                                                    }}
+                                                                                                    className="absolute cursor-pointer right-2 top-1/2 -translate-y-1/2 text-xs"
+                                                                                                    title="Switch back to select"
+                                                                                                >
+                                                                                                    <GoArrowSwitch />
+                                                                                                </Button>
+                                                                                            </>
+                                                                                        ) : (
+                                                                                            <Select
+                                                                                                onValueChange={(value) => {
+                                                                                                    if (value === "OTHER") {
+                                                                                                        setIsCustomDepartment(true);
+                                                                                                        field.onChange('');
+                                                                                                    } else {
+                                                                                                        field.onChange(value);
+                                                                                                    }
+                                                                                                }}
+                                                                                                defaultValue={field.value}
                                                                                             >
-                                                                                                {showPassword ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
-                                                                                            </button>
+                                                                                                <SelectTrigger className="min-h-[44px] w-full">
+                                                                                                    <SelectValue placeholder="Select Department" />
+                                                                                                </SelectTrigger>
+                                                                                                <SelectContent>
+                                                                                                    {filters.departments.map(dep => (
+                                                                                                        <SelectItem value={dep.name} key={dep.name}>
+                                                                                                            {dep.name}
+                                                                                                        </SelectItem>
+                                                                                                    ))}
+                                                                                                    <SelectItem value="OTHER" className="font-medium">
+                                                                                                        + Other (Type manually)
+                                                                                                    </SelectItem>
+                                                                                                </SelectContent>
+                                                                                            </Select>
                                                                                         )}
                                                                                     </div>
-                                                                                )}
+                                                                                ) :
+                                                                                    field.name === "avatar" ? (
+                                                                                        <div className="w-full">
+                                                                                            <label className="inline-block text-white font-medium px-4 py-1.5 rounded-md cursor-pointer transition bg-brand hover:bg-own-hover">
+                                                                                                Choose File
+                                                                                                <Input
+                                                                                                    ref={fileInputRef}
+                                                                                                    disabled={isWorking}
+                                                                                                    accept="image/*"
+                                                                                                    type="file"
+                                                                                                    className="hidden"
+                                                                                                    onChange={() => {
+                                                                                                        //* Set the actual File object as the value for the image field
+                                                                                                        const file = fileInputRef.current?.files?.[0] ?? null;
+                                                                                                        form.setValue('image' as Path<FormData>, file as any);
+
+                                                                                                        //* Update the selected file name
+                                                                                                        setSelectedFileName(file ? file.name : "No file chosen");
+                                                                                                    }}
+                                                                                                />
+                                                                                            </label>
+                                                                                            <span className="ml-3 text-sm">
+                                                                                                {selectedFileName}
+                                                                                            </span>
+                                                                                        </div>
+                                                                                    ) : (
+                                                                                        <div className="relative">
+                                                                                            <Input
+                                                                                                className={`min-h-[44px] placeholder:font-raleway ${field.name === 'password' || field.name === 'phone' ? 'font-en' : ''}`}
+                                                                                                placeholder={`Enter ${field.name}`}
+                                                                                                disabled={isWorking}
+                                                                                                type={field.name === 'password' ? showPassword ? 'text' : 'password' : 'text'}
+                                                                                                {...field}
+                                                                                            />
+                                                                                            {(field.name === 'password' || field.name === 'confirmPassword') && (
+                                                                                                <button
+                                                                                                    type="button"
+                                                                                                    onClick={() =>
+                                                                                                        setShowPassword(prev => !prev)
+                                                                                                    }
+                                                                                                    className="absolute cursor-pointer right-3 top-3.5 text-muted-foreground"
+                                                                                                >
+                                                                                                    {showPassword ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
+                                                                                                </button>
+                                                                                            )}
+                                                                                        </div>
+                                                                                    )}
                                             </FormControl>
                                             <FormMessage />
                                         </FormItem>
