@@ -3,6 +3,7 @@ import { deleteActionPlanById, getAllActionPlans, updateActionPlan } from "../..
 import { getSummaryData, testSuperAdmin } from "../../../controllers/super-admin/super-admin-controller"
 import { createNewEmployee, deleteEmployee, getAllEmployeesInfinite, updateEmployeeInformation } from "../../../controllers/super-admin/user-management-controller"
 import upload from "../../../middlewares/upload-files-middleware"
+import { getActionPlanStatus } from "../../../controllers/super-admin/analytics-controller"
 
 const router = express.Router()
 
@@ -22,5 +23,8 @@ router.delete("/emps", deleteEmployee)
 router.get("/action-plans", getAllActionPlans)
 router.delete("/action-plans", deleteActionPlanById)
 router.patch("/action-plans", updateActionPlan)
+
+//* Analytics routes
+router.get("/action-plan-status", getActionPlanStatus)
 
 export default router

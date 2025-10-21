@@ -39,7 +39,7 @@ export function ResponseTimeChart() {
     return (
         <Card className="flex flex-col">
             <CardHeader>
-                <CardTitle className="flex items-center gap-2">
+                <CardTitle className="text-xl md:text-2xl flex items-center gap-2">
                     <Clock className="size-5" />
                     Average Response Time
                 </CardTitle>

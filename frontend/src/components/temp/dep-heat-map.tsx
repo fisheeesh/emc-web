@@ -1,13 +1,13 @@
-import { TrendingUp, AlertCircle, CheckCircle } from "lucide-react"
 import {
     Card,
     CardContent,
     CardDescription,
     CardHeader,
     CardTitle,
-} from "@/components/ui/card"
+} from "@/components/ui/card";
+import { AlertCircle, CheckCircle, TrendingUp } from "lucide-react";
+import { BsBuildings } from "react-icons/bs";
 
-// Dummy data: Current wellbeing status by department
 const departmentData = [
     { name: "IT", avgScore: 3.8, status: "positive", employees: 45, trend: "up" },
     { name: "Customer Support", avgScore: 2.3, status: "critical", employees: 32, trend: "down" },
@@ -49,7 +49,8 @@ export function DepartmentHeatmap() {
     return (
         <Card className="flex flex-col">
             <CardHeader>
-                <CardTitle className="flex items-center gap-2">
+                <CardTitle className="text-xl md:text-2xl flex items-center gap-2">
+                    <BsBuildings />
                     Department Wellbeing Heatmap
                 </CardTitle>
                 <CardDescription>

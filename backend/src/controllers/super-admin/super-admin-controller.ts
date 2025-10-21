@@ -19,21 +19,21 @@ export const getSummaryData = [
         try {
             const departmentId = req.query.dep ? parseInt(req.query.dep as string) : undefined;
 
-            // Date range for current month
+            //* Date range for current month
             const now = new Date();
             const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
             const startOfLastMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1);
             const endOfLastMonth = new Date(now.getFullYear(), now.getMonth(), 0);
 
-            // Build where clause
+            //* Build where clause
             const whereClause: any = {};
 
-            // If departmentId is provided, filter by it
+            //* If departmentId is provided, filter by it
             if (departmentId) {
                 whereClause.departmentId = departmentId;
             }
 
-            // 1. Overall Wellbeing Score (avgScore average)
+            //* Overall Wellbeing Score (avgScore average)
             const wellbeingData = await prisma.employee.aggregate({
                 where: whereClause,
                 _avg: {
@@ -60,7 +60,7 @@ export const getSummaryData = [
                 ? ((Number(currentWellbeing) - Number(lastMonthWellbeing)) / Number(lastMonthWellbeing) * 100)
                 : 0;
 
-            // 2. Critical Alerts (unresolved critical employees)
+            //* Critical Alerts (unresolved critical employees)
             const criticalWhere: any = {
                 isResolved: false
             };
@@ -96,7 +96,7 @@ export const getSummaryData = [
                 }
             });
 
-            // 3. Check-in Rate (employees who checked in today vs total active employees)
+            //* Check-in Rate (employees who checked in today vs total active employees)
             const today = new Date();
             today.setHours(0, 0, 0, 0);
 
@@ -117,7 +117,7 @@ export const getSummaryData = [
                 ? (checkedInToday / totalEmployees * 100)
                 : 0;
 
-            // Last month check-in rate
+            //? Last month check-in rate
             const lastMonthDays = endOfLastMonth.getDate();
             const lastMonthCheckIns = await prisma.emotionCheckIn.count({
                 where: {
@@ -146,7 +146,7 @@ export const getSummaryData = [
                 ? ((checkInRate - lastMonthCheckInRate) / lastMonthCheckInRate * 100)
                 : 0;
 
-            // 4. Positive Emotion Rate (emotions >= 0 this month)
+            //* Positive Emotion Rate (emotions >= 0 this month)
             // Emotion scores are between -1 and 1
             // Positive/Neutral: >= 0
             // Negative: < 0
@@ -163,14 +163,14 @@ export const getSummaryData = [
 
             const totalEmotionsThisMonth = thisMonthEmotions.reduce((sum, item) => sum + item._count, 0);
             const positiveEmotionsThisMonth = thisMonthEmotions
-                .filter(item => Number(item.emotionScore) >= 0)
+                .filter(item => Number(item.emotionScore) >= 0.3)
                 .reduce((sum, item) => sum + item._count, 0);
 
             const positiveRate = totalEmotionsThisMonth > 0
                 ? (positiveEmotionsThisMonth / totalEmotionsThisMonth * 100)
                 : 0;
 
-            // Last month positive rate
+            //* Last month positive rate
             const lastMonthEmotions = await prisma.emotionCheckIn.groupBy({
                 by: ['emotionScore'],
                 where: {
@@ -185,7 +185,7 @@ export const getSummaryData = [
 
             const totalEmotionsLastMonth = lastMonthEmotions.reduce((sum, item) => sum + item._count, 0);
             const positiveEmotionsLastMonth = lastMonthEmotions
-                .filter(item => Number(item.emotionScore) >= 0)
+                .filter(item => Number(item.emotionScore) >= 0.3)
                 .reduce((sum, item) => sum + item._count, 0);
 
             const lastMonthPositiveRate = totalEmotionsLastMonth > 0
