@@ -73,12 +73,18 @@ export const prisma = new PrismaClient().$extends({
         },
         emotionCheckIn: {
             checkInTime: {
-                needs: { updatedAt: true },
+                needs: { createdAt: true },
                 compute(emotionCheckIn) {
-                    return emotionCheckIn.updatedAt.toLocaleTimeString("en-US", {
+                    return emotionCheckIn.createdAt.toLocaleTimeString("en-US", {
                         year: "numeric", month: "long", day: "numeric", hour: "numeric", minute: "numeric"
                     })
                 },
+            },
+            points: {
+                needs: { points: true },
+                compute(employee) {
+                    return Number(employee.points)
+                }
             },
             status: {
                 needs: { emotionScore: true },

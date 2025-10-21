@@ -360,6 +360,16 @@ export const getAllWatchlistEmps = [
                 department: true,
                 avgScore: true,
                 lastCritical: true,
+                checkIns: {
+                    select: {
+                        createdAt: true,
+                        status: true,
+                        emotionScore: true
+                    },
+                    orderBy: {
+                        createdAt: 'asc'
+                    }
+                },
                 criticalTimes: {
                     take: 1,
                     orderBy: {
@@ -375,9 +385,9 @@ export const getAllWatchlistEmps = [
             }
         }
 
-        const watchlistEmps = await getAllWatchlistInfinite(options) as any[]
+        const watchlistEmps = await getAllWatchlistInfinite(options)
 
-        //* Transform the data to flatten the actionPlan
+        //* Transform the data to flatten the actionPlan and include emotionData
         const transformedEmps = watchlistEmps.map(emp => ({
             id: emp.id,
             fullName: emp.fullName,
@@ -386,7 +396,8 @@ export const getAllWatchlistEmps = [
             department: emp.department,
             avgScore: emp.avgScore,
             lastCritical: emp.lastCritical,
-            actionPlan: emp.criticalTimes?.[0]?.actionPlan || null
+            actionPlan: emp.criticalTimes?.[0]?.actionPlan || null,
+            emotionHistory: emp.emotionHistory || []
         }))
 
         const hasNextPage = transformedEmps.length > +limit
