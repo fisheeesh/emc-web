@@ -1,9 +1,9 @@
 import express from "express"
 import { deleteActionPlanById, getAllActionPlans, updateActionPlan } from "../../../controllers/super-admin/action-plan-management-controller"
+import { getActionPlanStatus, getDepartmentsHeatmap } from "../../../controllers/super-admin/analytics-controller"
 import { getSummaryData, testSuperAdmin } from "../../../controllers/super-admin/super-admin-controller"
 import { createNewEmployee, deleteEmployee, getAllEmployeesInfinite, updateEmployeeInformation } from "../../../controllers/super-admin/user-management-controller"
 import upload from "../../../middlewares/upload-files-middleware"
-import { getActionPlanStatus } from "../../../controllers/super-admin/analytics-controller"
 
 const router = express.Router()
 
@@ -26,5 +26,6 @@ router.patch("/action-plans", updateActionPlan)
 
 //* Analytics routes
 router.get("/action-plan-status", getActionPlanStatus)
+router.get("/departments-heatmap", getDepartmentsHeatmap)
 
 export default router
