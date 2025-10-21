@@ -88,7 +88,7 @@ export function DepartmentHeatmap() {
                     {departmentData.map((dept) => (
                         <div
                             key={dept.name}
-                            className={`p-4 rounded-lg border-2 transition-all hover:scale-105 cursor-pointer ${getStatusColor(dept.status)}`}
+                            className={`p-4 rounded-lg border-2 ${getStatusColor(dept.status)}`}
                         >
                             <div className="flex items-start justify-between mb-2">
                                 <div className="flex items-center gap-2">

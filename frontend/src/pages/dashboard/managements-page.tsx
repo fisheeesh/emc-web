@@ -1,11 +1,7 @@
 import { actionPlansQuery, countriesQuery, empInfiniteQuery, summaryDataQuery } from "@/api/super-admin-query"
-import { SectionCards } from "@/components/dashboard/section-cards"
+import { SummaryCards } from "@/components/dashboard/summary-cards"
 import ActionsTable from "@/components/dashboard/tables/actions-table"
 import EmpTables from "@/components/dashboard/tables/emp-tables"
-import { ActionPlanStatusChart } from "@/components/temp/actoin-plan-status"
-import { DepartmentHeatmap } from "@/components/temp/dep-heat-map"
-import { ResponseTimeChart } from "@/components/temp/response-time-chart"
-import { TopConcernsWordCloud } from "@/components/temp/top-concern-words"
 import useTitle from "@/hooks/ui/use-title"
 import useCountryStore from "@/store/country-store"
 import { useInfiniteQuery, useIsFetching, useSuspenseQuery } from "@tanstack/react-query"
@@ -73,10 +69,7 @@ export default function ManagementsPage() {
 
     return (
         <section className="flex flex-col items-center justify-center w-full gap-3">
-            <SectionCards data={summaryData.data} isLoading={isSummaryRefetching} />
-            <div className="w-full">
-                <DepartmentHeatmap />
-            </div>
+            <SummaryCards data={summaryData.data} isLoading={isSummaryRefetching} />
             <div className="w-full">
                 <EmpTables
                     data={allEmps}
@@ -98,13 +91,6 @@ export default function ManagementsPage() {
                     fetchNextPage={fetchActionNextPage}
                     hasNextPage={hasActionNextPage}
                 />
-            </div>
-            <div className="w-full">
-                <TopConcernsWordCloud />
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full">
-                <ResponseTimeChart />
-                <ActionPlanStatusChart />
             </div>
         </section>
     )

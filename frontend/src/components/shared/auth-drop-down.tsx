@@ -25,6 +25,7 @@ import LogoutModal from "../modals/log-out-modal";
 import { Button } from "../ui/button";
 import { Dialog, DialogTrigger } from "../ui/dialog";
 import CustomBadge from "./custom-badge";
+import { MdOutlineAnalytics } from "react-icons/md";
 
 export default function AuthDropdown() {
     const { user } = useUserStore()
@@ -64,6 +65,13 @@ export default function AuthDropdown() {
                                 <FaRegCalendarCheck className="size-4 text-black mr-1 dark:text-white" aria-hidden="true" />
                                 Attendance Dashboard
                                 <DropdownMenuShortcut>⇧⌘A</DropdownMenuShortcut>
+                            </Link>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem asChild className="cursor-pointer">
+                            <Link to='dashboard/analytics' className="whitespace-nowrap">
+                                <MdOutlineAnalytics className="size-4 text-black mr-1 dark:text-white" aria-hidden="true" />
+                                Analytics Dashboard
+                                <DropdownMenuShortcut>⇧⌘G</DropdownMenuShortcut>
                             </Link>
                         </DropdownMenuItem>
                         {user?.role === 'SUPERADMIN' && <DropdownMenuItem asChild className="cursor-pointer">

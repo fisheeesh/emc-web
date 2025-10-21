@@ -9,6 +9,7 @@ export const IMG_URL = import.meta.env.VITE_IMG_URL
 export const NAVLINKS = [
     { to: "dashboard/sentiments", name: "Sentiments Dashboard" },
     { to: "dashboard/attendance", name: "Attendance Dashboard" },
+    { to: "dashboard/analytics", name: "Analytics Dashboard" },
     { to: "dashboard/managements", name: "Mangements" },
 ]
 
@@ -63,6 +64,12 @@ export const LEADERBOARD_FILTER = [
     { name: "All Time", value: "all" },
     { name: 'For This Month', value: '30' },
     { name: 'For This Week', value: '7' },
+]
+
+export const CRITICALSTATUS = [
+    { name: "All Status", value: "all" },
+    { name: "Resolved", value: "RESOLVED" },
+    { name: "Unresolved", value: "UNRESOLVED" }
 ]
 
 export const COMPARISON_FILTER = [

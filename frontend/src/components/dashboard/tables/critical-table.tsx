@@ -1,6 +1,7 @@
 import ActionModal from "@/components/modals/action-modal";
 import AIAnalysisModal from "@/components/modals/analysis-modal";
 import ConfirmModal from "@/components/modals/confirm-modal";
+import CommonFilter from "@/components/shared/common-filter";
 import LocalSearch from "@/components/shared/local-search";
 import TableSkeleton from "@/components/shared/table-skeleton";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -11,13 +12,13 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem,
 import Empty from "@/components/ui/empty";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import useDeleteCriticalEmp from "@/hooks/emps/use-delete-critical-emp";
-import { IMG_URL } from "@/lib/constants";
+import { CRITICALSTATUS, IMG_URL } from "@/lib/constants";
 import { getInitialName } from "@/lib/utils";
 import { useState } from "react";
 import { GrMoreVertical, GrNotes } from "react-icons/gr";
 import { IoSparklesOutline } from "react-icons/io5";
-import { RiDeleteBin5Line } from "react-icons/ri";
 import { MdOutlineSick } from "react-icons/md";
+import { RiDeleteBin5Line } from "react-icons/ri";
 
 interface Props {
     data: CriticalEmployee[]
@@ -37,15 +38,24 @@ export default function CriticalTable({ data, status, error, isFetchingNextPage,
 
     return (
         <Card className="rounded-md border-destructive border-2 flex flex-col gap-5">
-            <CardHeader className="flex flex-col md:flex-row gap-3 md:gap-0 justify-between">
-                <div className="flex flex-col items-start gap-2 tracking-wide">
-                    <CardTitle className="text-xl md:text-2xl text-destructive flex items-center gap-2">
-                        <MdOutlineSick />
-                        Critical Mood Table
-                    </CardTitle>
-                    <CardDescription>Employees whose average sentiment score lower than particular points will be shown here</CardDescription>
+            <CardHeader className="space-y-2">
+                <div className="flex flex-col xl:flex-row gap-3 xl:gap-0 justify-between">
+                    <div className="flex flex-col items-start gap-2 tracking-wide">
+                        <CardTitle className="text-xl md:text-2xl text-destructive flex items-center gap-2">
+                            <MdOutlineSick />
+                            Critical Mood Table
+                        </CardTitle>
+                        <CardDescription>Employees whose average sentiment score lower than particular points will be shown here</CardDescription>
+                    </div>
                 </div>
-                <LocalSearch filterValue="cKw" />
+                <div className="flex flex-col lg:flex-row gap-2">
+                    <LocalSearch filterValue="cKw" />
+                    <CommonFilter
+                        filterValue="cStatus"
+                        filters={CRITICALSTATUS}
+                        otherClasses="min-h-[44px] sm:min-w-[90px]"
+                    />
+                </div>
             </CardHeader>
 
             <CardContent>

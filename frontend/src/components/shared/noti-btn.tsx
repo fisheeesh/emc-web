@@ -54,10 +54,10 @@ export default function NotiBtn() {
                 </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent
-                className="w-[350px] h-[350px] flex flex-col p-0"
+                className="w-[380px] h-[350px] flex flex-col p-0"
                 align="end"
             >
-                <div className="flex items-center justify-between px-2 pt-2 pb-2 border-b sticky top-0 z-10 bg-background">
+                <div className="flex items-center justify-between px-2 pt-2 pb-2 border-b sticky top-0 z-10">
                     <h2 className="font-medium text-xl">Notifications</h2>
                     <Tabs value={filter} onValueChange={(v) => setFilter(v as "all" | "unread")} className="w-[90px]">
                         <TabsList className="h-[28px]">

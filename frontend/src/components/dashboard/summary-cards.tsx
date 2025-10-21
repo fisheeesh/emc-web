@@ -17,7 +17,7 @@ interface Props {
     isLoading: boolean
 }
 
-export function SectionCards({ data, isLoading }: Props) {
+export function SummaryCards({ data, isLoading }: Props) {
     return (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 lg:flex-row w-full">
             {/* Overall Wellbeing Score */}

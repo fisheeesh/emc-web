@@ -44,6 +44,13 @@ export default function Router() {
                     loader: attendanceLoader
                 },
                 {
+                    path: '/dashboard/analytics',
+                    lazy: async () => {
+                        const { default: AnalyticsDashboardPage } = await import('./pages/dashboard/analytics-page')
+                        return { Component: AnalyticsDashboardPage }
+                    }
+                },
+                {
                     path: '/dashboard/managements',
                     lazy: async () => {
                         const { default: SettingsPage } = await import('./pages/dashboard/managements-page')
