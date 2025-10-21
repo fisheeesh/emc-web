@@ -32,6 +32,7 @@ export default function SentimentsDashboardPage() {
     const wKw = searchParams.get("wKw")
     const cTs = searchParams.get("cTs")
     const wTs = searchParams.get("wTs")
+    const isResolved = searchParams.get("cStatus") || "all"
 
     const dep = user?.role === 'SUPERADMIN' ? gDep : user?.departmentId.toString()
 
@@ -50,7 +51,7 @@ export default function SentimentsDashboardPage() {
         isFetchingNextPage: isCFetchingNextPage,
         fetchNextPage: fetchCNextPage,
         hasNextPage: hasCNextPage,
-    } = useInfiniteQuery(criticalQuery(cKw, dep, cTs))
+    } = useInfiniteQuery(criticalQuery(cKw, dep, cTs, isResolved))
 
     const {
         status: wStatus,

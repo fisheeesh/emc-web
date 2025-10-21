@@ -199,19 +199,25 @@ export const getAllCriticalEmps = [
     query("dep", "Invalid Department.").trim().escape().optional(),
     query("kw", "Invalid Keyword.").trim().optional().escape(),
     query("ts", "Invalid Timestamp").trim().optional().escape(),
+    query("status", "Invalid Status").trim().optional().escape(),
     async (req: CustomRequest, res: Response, next: NextFunction) => {
         const empId = req.employeeId
         const emp = await getEmployeeById(empId!)
 
         checkEmployeeIfNotExits(emp)
 
-        const { limit = 7, cursor: lastCursor, dep, kw, ts = 'desc' } = req.query
+        const { limit = 7, cursor: lastCursor, dep, kw, ts = 'desc', status } = req.query
+
+        const statusFilter : Prisma.CriticalEmployeeWhereInput = status && status !== 'all' ? {
+            isResolved: status === 'RESOLVED' ? true : false
+        } : {}
 
         const options = {
             take: +limit + 1,
             skip: lastCursor ? 1 : 0,
             cursor: lastCursor ? { id: +lastCursor } : undefined,
             where: {
+                ...statusFilter,
                 ...(kw && {
                     employee: {
                         OR: [

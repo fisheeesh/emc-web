@@ -154,24 +154,26 @@ export const notificationQuery = () => ({
     queryFn: fetchAllNotifications
 })
 
-const fetchAllCriticalEmps = async ({ pageParam, cKw, dep, ts }: {
+const fetchAllCriticalEmps = async ({ pageParam, cKw, dep, ts, status }: {
     pageParam?: number | null,
     cKw?: string | null,
     dep?: string | null,
-    ts?: string | null
+    ts?: string | null,
+    status?: string | null
 }) => {
     let query = pageParam ? `?limit=7&cursor=${pageParam}` : "?limit=7"
     if (cKw) query += `&kw=${cKw}`
     if (dep) query += `&dep=${dep}`
     if (ts) query += `&ts=${ts}`
+    if (status) query += `&status=${status}`
     const res = await api.get(`/admin/critical-emps${query}`)
 
     return res.data
 }
 
-export const criticalQuery = (cKw: string | null = null, dep: string | null = null, ts: string | null = null) => ({
-    queryKey: ['critical', 'infinite', cKw, dep, ts],
-    queryFn: ({ pageParam = null }: { pageParam: number | null }) => fetchAllCriticalEmps({ pageParam, cKw, dep, ts }),
+export const criticalQuery = (cKw: string | null = null, dep: string | null = null, ts: string | null = null, status: string | null = null) => ({
+    queryKey: ['critical', 'infinite', cKw, dep, ts, status],
+    queryFn: ({ pageParam = null }: { pageParam: number | null }) => fetchAllCriticalEmps({ pageParam, cKw, dep, ts, status }),
     initialPageParam: null,
     // @ts-expect-error ignore type check
     getNextPageParam: (lastPage, pages) => lastPage.nextCursor ?? undefined
