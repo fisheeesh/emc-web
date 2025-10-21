@@ -167,7 +167,10 @@ export default function WatchListTable({ data, status, error, isFetchingNextPage
                                         />}
                                     </Dialog>
                                     <Dialog open={!!viewHistory} onOpenChange={(o) => !o && setHistory(null)}>
-                                        {viewHistory && <WathclistHistoryModal empName={viewHistory.fullName} />}
+                                        {viewHistory && <WathclistHistoryModal
+                                            empName={viewHistory.fullName}
+                                            emotionHistory={viewHistory.emotionHistory}
+                                        />}
                                     </Dialog>
                                 </TableBody>
                     }
