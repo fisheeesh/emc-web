@@ -105,12 +105,12 @@ const getBadgeConfig = (value: string): BadgeConfig => {
 
         //* Action Status
         'PENDING': {
-            icon: <Loader className="size-3.5 animate-spin" />,
+            icon: <Loader className="size-3.5" />,
             label: 'Pending',
             className: 'border-yellow-300 bg-yellow-50 text-yellow-700 dark:border-yellow-700 dark:bg-yellow-950/30 dark:text-yellow-400'
         },
         'PROCESSING': {
-            icon: <Loader className="size-3.5 animate-spin" />,
+            icon: <Loader className="size-3.5" />,
             label: 'Processing',
             className: 'border-yellow-300 bg-yellow-50 text-yellow-700 dark:border-yellow-700 dark:bg-yellow-950/30 dark:text-yellow-400'
         },

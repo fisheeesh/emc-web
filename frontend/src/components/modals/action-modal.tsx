@@ -326,12 +326,16 @@ export default function ActionModal({ employee, action, onClose }: Props) {
                                 <p className="italic text-amber-600 text-sm md:text-base text-center">
                                     Note: Take necessary steps to complete this action plan.
                                 </p>
-                                : action.type === 'REJECTED' ? <p className="italic text-sm md:text-base text-red-600 text-center">
-                                    Note: This action plan has been rejected. <br className="block md:hidden" /> Please review and take necessary steps.
-                                </p>
-                                    : <p className="italic text-sm md:text-base text-green-600 text-center">
-                                        Note: This action plan has been completed.
+                                : action.type === "PENDING" ?
+                                    <p className="italic text-amber-600 text-sm md:text-base text-center">
+                                        Note: Awaiting approval from Upper Management
                                     </p>
+                                    : action.type === 'REJECTED' ? <p className="italic text-sm md:text-base text-red-600 text-center">
+                                        Note: This action plan has been rejected. <br className="block md:hidden" /> Please review and take necessary steps.
+                                    </p>
+                                        : <p className="italic text-sm md:text-base text-green-600 text-center">
+                                            Note: This action plan has been completed.
+                                        </p>
                         }
                         <DialogClose asChild>
                             <Button type="button" variant="outline" className="min-h-[44px] cursor-pointer">
@@ -605,9 +609,9 @@ export default function ActionModal({ employee, action, onClose }: Props) {
                             />
                         </div>
 
-                        <div className="flex flex-col md:flex-row justify-between items-center gap-2">
+                        <div className="flex flex-col md:flex-row justify-between items-center gap-2 border-t pt-6 pb-2">
                             <p className="text-muted-foreground italic text-sm md:text-base">Note: Once created, this action plan cannot be modified.</p>
-                            <div className="flex items-center gap-3 border-t pt-6 pb-2">
+                            <div className="flex items-center gap-3">
                                 <DialogClose asChild>
                                     <Button disabled={isWorking} type="button" variant="outline" className="min-h-[44px] cursor-pointer">
                                         Cancel

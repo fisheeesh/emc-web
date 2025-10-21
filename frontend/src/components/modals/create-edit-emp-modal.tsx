@@ -321,7 +321,7 @@ export default function CreateEditEmpModal<T extends z.ZodType<any, any, any>>({
                                                                                                             {dep.name}
                                                                                                         </SelectItem>
                                                                                                     ))}
-                                                                                                    <SelectItem value="OTHER" className="font-medium">
+                                                                                                    <SelectItem value="OTHER" className="font-semibold text-brand hover:text-brand!">
                                                                                                         + Other (Type manually)
                                                                                                     </SelectItem>
                                                                                                 </SelectContent>
