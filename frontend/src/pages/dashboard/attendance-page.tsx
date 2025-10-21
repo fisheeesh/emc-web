@@ -5,7 +5,7 @@ import DisplayCard from "@/components/dashboard/display-card";
 import AttendanceTable from "@/components/dashboard/tables/attendance-table";
 import useTitle from "@/hooks/ui/use-title";
 import useUserStore from "@/store/user-store";
-import { useInfiniteQuery, useSuspenseQuery } from "@tanstack/react-query";
+import { useInfiniteQuery, useIsFetching, useSuspenseQuery } from "@tanstack/react-query";
 import { BarElement, CategoryScale, Chart as ChartJS, Legend, LinearScale, Tooltip } from "chart.js";
 import { useSearchParams } from "react-router";
 
@@ -42,13 +42,17 @@ export default function AttendanceDashboardPage() {
 
     const allAtts = attData?.pages.flatMap(page => page.data) ?? []
 
+    const isAttendanceRefetching = useIsFetching({
+        queryKey: ['daily-attendance'],
+    }) > 0
+
     return (
         <section className="flex flex-col justify-center items-center w-full gap-3">
             {/* Daily Attendance Cards */}
             <div className="flex flex-col lg:flex-row items-center justify-between w-full gap-3">
                 <div className="flex lg:flex-col gap-3 w-full lg:w-1/3">
-                    <DisplayCard data={attendanceData.totalEmp} type='total' />
-                    <DisplayCard data={attendanceData.totalPresent} type='present' />
+                    <DisplayCard data={attendanceData.totalEmp} isLoading={isAttendanceRefetching} type='total' />
+                    <DisplayCard data={attendanceData.totalPresent} isLoading={isAttendanceRefetching} type='present' />
                 </div>
                 {/* Daily Attendance Bar Chart */}
                 <DailyAttendanceChart dataNum={attendanceData.data} dataPerc={attendanceData.percentages} />

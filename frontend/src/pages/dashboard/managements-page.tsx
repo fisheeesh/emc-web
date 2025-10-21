@@ -8,7 +8,7 @@ import { ResponseTimeChart } from "@/components/temp/response-time-chart"
 import { TopConcernsWordCloud } from "@/components/temp/top-concern-words"
 import useTitle from "@/hooks/ui/use-title"
 import useCountryStore from "@/store/country-store"
-import { useInfiniteQuery, useSuspenseQuery } from "@tanstack/react-query"
+import { useInfiniteQuery, useIsFetching, useSuspenseQuery } from "@tanstack/react-query"
 import { useEffect } from "react"
 import { useSearchParams } from "react-router"
 
@@ -67,9 +67,13 @@ export default function ManagementsPage() {
         }
     }, [countriesData, setCountries])
 
+    const isSummaryRefetching = useIsFetching({
+        queryKey: ['summary'],
+    }) > 0
+
     return (
         <section className="flex flex-col items-center justify-center w-full gap-3">
-            <SectionCards data={summaryData.data} />
+            <SectionCards data={summaryData.data} isLoading={isSummaryRefetching} />
             <div className="w-full">
                 <DepartmentHeatmap />
             </div>
