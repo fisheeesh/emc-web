@@ -110,6 +110,10 @@ export const getNotificationContent = (status: string, empName: string, emailTyp
         return `Additional suggestions have been added to the action plan for critical employee - ${empName}. Please review the updated recommendations.`;
     }
 
+    if (emailType === 'REJECTED_DELETE') {
+        return `The rejected action plan for ${empName} has been removed. You can now create a new action plan with the necessary improvements.`;
+    }
+
     switch (status.toUpperCase()) {
         case 'APPROVED':
             return `Your action plan for critical employee - ${empName} has been approved by upper management. You can now proceed with the process! Keep up the great work! 💪`;

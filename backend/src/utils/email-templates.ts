@@ -189,7 +189,7 @@ export const critical_body = (empName: string) => `
 
                         <p style="margin-top: 30px;">
                             Best regards,<br>
-                            <strong>Employee Wellness Monitoring System</strong>
+                            <strong>Employee Wellbeing Management & Emotion Check-in System</strong>
                         </p>
                     </div>
                     
@@ -348,7 +348,7 @@ export const normal_body = (empName: string) => `
 
                 <p style="margin-top: 30px;">
                     Warm regards,<br>
-                    <strong>Employee Wellness Monitoring System</strong>
+                    <strong>Employee Wellbeing Management & Emotion Check-in System</strong>
                 </p>
             </div>
             
@@ -491,3 +491,14 @@ export const completion_body = (empName: string, responsibleHR: string) => {
 <p style="color: #9ca3af; font-size: 12px;">This is an automated notification from the Employee Wellbeing Management & Emotion Check-in System.</p>
     `;
 }
+
+export const rejected_delete_subject = (empName: string) => `Action Required: Create New Action Plan for ${empName}`
+
+export const rejected_delete_body = (empName: string) => `
+    <h2>Action Plan Removed</h2>
+    <p>The rejected action plan for <strong>${empName}</strong> has been removed from the system.</p>
+    <p>Please create a new action plan with the necessary improvements and resubmit it for approval.</p>
+    <p>If you need assistance or guidance on creating an effective action plan, feel free to reach out to the HR department.</p>
+    <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 30px 0;">
+    <p style="color: #9ca3af; font-size: 12px;">This is an automated notification from the Employee Wellbeing Management & Emotion Check-in System.</p>
+`;

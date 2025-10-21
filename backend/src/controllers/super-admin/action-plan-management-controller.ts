@@ -6,7 +6,7 @@ import { checkEmployeeIfNotExits, createHttpErrors } from "../../utils/check"
 import { errorCodes } from "../../config/error-codes"
 import { prisma } from "../../config/prisma-client"
 import { EmailQueue } from "../../jobs/queues/email-queue"
-import { response_subject, response_body } from "../../utils/email-templates"
+import { response_subject, response_body, rejected_delete_subject, rejected_delete_body } from "../../utils/email-templates"
 import { getNotificationContent } from "../../utils/helplers"
 
 interface CustomRequest extends Request {
@@ -138,7 +138,20 @@ export const deleteActionPlanById = [
         const { id } = req.body
 
         const actionPlan = await prisma.actionPlan.findUnique({
-            where: { id }
+            where: { id },
+            select: {
+                criticalEmployee: {
+                    select: {
+                        employee: {
+                            select: {
+                                fullName: true
+                            }
+                        }
+                    }
+                },
+                status: true,
+                departmentId: true
+            }
         })
 
         if (!actionPlan) return next(createHttpErrors({
@@ -146,6 +159,21 @@ export const deleteActionPlanById = [
             status: 404,
             code: errorCodes.notFound
         }))
+
+        if (actionPlan.status === 'REJECTED') {
+            await prisma.notification.create({
+                data: {
+                    avatar: emp!.avatar! ?? "",
+                    type: "REJECTED_DELETE",
+                    content: getNotificationContent(actionPlan.status, actionPlan.criticalEmployee.employee.fullName, "REJECTED_DELETE"),
+                    departmentId: actionPlan.departmentId
+                }
+            })
+            await EmailQueue.add("notify-email", {
+                subject: rejected_delete_subject(actionPlan.criticalEmployee.employee.fullName),
+                body: rejected_delete_body(actionPlan.criticalEmployee.employee.fullName)
+            })
+        }
 
         const delActionPlan = await prisma.actionPlan.delete({
             where: { id }
