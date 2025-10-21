@@ -24,6 +24,7 @@ import { Link } from "react-router";
 import LogoutModal from "../modals/log-out-modal";
 import { Button } from "../ui/button";
 import { Dialog, DialogTrigger } from "../ui/dialog";
+import CustomBadge from "./custom-badge";
 
 export default function AuthDropdown() {
     const { user } = useUserStore()
@@ -43,11 +44,12 @@ export default function AuthDropdown() {
                     </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent className="w-70" align="end" forceMount>
-                    <DropdownMenuLabel className="font-normal mb-1">
+                    <DropdownMenuLabel className="font-normal mb-1 flex items-center justify-between">
                         <div className="flex flex-col space-y-1">
                             <p className="text-sm font-medium leading-none truncate">{user?.fullName}</p>
                             <p className="text-xs leading-none text-muted-foreground truncate">{user?.email}</p>
                         </div>
+                        <CustomBadge value={user!.role} />
                     </DropdownMenuLabel>
                     <DropdownMenuGroup>
                         <DropdownMenuItem asChild className="cursor-pointer">

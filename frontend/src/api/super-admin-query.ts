@@ -57,6 +57,18 @@ export const actionPlansQuery = (kw: string | null = null, dep: string | null = 
     getNextPageParam: (lastPage, pages) => lastPage.nextCursor ?? undefined
 })
 
+const fetchSummaryData = async (dep: string | null = null) => {
+    const query = dep ? `?dep=${dep}` : ''
+    const res = await superApi.get(`/super-admin/summary${query}`)
+
+    return res.data
+}
+
+export const summaryDataQuery = (dep: string | null = null) => ({
+    queryKey: ['summary', dep ?? undefined],
+    queryFn: () => fetchSummaryData(dep)
+})
+
 const fetchCountries = async () => {
     const res = await axios.get("https://restcountries.com/v2/all?fields=name,flag")
 

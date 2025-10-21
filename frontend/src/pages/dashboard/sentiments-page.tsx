@@ -1,12 +1,10 @@
 import { adminUserDataQuery, criticalQuery, departmentsQuery, leaderboardsQuery, moodOverviewQuery, notificationQuery, sentimentsComparisonQuery, watchlistQuery } from "@/api/query";
-import { countriesQuery } from "@/api/super-admin-query";
 import OverViewChart from "@/components/dashboard/charts/overview-chart";
 import SentimentsComparisonChart from "@/components/dashboard/charts/sentiments-comparison-chart";
 import CriticalTable from "@/components/dashboard/tables/critical-table";
 import LeaderBoardTable from "@/components/dashboard/tables/leaderboard-table";
 import WatchListTable from "@/components/dashboard/tables/watchlist-table";
 import useTitle from "@/hooks/ui/use-title";
-import useCountryStore from "@/store/country-store";
 import useFilterStore from "@/store/filter-store";
 import useNotiStore from "@/store/noti-store";
 import useUserStore from "@/store/user-store";
@@ -23,7 +21,6 @@ export default function SentimentsDashboardPage() {
     const { user, setUser } = useUserStore()
     const { setFilters } = useFilterStore()
     const { setNotis } = useNotiStore()
-    const { setCountries } = useCountryStore()
     const [searchParams] = useSearchParams()
 
     const gDep = searchParams.get('gDep') || 'all'
@@ -44,7 +41,6 @@ export default function SentimentsDashboardPage() {
     const { data: sentimentsComparison } = useSuspenseQuery(sentimentsComparisonQuery(sentimentsFilter, dep))
     const { data: leaderboardsData } = useSuspenseQuery(leaderboardsQuery(lKw, dep, lduration))
     const { data: notificationsData } = useSuspenseQuery(notificationQuery())
-    const { data: countriesData } = useSuspenseQuery(countriesQuery())
 
     const {
         status: cStatus,
@@ -80,13 +76,6 @@ export default function SentimentsDashboardPage() {
             })
         }
 
-        if (countriesData) {
-            setCountries(countriesData.map((country: Country) => ({
-                name: country.name,
-                value: country.name
-            })))
-        }
-
         if (notificationsData) {
             setNotis(notificationsData.data)
         }
@@ -101,7 +90,7 @@ export default function SentimentsDashboardPage() {
                 departmentId: adminUserData.data.departmentId
             })
         }
-    }, [departmentsData, adminUserData, setUser, setFilters, notificationsData, setNotis, countriesData, setCountries])
+    }, [departmentsData, adminUserData, setUser, setFilters, notificationsData, setNotis])
 
     return (
         <section className="flex flex-col items-center justify-center w-full gap-3">

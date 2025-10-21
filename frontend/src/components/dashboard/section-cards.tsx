@@ -11,7 +11,7 @@ import {
     CardTitle,
 } from "@/components/ui/card"
 
-export function SectionCards() {
+export function SectionCards({ data }: { data: SummaryData }) {
     return (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 lg:flex-row w-full">
             {/* Overall Wellbeing Score */}
@@ -22,21 +22,24 @@ export function SectionCards() {
                         Overall Wellbeing
                     </CardDescription>
                     <CardTitle className="text-2xl font-semibold tabular-nums font-en">
-                        3.2/4.0
+                        {data.wellbeing.score}/{data.wellbeing.maxScore}
                     </CardTitle>
                     <CardAction>
                         <Badge variant="outline" className="gap-1">
-                            <IoIosTrendingUp />
-                            <span className="font-en">+5.2%</span>
+                            {data.wellbeing.trend === 'up' ? <IoIosTrendingUp /> : <IoIosTrendingDown />}
+                            <span className="font-en">
+                                {data.wellbeing.change > 0 ? '+' : ''}{data.wellbeing.change}%
+                            </span>
                         </Badge>
                     </CardAction>
                 </CardHeader>
                 <CardFooter className="flex-col items-start gap-1.5 text-sm">
                     <div className="line-clamp-1 flex gap-2 font-medium">
-                        Improving this month <IoIosTrendingUp className="size-4" />
+                        {data.wellbeing.trend === 'up' ? 'Improving' : 'Declining'} this month{' '}
+                        {data.wellbeing.trend === 'up' ? <IoIosTrendingUp className="size-4" /> : <IoIosTrendingDown className="size-4" />}
                     </div>
                     <div className="text-muted-foreground">
-                        Average emotion score increasing
+                        Average emotion score {data.wellbeing.trend === 'up' ? 'increasing' : 'decreasing'}
                     </div>
                 </CardFooter>
             </Card>
@@ -49,18 +52,21 @@ export function SectionCards() {
                         Critical Alerts
                     </CardDescription>
                     <CardTitle className="text-2xl font-semibold tabular-nums font-en">
-                        8
+                        {data.criticalAlerts.count}
                     </CardTitle>
                     <CardAction>
                         <Badge variant="outline" className="gap-1">
-                            <IoIosTrendingDown />
-                            <span className="font-en">-3</span>
+                            {data.criticalAlerts.trend === 'down' ? <IoIosTrendingDown /> : <IoIosTrendingUp />}
+                            <span className="font-en">
+                                {data.criticalAlerts.change > 0 ? '+' : ''}{data.criticalAlerts.change}
+                            </span>
                         </Badge>
                     </CardAction>
                 </CardHeader>
                 <CardFooter className="flex-col items-start gap-1.5 text-sm">
                     <div className="line-clamp-1 flex gap-2 font-medium">
-                        <span className="font-en">5</span> resolved this month <IoIosTrendingDown className="size-4" />
+                        <span className="font-en">{data.criticalAlerts.resolvedThisMonth}</span> resolved this month{' '}
+                        <IoIosTrendingDown className="size-4" />
                     </div>
                     <div className="text-muted-foreground">
                         Active critical & watchlist cases
@@ -76,18 +82,21 @@ export function SectionCards() {
                         Check-in Rate
                     </CardDescription>
                     <CardTitle className="text-2xl font-semibold tabular-nums font-en">
-                        94.3%
+                        {data.checkInRate.rate}%
                     </CardTitle>
                     <CardAction>
                         <Badge variant="outline" className="gap-1">
-                            <IoIosTrendingUp />
-                            <span className="font-en">+2.1%</span>
+                            {data.checkInRate.trend === 'up' ? <IoIosTrendingUp /> : <IoIosTrendingDown />}
+                            <span className="font-en">
+                                {data.checkInRate.change > 0 ? '+' : ''}{data.checkInRate.change}%
+                            </span>
                         </Badge>
                     </CardAction>
                 </CardHeader>
                 <CardFooter className="flex-col items-start gap-1.5 text-sm">
                     <div className="line-clamp-1 flex gap-2 font-medium">
-                        Strong engagement <IoIosTrendingUp className="size-4" />
+                        {data.checkInRate.trend === 'up' ? 'Strong' : 'Declining'} engagement{' '}
+                        {data.checkInRate.trend === 'up' ? <IoIosTrendingUp className="size-4" /> : <IoIosTrendingDown className="size-4" />}
                     </div>
                     <div className="text-muted-foreground">
                         Daily attendance & emotion tracking
@@ -103,18 +112,21 @@ export function SectionCards() {
                         Positive Emotion Rate
                     </CardDescription>
                     <CardTitle className="text-2xl font-semibold tabular-nums font-en">
-                        78.5%
+                        {data.positiveRate.rate}%
                     </CardTitle>
                     <CardAction>
                         <Badge variant="outline" className="gap-1">
-                            <IoIosTrendingUp />
-                            <span className="font-en">+8.5%</span>
+                            {data.positiveRate.trend === 'up' ? <IoIosTrendingUp /> : <IoIosTrendingDown />}
+                            <span className="font-en">
+                                {data.positiveRate.change > 0 ? '+' : ''}{data.positiveRate.change}%
+                            </span>
                         </Badge>
                     </CardAction>
                 </CardHeader>
                 <CardFooter className="flex-col items-start gap-1.5 text-sm">
                     <div className="line-clamp-1 flex gap-2 font-medium">
-                        Employees feeling good <IoIosTrendingUp className="size-4" />
+                        Employees feeling {data.positiveRate.trend === 'up' ? 'better' : 'worse'}{' '}
+                        {data.positiveRate.trend === 'up' ? <IoIosTrendingUp className="size-4" /> : <IoIosTrendingDown className="size-4" />}
                     </div>
                     <div className="text-muted-foreground">
                         Positive & neutral emotions this month

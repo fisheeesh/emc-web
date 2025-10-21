@@ -188,3 +188,28 @@ interface Country {
     flag: string,
     independent: boolean
 }
+
+interface SummaryData {
+    wellbeing: {
+        score: string;
+        maxScore: number;
+        change: number;
+        trend: 'up' | 'down';
+    };
+    criticalAlerts: {
+        count: number;
+        change: number;
+        resolvedThisMonth: number;
+        trend: 'up' | 'down';
+    };
+    checkInRate: {
+        rate: number;
+        change: number;
+        trend: 'up' | 'down';
+    };
+    positiveRate: {
+        rate: number;
+        change: number;
+        trend: 'up' | 'down';
+    };
+}

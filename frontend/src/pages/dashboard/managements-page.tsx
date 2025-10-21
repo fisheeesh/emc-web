@@ -1,4 +1,4 @@
-import { actionPlansQuery, empInfiniteQuery } from "@/api/super-admin-query"
+import { actionPlansQuery, countriesQuery, empInfiniteQuery, summaryDataQuery } from "@/api/super-admin-query"
 import { SectionCards } from "@/components/dashboard/section-cards"
 import ActionsTable from "@/components/dashboard/tables/actions-table"
 import EmpTables from "@/components/dashboard/tables/emp-tables"
@@ -7,12 +7,15 @@ import { DepartmentHeatmap } from "@/components/temp/dep-heat-map"
 import { ResponseTimeChart } from "@/components/temp/response-time-chart"
 import { TopConcernsWordCloud } from "@/components/temp/top-concern-words"
 import useTitle from "@/hooks/ui/use-title"
-import { useInfiniteQuery } from "@tanstack/react-query"
+import useCountryStore from "@/store/country-store"
+import { useInfiniteQuery, useSuspenseQuery } from "@tanstack/react-query"
+import { useEffect } from "react"
 import { useSearchParams } from "react-router"
 
 export default function ManagementsPage() {
     useTitle("General Mangements")
     const [searchParams] = useSearchParams()
+    const { setCountries } = useCountryStore()
 
     const kw = searchParams.get("kw")
     const dep = searchParams.get("gDep")
@@ -48,12 +51,25 @@ export default function ManagementsPage() {
         hasNextPage: hasActionNextPage,
     } = useInfiniteQuery(actionPlansQuery(rKw, dep, priority, rStatus, rType, rTs))
 
+    const { data: summaryData } = useSuspenseQuery(summaryDataQuery(dep))
+    const { data: countriesData } = useSuspenseQuery(countriesQuery())
+
     const allEmps = empData?.pages.flatMap(page => page.data) ?? []
     const allActionPlans = actionData?.pages.flatMap(page => page.data) ?? []
 
+    useEffect(() => {
+
+        if (countriesData) {
+            setCountries(countriesData.map((country: Country) => ({
+                name: country.name,
+                value: country.name
+            })))
+        }
+    }, [countriesData, setCountries])
+
     return (
         <section className="flex flex-col items-center justify-center w-full gap-3">
-            <SectionCards />
+            <SectionCards data={summaryData.data} />
             <div className="w-full">
                 <DepartmentHeatmap />
             </div>
