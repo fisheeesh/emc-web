@@ -6,18 +6,7 @@ import {
     CardTitle,
 } from "@/components/ui/card";
 import { AlertCircle, CheckCircle, TrendingUp } from "lucide-react";
-import { BsBuildings } from "react-icons/bs";
-
-const departmentData = [
-    { name: "IT", avgScore: 3.8, status: "positive", employees: 45, trend: "up" },
-    { name: "Customer Support", avgScore: 2.3, status: "critical", employees: 32, trend: "down" },
-    { name: "HR", avgScore: 3.9, status: "positive", employees: 12, trend: "up" },
-    { name: "Sales", avgScore: 3.4, status: "positive", employees: 28, trend: "stable" },
-    { name: "Finance", avgScore: 3.6, status: "positive", employees: 18, trend: "up" },
-    { name: "Marketing", avgScore: 2.9, status: "neutral", employees: 22, trend: "down" },
-    { name: "Operations", avgScore: 3.2, status: "neutral", employees: 35, trend: "up" },
-    { name: "Product", avgScore: 3.7, status: "positive", employees: 24, trend: "stable" },
-]
+import { BsBuildings } from "react-icons/bs"
 
 const getStatusColor = (status: string) => {
     const colors = {
@@ -41,10 +30,10 @@ const getTrendIcon = (trend: string) => {
     return <span className="text-gray-400">—</span>
 }
 
-export function DepartmentHeatmap() {
-    const criticalCount = departmentData.filter(d => d.status === 'critical').length
-    const positiveCount = departmentData.filter(d => d.status === 'positive').length
-    const avgOverall = (departmentData.reduce((acc, curr) => acc + curr.avgScore, 0) / departmentData.length).toFixed(2)
+export function DepartmentHeatmap({ depHeatmapData }: { depHeatmapData: DepHeatMap[] }) {
+    const criticalCount = depHeatmapData.filter(d => d.status === 'critical').length
+    const positiveCount = depHeatmapData.filter(d => d.status === 'positive').length
+    const avgOverall = (depHeatmapData.reduce((acc, curr) => acc + curr.avgScore, 0) / depHeatmapData.length).toFixed(2)
 
     return (
         <Card className="flex flex-col">
@@ -86,7 +75,7 @@ export function DepartmentHeatmap() {
 
                 {/* Heatmap Grid */}
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
-                    {departmentData.map((dept) => (
+                    {depHeatmapData.map((dept) => (
                         <div
                             key={dept.name}
                             className={`p-4 rounded-lg border-2 ${getStatusColor(dept.status)}`}
@@ -106,7 +95,7 @@ export function DepartmentHeatmap() {
                                     <span className="text-2xl font-bold font-en">
                                         {dept.avgScore.toFixed(1)}
                                     </span>
-                                    <span className="text-xs opacity-70">/4.0</span>
+                                    <span className="text-xs opacity-70 font-en">/1.0</span>
                                 </div>
 
                                 <div className="flex items-center justify-between text-xs opacity-80">
@@ -123,19 +112,19 @@ export function DepartmentHeatmap() {
                     <span className="font-semibold text-gray-700 dark:text-gray-300">Status:</span>
                     <div className="flex items-center gap-1.5">
                         <div className="w-3 h-3 rounded-full bg-green-500"></div>
-                        <span className="text-gray-600 dark:text-gray-400">Positive (3.5-4.0)</span>
+                        <span className="text-gray-600 dark:text-gray-400">Positive <span className="font-en">(0.4 ↔ 1.0)</span></span>
                     </div>
                     <div className="flex items-center gap-1.5">
                         <div className="w-3 h-3 rounded-full bg-purple-500"></div>
-                        <span className="text-gray-600 dark:text-gray-400">Neutral (2.5-3.4)</span>
+                        <span className="text-gray-600 dark:text-gray-400">Neutral <span className="font-en">(-0.3 ↔ 0.3)</span></span>
                     </div>
                     <div className="flex items-center gap-1.5">
                         <div className="w-3 h-3 rounded-full bg-orange-500"></div>
-                        <span className="text-gray-600 dark:text-gray-400">Negative (1.5-2.4)</span>
+                        <span className="text-gray-600 dark:text-gray-400">Negative <span className="font-en">(-0.7 ↔ -0.4)</span></span>
                     </div>
                     <div className="flex items-center gap-1.5">
                         <div className="w-3 h-3 rounded-full bg-red-500"></div>
-                        <span className="text-gray-600 dark:text-gray-400">Critical (&lt;1.5)</span>
+                        <span className="text-gray-600 dark:text-gray-400">Critical <span className="font-en">(&gt;-0.8)</span></span>
                     </div>
                 </div>
             </CardContent>

@@ -222,3 +222,11 @@ interface ActionPlanStatus {
     count: number
     fill: string
 }
+
+interface DepHeatMap {
+    name: string,
+    avgScore: number,
+    status: string,
+    employees: number,
+    trend: string
+}

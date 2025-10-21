@@ -1,5 +1,5 @@
 import queryClient from "@/api/query"
-import { actionPlansQuery, actionPlanStatusQuery, countriesQuery, empInfiniteQuery, summaryDataQuery } from "@/api/super-admin-query"
+import { actionPlansQuery, actionPlanStatusQuery, countriesQuery, depHeatMapQuery, empInfiniteQuery, summaryDataQuery } from "@/api/super-admin-query"
 
 export const managementsLoader = async () => {
     await Promise.all([
@@ -14,7 +14,8 @@ export const managementsLoader = async () => {
 
 export const analyticsLoader = async () => {
     await Promise.all([
-        queryClient.ensureQueryData(actionPlanStatusQuery())
+        queryClient.ensureQueryData(actionPlanStatusQuery()),
+        queryClient.ensureQueryData(depHeatMapQuery()),
     ])
 
     return null

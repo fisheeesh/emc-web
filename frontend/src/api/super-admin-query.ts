@@ -81,6 +81,17 @@ export const actionPlanStatusQuery = () => ({
     queryFn: getActionPlanStatus
 })
 
+const getDepHeatMap = async () => {
+    const res = await superApi.get('/super-admin/departments-heatmap')
+
+    return res.data
+}
+
+export const depHeatMapQuery = () => ({
+    queryKey: ['departments-heatmap'],
+    queryFn: getDepHeatMap
+})
+
 const fetchCountries = async () => {
     const res = await axios.get("https://restcountries.com/v2/all?fields=name,flag")
 

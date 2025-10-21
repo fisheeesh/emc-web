@@ -1,4 +1,4 @@
-import { actionPlanStatusQuery } from "@/api/super-admin-query";
+import { actionPlanStatusQuery, depHeatMapQuery } from "@/api/super-admin-query";
 import { ActionPlanStatusChart } from "@/components/temp/action-plan-status";
 import { DepartmentHeatmap } from "@/components/temp/dep-heat-map";
 import { ResponseTimeChart } from "@/components/temp/response-time-chart";
@@ -7,11 +7,12 @@ import { useSuspenseQuery } from "@tanstack/react-query";
 
 export default function AnalyticsDashboardPage() {
     const { data: actionPlaStatusData } = useSuspenseQuery(actionPlanStatusQuery())
+    const { data: depHeatmapData } = useSuspenseQuery(depHeatMapQuery())
 
     return (
         <section className="flex flex-col items-center justify-center w-full gap-3">
             <div className="w-full">
-                <DepartmentHeatmap />
+                <DepartmentHeatmap depHeatmapData={depHeatmapData.data} />
             </div>
             <div className="w-full">
                 <TopConcernsWordCloud />
