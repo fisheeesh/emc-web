@@ -113,38 +113,38 @@ export default function CriticalTable({ data, status, error, isFetchingNextPage,
                                                     <span className="whitespace-nowrap font-en">{emp.resolvedAt ?? '—'}</span>
                                                 </TableCell>
                                                 <TableCell className="text-center">
-                                                    <DropdownMenu>
-                                                        <DropdownMenuTrigger asChild>
-                                                            <Button size='icon' variant='ghost' className="cursor-pointer">
-                                                                <GrMoreVertical className="size-4" />
-                                                            </Button>
-                                                        </DropdownMenuTrigger>
-                                                        <DropdownMenuContent className="w-30" align="end" forceMount>
-                                                            <DropdownMenuGroup>
-                                                                <DropdownMenuItem asChild className="cursor-pointer">
-                                                                    <Button
-                                                                        size='icon'
-                                                                        variant='ghost'
-                                                                        className="w-full cursor-pointer flex justify-start gap-2 px-1.5"
-                                                                        onClick={() => setViewAnalysis(emp)}
-                                                                    >
-                                                                        <IoSparklesOutline className="text-black dark:text-white" />
-                                                                        Analysis
-                                                                    </Button>
-                                                                </DropdownMenuItem>
-                                                                <DropdownMenuItem asChild className="cursor-pointer">
-                                                                    <Button
-                                                                        size='icon'
-                                                                        variant='ghost'
-                                                                        className="w-full cursor-pointer flex justify-start gap-2 px-1.5"
-                                                                        onClick={() => setViewAction(emp)}
-                                                                    >
-                                                                        <GrNotes className="text-black dark:text-white" />
-                                                                        Action
-                                                                    </Button>
-                                                                </DropdownMenuItem>
-                                                                <DropdownMenuItem asChild className="cursor-pointer">
-                                                                    <Dialog>
+                                                    <Dialog>
+                                                        <DropdownMenu>
+                                                            <DropdownMenuTrigger asChild>
+                                                                <Button size='icon' variant='ghost' className="cursor-pointer">
+                                                                    <GrMoreVertical className="size-4" />
+                                                                </Button>
+                                                            </DropdownMenuTrigger>
+                                                            <DropdownMenuContent className="w-30" align="end" forceMount>
+                                                                <DropdownMenuGroup>
+                                                                    <DropdownMenuItem asChild className="cursor-pointer">
+                                                                        <Button
+                                                                            size='icon'
+                                                                            variant='ghost'
+                                                                            className="w-full cursor-pointer flex justify-start gap-2 px-1.5"
+                                                                            onClick={() => setViewAnalysis(emp)}
+                                                                        >
+                                                                            <IoSparklesOutline className="text-black dark:text-white" />
+                                                                            Analysis
+                                                                        </Button>
+                                                                    </DropdownMenuItem>
+                                                                    <DropdownMenuItem asChild className="cursor-pointer">
+                                                                        <Button
+                                                                            size='icon'
+                                                                            variant='ghost'
+                                                                            className="w-full cursor-pointer flex justify-start gap-2 px-1.5"
+                                                                            onClick={() => setViewAction(emp)}
+                                                                        >
+                                                                            <GrNotes className="text-black dark:text-white" />
+                                                                            Action
+                                                                        </Button>
+                                                                    </DropdownMenuItem>
+                                                                    <DropdownMenuItem asChild className="cursor-pointer">
                                                                         <DialogTrigger asChild>
                                                                             <Button
                                                                                 size='icon'
@@ -155,18 +155,18 @@ export default function CriticalTable({ data, status, error, isFetchingNextPage,
                                                                                 Delete
                                                                             </Button>
                                                                         </DialogTrigger>
-                                                                        <ConfirmModal
-                                                                            title="Delete Critical Employee Info Confirmation."
-                                                                            description={`Are you sure you want to delete this critical employee information? This action cannot be undone.`}
-                                                                            isLoading={deletingCriticalEmp}
-                                                                            loadingLabel="Deleting..."
-                                                                            onConfirm={() => deleteCriticalEmp(emp.id)}
-                                                                        />
-                                                                    </Dialog>
-                                                                </DropdownMenuItem>
-                                                            </DropdownMenuGroup>
-                                                        </DropdownMenuContent>
-                                                    </DropdownMenu>
+                                                                    </DropdownMenuItem>
+                                                                </DropdownMenuGroup>
+                                                            </DropdownMenuContent>
+                                                        </DropdownMenu>
+                                                        <ConfirmModal
+                                                            title="Delete Critical Employee Info Confirmation."
+                                                            description={`Are you sure you want to delete this critical employee information? This action cannot be undone.`}
+                                                            isLoading={deletingCriticalEmp}
+                                                            loadingLabel="Deleting..."
+                                                            onConfirm={() => deleteCriticalEmp(emp.id)}
+                                                        />
+                                                    </Dialog>
                                                 </TableCell>
                                             </TableRow>
                                         ))

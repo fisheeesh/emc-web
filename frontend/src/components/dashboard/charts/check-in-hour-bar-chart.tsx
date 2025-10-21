@@ -70,15 +70,15 @@ export default function CheckInHourBarChart({ data }: { data: CheckInHoursData[]
 
     return (
         <Card className="rounded-md flex flex-col gap-5">
-            <CardHeader className="flex items-center justify-between flex-col md:flex-row gap-2">
-                <div className="w-full lg:w-2/4">
+            <CardHeader className="flex items-center justify-between flex-col lg:flex-row gap-4">
+                <div className="w-full lg:w-3/4">
                     <CardTitle className="text-xl md:text-2xl flex items-center gap-2">
                         <MdAccessTime />
                         Check-in Hours
                     </CardTitle>
                     <CardDescription>Track the busiest check-in times across different periods</CardDescription>
                 </div>
-                <div className="flex items-center gap-3 w-full lg:w-1/4 md:px-5">
+                <div className="flex items-center gap-3 w-full lg:w-1/4 lg:px-5">
                     <RadioGroup
                         value={checkInFilter}
                         onValueChange={(v: "daily" | "monthly" | "yearly") => setCheckInFilter(v)}

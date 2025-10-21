@@ -15,7 +15,6 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { IMG_URL } from "@/lib/constants";
 import useUserStore from "@/store/user-store";
-import { useRef } from "react";
 import { FaRegCalendarCheck } from "react-icons/fa";
 import { IoMdLogOut } from "react-icons/io";
 import { LuLayoutDashboard } from "react-icons/lu";
@@ -29,7 +28,6 @@ import { MdOutlineAnalytics } from "react-icons/md";
 
 export default function AuthDropdown() {
     const { user } = useUserStore()
-    const dialogTriggerRef = useRef<HTMLButtonElement>(null)
 
     const initialName = `${user?.fullName.split(" ")[0]?.charAt(0).toUpperCase()}${user?.fullName.split(" ")[1]?.charAt(0).toUpperCase()}`
 
@@ -67,39 +65,38 @@ export default function AuthDropdown() {
                                 <DropdownMenuShortcut>⇧⌘A</DropdownMenuShortcut>
                             </Link>
                         </DropdownMenuItem>
-                        <DropdownMenuItem asChild className="cursor-pointer">
-                            <Link to='dashboard/analytics' className="whitespace-nowrap">
-                                <MdOutlineAnalytics className="size-4 text-black mr-1 dark:text-white" aria-hidden="true" />
-                                Analytics Dashboard
-                                <DropdownMenuShortcut>⇧⌘G</DropdownMenuShortcut>
-                            </Link>
-                        </DropdownMenuItem>
-                        {user?.role === 'SUPERADMIN' && <DropdownMenuItem asChild className="cursor-pointer">
-                            <Link to='dashboard/managements'>
-                                <MdOutlineSettings className="size-4 text-black mr-1 dark:text-white" aria-hidden="true" />
-                                General Managements
-                                <DropdownMenuShortcut>⌘M</DropdownMenuShortcut>
-                            </Link>
-                        </DropdownMenuItem>}
+                        {
+                            user?.role === 'SUPERADMIN' && <>
+                                <DropdownMenuItem asChild className="cursor-pointer">
+                                    <Link to='dashboard/analytics' className="whitespace-nowrap">
+                                        <MdOutlineAnalytics className="size-4 text-black mr-1 dark:text-white" aria-hidden="true" />
+                                        Analytics Dashboard
+                                        <DropdownMenuShortcut>⇧⌘G</DropdownMenuShortcut>
+                                    </Link>
+                                </DropdownMenuItem>
+                                <DropdownMenuItem asChild className="cursor-pointer">
+                                    <Link to='dashboard/managements'>
+                                        <MdOutlineSettings className="size-4 text-black mr-1 dark:text-white" aria-hidden="true" />
+                                        General Managements
+                                        <DropdownMenuShortcut>⌘M</DropdownMenuShortcut>
+                                    </Link>
+                                </DropdownMenuItem>
+                            </>
+                        }
                     </DropdownMenuGroup>
                     <DropdownMenuSeparator />
-                    <DropdownMenuItem
-                        onSelect={(e) => {
-                            e.preventDefault()
-                            dialogTriggerRef.current?.click()
-                        }}
-                        className="cursor-pointer"
-                    >
-                        <IoMdLogOut className="size-4 mr-1 text-sm dark:text-white" aria-hidden="true" />
-                        Logout
-                        <DropdownMenuShortcut>⇧⌘Q</DropdownMenuShortcut>
+                    <DropdownMenuItem asChild className="cursor-pointer">
+                        <DialogTrigger asChild>
+                            <Button variant="ghost" className="w-full justify-start px-2 py-1.5">
+                                <IoMdLogOut className="size-4 mr-1 text-sm dark:text-white" aria-hidden="true" />
+                                Logout
+                                <DropdownMenuShortcut>⇧⌘Q</DropdownMenuShortcut>
+                            </Button>
+                        </DialogTrigger>
                     </DropdownMenuItem>
                 </DropdownMenuContent>
             </DropdownMenu>
 
-            <DialogTrigger asChild>
-                <button ref={dialogTriggerRef} className="hidden" />
-            </DialogTrigger>
             <LogoutModal />
         </Dialog>
     )

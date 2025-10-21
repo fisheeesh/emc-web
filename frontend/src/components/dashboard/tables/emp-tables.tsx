@@ -178,38 +178,38 @@ export default function EmpTables({ data, status, error, isFetchingNextPage, fet
                                                     <span className="whitespace-nowrap font-en">{emp.createdAt}</span>
                                                 </TableCell>
                                                 <TableCell>
-                                                    <DropdownMenu>
-                                                        <DropdownMenuTrigger asChild>
-                                                            <Button size='icon' variant='ghost' className="cursor-pointer">
-                                                                <GrMoreVertical className="size-4" />
-                                                            </Button>
-                                                        </DropdownMenuTrigger>
-                                                        <DropdownMenuContent className="w-30" align="end" forceMount>
-                                                            <DropdownMenuGroup>
-                                                                <DropdownMenuItem asChild className="cursor-pointer">
-                                                                    <Button
-                                                                        size='icon'
-                                                                        variant='ghost'
-                                                                        className="w-full cursor-pointer flex justify-start gap-2 px-1.5"
-                                                                        onClick={() => setViewEmp(emp)}
-                                                                    >
-                                                                        <BsEye className="text-black dark:text-white" />
-                                                                        View Details
-                                                                    </Button>
-                                                                </DropdownMenuItem>
-                                                                <DropdownMenuItem asChild className="cursor-pointer">
-                                                                    <Button
-                                                                        size='icon'
-                                                                        variant='ghost'
-                                                                        className="w-full cursor-pointer flex justify-start gap-2 px-1.5"
-                                                                        onClick={() => setEditingEmp(emp)}
-                                                                    >
-                                                                        <LuUserPen className="text-black dark:text-white" />
-                                                                        Edit
-                                                                    </Button>
-                                                                </DropdownMenuItem>
-                                                                {user?.id !== emp.id && <DropdownMenuItem asChild className="cursor-pointer">
-                                                                    <Dialog>
+                                                    <Dialog>
+                                                        <DropdownMenu>
+                                                            <DropdownMenuTrigger asChild>
+                                                                <Button size='icon' variant='ghost' className="cursor-pointer">
+                                                                    <GrMoreVertical className="size-4" />
+                                                                </Button>
+                                                            </DropdownMenuTrigger>
+                                                            <DropdownMenuContent className="w-30" align="end" forceMount>
+                                                                <DropdownMenuGroup>
+                                                                    <DropdownMenuItem asChild className="cursor-pointer">
+                                                                        <Button
+                                                                            size='icon'
+                                                                            variant='ghost'
+                                                                            className="w-full cursor-pointer flex justify-start gap-2 px-1.5"
+                                                                            onClick={() => setViewEmp(emp)}
+                                                                        >
+                                                                            <BsEye className="text-black dark:text-white" />
+                                                                            View Details
+                                                                        </Button>
+                                                                    </DropdownMenuItem>
+                                                                    <DropdownMenuItem asChild className="cursor-pointer">
+                                                                        <Button
+                                                                            size='icon'
+                                                                            variant='ghost'
+                                                                            className="w-full cursor-pointer flex justify-start gap-2 px-1.5"
+                                                                            onClick={() => setEditingEmp(emp)}
+                                                                        >
+                                                                            <LuUserPen className="text-black dark:text-white" />
+                                                                            Edit
+                                                                        </Button>
+                                                                    </DropdownMenuItem>
+                                                                    {user?.id !== emp.id && <DropdownMenuItem asChild className="cursor-pointer">
                                                                         <DialogTrigger asChild>
                                                                             <Button
                                                                                 size='icon'
@@ -220,18 +220,18 @@ export default function EmpTables({ data, status, error, isFetchingNextPage, fet
                                                                                 Delete
                                                                             </Button>
                                                                         </DialogTrigger>
-                                                                        <ConfirmModal
-                                                                            title="Delete Employee Confirmation."
-                                                                            description={`Are you sure you want to delete this employee? This action cannot be undone.`}
-                                                                            isLoading={deletingEmp}
-                                                                            loadingLabel="Deleting..."
-                                                                            onConfirm={() => deleteEmp(emp.id)}
-                                                                        />
-                                                                    </Dialog>
-                                                                </DropdownMenuItem>}
-                                                            </DropdownMenuGroup>
-                                                        </DropdownMenuContent>
-                                                    </DropdownMenu>
+                                                                    </DropdownMenuItem>}
+                                                                </DropdownMenuGroup>
+                                                            </DropdownMenuContent>
+                                                        </DropdownMenu>
+                                                        <ConfirmModal
+                                                            title="Delete Employee Confirmation."
+                                                            description={`Are you sure you want to delete this employee? This action cannot be undone.`}
+                                                            isLoading={deletingEmp}
+                                                            loadingLabel="Deleting..."
+                                                            onConfirm={() => deleteEmp(emp.id)}
+                                                        />
+                                                    </Dialog>
                                                 </TableCell>
                                             </TableRow>
                                         ))

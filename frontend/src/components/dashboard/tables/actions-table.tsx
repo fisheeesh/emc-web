@@ -130,37 +130,37 @@ export default function ActionsTable({ data, status, error, isFetchingNextPage, 
                                                     <span className="whitespace-nowrap font-en">{action.criticalEmployee.resovledAt ?? '—'}</span>
                                                 </TableCell>
                                                 <TableCell>
-                                                    <DropdownMenu>
-                                                        <DropdownMenuTrigger asChild>
-                                                            <Button size='icon' variant='ghost' className="cursor-pointer">
-                                                                <GrMoreVertical className="size-4" />
-                                                            </Button>
-                                                        </DropdownMenuTrigger>
-                                                        <DropdownMenuContent className="w-35" align="end" forceMount>
-                                                            <DropdownMenuGroup>
-                                                                <DropdownMenuItem asChild className="cursor-pointer">
-                                                                    <Button
-                                                                        size='icon'
-                                                                        variant='ghost'
-                                                                        className="w-full cursor-pointer flex justify-start gap-2 px-1.5"
-                                                                        onClick={() => setEditingPlan(action)}
-                                                                    >
-                                                                        <FaListCheck className="text-black dark:text-white" />
-                                                                        Check Details
-                                                                    </Button>
-                                                                </DropdownMenuItem>
-                                                                <DropdownMenuItem asChild className="cursor-pointer">
-                                                                    <Button
-                                                                        size='icon'
-                                                                        variant='ghost'
-                                                                        className="w-full cursor-pointer flex justify-start gap-2 px-1.5"
-                                                                    >
-                                                                        <ImFilePdf className="text-black dark:text-white" />
-                                                                        Export PDF
-                                                                    </Button>
-                                                                </DropdownMenuItem>
-                                                                <DropdownMenuItem asChild className="cursor-pointer">
-                                                                    <Dialog>
+                                                    <Dialog>
+                                                        <DropdownMenu>
+                                                            <DropdownMenuTrigger asChild>
+                                                                <Button size='icon' variant='ghost' className="cursor-pointer">
+                                                                    <GrMoreVertical className="size-4" />
+                                                                </Button>
+                                                            </DropdownMenuTrigger>
+                                                            <DropdownMenuContent className="w-35" align="end" forceMount>
+                                                                <DropdownMenuGroup>
+                                                                    <DropdownMenuItem asChild className="cursor-pointer">
+                                                                        <Button
+                                                                            size='icon'
+                                                                            variant='ghost'
+                                                                            className="w-full cursor-pointer flex justify-start gap-2 px-1.5"
+                                                                            onClick={() => setEditingPlan(action)}
+                                                                        >
+                                                                            <FaListCheck className="text-black dark:text-white" />
+                                                                            Check Details
+                                                                        </Button>
+                                                                    </DropdownMenuItem>
+                                                                    <DropdownMenuItem asChild className="cursor-pointer">
+                                                                        <Button
+                                                                            size='icon'
+                                                                            variant='ghost'
+                                                                            className="w-full cursor-pointer flex justify-start gap-2 px-1.5"
+                                                                        >
+                                                                            <ImFilePdf className="text-black dark:text-white" />
+                                                                            Export PDF
+                                                                        </Button>
+                                                                    </DropdownMenuItem>
+                                                                    <DropdownMenuItem asChild className="cursor-pointer">
                                                                         <DialogTrigger asChild>
                                                                             <Button
                                                                                 size='icon'
@@ -171,18 +171,18 @@ export default function ActionsTable({ data, status, error, isFetchingNextPage, 
                                                                                 Delete
                                                                             </Button>
                                                                         </DialogTrigger>
-                                                                        <ConfirmModal
-                                                                            title="Delete Action Plan Confirmation."
-                                                                            description={`Are you sure you want to delete this action plan? This action cannot be undone.`}
-                                                                            isLoading={deletingActionPlan}
-                                                                            loadingLabel="Deleting..."
-                                                                            onConfirm={() => deleteActionPlan(action.id)}
-                                                                        />
-                                                                    </Dialog>
-                                                                </DropdownMenuItem>
-                                                            </DropdownMenuGroup>
-                                                        </DropdownMenuContent>
-                                                    </DropdownMenu>
+                                                                    </DropdownMenuItem>
+                                                                </DropdownMenuGroup>
+                                                            </DropdownMenuContent>
+                                                        </DropdownMenu>
+                                                        <ConfirmModal
+                                                            title="Delete Action Plan Confirmation."
+                                                            description={`Are you sure you want to delete this action plan? This action cannot be undone.`}
+                                                            isLoading={deletingActionPlan}
+                                                            loadingLabel="Deleting..."
+                                                            onConfirm={() => deleteActionPlan(action.id)}
+                                                        />
+                                                    </Dialog>
                                                 </TableCell>
                                             </TableRow>
                                         ))
