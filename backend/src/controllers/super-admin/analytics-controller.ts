@@ -1,7 +1,8 @@
 import { NextFunction, Request, Response } from "express"
-import { checkEmployeeIfNotExits } from "../../utils/check"
 import { prisma } from "../../config/prisma-client"
+import { checkEmployeeIfNotExits } from "../../utils/check"
 import { getStatusFromScore } from "../../utils/helplers"
+import { differenceInDays } from "date-fns"
 
 interface CustomRequest extends Request {
     employeeId?: number
@@ -75,5 +76,59 @@ export const getDepartmentsHeatmap = async (req: CustomRequest, res: Response, n
     res.status(200).json({
         status: 'Here is the departments heatmap data',
         data: transformedData,
+    })
+}
+
+export const getActionAvgReponseTime = async (req: CustomRequest, res: Response, next: NextFunction) => {
+    const emp = req.employee
+    checkEmployeeIfNotExits(emp)
+
+    //* [{ department: "IT", responseTime: 2.5 }, ...]
+    const departments = await prisma.department.findMany({
+        select: {
+            name: true,
+            criticalEmployees: {
+                select: {
+                    createdAt: true,
+                    actionPlan: {
+                        select: {
+                            createdAt: true,
+                        }
+                    }
+                }
+            },
+        }
+    })
+
+    const transformedData = departments.map(dep => {
+        let totalResponseTime = 0
+        let count = 0
+
+        //* For each critical employee, calculate time to their action plan
+        dep.criticalEmployees.forEach(criticalEmp => {
+            //* Only calculate if this critical employee has an action plan
+            if (criticalEmp.actionPlan) {
+                const daysDifference = differenceInDays(
+                    criticalEmp.actionPlan.createdAt,
+                    criticalEmp.createdAt
+                )
+
+                //* Only count if action plan was created after critical employee
+                if (daysDifference >= 0) {
+                    totalResponseTime += daysDifference
+                    count++
+                }
+            }
+        })
+
+        return {
+            department: dep.name,
+            responseTime: count > 0 ? parseFloat((totalResponseTime / count).toFixed(2)) : 0
+        }
+    })
+
+    res.status(200).json({
+        message: "Here is Action Plan Avgerage Time data",
+        data: transformedData
     })
 }
