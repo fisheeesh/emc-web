@@ -1,11 +1,15 @@
 import { actionAvgResponseTimeQuery, actionPlanStatusQuery, depHeatMapQuery, topConcernWordsQuery } from "@/api/super-admin-query";
+import AnalysisDurationToggleBtn from "@/components/shared/analysis-duration-toggle-btn";
 import { ActionPlanStatusChart } from "@/components/temp/action-plan-status";
 import { DepartmentHeatmap } from "@/components/temp/dep-heat-map";
 import { ResponseTimeChart } from "@/components/temp/response-time-chart";
 import { TopConcernsWordCloud } from "@/components/temp/top-concern-words";
+import useTitle from "@/hooks/ui/use-title";
 import { useSuspenseQuery } from "@tanstack/react-query";
 
 export default function AnalyticsDashboardPage() {
+    useTitle("Analytics & Insights")
+
     const { data: actionPlaStatusData } = useSuspenseQuery(actionPlanStatusQuery())
     const { data: depHeatmapData } = useSuspenseQuery(depHeatMapQuery())
     const { data: avgResponseTime } = useSuspenseQuery(actionAvgResponseTimeQuery())
@@ -13,6 +17,7 @@ export default function AnalyticsDashboardPage() {
 
     return (
         <section className="flex flex-col items-center justify-center w-full gap-3">
+            <AnalysisDurationToggleBtn />
             <div className="w-full">
                 <DepartmentHeatmap depHeatmapData={depHeatmapData.data} />
             </div>
