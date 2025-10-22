@@ -2,9 +2,11 @@ import ConfirmModal from "@/components/modals/confirm-modal";
 import CreateEditEmpModal from "@/components/modals/create-edit-emp-modal";
 import EmpDetailsModal from "@/components/modals/emp-details-modal";
 import CommonFilter from "@/components/shared/common-filter";
+import CreateEmpBtn from "@/components/shared/create-emp-btn";
 import CustomBadge from "@/components/shared/custom-badge";
 import LocalSearch from "@/components/shared/local-search";
 import TableSkeleton from "@/components/shared/table-skeleton";
+import UploadCSVBtn from "@/components/shared/upload-csv-btn";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -21,12 +23,11 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import useDeleteEmp from "@/hooks/emps/use-delete-emp";
 import { ACC_FILTER, EMOTION_FILTER, IMG_URL, JOBS_FILTER, ROLES_FILTER, TSFILTER } from "@/lib/constants";
 import { getInitialName } from "@/lib/utils";
-import { createEmpSchema, updateEmpSchema } from "@/lib/validators";
+import { updateEmpSchema } from "@/lib/validators";
 import useUserStore from "@/store/user-store";
 import { useState } from "react";
 import { BsEye } from "react-icons/bs";
 import { GrMoreVertical } from "react-icons/gr";
-import { IoPersonAdd } from "react-icons/io5";
 import { LuUserPen } from "react-icons/lu";
 import { RiDeleteBin5Line } from "react-icons/ri";
 
@@ -42,7 +43,6 @@ interface Props {
 
 export default function EmpTables({ data, status, error, isFetchingNextPage, fetchNextPage, hasNextPage }: Props) {
     const { user } = useUserStore()
-    const [createOpen, setCreateOpen] = useState(false);
     const [editingEmp, setEditingEmp] = useState<Employee | null>(null);
     const [viewEmp, setViewEmp] = useState<Employee | null>(null);
     const { deleteEmp, deletingEmp } = useDeleteEmp()
@@ -52,38 +52,12 @@ export default function EmpTables({ data, status, error, isFetchingNextPage, fet
             <CardHeader className="space-y-2">
                 <div className="flex flex-col xl:flex-row gap-3 xl:gap-0 justify-between">
                     <div className="flex flex-col items-start gap-2 tracking-wide">
-                        <CardTitle className="text-xl md:text-2xl bg-gradient-to-r from-purple-400 via-pink-500 to-blue-500 bg-clip-text text-transparent">Employee Lists under ATA - IT Company</CardTitle>
-                        <CardDescription>Create, Update, and Delete employees</CardDescription>
+                        <CardTitle className="text-xl md:text-2xl text-gradient">Employee Lists under ATA - IT Company</CardTitle>
+                        <CardDescription>Complete employee directory with management capabilities</CardDescription>
                     </div>
-                    <div className="flex flex-col xl:flex-row xl:items-center gap-2">
-                        <Dialog open={createOpen} onOpenChange={setCreateOpen}>
-                            <DialogTrigger asChild>
-                                <Button className="bg-gradient-to-r from-purple-400 via-pink-500 to-blue-500 font-semibold hover:from-pink-500 hover:via-purple-500 hover:to-blue-400 transition-colors duration-300 w-fit min-h-[44px] text-white flex items-center gap-2 cursor-pointer">
-                                    <IoPersonAdd /> Create a new employee
-                                </Button>
-                            </DialogTrigger>
-                            {createOpen && <CreateEditEmpModal
-                                formType="CREATE"
-                                schema={createEmpSchema}
-                                defaultValues={{
-                                    firstName: "",
-                                    lastName: "",
-                                    email: "",
-                                    password: "",
-                                    phone: "",
-                                    position: "",
-                                    department: "",
-                                    role: "EMPLOYEE",
-                                    gender: "MALE",
-                                    birthdate: new Date().toString(),
-                                    workStyle: "ONSITE",
-                                    country: "Thailand",
-                                    jobType: "FULLTIME",
-                                    avatar: undefined,
-                                }}
-                                onClose={() => setCreateOpen(false)}
-                            />}
-                        </Dialog>
+                    <div className="flex items-center gap-2">
+                        <CreateEmpBtn />
+                        <UploadCSVBtn />
                     </div>
                 </div>
                 <div className="flex flex-col lg:flex-row gap-2">
