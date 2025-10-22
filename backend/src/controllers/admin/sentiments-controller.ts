@@ -1,4 +1,4 @@
-import { endOfDay, startOfDay, subDays } from "date-fns";
+import { endOfDay, startOfDay, startOfMonth, subDays } from "date-fns";
 import { NextFunction, Request, Response } from "express";
 import { body, query, validationResult } from "express-validator";
 import { Prisma, PrismaClient } from "../../../generated/prisma";
@@ -26,8 +26,14 @@ export const getMoodOverview = [
         checkEmployeeIfNotExits(emp)
 
         const now = new Date()
-        const start = startOfDay(subDays(now, +duration - 1))
+        let start: Date
         const end = endOfDay(now)
+
+        if (+duration === 30) {
+            start = startOfMonth(now)
+        } else {
+            start = startOfDay(subDays(now, +duration - 1))
+        }
 
         const durationFilter = {
             gte: start,
@@ -208,7 +214,7 @@ export const getAllCriticalEmps = [
 
         const { limit = 7, cursor: lastCursor, dep, kw, ts = 'desc', status } = req.query
 
-        const statusFilter : Prisma.CriticalEmployeeWhereInput = status && status !== 'all' ? {
+        const statusFilter: Prisma.CriticalEmployeeWhereInput = status && status !== 'all' ? {
             isResolved: status === 'RESOLVED' ? true : false
         } : {}
 
