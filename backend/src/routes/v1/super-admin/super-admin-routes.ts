@@ -1,6 +1,6 @@
 import express from "express"
 import { deleteActionPlanById, getAllActionPlans, updateActionPlan } from "../../../controllers/super-admin/action-plan-management-controller"
-import { getActionAvgReponseTime, getActionPlanStatus, getDepartmentsHeatmap } from "../../../controllers/super-admin/analytics-controller"
+import { getActionAvgReponseTime, getActionPlanStatus, getDepartmentsHeatmap, getTopConcernWords } from "../../../controllers/super-admin/analytics-controller"
 import { getSummaryData, testSuperAdmin } from "../../../controllers/super-admin/super-admin-controller"
 import { createNewEmployee, deleteEmployee, getAllEmployeesInfinite, updateEmployeeInformation } from "../../../controllers/super-admin/user-management-controller"
 import upload from "../../../middlewares/upload-files-middleware"
@@ -28,5 +28,6 @@ router.patch("/action-plans", updateActionPlan)
 router.get("/action-plan-status", getActionPlanStatus)
 router.get("/departments-heatmap", getDepartmentsHeatmap)
 router.get("/action-avg-response-time", getActionAvgReponseTime)
+router.get("/top-concern-words", getTopConcernWords)
 
 export default router

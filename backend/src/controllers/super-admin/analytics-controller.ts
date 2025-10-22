@@ -1,8 +1,8 @@
+import { differenceInDays } from "date-fns"
 import { NextFunction, Request, Response } from "express"
 import { prisma } from "../../config/prisma-client"
 import { checkEmployeeIfNotExits } from "../../utils/check"
-import { getStatusFromScore } from "../../utils/helplers"
-import { differenceInDays } from "date-fns"
+import { analyzeConcernWords, getStatusFromScore } from "../../utils/helplers"
 
 interface CustomRequest extends Request {
     employeeId?: number
@@ -130,5 +130,61 @@ export const getActionAvgReponseTime = async (req: CustomRequest, res: Response,
     res.status(200).json({
         message: "Here is Action Plan Avgerage Time data",
         data: transformedData
+    })
+}
+
+export const getTopConcernWords = async (req: CustomRequest, res: Response, next: NextFunction) => {
+    const emp = req.employee
+    checkEmployeeIfNotExits(emp)
+
+    const emotionCheckIns = await prisma.emotionCheckIn.findMany({
+        select: {
+            textFeeling: true
+        }
+    })
+
+    if (emotionCheckIns.length === 0) {
+        return res.status(200).json({
+            message: "No emotion check-ins available",
+            data: []
+        })
+    }
+
+    const emotionTexts = emotionCheckIns
+        .map(e => e.textFeeling)
+        .filter(text => text && text.trim().length > 0)
+
+    if (emotionTexts.length === 0) {
+        return res.status(200).json({
+            message: "No emotion check-ins with text available",
+            data: [],
+            recommendation: ''
+        })
+    }
+
+    const { concerns, recommendation } = await analyzeConcernWords(emotionTexts)
+
+    if (concerns.length === 0) {
+        return res.status(200).json({
+            message: "No concerns identified",
+            data: []
+        })
+    }
+
+    const maxCount = Math.max(...concerns.map(c => c.count))
+    const minCount = Math.min(...concerns.map(c => c.count))
+
+    const data = concerns.map(concern => ({
+        word: concern.word,
+        count: concern.count,
+        size: minCount === maxCount
+            ? 2
+            : 1 + Math.round(((concern.count - minCount) / (maxCount - minCount)) * 2)
+    })).sort((a, b) => b.count - a.count)
+
+    res.status(200).json({
+        message: "Here is Employee Concern Words",
+        data,
+        recommendation
     })
 }
