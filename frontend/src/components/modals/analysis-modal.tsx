@@ -219,7 +219,7 @@ export default function AIAnalysisModal({ analysis: initialAnalysis, empName, cr
                                 <IoSparklesOutline className="text-xl text-pink-400" />
                                 AI-Powered Weekly Emotional Analysis
                             </DialogTitle>
-                            <DialogDescription className="line-clamp-1">
+                            <DialogDescription className="line-clamp-1 text-start">
                                 Summary of {empName}'s emotional state across the week
                             </DialogDescription>
                         </div>

@@ -162,7 +162,7 @@ export default function ActionModal({ employee, action, onClose }: Props) {
                                 <CheckCircle2 className="text-green-600 size-5 md:size-7" />
                                 Action Plan Details - {employee?.name || 'Employee'}
                             </DialogTitle>
-                            <DialogDescription className="text-xs md:text-sm">
+                            <DialogDescription className="text-xs md:text-sm text-start">
                                 View the action plan created for this employee's wellbeing support.
                             </DialogDescription>
                         </div>
@@ -366,7 +366,7 @@ export default function ActionModal({ employee, action, onClose }: Props) {
                         <MdAdminPanelSettings className="text-blue-600 size-5 md:size-7" />
                         Create Action Plan for {employee?.name || 'Employee'}
                     </DialogTitle>
-                    <DialogDescription className="text-xs md:text-sm">
+                    <DialogDescription className="text-xs md:text-sm text-start">
                         Submit an action plan to support this employee's wellbeing. This will be sent to Upper Management for review and approval.
                     </DialogDescription>
                 </DialogHeader>

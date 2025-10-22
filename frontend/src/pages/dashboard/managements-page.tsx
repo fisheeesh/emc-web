@@ -1,6 +1,8 @@
 import { actionPlansQuery, countriesQuery, empInfiniteQuery, summaryDataQuery } from "@/api/super-admin-query"
+import EmotionDisplay from "@/components/dashboard/emotion-display-card"
 import { SummaryCards } from "@/components/dashboard/summary-cards"
 import ActionsTable from "@/components/dashboard/tables/actions-table"
+import DepartmentTable from "@/components/dashboard/tables/dep-table"
 import EmpTables from "@/components/dashboard/tables/emp-tables"
 import useTitle from "@/hooks/ui/use-title"
 import useCountryStore from "@/store/country-store"
@@ -70,6 +72,10 @@ export default function ManagementsPage() {
     return (
         <section className="flex flex-col items-center justify-center w-full gap-3">
             <SummaryCards data={summaryData.data} isLoading={isSummaryRefetching} />
+            <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-3 w-full">
+                <DepartmentTable />
+                <EmotionDisplay />
+            </div>
             <div className="w-full">
                 <EmpTables
                     data={allEmps}

@@ -65,7 +65,7 @@ export default function ActionDetailsModal({ action, onClose }: { action: Action
                         <CheckCircle2 className="text-blue-600 size-5 md:size-7" />
                         Review Action Plan
                     </DialogTitle>
-                    <DialogDescription className="text-xs md:text-sm">
+                    <DialogDescription className="text-xs md:text-sm text-start">
                         Review the action plan and decide to approve or reject. Add suggestions to help guide the implementation or improvement process.
                     </DialogDescription>
                 </DialogHeader>

@@ -55,7 +55,7 @@ export default function WatchlistHistoryModal({ empName, emotionHistory }: Props
                             <Activity className="text-blue-600 size-5 md:size-7" />
                             Watchlist Recovery Tracking - {empName || 'Employee'}
                         </DialogTitle>
-                        <DialogDescription className="text-xs md:text-sm">
+                        <DialogDescription className="text-xs md:text-sm text-start">
                             Monitor emotional wellbeing progress after HR intervention action plan.
                             {isRecovering && <span className="text-green-600 font-semibold ml-1">Ready for removal from watchlist!</span>}
                         </DialogDescription>

@@ -88,3 +88,12 @@ export const updateActionFormSchema = z.object({
     message: "Status must be either Approved or Rejected",
     path: ["status"]
 })
+
+export const createDepartmentSchema = z.object({
+    name: z.string().min(1, { message: "Department Name is required" }),
+    description: z.string().min(1, { message: "Department Description is required" }),
+})
+
+export const updateDepartmentSchema = createDepartmentSchema.extend({
+    status: z.enum(["ACTIVE", "INACTIVE"], { message: "Department Status is required" })
+})

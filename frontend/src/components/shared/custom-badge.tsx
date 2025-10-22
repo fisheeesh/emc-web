@@ -2,7 +2,8 @@ import { Badge } from "../ui/badge";
 import {
     Smile, Meh, Frown, AlertTriangle, TrendingUp, Minus, TrendingDown,
     Shield, ShieldCheck, Crown, CheckCircle2, Pause, Clock, Briefcase,
-    FileText, GraduationCap, Loader
+    FileText, GraduationCap, Loader,
+    XCircle
 } from "lucide-react";
 
 interface BadgeConfig {
@@ -74,6 +75,11 @@ const getBadgeConfig = (value: string): BadgeConfig => {
             icon: <CheckCircle2 className="size-3.5" />,
             label: 'Active',
             className: 'border-green-300 bg-green-50 text-green-700 dark:border-green-700 dark:bg-green-950/30 dark:text-green-400'
+        },
+        'INACTIVE': {
+            icon: <XCircle className="size-3.5" />,
+            label: 'Inactive',
+            className: 'border-red-300 bg-red-50 text-red-700 dark:border-red-700 dark:bg-red-950/30 dark:text-red-400'
         },
         'FREEZE': {
             icon: <Pause className="size-3.5" />,

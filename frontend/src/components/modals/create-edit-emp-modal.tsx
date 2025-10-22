@@ -111,7 +111,7 @@ export default function CreateEditEmpModal<T extends z.ZodType<any, any, any>>({
                     {formType === 'CREATE' ? <FaUserPlus /> : <FaUserPen />}
                     {formType === 'CREATE' ? 'Create a new Employee' : "Edit Employee Information"}
                 </DialogTitle>
-                <DialogDescription>
+                <DialogDescription className="text-start">
                     {formType === 'CREATE' ? 'Fill in the details to add a new employee.' : "Update the employee information and save changes."}
                 </DialogDescription>
             </DialogHeader>
@@ -316,7 +316,7 @@ export default function CreateEditEmpModal<T extends z.ZodType<any, any, any>>({
                                                                                                     <SelectValue placeholder="Select Department" />
                                                                                                 </SelectTrigger>
                                                                                                 <SelectContent>
-                                                                                                    {filters.departments.map(dep => (
+                                                                                                    {filters.departments.slice(1, filters.departments.length).map(dep => (
                                                                                                         <SelectItem value={dep.name} key={dep.name}>
                                                                                                             {dep.name}
                                                                                                         </SelectItem>
@@ -343,7 +343,6 @@ export default function CreateEditEmpModal<T extends z.ZodType<any, any, any>>({
                                                                                                         //* Set the actual File object as the value for the image field
                                                                                                         const file = fileInputRef.current?.files?.[0] ?? null;
                                                                                                         form.setValue('image' as Path<FormData>, file as any);
-
                                                                                                         //* Update the selected file name
                                                                                                         setSelectedFileName(file ? file.name : "No file chosen");
                                                                                                     }}
@@ -386,7 +385,7 @@ export default function CreateEditEmpModal<T extends z.ZodType<any, any, any>>({
                     <div className="flex justify-end">
                         <Button
                             type="submit"
-                            className="bg-gradient-to-r from-purple-400 via-pink-500 to-blue-500 font-semibold hover:from-pink-500 hover:via-purple-500 hover:to-blue-400 transition-colors duration-300 w-fit text-white flex items-center gap-2 cursor-pointer"
+                            className="bg-gradient w-fit flex items-center gap-2 cursor-pointer text-white"
                             disabled={isWorking}
                         >
                             <Spinner
