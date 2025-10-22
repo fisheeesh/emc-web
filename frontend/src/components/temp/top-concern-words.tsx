@@ -1,30 +1,14 @@
-import { MessageSquare } from "lucide-react"
 import {
     Card,
     CardContent,
     CardDescription,
     CardHeader,
     CardTitle,
-} from "@/components/ui/card"
-
-// Dummy data: Top concerns from textFeeling analysis
-const concernsData = [
-    { word: "workload", count: 48, size: 3 },
-    { word: "stress", count: 42, size: 2.8 },
-    { word: "deadline", count: 38, size: 2.6 },
-    { word: "tired", count: 35, size: 2.4 },
-    { word: "overwhelmed", count: 32, size: 2.2 },
-    { word: "pressure", count: 28, size: 2 },
-    { word: "burnout", count: 25, size: 1.8 },
-    { word: "exhausted", count: 22, size: 1.6 },
-    { word: "anxious", count: 20, size: 1.5 },
-    { word: "unmotivated", count: 18, size: 1.4 },
-    { word: "difficult", count: 16, size: 1.3 },
-    { word: "frustrated", count: 15, size: 1.2 },
-    { word: "team issues", count: 14, size: 1.2 },
-    { word: "confused", count: 12, size: 1.1 },
-    { word: "isolated", count: 10, size: 1 },
-]
+} from "@/components/ui/card";
+import { MessageSquare } from "lucide-react";
+import { HiOutlineSparkles } from "react-icons/hi2";
+import { BsFire } from "react-icons/bs";
+import Empty from "../ui/empty";
 
 const getWordColor = (index: number) => {
     const colors = [
@@ -40,7 +24,27 @@ const getWordColor = (index: number) => {
     return colors[index % colors.length]
 }
 
-export function TopConcernsWordCloud() {
+export function TopConcernsWordCloud({ concernsData, recommendation }: { concernsData: TopConcernWords[], recommendation: string }) {
+    if (!concernsData || concernsData.length === 0) {
+        return (
+            <Card className="flex flex-col">
+                <CardHeader>
+                    <CardTitle className="text-xl md:text-2xl flex items-center gap-2">
+                        <MessageSquare className="size-5" />
+                        Top Employee Concerns
+                    </CardTitle>
+                    <CardDescription>
+                        Most frequently mentioned keywords from emotion check-in notes
+                    </CardDescription>
+                </CardHeader>
+                <CardContent>
+                    <div className="flex flex-col items-center justify-center py-8 max-w-xs sm:max-w-sm md:max-w-md mx-auto">
+                        <Empty label="No employee concerns identified yet. Employees need to submit emotion check-ins with text to see insights here." />
+                    </div>
+                </CardContent>
+            </Card>
+        )
+    }
     const totalMentions = concernsData.reduce((acc, curr) => acc + curr.count, 0)
     const topConcern = concernsData[0]
     const trendingConcerns = concernsData.slice(0, 3)
@@ -106,7 +110,8 @@ export function TopConcernsWordCloud() {
                 {/* Top 3 Trending */}
                 <div className="mt-6 p-4 bg-orange-50 dark:bg-orange-950/20 rounded-lg border border-orange-100 dark:border-orange-900/30">
                     <h4 className="text-sm font-semibold text-orange-900 dark:text-orange-300 mb-3 flex items-center gap-2">
-                        🔥 Top 3 Trending Concerns
+                        <BsFire className="text-orange-500 dark:text-orange-400 text-base animate-pulse" />
+                        Top<span className="font-en">3</span>Trending Concerns
                     </h4>
                     <div className="space-y-2">
                         {trendingConcerns.map((concern, index) => (
@@ -136,9 +141,10 @@ export function TopConcernsWordCloud() {
                 </div>
 
                 {/* Insight */}
-                <div className="mt-4 p-3 bg-blue-50 dark:bg-blue-950/20 rounded-lg border border-blue-100 dark:border-blue-900/30">
+                <div className="mt-4 p-3 flex items-center gap-2 bg-blue-50 dark:bg-blue-950/20 rounded-lg border border-blue-100 dark:border-blue-900/30">
+                    <HiOutlineSparkles className="size-3.5 text-brand" />
                     <p className="text-xs text-gray-700 dark:text-gray-300">
-                        💡 <span className="font-semibold">"{topConcern.word}"</span> is mentioned most frequently (<span className="font-en font-semibold">{topConcern.count}</span> times). Consider addressing workload distribution and resource allocation to improve employee wellbeing.
+                        <span className="font-semibold">"{topConcern.word}"</span> is mentioned most frequently (<span className="font-en font-semibold">{topConcern.count}</span> times). {recommendation}
                     </p>
                 </div>
             </CardContent>

@@ -235,3 +235,9 @@ interface AvgResponseTime {
     department: string,
     responseTime: number
 }
+
+interface TopConcernWords {
+    word: string,
+    count: number,
+    size: number
+}

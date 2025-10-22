@@ -103,6 +103,17 @@ export const actionAvgResponseTimeQuery = () => ({
     queryFn: fetchActionAvgResponseTime
 })
 
+const fetchTopConcernWords = async () => {
+    const res = await superApi.get("/super-admin/top-concern-words")
+
+    return res.data
+}
+
+export const topConcernWordsQuery = () => ({
+    queryKey: ['top-concern-words'],
+    queryFn: fetchTopConcernWords
+})
+
 
 const fetchCountries = async () => {
     const res = await axios.get("https://restcountries.com/v2/all?fields=name,flag")
