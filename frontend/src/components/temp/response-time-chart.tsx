@@ -1,5 +1,5 @@
+import { Clock, Lightbulb } from "lucide-react"
 import { Bar, BarChart, CartesianGrid, XAxis, YAxis } from "recharts"
-import { Clock } from "lucide-react"
 
 import {
     Card,
@@ -14,15 +14,7 @@ import {
     ChartTooltip,
     ChartTooltipContent,
 } from "@/components/ui/chart"
-
-// Dummy data: Average response time from CRITICAL alert to action plan creation (in hours)
-const chartData = [
-    { department: "IT", responseTime: 2.5 },
-    { department: "Customer Support", responseTime: 4.8 },
-    { department: "HR", responseTime: 1.2 },
-    { department: "Sales", responseTime: 3.1 },
-    { department: "Finance", responseTime: 2.8 },
-]
+import Empty from "../ui/empty"
 
 const chartConfig = {
     responseTime: {
@@ -31,7 +23,29 @@ const chartConfig = {
     },
 } satisfies ChartConfig
 
-export function ResponseTimeChart() {
+export function ResponseTimeChart({ chartData }: { chartData: AvgResponseTime[] }) {
+    const hasValidData = chartData.length > 0 && chartData.some(dept => dept.responseTime > 0)
+
+    if (!hasValidData) {
+        return (
+            <Card className="flex flex-col">
+                <CardHeader>
+                    <CardTitle className="text-xl md:text-2xl flex items-center gap-2">
+                        <Clock className="size-5" />
+                        Average Response Time
+                    </CardTitle>
+                    <CardDescription className="line-clamp-1">
+                        Time from critical alert to action plan creation by department
+                    </CardDescription>
+                </CardHeader>
+                <CardContent>
+                    <div className="flex flex-col items-center max-w-xs sm:max-w-sm md:max-w-md mx-auto justify-center py-8">
+                        <Empty label="No response time data available yet. Create action plans for critical employees to see metrics here." />
+                    </div>
+                </CardContent>
+            </Card>
+        )
+    }
     const avgResponseTime = (chartData.reduce((acc, curr) => acc + curr.responseTime, 0) / chartData.length).toFixed(1)
     const fastestDept = chartData.reduce((min, dept) => dept.responseTime < min.responseTime ? dept : min)
     const slowestDept = chartData.reduce((max, dept) => dept.responseTime > max.responseTime ? dept : max)
@@ -43,7 +57,7 @@ export function ResponseTimeChart() {
                     <Clock className="size-5" />
                     Average Response Time
                 </CardTitle>
-                <CardDescription>
+                <CardDescription className="line-clamp-1">
                     Time from critical alert to action plan creation by department
                 </CardDescription>
             </CardHeader>
@@ -124,9 +138,10 @@ export function ResponseTimeChart() {
                 </ChartContainer>
 
                 {/* Insight */}
-                <div className="mt-4 p-3 bg-gray-50 dark:bg-gray-900/20 rounded-lg border">
+                <div className="mt-4 p-3 flex items-center gap-2 bg-gray-50 dark:bg-gray-900/20 rounded-lg border">
+                    <Lightbulb className="size-3.5 text-yellow-500" />
                     <p className="text-xs text-gray-700 dark:text-gray-300">
-                        💡 <span className="font-semibold">{fastestDept.department}</span> responds fastest with an average of <span className="font-en font-semibold">{fastestDept.responseTime}h</span>, while <span className="font-semibold">{slowestDept.department}</span> may need process improvements.
+                        <span className="font-semibold">{fastestDept.department}</span> responds fastest with an average of <span className="font-en font-semibold">{fastestDept.responseTime}h</span>, while <span className="font-semibold">{slowestDept.department}</span> may need process improvements.
                     </p>
                 </div>
             </CardContent>

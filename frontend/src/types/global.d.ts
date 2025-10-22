@@ -230,3 +230,8 @@ interface DepHeatMap {
     employees: number,
     trend: string
 }
+
+interface AvgResponseTime {
+    department: string,
+    responseTime: number
+}

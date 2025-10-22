@@ -70,7 +70,7 @@ export const summaryDataQuery = (dep: string | null = null) => ({
     queryFn: () => fetchSummaryData(dep)
 })
 
-const getActionPlanStatus = async () => {
+const fetchActionPlanStatus = async () => {
     const res = await superApi.get('/super-admin/action-plan-status')
 
     return res.data
@@ -78,10 +78,10 @@ const getActionPlanStatus = async () => {
 
 export const actionPlanStatusQuery = () => ({
     queryKey: ['action-plan-status'],
-    queryFn: getActionPlanStatus
+    queryFn: fetchActionPlanStatus
 })
 
-const getDepHeatMap = async () => {
+const fetchDepHeatMap = async () => {
     const res = await superApi.get('/super-admin/departments-heatmap')
 
     return res.data
@@ -89,8 +89,20 @@ const getDepHeatMap = async () => {
 
 export const depHeatMapQuery = () => ({
     queryKey: ['departments-heatmap'],
-    queryFn: getDepHeatMap
+    queryFn: fetchDepHeatMap
 })
+
+const fetchActionAvgResponseTime = async () => {
+    const res = await superApi.get("/super-admin/action-avg-response-time")
+
+    return res.data
+}
+
+export const actionAvgResponseTimeQuery = () => ({
+    queryKey: ['action-avg-response-time'],
+    queryFn: fetchActionAvgResponseTime
+})
+
 
 const fetchCountries = async () => {
     const res = await axios.get("https://restcountries.com/v2/all?fields=name,flag")
