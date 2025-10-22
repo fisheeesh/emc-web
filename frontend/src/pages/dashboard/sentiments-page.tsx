@@ -1,11 +1,10 @@
-import { adminUserDataQuery, criticalQuery, departmentsQuery, leaderboardsQuery, moodOverviewQuery, notificationQuery, sentimentsComparisonQuery, watchlistQuery } from "@/api/query";
+import { adminUserDataQuery, criticalQuery, leaderboardsQuery, moodOverviewQuery, notificationQuery, sentimentsComparisonQuery, watchlistQuery } from "@/api/query";
 import OverViewChart from "@/components/dashboard/charts/overview-chart";
 import SentimentsComparisonChart from "@/components/dashboard/charts/sentiments-comparison-chart";
 import CriticalTable from "@/components/dashboard/tables/critical-table";
 import LeaderBoardTable from "@/components/dashboard/tables/leaderboard-table";
 import WatchListTable from "@/components/dashboard/tables/watchlist-table";
 import useTitle from "@/hooks/ui/use-title";
-import useFilterStore from "@/store/filter-store";
 import useNotiStore from "@/store/noti-store";
 import useUserStore from "@/store/user-store";
 import { useInfiniteQuery, useIsFetching, useSuspenseQuery } from "@tanstack/react-query";
@@ -19,7 +18,6 @@ export default function SentimentsDashboardPage() {
     useTitle("Sentiments Dashboard")
 
     const { user, setUser } = useUserStore()
-    const { setFilters } = useFilterStore()
     const { setNotis } = useNotiStore()
     const [searchParams] = useSearchParams()
 
@@ -36,7 +34,6 @@ export default function SentimentsDashboardPage() {
 
     const dep = user?.role === 'SUPERADMIN' ? gDep : user?.departmentId.toString()
 
-    const { data: departmentsData } = useSuspenseQuery(departmentsQuery())
     const { data: adminUserData } = useSuspenseQuery(adminUserDataQuery())
     const { data: overviewData } = useSuspenseQuery(moodOverviewQuery(duration, dep))
     const { data: sentimentsComparison } = useSuspenseQuery(sentimentsComparisonQuery(sentimentsFilter, dep))
@@ -71,12 +68,6 @@ export default function SentimentsDashboardPage() {
     }) > 0
 
     useEffect(() => {
-        if (departmentsData) {
-            setFilters({
-                departments: departmentsData.data
-            })
-        }
-
         if (notificationsData) {
             setNotis(notificationsData.data)
         }
@@ -91,7 +82,7 @@ export default function SentimentsDashboardPage() {
                 departmentId: adminUserData.data.departmentId
             })
         }
-    }, [departmentsData, adminUserData, setUser, setFilters, notificationsData, setNotis])
+    }, [adminUserData, setUser, notificationsData, setNotis])
 
     return (
         <section className="flex flex-col items-center justify-center w-full gap-3">
