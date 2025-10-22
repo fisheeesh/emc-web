@@ -8,6 +8,7 @@ import { createEmployeeWithOTP, deleteEmployeeById, getEmployeesInfiniteData, up
 import { checkEmployeeIfExits, checkEmployeeIfNotExits, checkUploadFile, createHttpErrors } from "../../utils/check"
 import { generateHashedValue, generateToken } from "../../utils/generate"
 import { removeFiles } from "../../utils/helplers"
+import { parse } from "csv-parse/sync";
 
 interface CustomRequest extends Request {
     employeeId?: number
@@ -425,3 +426,162 @@ export const deleteEmployee = [
         })
     }
 ]
+
+interface CSVRow {
+    firstName: string;
+    lastName: string;
+    email: string;
+    password: string;
+    position: string;
+    department: string;
+}
+
+interface UploadResult {
+    status: "success" | "failed";
+    email: string;
+    error?: string;
+}
+
+export const bulkRegister = [
+    async (req: CustomRequest, res: Response, next: NextFunction) => {
+        //* Check if file was uploaded
+        if (!req.file) {
+            return res.status(400).json({
+                message: "No CSV file uploaded",
+            });
+        }
+
+        //? Parse CSV file
+        let records: CSVRow[];
+        try {
+            records = parse(req.file.buffer, {
+                columns: true,
+                skip_empty_lines: true,
+                trim: true,
+            }) as CSVRow[];
+        } catch (parseError) {
+            return res.status(400).json({
+                message: "Invalid CSV format. Please check your file.",
+            });
+        }
+
+        //? Validate CSV has data
+        if (!records || records.length === 0) {
+            return res.status(400).json({
+                message: "CSV file is empty",
+            });
+        }
+
+        //* Expected headers
+        const requiredHeaders = ['firstName', 'lastName', 'email', 'password', 'position', 'department'];
+        const firstRecord = records[0];
+        const headers = Object.keys(firstRecord);
+
+        //* Validate headers
+        const hasAllHeaders = requiredHeaders.every(header => headers.includes(header));
+        if (!hasAllHeaders) {
+            return res.status(400).json({
+                message: `CSV must have headers: ${requiredHeaders.join(', ')}`,
+            });
+        }
+
+        const results: UploadResult[] = [];
+        let successCount = 0;
+        let failureCount = 0;
+
+        //* Process each record
+        for (const record of records) {
+            try {
+                //* Validate required fields
+                if (!record.firstName || !record.lastName || !record.email || !record.password || !record.position || !record.department) {
+                    results.push({
+                        status: "failed",
+                        email: record.email || "unknown",
+                        error: "Missing required fields",
+                    });
+                    failureCount++;
+                    continue;
+                }
+
+                //* Validate email format
+                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                if (!emailRegex.test(record.email)) {
+                    results.push({
+                        status: "failed",
+                        email: record.email,
+                        error: "Invalid email format",
+                    });
+                    failureCount++;
+                    continue;
+                }
+
+                //* Validate password (at least 8 characters, only numbers)
+                if (record.password.length < 8 || !/^\d+$/.test(record.password)) {
+                    results.push({
+                        status: "failed",
+                        email: record.email,
+                        error: "Password must be at least 8 numbers",
+                    });
+                    failureCount++;
+                    continue;
+                }
+
+                //* Check if exisint user or not
+                const existingUser = await getEmployeeByEmail(record.email);
+
+                if (existingUser) {
+                    results.push({
+                        status: "failed",
+                        email: record.email,
+                        error: "Employee with this email already exists",
+                    });
+                    failureCount++;
+                    continue;
+                }
+
+                const otp = 123456
+                const hashedOTP = await generateHashedValue(otp.toString())
+                const hashedPassword = await generateHashedValue(record.password)
+                const token = generateToken()
+
+                const otpData = {
+                    email: record.email,
+                    otp: hashedOTP,
+                    rememberToken: generateToken(),
+                    count: 1
+                }
+
+                await createEmployeeWithOTP({
+                    firstName: record.firstName,
+                    lastName: record.lastName,
+                    email: record.email,
+                    password: hashedPassword,
+                    position: record.position,
+                    department: record.department,
+                    rndToken: token,
+                }, otpData)
+
+                results.push({
+                    status: "success",
+                    email: record.email,
+                });
+                successCount++;
+            } catch (error) {
+                console.error(`Error processing user ${record.email}:`, error);
+                results.push({
+                    status: "failed",
+                    email: record.email,
+                    error: "Failed to create user",
+                });
+                failureCount++;
+            }
+        }
+
+        return res.status(200).json({
+            message: `Bulk registration completed. Success: ${successCount}, Failed: ${failureCount}`,
+            results,
+            successCount,
+            failureCount,
+        });
+    }
+];

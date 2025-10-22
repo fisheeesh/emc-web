@@ -3,7 +3,7 @@ import { createActionPlan, getAdminUser, getAllDepartments, getAllNotifications,
 import { generateAIAnalysis, generateAIRecommendation, regenerateAIAnalysis } from "../../../controllers/admin/ai-controller"
 import { getAttendanceOverView, getCheckInHours, getDailyAttendance } from "../../../controllers/admin/attendance-controller"
 import { deleteCriticalEmpById, deleteWatchlistEmpById, getAllCriticalEmps, getAllWatchlistEmps, getLeaderboards, getMoodOverview, getSenitmentsComparison } from "../../../controllers/admin/sentiments-controller"
-import { setMaintenance } from "../../../controllers/admin/system-contorller"
+import { setMaintenance } from "../../../controllers/admin/system-controller"
 
 const router = express.Router()
 
