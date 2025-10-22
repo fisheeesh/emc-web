@@ -36,13 +36,13 @@ export default function WatchListTable({ data, status, error, isFetchingNextPage
 
     return (
         <Card className="rounded-md border-yellow-500 border-2 flex flex-col gap-5">
-            <CardHeader className="flex flex-col md:flex-row gap-3 md:gap-0 justify-between">
+            <CardHeader className="flex flex-col md:flex-row gap-3 justify-between">
                 <div className="flex flex-col items-start gap-2 tracking-wide">
                     <CardTitle className="text-xl md:text-2xl text-yellow-600 flex items-center gap-2">
                         <GiBinoculars />
                         WatchList Employees
                     </CardTitle>
-                    <CardDescription>Employees moved from critical status after intervention, now under ongoing observation for stability</CardDescription>
+                    <CardDescription className="md:line-clamp-1">Employees moved from critical status after intervention, now under ongoing observation for stability</CardDescription>
                 </div>
                 <LocalSearch filterValue="wKw" />
             </CardHeader>

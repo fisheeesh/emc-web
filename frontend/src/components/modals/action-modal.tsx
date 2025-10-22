@@ -322,17 +322,17 @@ export default function ActionModal({ employee, action, onClose }: Props) {
 
                     <div className="flex flex-col md:flex-row justify-between items-center gap-3 border-t pt-6 pb-2 mt-6">
                         {
-                            action.type === 'PROCESSING' ?
-                                <p className="italic text-amber-600 text-sm md:text-base text-center">
-                                    Note: Take necessary steps to complete this action plan.
-                                </p>
-                                : action.type === "PENDING" ?
+                            action.status === 'REJECTED' ? <p className="italic text-sm md:text-base text-red-600 text-center">
+                                Note: This action plan has been rejected. <br className="block md:hidden" /> Please review and take necessary steps.
+                            </p> :
+                                action.type === 'PROCESSING' ?
                                     <p className="italic text-amber-600 text-sm md:text-base text-center">
-                                        Note: Awaiting approval from Upper Management
+                                        Note: Take necessary steps to complete this action plan.
                                     </p>
-                                    : action.type === 'REJECTED' ? <p className="italic text-sm md:text-base text-red-600 text-center">
-                                        Note: This action plan has been rejected. <br className="block md:hidden" /> Please review and take necessary steps.
-                                    </p>
+                                    : action.type === "PENDING" ?
+                                        <p className="italic text-amber-600 text-sm md:text-base text-center">
+                                            Note: Awaiting approval from Upper Management
+                                        </p>
                                         : <p className="italic text-sm md:text-base text-green-600 text-center">
                                             Note: This action plan has been completed.
                                         </p>
@@ -342,7 +342,7 @@ export default function ActionModal({ employee, action, onClose }: Props) {
                                 Close
                             </Button>
                         </DialogClose>
-                        {action.type === 'PROCESSING' &&
+                        {action.type === 'PROCESSING' && action.status !== 'REJECTED' &&
                             <Button
                                 onClick={() => onMarkAsCompleted(action.id)}
                                 disabled={updatingAction}
