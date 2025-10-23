@@ -27,12 +27,22 @@ export const getSummaryData = [
             const startOfLastMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1);
             const endOfLastMonth = new Date(now.getFullYear(), now.getMonth(), 0);
 
-            //* Build where clause
-            const whereClause: any = {};
+            //* Build where clause - ONLY ACTIVE EMPLOYEES
+            const whereClause: any = {
+                accType: 'ACTIVE'
+            };
 
-            //* If departmentId is provided, filter by it
+            //* If departmentId is provided, filter by it (and ensure department is active)
             if (departmentId) {
                 whereClause.departmentId = departmentId;
+                whereClause.department = {
+                    isActive: true
+                };
+            } else {
+                //* If no specific department, only include employees from active departments
+                whereClause.department = {
+                    isActive: true
+                };
             }
 
             //* Overall Wellbeing Score (avgScore average)
@@ -62,9 +72,12 @@ export const getSummaryData = [
                 ? ((Number(currentWellbeing) - Number(lastMonthWellbeing)) / Number(lastMonthWellbeing) * 100)
                 : 0;
 
-            //* Critical Alerts (unresolved critical employees)
+            //* Critical Alerts (unresolved critical employees) - ONLY FROM ACTIVE DEPARTMENTS
             const criticalWhere: any = {
-                isResolved: false
+                isResolved: false,
+                department: {
+                    isActive: true
+                }
             };
 
             if (departmentId) {
@@ -87,13 +100,16 @@ export const getSummaryData = [
 
             const criticalChange = criticalAlerts - lastMonthCriticalAlerts;
 
-            // Count resolved this month
+            //* Count resolved this month only from active dep
             const resolvedThisMonth = await prisma.criticalEmployee.count({
                 where: {
                     ...(departmentId ? { departmentId } : {}),
                     isResolved: true,
                     resolvedAt: {
                         gte: startOfMonth
+                    },
+                    department: {
+                        isActive: true
                     }
                 }
             });

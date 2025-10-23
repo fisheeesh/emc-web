@@ -18,6 +18,9 @@ export const createOrUpdateSettingStatus = async (key: string, value: string) =>
 
 export const getAllDepartmentsData = async () => {
     const deps = await prisma.department.findMany({
+        where: {
+            isActive: true
+        },
         orderBy: {
             name: 'asc'
         }
