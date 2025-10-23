@@ -304,7 +304,7 @@ export default function AIAnalysisModal({ analysis: initialAnalysis, empName, cr
                                         type="button"
                                         disabled={regenerating}
                                         onClick={handleRegenerateAnalysis}
-                                        className="flex text-white items-center gap-2 cursor-pointer bg-gradient-to-r from-purple-500 via-pink-500 to-blue-500 hover:from-purple-600 hover:via-pink-600 hover:to-blue-600">
+                                        className="flex text-white items-center gap-2 cursor-pointer bg-gradient">
                                         <RiRefreshLine />
                                         Re-Generate
                                     </Button>

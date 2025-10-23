@@ -562,7 +562,7 @@ export default function ActionModal({ employee, action, onClose }: Props) {
                                                 disabled={generating || isWorking}
                                                 onClick={handleAIRecommendation}
                                                 type="button"
-                                                className="relative flex items-center gap-1.5 min-h-[40px] cursor-pointer overflow-hidden bg-gradient-to-r from-purple-500 via-pink-500 to-blue-500 text-white font-semibold before:absolute before:inset-0 before:bg-gradient-to-r before:from-transparent before:via-white/30 before:to-transparent before:animate-[shimmer_2s_ease-in-out_infinite] before:[animation-delay:0s]"
+                                                className="relative flex items-center gap-1.5 min-h-[40px] cursor-pointer overflow-hidden bg-gradient-to-r from-pink-500 to-purple-600 text-white font-semibold hover:brightness-110 transition-all duration-300 before:absolute before:inset-0 before:bg-gradient-to-r before:from-transparent before:via-white/30 before:to-transparent before:animate-[shimmer_2s_ease-in-out_infinite] before:[animation-delay:0s]"
                                                 style={{
                                                     animationTimingFunction: 'linear'
                                                 }}

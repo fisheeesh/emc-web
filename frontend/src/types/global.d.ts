@@ -82,7 +82,8 @@ interface AttendanceOverviewData {
     emotionScore: number,
     checkInTime: string,
     status: "positive" | "neutral" | "negative" | "critical",
-    employee: Employee
+    employee: Employee,
+    points: number
 }
 
 interface LeaderboardData {

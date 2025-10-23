@@ -133,6 +133,7 @@ export const getAttendanceOverView = [
                 textFeeling: true,
                 emotionScore: true,
                 status: true,
+                points: true,
                 checkInTime: true,
                 employee: {
                     select: {

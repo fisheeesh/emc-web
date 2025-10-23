@@ -3,16 +3,13 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { EMOTION_FILTER, IMG_URL, TSFILTER } from "@/lib/constants";
-import { Dialog, DialogTrigger } from "@radix-ui/react-dialog";
-
-import EmpEmotionModal from "@/components/modals/emp-emotion-modal";
 import CommonFilter from "@/components/shared/common-filter";
 import CustomBadge from "@/components/shared/custom-badge";
 import CustomCalendar from "@/components/shared/custom-calendar";
-import Empty from "@/components/ui/empty";
 import TableSkeleton from "@/components/shared/table-skeleton";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import Empty from "@/components/ui/empty";
 import { getInitialName } from "@/lib/utils";
-import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { BsCalendar2Check } from "react-icons/bs";
 
 interface Props {
@@ -61,7 +58,7 @@ export default function AttendanceTable({ data, status, error, isFetchingNextPag
                             <TableHead className="whitespace-nowrap font-semibold">Job Type</TableHead>
                             <TableHead className="whitespace-nowrap font-semibold">Emotion</TableHead>
                             <TableHead className="whitespace-nowrap font-semibold">Check-in Time</TableHead>
-                            <TableHead className="whitespace-nowrap text-center font-semibold">Actions</TableHead>
+                            <TableHead className="whitespace-nowrap font-semibold">Points</TableHead>
                         </TableRow>
                     </TableHeader>
 
@@ -101,8 +98,10 @@ export default function AttendanceTable({ data, status, error, isFetchingNextPag
                                                 <TableCell>
                                                     <span className="whitespace-nowrap font-en">{att.checkInTime}</span>
                                                 </TableCell>
-                                                <TableCell className="space-x-2 text-center">
-                                                    {/* Details Dialog */}
+                                                <TableCell>
+                                                    <span className="whitespace-nowrap font-en">{att.points}</span>
+                                                </TableCell>
+                                                {/* <TableCell className="space-x-2 text-center">
                                                     <Dialog>
                                                         <DialogTrigger asChild>
                                                             <Button variant='outline' className="cursor-pointer">
@@ -111,7 +110,7 @@ export default function AttendanceTable({ data, status, error, isFetchingNextPag
                                                         </DialogTrigger>
                                                         <EmpEmotionModal empName={att.employee.fullName} emoji={att.emoji} textFeeling={att.textFeeling} checkInTime={att.checkInTime} score={att.emotionScore} />
                                                     </Dialog>
-                                                </TableCell>
+                                                </TableCell> */}
                                             </TableRow>
                                         ))
                                     }
