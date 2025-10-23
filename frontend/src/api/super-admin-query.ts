@@ -136,6 +136,17 @@ export const allDepartmentsDataQuery = () => ({
     queryFn: fetchAllDepartmentsData
 })
 
+const fetchAllEmotionCategories = async () => {
+    const res = await superApi.get("/super-admin/emotion-categories")
+
+    return res.data
+}
+
+export const allEmotionCategoriesQuery = () => ({
+    queryKey: ['all-emotion-categories'],
+    queryFn: fetchAllEmotionCategories
+})
+
 const fetchCountries = async () => {
     const res = await axios.get("https://restcountries.com/v2/all?fields=name,flag")
 

@@ -1,4 +1,4 @@
-import { actionPlansQuery, allDepartmentsDataQuery, countriesQuery, empInfiniteQuery, summaryDataQuery } from "@/api/super-admin-query"
+import { actionPlansQuery, allDepartmentsDataQuery, allEmotionCategoriesQuery, countriesQuery, empInfiniteQuery, summaryDataQuery } from "@/api/super-admin-query"
 import EmotionDisplay from "@/components/dashboard/emotion-display-card"
 import { SummaryCards } from "@/components/dashboard/summary-cards"
 import ActionsTable from "@/components/dashboard/tables/actions-table"
@@ -52,12 +52,12 @@ export default function ManagementsPage() {
     const { data: summaryData } = useSuspenseQuery(summaryDataQuery(dep))
     const { data: countriesData } = useSuspenseQuery(countriesQuery())
     const { data: allDepData } = useSuspenseQuery(allDepartmentsDataQuery())
+    const { data: allEmotionCate } = useSuspenseQuery(allEmotionCategoriesQuery())
 
     const allEmps = empData?.pages.flatMap(page => page.data) ?? []
     const allActionPlans = actionData?.pages.flatMap(page => page.data) ?? []
 
     useEffect(() => {
-
         if (countriesData) {
             setCountries(countriesData.map((country: Country) => ({
                 name: country.name,
@@ -75,7 +75,7 @@ export default function ManagementsPage() {
             <SummaryCards data={summaryData.data} isLoading={isSummaryRefetching} />
             <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-3 w-full">
                 <DepartmentTable data={allDepData.data} />
-                <EmotionDisplay />
+                <EmotionDisplay data={allEmotionCate.data} />
             </div>
             <div className="w-full">
                 <EmpTables

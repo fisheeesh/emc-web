@@ -1,93 +1,15 @@
 import { clsx, type ClassValue } from "clsx"
 import { twMerge } from "tailwind-merge"
-import html2canvas from 'html2canvas';
-import jsPDF from 'jspdf';
-import { toast } from "sonner";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
 
-interface DownloadPDFOptions {
-  empName: string;
-  weekRange?: string | number;
+export const getEmotionColors = (type: string) => {
+  if (type === 'positive') return 'from-green-500 to-emerald-500'
+  else if (type === 'neutral') return 'from-purple-500 to-indigo-500'
+  else return 'from-red-500 to-orange-500'
 }
-
-export const downloadAnalysisAsPDF = async ({ empName, weekRange }: DownloadPDFOptions) => {
-  const element = document.getElementById('analysis');
-
-  if (!element) {
-    console.error('Analysis element not found');
-    return;
-  }
-
-  try {
-    // Show loading toast
-    const loadingToast = toast.loading('Generating PDF...');
-
-    // Capture the element as canvas with higher quality
-    const canvas = await html2canvas(element, {
-      scale: 2, // Higher quality
-      useCORS: true,
-      logging: false,
-      backgroundColor: '#ffffff'
-    });
-
-    // Calculate PDF dimensions
-    const imgWidth = 190; // A4 width in mm minus margins
-    const pageHeight = 277; // A4 height in mm
-    const imgHeight = (canvas.height * imgWidth) / canvas.width;
-
-    // Create PDF
-    const pdf = new jsPDF('p', 'mm', 'a4');
-    let heightLeft = imgHeight;
-    let position = 10; // Top margin
-
-    // Add title
-    pdf.setFontSize(16);
-    pdf.setTextColor(147, 51, 234); // Purple color
-    pdf.text('AI-Powered Weekly Emotional Analysis', 10, position);
-    position += 8;
-
-    pdf.setFontSize(12);
-    pdf.setTextColor(0, 0, 0);
-    pdf.text(`Employee: ${empName}`, 10, position);
-    position += 6;
-
-    if (weekRange) {
-      pdf.setFontSize(10);
-      pdf.setTextColor(100, 100, 100);
-      pdf.text(`Period: ${weekRange}`, 10, position);
-      position += 10;
-    } else {
-      position += 4;
-    }
-
-    // Add the canvas image
-    const imgData = canvas.toDataURL('image/png');
-    pdf.addImage(imgData, 'PNG', 10, position, imgWidth, imgHeight);
-    heightLeft -= pageHeight;
-
-    // Add new pages if content is longer than one page
-    while (heightLeft >= 0) {
-      position = heightLeft - imgHeight + 10;
-      pdf.addPage();
-      pdf.addImage(imgData, 'PNG', 10, position, imgWidth, imgHeight);
-      heightLeft -= pageHeight;
-    }
-
-    // Save the PDF
-    const fileName = `${empName.replace(/\s+/g, '_')}_Analysis_${new Date().toISOString().split('T')[0]}.pdf`;
-    pdf.save(fileName);
-
-    // Dismiss loading and show success
-    toast.dismiss(loadingToast);
-    toast.success('PDF downloaded successfully!');
-  } catch (error) {
-    console.error('Error generating PDF:', error);
-    toast.error('Failed to generate PDF');
-  }
-};
 
 export const getInitialName = (fullName: string) => {
   return `${fullName?.split(" ")[0]?.charAt(0).toUpperCase()}${fullName?.split(" ")[1]?.charAt(0).toUpperCase()}`

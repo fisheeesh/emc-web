@@ -1,70 +1,40 @@
+
 import { Button } from "@/components/ui/button";
 import { DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Form, FormControl, FormField, FormItem, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import useUpdateEmotionCategories from "@/hooks/ui/use-update-emotion-categories";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { X } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { MdAdd } from "react-icons/md";
 import { RiEmotionHappyLine } from "react-icons/ri";
+import { toast } from "sonner";
 import { z } from "zod";
-
-interface Emotion {
-    icon: string;
-    label: string;
-}
-
-const INITIAL_EMOTIONS: Record<string, Emotion[]> = {
-    negative: [
-        { icon: '😓', label: 'tired' },
-        { icon: '😩', label: 'stressed' },
-        { icon: '😴', label: 'bored' },
-        { icon: '😡', label: 'frustrated' },
-        { icon: '😞', label: 'disappointed' },
-        { icon: '😭', label: 'sad' },
-        { icon: '😰', label: 'anxious' },
-        { icon: '😒', label: 'annoyed' },
-        { icon: '😠', label: 'mad' },
-    ],
-    neutral: [
-        { icon: '😐', label: 'neutral' },
-        { icon: '😌', label: 'calm' },
-        { icon: '😑', label: 'meh' },
-        { icon: '😶', label: 'indifferent' },
-        { icon: '🙂', label: 'okay' },
-        { icon: '😕', label: 'unsure' },
-        { icon: '🤔', label: 'curious' },
-        { icon: '🙃', label: 'playful' },
-        { icon: '🫤', label: 'uncertain' },
-    ],
-    positive: [
-        { icon: '😀', label: 'happy' },
-        { icon: '😄', label: 'excited' },
-        { icon: '😍', label: 'loved' },
-        { icon: '😁', label: 'joyful' },
-        { icon: '🥳', label: 'celebratory' },
-        { icon: '😎', label: 'confident' },
-        { icon: '😊', label: 'grateful' },
-        { icon: '🤩', label: 'thrilled' },
-        { icon: '😇', label: 'peaceful' },
-    ],
-};
+import Spinner from "../shared/spinner";
 
 const addEmotionSchema = z.object({
     emoji: z.string().min(1, "Emoji is required"),
-    label: z.string().min(1, "Label is required"),
+    label: z.string().min(1, "Label is required").max(50, "Label must be 50 characters or less"),
 });
 
 interface ModifyEmotionsModalProps {
     onClose?: () => void;
+    data: EmotionCategory[];
 }
 
-export default function ModifyEmotionsModal({ onClose }: ModifyEmotionsModalProps) {
-    const [selectedCategory, setSelectedCategory] = useState<'negative' | 'neutral' | 'positive'>('neutral');
-    const [emotions, setEmotions] = useState<Record<string, Emotion[]>>(INITIAL_EMOTIONS);
+export default function ModifyEmotionsModal({ onClose, data }: ModifyEmotionsModalProps) {
+    const [selectedCategory, setSelectedCategory] = useState<'Negative' | 'Neutral' | 'Positive'>('Neutral');
+    const [emotions, setEmotions] = useState<Record<string, Emotion[]>>({
+        Negative: [],
+        Neutral: [],
+        Positive: [],
+    });
+
+    const { updateEmotionCate, updating } = useUpdateEmotionCategories()
 
     const form = useForm({
         resolver: zodResolver(addEmotionSchema),
@@ -74,7 +44,39 @@ export default function ModifyEmotionsModal({ onClose }: ModifyEmotionsModalProp
         },
     });
 
+    useEffect(() => {
+        if (data && data.length > 0) {
+            const emotionsMap: Record<string, Emotion[]> = {
+                Negative: [],
+                Neutral: [],
+                Positive: [],
+            };
+
+            data.forEach((category) => {
+                emotionsMap[category.title] = category.emotions || [];
+            });
+
+            setEmotions(emotionsMap);
+        }
+    }, [data]);
+
     const handleAddEmotion = (values: z.infer<typeof addEmotionSchema>) => {
+        //* Check if already at 9 emotions
+        if (emotions[selectedCategory].length >= 9) {
+            toast.error('Maximum 9 emotions allowed per category');
+            return;
+        }
+
+        //* Check for duplicate label
+        const isDuplicate = emotions[selectedCategory].some(
+            e => e.label.toLowerCase() === values.label.trim().toLowerCase()
+        );
+
+        if (isDuplicate) {
+            toast.error('This emotion already exists in this category');
+            return;
+        }
+
         setEmotions(prev => ({
             ...prev,
             [selectedCategory]: [
@@ -87,49 +89,97 @@ export default function ModifyEmotionsModal({ onClose }: ModifyEmotionsModalProp
     };
 
     const handleDeleteEmotion = (index: number) => {
+        const deletedEmotion = emotions[selectedCategory][index];
+
         setEmotions(prev => ({
             ...prev,
             [selectedCategory]: prev[selectedCategory].filter((_, i) => i !== index)
         }));
+
+        toast.success(`Removed "${deletedEmotion.label}" from ${selectedCategory}`);
     };
 
     const handleSubmit = () => {
-        console.log('Submitting emotions:', emotions);
-        onClose?.();
+        if (emotions[selectedCategory].length !== 9) {
+            toast.error(`You must have exactly 9 emotions in the ${selectedCategory} category. Currently: ${emotions[selectedCategory].length}`);
+            return;
+        }
+
+        updateEmotionCate({
+            title: selectedCategory,
+            emotions: emotions[selectedCategory],
+        }, {
+            onSettled: () => {
+                form.reset()
+                onClose?.()
+            }
+        });
     };
+
+    const currentEmotionCount = emotions[selectedCategory].length;
+    const isMaxReached = currentEmotionCount >= 9;
+    const canSubmit = currentEmotionCount === 9;
 
     return (
         <DialogContent className="sm:max-w-[700px] max-h-[90vh] overflow-y-auto no-scrollbar">
             <DialogHeader>
                 <DialogTitle className="text-lg md:text-xl font-bold flex items-center gap-2">
                     <RiEmotionHappyLine className="size-5 md:size-7" />
-                    Modify Emtion Categories
+                    Modify Emotion Categories
                 </DialogTitle>
                 <DialogDescription className="text-xs md:text-sm text-start">
-                    Customize emotion tags for each category. Add or remove emotions as needed.
+                    Customize emotion tags for each category. Each category must have exactly 9 emotions.
                 </DialogDescription>
             </DialogHeader>
 
             <div className="space-y-6 py-4">
-                {/* Category Select */}
                 <div className="space-y-2">
                     <Label>Select Category</Label>
                     <Select
                         value={selectedCategory}
-                        onValueChange={(value: 'negative' | 'neutral' | 'positive') => setSelectedCategory(value)}
+                        onValueChange={(value: 'Negative' | 'Neutral' | 'Positive') => setSelectedCategory(value)}
                     >
                         <SelectTrigger className="min-h-[44px] cursor-pointer">
                             <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
-                            <SelectItem value="negative">Negative</SelectItem>
-                            <SelectItem value="neutral">Neutral</SelectItem>
-                            <SelectItem value="positive">Positive</SelectItem>
+                            <SelectItem value="Negative">
+                                <div className="flex items-center justify-between w-full gap-2">
+                                    <span>Negative</span>
+                                    <span className={`text-xs font-en font-bold ${emotions.Negative.length === 9
+                                        ? 'text-green-600'
+                                        : 'text-orange-600'
+                                        }`}>
+                                        ({emotions.Negative.length}/9)
+                                    </span>
+                                </div>
+                            </SelectItem>
+                            <SelectItem value="Neutral">
+                                <div className="flex items-center justify-between w-full gap-2">
+                                    <span>Neutral</span>
+                                    <span className={`text-xs font-en font-bold ${emotions.Neutral.length === 9
+                                        ? 'text-green-600'
+                                        : 'text-orange-600'
+                                        }`}>
+                                        ({emotions.Neutral.length}/9)
+                                    </span>
+                                </div>
+                            </SelectItem>
+                            <SelectItem value="Positive">
+                                <div className="flex items-center justify-between w-full gap-2">
+                                    <span>Positive</span>
+                                    <span className={`text-xs font-en font-bold ${emotions.Positive.length === 9
+                                        ? 'text-green-600'
+                                        : 'text-orange-600'
+                                        }`}>
+                                        ({emotions.Positive.length}/9)
+                                    </span>
+                                </div>
+                            </SelectItem>
                         </SelectContent>
                     </Select>
                 </div>
 
-                {/* Emotion Tags */}
                 <div className="space-y-2">
                     <Label>Current Emotions</Label>
                     <div className="flex flex-wrap gap-2 p-4 border-2 border-gray-200 dark:border-gray-700 rounded-lg bg-gray-50 dark:bg-gray-900">
@@ -149,6 +199,7 @@ export default function ModifyEmotionsModal({ onClose }: ModifyEmotionsModalProp
                                         type="button"
                                         onClick={() => handleDeleteEmotion(index)}
                                         className="ml-1 text-gray-500 hover:text-red-500 transition-colors cursor-pointer"
+                                        aria-label={`Remove ${emotion.label}`}
                                     >
                                         <X className="w-4 h-4" />
                                     </button>
@@ -158,7 +209,6 @@ export default function ModifyEmotionsModal({ onClose }: ModifyEmotionsModalProp
                     </div>
                 </div>
 
-                {/* Add New Emotion */}
                 <div className="space-y-2">
                     <Label>Add New Emotion</Label>
                     <Form {...form}>
@@ -175,6 +225,7 @@ export default function ModifyEmotionsModal({ onClose }: ModifyEmotionsModalProp
                                                     {...field}
                                                     className="min-h-[44px] text-center text-2xl"
                                                     maxLength={2}
+                                                    disabled={isMaxReached}
                                                 />
                                             </FormControl>
                                             <FormMessage />
@@ -191,6 +242,7 @@ export default function ModifyEmotionsModal({ onClose }: ModifyEmotionsModalProp
                                                     placeholder="Add only adjective to express emotion (e.g., happy, sad, excited)"
                                                     {...field}
                                                     className="min-h-[44px]"
+                                                    disabled={isMaxReached}
                                                 />
                                             </FormControl>
                                             <FormMessage />
@@ -200,33 +252,43 @@ export default function ModifyEmotionsModal({ onClose }: ModifyEmotionsModalProp
                                 <Button
                                     type="submit"
                                     size="icon"
-                                    className="min-h-[44px] w-[44px] bg-gradient text-white cursor-pointer"
+                                    className="min-h-[44px] w-[44px] bg-gradient text-white cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                                    disabled={isMaxReached}
                                 >
                                     <MdAdd className="w-5 h-5" />
                                 </Button>
                             </div>
-                            <p className="text-xs text-muted-foreground">
-                                Enter an emoji and an adjective that describes the emotion
-                            </p>
+                            {
+                                isMaxReached ?
+                                    <p className="text-xs text-muted-foreground">
+                                        Maximum 9 emotions reached. You can now save changes.
+                                    </p>
+                                    : <p className="text-xs text-muted-foreground">
+                                        Enter an emoji and an adjective that describes the emotion (<span className="font-en">{9 - currentEmotionCount}</span> more needed)
+                                    </p>
+                            }
                         </form>
                     </Form>
                 </div>
             </div>
 
-            {/* Footer Buttons */}
             <div className="flex justify-end gap-2 pt-4 border-t">
                 <Button
                     variant="outline"
                     onClick={onClose}
-                    className="min-h-[44px]"
+                    className="min-h-[44px] cursor-pointer"
+                    disabled={updating}
                 >
                     Close
                 </Button>
                 <Button
                     onClick={handleSubmit}
-                    className="min-h-[44px] bg-gradient text-white cursor-pointer"
+                    className="min-h-[44px] bg-gradient text-white cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                    disabled={!canSubmit || updating}
                 >
-                    Save Changes
+                    <Spinner isLoading={updating} label="Saving...">
+                        Save Changes
+                    </Spinner>
                 </Button>
             </div>
         </DialogContent>

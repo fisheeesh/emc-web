@@ -258,3 +258,13 @@ interface DepartmentData {
         actionPlans: number
     }
 }
+
+interface Emotion {
+    icon: string;
+    label: string;
+}
+
+interface EmotionCategory {
+    title: string;
+    emotions: Emotion[];
+}

@@ -15,7 +15,6 @@ import { toast } from "sonner";
 import { Button } from "../ui/button";
 import useRegenerateAIAnalysis from "@/hooks/ai/use-regenerate-ai-analysis";
 import queryClient from "@/api/query";
-import { downloadAnalysisAsPDF } from "@/lib/utils";
 
 interface Props {
     analysis?: Analysis;
@@ -122,14 +121,7 @@ export default function AIAnalysisModal({ analysis: initialAnalysis, empName, cr
             setProgress(0);
             setIsRegenerating(false);
         }
-    };
-
-    const handleDownloadPDF = () => {
-        downloadAnalysisAsPDF({
-            empName,
-            weekRange: analysis?.weekRange
-        });
-    };
+    }
 
     const showProgressBar = isGenerating || isRegenerating;
 
@@ -235,7 +227,7 @@ export default function AIAnalysisModal({ analysis: initialAnalysis, empName, cr
                             variant="outline"
                             size="icon"
                             className="cursor-pointer shrink-0 mr-5"
-                            onClick={handleDownloadPDF}
+                            onClick={() => toast.success("Success", { description: "SYP will implement this later on" })}
                         >
                             <Download className="h-4 w-4" />
                         </Button>
