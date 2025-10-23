@@ -1,3 +1,4 @@
+import { Button } from "@/components/ui/button";
 import {
     Card,
     CardContent,
@@ -5,10 +6,13 @@ import {
     CardHeader,
     CardTitle,
 } from "@/components/ui/card";
+import useRefreshAIConcerns from "@/hooks/ai/use-refresh-ai-concrens";
 import { WORDS_FILTERS } from "@/lib/constants";
-import { MessageSquare } from "lucide-react";
+import { MessageSquare, RefreshCw } from "lucide-react";
 import { BsFire } from "react-icons/bs";
 import { HiOutlineSparkles } from "react-icons/hi2";
+import { TiPin } from "react-icons/ti";
+import { useSearchParams } from "react-router";
 import CommonFilter from "../shared/common-filter";
 import Empty from "../ui/empty";
 
@@ -26,7 +30,23 @@ const getWordColor = (index: number) => {
     return colors[index % colors.length]
 }
 
-export function TopConcernsWordCloud({ concernsData, recommendation }: { concernsData: TopConcernWords[], recommendation: string }) {
+interface Props {
+    concernsData: TopConcernWords[],
+    recommendation: string,
+    generatedAt: string,
+    isCached: boolean
+}
+
+export function TopConcernsWordCloud({ concernsData, recommendation, generatedAt, isCached }: Props) {
+    const { refreshAIConcerns, refreshing } = useRefreshAIConcerns()
+    const [searchParams] = useSearchParams()
+    const timeRange = searchParams.get("timeRange") || '7'
+    const query = `?timeRange=${timeRange}&forceRefresh=true`
+
+    const handleRefresh = () => {
+        refreshAIConcerns(query)
+    }
+
     if (!concernsData || concernsData.length === 0) {
         return (
             <Card className="flex flex-col">
@@ -61,9 +81,29 @@ export function TopConcernsWordCloud({ concernsData, recommendation }: { concern
                     </CardTitle>
                     <CardDescription>
                         Most frequently mentioned keywords from emotion check-in notes
+                        {generatedAt && (
+                            <p className="flex items-center gap-2 text-xs mt-1">
+                                {isCached && <TiPin className="text-red-600" />}
+                                Last analyzed:
+                                <span className="font-en">
+                                    {new Date(generatedAt).toLocaleTimeString("en-US", {
+                                        year: "numeric", month: "long", day: "numeric", hour: "numeric", minute: "numeric"
+                                    })}
+                                </span>
+                            </p>
+                        )}
                     </CardDescription>
                 </div>
-                <div>
+                <div className="flex items-center gap-2">
+                    <Button
+                        variant="outline"
+                        onClick={handleRefresh}
+                        disabled={refreshing}
+                        className="gap-2 min-h-[44px] cursor-pointer"
+                    >
+                        <RefreshCw className={`size-4 ${refreshing ? 'animate-spin' : ''}`} />
+                        Refresh Analysis
+                    </Button>
                     <CommonFilter
                         font="font-en"
                         filterValue="timeRange"
@@ -73,7 +113,6 @@ export function TopConcernsWordCloud({ concernsData, recommendation }: { concern
                 </div>
             </CardHeader>
             <CardContent>
-                {/* Summary Stats */}
                 <div className="grid grid-cols-3 gap-3 mb-6">
                     <div className="flex flex-col items-center gap-1 p-3 rounded-lg bg-red-50 dark:bg-red-950/20 border border-red-100 dark:border-red-900/30">
                         <p className="text-xs text-gray-600 dark:text-gray-400">Top Concern</p>
@@ -100,7 +139,6 @@ export function TopConcernsWordCloud({ concernsData, recommendation }: { concern
                     </div>
                 </div>
 
-                {/* Word Cloud Visualization */}
                 <div className="relative min-h-[280px] border-2 border-dashed rounded-lg p-6 bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900/50 dark:to-gray-800/50 flex items-center justify-center">
                     <div className="flex flex-wrap gap-4 items-center justify-center max-w-2xl">
                         {concernsData.map((concern, index) => (
@@ -119,7 +157,6 @@ export function TopConcernsWordCloud({ concernsData, recommendation }: { concern
                     </div>
                 </div>
 
-                {/* Top 3 Trending */}
                 <div className="mt-6 p-4 bg-orange-50 dark:bg-orange-950/20 rounded-lg border border-orange-100 dark:border-orange-900/30">
                     <h4 className="text-sm font-semibold text-orange-900 dark:text-orange-300 mb-3 flex items-center gap-2">
                         <BsFire className="text-orange-500 dark:text-orange-400 text-base animate-pulse" />
@@ -152,7 +189,6 @@ export function TopConcernsWordCloud({ concernsData, recommendation }: { concern
                     </div>
                 </div>
 
-                {/* Insight */}
                 <div className="mt-4 p-3 flex items-center gap-2 bg-blue-50 dark:bg-blue-950/20 rounded-lg border border-blue-100 dark:border-blue-900/30">
                     <HiOutlineSparkles className="size-3.5 text-brand" />
                     <p className="text-xs text-gray-700 dark:text-gray-300">

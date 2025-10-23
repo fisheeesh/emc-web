@@ -17,7 +17,7 @@ export default function AnalyticsDashboardPage() {
     const { data: actionPlaStatusData } = useSuspenseQuery(actionPlanStatusQuery())
     const { data: depHeatmapData } = useSuspenseQuery(depHeatMapQuery())
     const { data: avgResponseTime } = useSuspenseQuery(actionAvgResponseTimeQuery())
-    const { data: topConcernsWords } = useSuspenseQuery(topConcernWordsQuery(timeRange))
+    const { data: topConcernsWords } = useSuspenseQuery(topConcernWordsQuery(timeRange, false))
 
     return (
         <section className="flex flex-col items-center justify-center w-full gap-3">
@@ -25,7 +25,12 @@ export default function AnalyticsDashboardPage() {
                 <DepartmentHeatmap depHeatmapData={depHeatmapData.data} />
             </div>
             <div className="w-full">
-                <TopConcernsWordCloud concernsData={topConcernsWords.data} recommendation={topConcernsWords.recommendation} />
+                <TopConcernsWordCloud
+                    concernsData={topConcernsWords.data}
+                    recommendation={topConcernsWords.recommendation}
+                    generatedAt={topConcernsWords.generatedAt}
+                    isCached={topConcernsWords.isCached}
+                />
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3 w-full">
                 <ResponseTimeChart chartData={avgResponseTime.data} />

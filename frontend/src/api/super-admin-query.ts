@@ -112,17 +112,26 @@ export const actionAvgResponseTimeQuery = () => ({
     queryFn: fetchActionAvgResponseTime
 })
 
-const fetchTopConcernWords = async (timeRange: string | null = null) => {
+const fetchTopConcernWords = async (
+    timeRange: string | null = null,
+    forceRefresh: boolean = false
+) => {
     let query = "?"
-    if (timeRange) query += `&timeRange=${timeRange}`
-    const res = await superApi.get(`/super-admin/top-concern-words${query}`)
+    if (timeRange) query += `timeRange=${timeRange}`
+    if (forceRefresh) query += `&forceRefresh=true`
 
+    const res = await superApi.get(`/super-admin/top-concern-words${query}`)
     return res.data
 }
 
-export const topConcernWordsQuery = (timeRange: string | null = null) => ({
+export const topConcernWordsQuery = (
+    timeRange: string | null = null,
+    forceRefresh: boolean = false
+) => ({
     queryKey: ['top-concern-words', timeRange ?? undefined],
-    queryFn: () => fetchTopConcernWords(timeRange)
+    queryFn: () => fetchTopConcernWords(timeRange, forceRefresh),
+    staleTime: 24 * 60 * 60 * 1000,
+    gcTime: 24 * 60 * 60 * 1000,
 })
 
 const fetchAllDepartmentsData = async () => {
