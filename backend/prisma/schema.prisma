@@ -260,6 +260,16 @@ model Emotion {
   @@map("emotions")
 }
 
+model ConcernAnalysis {
+  id             String   @id @default(cuid())
+  timeRange      String
+  data           Json
+  recommendation String
+  generatedAt    DateTime @default(now())
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}
+
 model Setting {
   id        Int      @id @default(autoincrement())
   key       String   @unique @db.VarChar(100)
