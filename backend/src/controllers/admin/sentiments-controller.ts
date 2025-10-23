@@ -100,6 +100,9 @@ export const getLeaderboards = [
         //* Fetch employees with conditional check-ins query
         const employees = await prisma.employee.findMany({
             where: {
+                department: {
+                    isActive: true,
+                },
                 departmentId:
                     emp!.role !== 'SUPERADMIN'
                         ? emp!.departmentId
@@ -232,6 +235,9 @@ export const getAllCriticalEmps = [
                         ]
                     }
                 }),
+                department: {
+                    isActive: true
+                },
                 departmentId:
                     emp!.role !== 'SUPERADMIN'
                         ? emp!.departmentId
@@ -357,6 +363,9 @@ export const getAllWatchlistEmps = [
             where: {
                 ...kwFilter,
                 status: 'WATCHLIST',
+                department: {
+                    isActive: true
+                },
                 departmentId:
                     emp!.role !== 'SUPERADMIN'
                         ? emp!.departmentId

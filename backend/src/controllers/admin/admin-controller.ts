@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import { body, validationResult } from "express-validator";
-import { PrismaClient, Status } from "../../../generated/prisma";
+import { Status } from "../../../generated/prisma";
 import { errorCodes } from "../../config/error-codes";
 import { prisma } from "../../config/prisma-client";
 import { EmailQueue } from "../../jobs/queues/email-queue";
@@ -13,8 +13,6 @@ import { completion_body, completion_subject, request_body, request_subject } fr
 interface CustomRequest extends Request {
     employeeId?: number
 }
-
-const prismaClient = new PrismaClient()
 
 export const testAdmin = (req: Request, res: Response, next: NextFunction) => {
     res.status(200).json({

@@ -155,6 +155,9 @@ export const getDailyAttendanceData = async (uDepartmentId: number, qDepartmentI
         //* Get all emp from the department
         const totalEmp = await prismaClient.employee.count({
             where: {
+                department: {
+                    isActive: true,
+                },
                 departmentId:
                     role !== 'SUPERADMIN'
                         ? uDepartmentId

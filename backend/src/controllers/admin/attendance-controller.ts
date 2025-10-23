@@ -103,6 +103,10 @@ export const getAttendanceOverView = [
             employeeWhere.departmentId = deptId;
         }
 
+        employeeWhere.department = {
+            isActive: true
+        };
+
         const kwTrimmed = (kw || "").toString().trim();
         if (kwTrimmed.length > 0) {
             employeeWhere.OR = [
@@ -113,7 +117,7 @@ export const getAttendanceOverView = [
         }
 
         if (Object.keys(employeeWhere).length > 0) {
-            where.employee = Object.keys(employeeWhere).length === 1 && "departmentId" in employeeWhere
+            where.employee = Object.keys(employeeWhere).length === 1 && "department" in employeeWhere
                 ? employeeWhere
                 : { AND: [employeeWhere] };
         }

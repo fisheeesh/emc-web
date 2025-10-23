@@ -16,6 +16,11 @@ export const getActionPlanStatus = async (req: CustomRequest, res: Response, nex
 
     const actionPlans = await prisma.actionPlan.groupBy({
         by: ['status'],
+        where: {
+            department: {
+                isActive: true
+            }
+        },
         _count: {
             status: true,
         },
@@ -34,7 +39,7 @@ export const getActionPlanStatus = async (req: CustomRequest, res: Response, nex
     }))
 
     res.status(200).json({
-        status: 'Here is the action plan status data',
+        message: 'Here is the action plan status data',
         data,
     })
 }
@@ -44,6 +49,9 @@ export const getDepartmentsHeatmap = async (req: CustomRequest, res: Response, n
     checkEmployeeIfNotExits(employee)
 
     const departments = await prisma.department.findMany({
+        where: {
+            isActive: true
+        },
         select: {
             name: true,
             employees: {
@@ -86,6 +94,9 @@ export const getActionAvgReponseTime = async (req: CustomRequest, res: Response,
 
     //* [{ department: "IT", responseTime: 2.5 }, ...]
     const departments = await prisma.department.findMany({
+        where: {
+            isActive: true
+        },
         select: {
             name: true,
             criticalEmployees: {
@@ -147,6 +158,11 @@ export const getTopConcernWords = [
 
         const emotionCheckIns = await prisma.emotionCheckIn.findMany({
             where: {
+                employee: {
+                    department: {
+                        isActive: true
+                    }
+                },
                 createdAt: {
                     gte: start,
                     lte: end

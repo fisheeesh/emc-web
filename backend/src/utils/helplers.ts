@@ -42,9 +42,20 @@ export function getStatusFromScore(score: number) {
 
 export const departmentFilter = (role: string, uDepartmentId: number, qDepartmentId?: string) => {
     return role !== 'SUPERADMIN'
-        ? { employee: { departmentId: uDepartmentId } }
+        ? {
+            employee: {
+                departmentId: uDepartmentId,
+            }
+        }
         : qDepartmentId && qDepartmentId !== 'all'
-            ? { employee: { departmentId: Number(qDepartmentId) } }
+            ? {
+                employee: {
+                    departmentId: Number(qDepartmentId),
+                    department: {
+                        isActive: true
+                    }
+                }
+            }
             : {};
 }
 

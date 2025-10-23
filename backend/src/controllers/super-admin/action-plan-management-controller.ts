@@ -31,6 +31,9 @@ export const getAllActionPlans = [
 
         const depFilter: Prisma.ActionPlanWhereInput =
             dep && dep !== 'all' ? {
+                department: {
+                    isActive: true,
+                },
                 departmentId: +dep
             } : {}
 

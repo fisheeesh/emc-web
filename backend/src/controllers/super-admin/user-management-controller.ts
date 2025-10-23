@@ -1,14 +1,15 @@
+import { parse } from "csv-parse/sync"
 import { NextFunction, Request, Response } from "express"
 import { body, query, validationResult } from "express-validator"
 import { AccType, Gender, JobType, Prisma, Role, WorkStyle } from "../../../generated/prisma"
 import { errorCodes } from "../../config/error-codes"
+import { prisma } from "../../config/prisma-client"
 import { ImageQueue } from "../../jobs/queues/image-queue"
 import { getEmployeeByEmail, getEmployeeById } from "../../services/auth-services"
 import { createEmployeeWithOTP, deleteEmployeeById, getEmployeesInfiniteData, updateEmpDataById } from "../../services/emp-services"
 import { checkEmployeeIfExits, checkEmployeeIfNotExits, checkUploadFile, createHttpErrors } from "../../utils/check"
 import { generateHashedValue, generateToken } from "../../utils/generate"
 import { removeFiles } from "../../utils/helplers"
-import { parse } from "csv-parse/sync";
 
 interface CustomRequest extends Request {
     employeeId?: number
@@ -79,6 +80,19 @@ export const createNewEmployee = [
 
         const existEmp = await getEmployeeByEmail(email)
         checkEmployeeIfExits(existEmp)
+
+        const activeDepartments = await prisma.department.findMany({
+            where: { isActive: true },
+            select: { name: true }
+        });
+
+        const activeDeptNames = new Set(activeDepartments.map(d => d.name));
+
+        if (!activeDeptNames.has(department)) return next(createHttpErrors({
+            message: `Department '${department}' is inactive. Please activate it before adding employees.`,
+            status: 400,
+            code: errorCodes.invalid
+        }))
 
         if (req.file) {
             checkUploadFile(req.file)
@@ -485,6 +499,13 @@ export const bulkRegister = [
             });
         }
 
+        const activeDepartments = await prisma.department.findMany({
+            where: { isActive: true },
+            select: { name: true }
+        });
+
+        const activeDeptNames = new Set(activeDepartments.map(d => d.name));
+
         const results: UploadResult[] = [];
         let successCount = 0;
         let failureCount = 0;
@@ -510,6 +531,16 @@ export const bulkRegister = [
                         status: "failed",
                         email: record.email,
                         error: "Invalid email format",
+                    });
+                    failureCount++;
+                    continue;
+                }
+
+                if (!activeDeptNames.has(record.department)) {
+                    results.push({
+                        status: 'failed',
+                        email: record.email,
+                        error: `Department '${record.department}' is inactive. Please activate it before adding employees.`
                     });
                     failureCount++;
                     continue;
