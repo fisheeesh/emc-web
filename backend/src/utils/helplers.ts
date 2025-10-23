@@ -4,6 +4,7 @@ import path from "path"
 import { unlink } from "node:fs/promises";
 import { generateText } from 'ai'
 import { groq } from '@ai-sdk/groq'
+import { startOfDay, subMonths, subDays, endOfDay } from 'date-fns';
 
 export const calculatePositiveStreak = (scores: number[]): number => {
     let streak = 0;
@@ -16,6 +17,21 @@ export const calculatePositiveStreak = (scores: number[]): number => {
     }
     return streak >= 3 ? streak : 0
 };
+
+export const getDateRangeFromTimeRange = (timeRange: string | number) => {
+    const now = new Date()
+    let start: Date
+
+    if (+timeRange === 90) {
+        start = startOfDay(subMonths(now, 3))
+    } else {
+        start = startOfDay(subDays(now, +timeRange - 1))
+    }
+
+    const end = endOfDay(now)
+
+    return { start, end }
+}
 
 export function getStatusFromScore(score: number) {
     if (score >= 0.4) return 'positive';

@@ -1,7 +1,7 @@
 import express from "express"
 import { deleteActionPlanById, getAllActionPlans, updateActionPlan } from "../../../controllers/super-admin/action-plan-management-controller"
 import { getActionAvgReponseTime, getActionPlanStatus, getDepartmentsHeatmap, getTopConcernWords } from "../../../controllers/super-admin/analytics-controller"
-import { getSummaryData, testSuperAdmin } from "../../../controllers/super-admin/super-admin-controller"
+import { createNewDepartment, deleteDepartmentById, getAllDepartmentsData, getSummaryData, testSuperAdmin, updateDepartmentById } from "../../../controllers/super-admin/super-admin-controller"
 import { bulkRegister, createNewEmployee, deleteEmployee, getAllEmployeesInfinite, updateEmployeeInformation } from "../../../controllers/super-admin/user-management-controller"
 import upload, { uploadCSV } from "../../../middlewares/upload-files-middleware"
 
@@ -12,6 +12,12 @@ router.get("/test", testSuperAdmin)
 
 //* Summary data
 router.get("/summary", getSummaryData)
+
+//* Dep routes
+router.get("/departments-data", getAllDepartmentsData)
+router.post("/departments", createNewDepartment)
+router.patch("/departments", updateDepartmentById)
+router.delete("/departments", deleteDepartmentById)
 
 //* Emp management routes
 router.get("/emps-infinite", getAllEmployeesInfinite)
