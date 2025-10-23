@@ -7,6 +7,15 @@ export const invalidateEmpQueries = async () => {
     await Promise.all([
         queryClient.invalidateQueries({ queryKey: ['emps', 'infinite'], exact: false }),
         queryClient.invalidateQueries({ queryKey: ['departments'] }),
+        queryClient.invalidateQueries({ queryKey: ['all-dep-data'] }),
+        queryClient.invalidateQueries({ queryKey: ['summary'], exact: false }),
+    ]);
+};
+
+export const invalidateDepQueries = async () => {
+    await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ['departments'] }),
+        queryClient.invalidateQueries({ queryKey: ['all-dep-data'] }),
         queryClient.invalidateQueries({ queryKey: ['summary'], exact: false }),
     ]);
 };
@@ -103,17 +112,29 @@ export const actionAvgResponseTimeQuery = () => ({
     queryFn: fetchActionAvgResponseTime
 })
 
-const fetchTopConcernWords = async () => {
-    const res = await superApi.get("/super-admin/top-concern-words")
+const fetchTopConcernWords = async (timeRange: string | null = null) => {
+    let query = "?"
+    if (timeRange) query += `&timeRange=${timeRange}`
+    const res = await superApi.get(`/super-admin/top-concern-words${query}`)
 
     return res.data
 }
 
-export const topConcernWordsQuery = () => ({
-    queryKey: ['top-concern-words'],
-    queryFn: fetchTopConcernWords
+export const topConcernWordsQuery = (timeRange: string | null = null) => ({
+    queryKey: ['top-concern-words', timeRange ?? undefined],
+    queryFn: () => fetchTopConcernWords(timeRange)
 })
 
+const fetchAllDepartmentsData = async () => {
+    const res = await superApi.get("/super-admin/departments-data")
+
+    return res.data
+}
+
+export const allDepartmentsDataQuery = () => ({
+    queryKey: ["all-dep-data"],
+    queryFn: fetchAllDepartmentsData
+})
 
 const fetchCountries = async () => {
     const res = await axios.get("https://restcountries.com/v2/all?fields=name,flag")

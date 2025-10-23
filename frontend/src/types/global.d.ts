@@ -241,3 +241,20 @@ interface TopConcernWords {
     count: number,
     size: number
 }
+
+interface DepartmentData {
+    id: number,
+    name: string,
+    description: string,
+    isActive: boolean,
+    createdAt: string,
+    employees: {
+        fullName: string,
+        email: string
+    }[],
+    _count: {
+        employees: number,
+        criticalEmployees: number,
+        actionPlans: number
+    }
+}

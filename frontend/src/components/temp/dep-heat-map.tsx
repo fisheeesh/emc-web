@@ -40,10 +40,10 @@ export function DepartmentHeatmap({ depHeatmapData }: { depHeatmapData: DepHeatM
             <CardHeader>
                 <CardTitle className="text-xl md:text-2xl flex items-center gap-2">
                     <BsBuildings />
-                    Department Wellbeing Heatmap
+                    Departments Wellbeing Heatmap
                 </CardTitle>
                 <CardDescription>
-                    Real-time wellbeing status across all departments
+                    Real-time wellbeing status across all departments based on the last <span className="font-en">3</span> months of data
                 </CardDescription>
             </CardHeader>
             <CardContent>

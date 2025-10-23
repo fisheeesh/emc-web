@@ -74,7 +74,7 @@ export default function EmotionDisplay() {
     const [modifyOpen, setModifyOpen] = useState(false);
 
     return (
-        <Card className="rounded-md flex flex-col gap-5">
+        <Card className="rounded-md max-h-[600px] flex flex-col gap-5">
             <CardHeader className="space-y-2">
                 <div className="flex flex-col xl:flex-row gap-3 xl:gap-0 justify-between">
                     <div className="flex flex-col items-start gap-2 tracking-wide">

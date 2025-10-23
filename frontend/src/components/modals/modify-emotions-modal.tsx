@@ -174,7 +174,7 @@ export default function ModifyEmotionsModal({ onClose }: ModifyEmotionsModalProp
                                                     placeholder="😊"
                                                     {...field}
                                                     className="min-h-[44px] text-center text-2xl"
-                                                    maxLength={1}
+                                                    maxLength={2}
                                                 />
                                             </FormControl>
                                             <FormMessage />

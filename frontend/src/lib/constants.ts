@@ -66,6 +66,12 @@ export const LEADERBOARD_FILTER = [
     { name: 'For This Week', value: '7' },
 ]
 
+export const WORDS_FILTERS = [
+    { name: 'Last 7 days', value: '7' },
+    { name: 'Last 30 days', value: '30' },
+    { name: 'Last 3 months', value: '90' },
+]
+
 export const CRITICALSTATUS = [
     { name: "All Status", value: "all" },
     { name: "Resolved", value: "RESOLVED" },

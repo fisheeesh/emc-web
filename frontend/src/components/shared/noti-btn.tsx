@@ -71,7 +71,7 @@ export default function NotiBtn() {
                     </Tabs>
                 </div>
 
-                <div className="overflow-y-auto flex-1 p-2 space-y-2">
+                <div className="overflow-y-auto flex-1 p-2 space-y-2 no-scrollbar">
                     {filteredNotifications.length === 0 ? (
                         <div className="flex flex-col items-center justify-center h-full gap-2">
                             <BellOff className="h-12 w-12 text-muted-foreground/50" />

@@ -1,6 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import useCreateDep from "@/hooks/dep/use-create-dep";
+import useUpdateDep from "@/hooks/dep/use-update-dep";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm, type DefaultValues, type Path, type SubmitHandler } from "react-hook-form";
 import { MdAddBusiness, MdEditNote } from "react-icons/md";
@@ -28,6 +30,8 @@ export default function CreateEditDepartmentModal<T extends z.ZodType<any, any, 
     ...props
 }: CreateEditDepartmentModalProps<T>) {
     type FormData = z.infer<T>;
+    const { createDep, creatingDep, } = useCreateDep()
+    const { updateDep, updatingDep } = useUpdateDep()
 
     const form = useForm({
         resolver: zodResolver(schema) as any,
@@ -36,20 +40,32 @@ export default function CreateEditDepartmentModal<T extends z.ZodType<any, any, 
 
     const onHandleSubmit: SubmitHandler<FormData> = async (values) => {
         if (formType === "CREATE") {
-            console.log("Creating department:", values);
+            createDep({
+                name: values.name,
+                description: values.description
+            }, {
+                onSettled: () => {
+                    form.reset()
+                    onClose?.()
+                }
+            })
         } else {
-            console.log("Editing department:", { id: departmentId, ...values });
+            updateDep({
+                id: departmentId,
+                name: values.name,
+                description: values.description,
+                status: values.status
+            }, {
+                onSettled: () => {
+                    form.reset()
+                    onClose?.()
+                }
+            })
         }
-
-        // Simulate API call
-        setTimeout(() => {
-            form.reset();
-            onClose?.();
-        }, 1000);
     };
 
     const buttonText = formType === "CREATE" ? "Create Department" : "Save Changes";
-    const isWorking = form.formState.isSubmitting;
+    const isWorking = form.formState.isSubmitting || creatingDep || updatingDep
 
     return (
         <DialogContent className="sm:max-w-[600px]" {...props}>

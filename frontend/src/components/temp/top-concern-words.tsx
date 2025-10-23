@@ -5,9 +5,11 @@ import {
     CardHeader,
     CardTitle,
 } from "@/components/ui/card";
+import { WORDS_FILTERS } from "@/lib/constants";
 import { MessageSquare } from "lucide-react";
-import { HiOutlineSparkles } from "react-icons/hi2";
 import { BsFire } from "react-icons/bs";
+import { HiOutlineSparkles } from "react-icons/hi2";
+import CommonFilter from "../shared/common-filter";
 import Empty from "../ui/empty";
 
 const getWordColor = (index: number) => {
@@ -51,14 +53,24 @@ export function TopConcernsWordCloud({ concernsData, recommendation }: { concern
 
     return (
         <Card className="flex flex-col">
-            <CardHeader>
-                <CardTitle className="text-xl md:text-2xl flex items-center gap-2">
-                    <MessageSquare className="size-5" />
-                    Top Employee Concerns
-                </CardTitle>
-                <CardDescription>
-                    Most frequently mentioned keywords from emotion check-in notes
-                </CardDescription>
+            <CardHeader className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div>
+                    <CardTitle className="text-xl md:text-2xl flex items-center gap-2">
+                        <MessageSquare className="size-5" />
+                        Top Employee Concerns
+                    </CardTitle>
+                    <CardDescription>
+                        Most frequently mentioned keywords from emotion check-in notes
+                    </CardDescription>
+                </div>
+                <div>
+                    <CommonFilter
+                        font="font-en"
+                        filterValue="timeRange"
+                        filters={WORDS_FILTERS}
+                        otherClasses="min-h-[44px] sm:min-w-[90px]"
+                    />
+                </div>
             </CardHeader>
             <CardContent>
                 {/* Summary Stats */}
