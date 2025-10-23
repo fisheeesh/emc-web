@@ -1,9 +1,10 @@
 import express from "express"
 import { deleteActionPlanById, getAllActionPlans, updateActionPlan } from "../../../controllers/super-admin/action-plan-management-controller"
 import { getActionAvgReponseTime, getActionPlanStatus, getDepartmentsHeatmap, getTopConcernWords } from "../../../controllers/super-admin/analytics-controller"
-import { createNewDepartment, deleteDepartmentById, getAllDepartmentsData, getSummaryData, testSuperAdmin, updateDepartmentById } from "../../../controllers/super-admin/super-admin-controller"
+import { createEmotion, getEmotions, getSummaryData, testSuperAdmin, updateEmotion, } from "../../../controllers/super-admin/super-admin-controller"
 import { bulkRegister, createNewEmployee, deleteEmployee, getAllEmployeesInfinite, updateEmployeeInformation } from "../../../controllers/super-admin/user-management-controller"
 import upload, { uploadCSV } from "../../../middlewares/upload-files-middleware"
+import { createNewDepartment, updateDepartmentById, deleteDepartmentById, getAllDepartmentsData } from "../../../controllers/super-admin/dep-controller"
 
 const router = express.Router()
 
@@ -12,6 +13,11 @@ router.get("/test", testSuperAdmin)
 
 //* Summary data
 router.get("/summary", getSummaryData)
+
+//* Emotion routes
+router.get("/emotion-categories", getEmotions)
+router.post("/emotion-categories", createEmotion)
+router.patch("/emotion-categories", updateEmotion)
 
 //* Dep routes
 router.get("/departments-data", getAllDepartmentsData)

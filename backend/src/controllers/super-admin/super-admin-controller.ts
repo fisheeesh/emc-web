@@ -1,8 +1,8 @@
 import { NextFunction, Request, Response } from "express"
 import { body, query, validationResult } from "express-validator"
-import { errorCodes } from "../../config/error-codes"
 import { prisma } from "../../config/prisma-client"
-import { checkEmployeeIfNotExits, createHttpErrors } from "../../utils/check"
+import { createHttpErrors } from "../../utils/check"
+import { errorCodes } from "../../config/error-codes"
 
 interface CustomRequest extends Request {
     employeeId?: number
@@ -27,12 +27,12 @@ export const getSummaryData = [
             const startOfLastMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1);
             const endOfLastMonth = new Date(now.getFullYear(), now.getMonth(), 0);
 
-            //* Build where clause - ONLY ACTIVE EMPLOYEES
+            //* Build where clause only active dep
             const whereClause: any = {
                 accType: 'ACTIVE'
             };
 
-            //* If departmentId is provided, filter by it (and ensure department is active)
+            //* If departmentId is provided, filter by it and ensure department is active
             if (departmentId) {
                 whereClause.departmentId = departmentId;
                 whereClause.department = {
@@ -45,7 +45,7 @@ export const getSummaryData = [
                 };
             }
 
-            //* Overall Wellbeing Score (avgScore average)
+            //* Overall Wellbeing Score
             const wellbeingData = await prisma.employee.aggregate({
                 where: whereClause,
                 _avg: {
@@ -72,7 +72,7 @@ export const getSummaryData = [
                 ? ((Number(currentWellbeing) - Number(lastMonthWellbeing)) / Number(lastMonthWellbeing) * 100)
                 : 0;
 
-            //* Critical Alerts (unresolved critical employees) - ONLY FROM ACTIVE DEPARTMENTS
+            //* Critical Alerts only from active dep
             const criticalWhere: any = {
                 isResolved: false,
                 department: {
@@ -114,7 +114,7 @@ export const getSummaryData = [
                 }
             });
 
-            //* Check-in Rate (employees who checked in today vs total active employees)
+            //* Check-in Rate -> employees who checked in today vs total active employees
             const today = new Date();
             today.setHours(0, 0, 0, 0);
 
@@ -164,10 +164,7 @@ export const getSummaryData = [
                 ? ((checkInRate - lastMonthCheckInRate) / lastMonthCheckInRate * 100)
                 : 0;
 
-            //* Positive Emotion Rate (emotions >= 0 this month)
-            // Emotion scores are between -1 and 1
-            // Positive/Neutral: >= 0
-            // Negative: < 0
+            //* Positive Emotion Rate (emotions >= 0.4 this month)
             const thisMonthEmotions = await prisma.emotionCheckIn.groupBy({
                 by: ['emotionScore'],
                 where: {
@@ -181,7 +178,7 @@ export const getSummaryData = [
 
             const totalEmotionsThisMonth = thisMonthEmotions.reduce((sum, item) => sum + item._count, 0);
             const positiveEmotionsThisMonth = thisMonthEmotions
-                .filter(item => Number(item.emotionScore) >= 0.3)
+                .filter(item => Number(item.emotionScore) >= 0.4)
                 .reduce((sum, item) => sum + item._count, 0);
 
             const positiveRate = totalEmotionsThisMonth > 0
@@ -203,7 +200,7 @@ export const getSummaryData = [
 
             const totalEmotionsLastMonth = lastMonthEmotions.reduce((sum, item) => sum + item._count, 0);
             const positiveEmotionsLastMonth = lastMonthEmotions
-                .filter(item => Number(item.emotionScore) >= 0.3)
+                .filter(item => Number(item.emotionScore) >= 0.4)
                 .reduce((sum, item) => sum + item._count, 0);
 
             const lastMonthPositiveRate = totalEmotionsLastMonth > 0
@@ -247,185 +244,203 @@ export const getSummaryData = [
     }
 ]
 
-export const getAllDepartmentsData = async (req: CustomRequest, res: Response, next: NextFunction) => {
-    const emp = req.employee
-    checkEmployeeIfNotExits(emp)
-
-    const departments = await prisma.department.findMany({
-        select: {
-            id: true,
-            name: true,
-            description: true,
-            isActive: true,
-            createdAt: true,
-            employees: {
-                where: {
-                    role: "ADMIN"
+export const getEmotions = [
+    async (req: CustomRequest, res: Response, next: NextFunction) => {
+        const categories = await prisma.emotionCategory.findMany({
+            orderBy: { order: 'asc' },
+            include: {
+                emotions: {
+                    orderBy: { order: 'asc' },
+                    select: {
+                        icon: true,
+                        label: true,
+                    },
                 },
-                select: {
-                    fullName: true,
-                    email: true,
-                }
             },
-            _count: {
-                select: {
-                    criticalEmployees: true,
-                    employees: true,
-                    actionPlans: true,
-                }
-            }
-        },
-        orderBy: {
-            employees: {
-                _count: 'desc'
-            }
-        }
-    })
+        });
 
-    res.status(200).json({
-        message: "Here is all departments data",
-        data: departments
-    })
-}
-
-export const createNewDepartment = [
-    body("name", "Department name is required").trim().notEmpty().escape(),
-    body("description", "Department description is required").trim().notEmpty(),
-    async (req: CustomRequest, res: Response, next: NextFunction) => {
-        const errors = validationResult(req).array({ onlyFirstError: true })
-        if (errors.length > 0) return next(createHttpErrors({
-            message: errors[0].msg,
-            status: 400,
-            code: errorCodes.invalid
-        }))
-
-        const emp = req.employee
-        checkEmployeeIfNotExits(emp)
-
-        if (emp.role !== 'SUPERADMIN') return next(createHttpErrors({
-            message: "You are not allowed to do this action",
-            status: 403,
-            code: errorCodes.forbidden
-        }))
-
-        const { name, description } = req.body
-
-        const newDep = await prisma.department.create({
-            data: { name, description }
-        })
-
-        res.status(201).json({
-            message: "Successfully created a department",
-            depId: newDep.id
-        })
-    }
-]
-
-export const updateDepartmentById = [
-    body("id", "Department Id is required").isInt({ gt: 0 }),
-    body("name", "Department name is required").trim().optional().escape(),
-    body("description", "Department description is required").trim().optional(),
-    body("status", "Department Status is required").trim().optional().trim(),
-    async (req: CustomRequest, res: Response, next: NextFunction) => {
-        const errors = validationResult(req).array({ onlyFirstError: true })
-        if (errors.length > 0) return next(createHttpErrors({
-            message: errors[0].msg,
-            status: 400,
-            code: errorCodes.invalid
-        }))
-
-        const emp = req.employee
-        checkEmployeeIfNotExits(emp)
-
-        if (emp.role !== 'SUPERADMIN') return next(createHttpErrors({
-            message: "You are not allowed to do this action",
-            status: 403,
-            code: errorCodes.forbidden
-        }))
-
-        const { id, name, description, status } = req.body
-
-        const existingDep = await prisma.department.findUnique({
-            where: { id }
-        })
-
-        if (!existingDep) return next(createHttpErrors({
-            message: "Department with provided Id is not existed.",
-            status: 404,
-            code: errorCodes.notFound
-        }))
-
-        const updatedDep = await prisma.department.update({
-            where: { id },
-            data: {
-                name,
-                description,
-                isActive: status === 'ACTIVE' ? true : false
-            }
-        })
+        const data = categories.map(category => ({
+            title: category.title,
+            emotions: category.emotions,
+        }));
 
         res.status(200).json({
-            message: `Successfully updated department with ${updatedDep.id}`,
-            depId: updatedDep.id
-        })
+            message: "Emotion categories retrieved successfully",
+            data,
+        });
     }
-]
+];
 
-export const deleteDepartmentById = [
-    body("id", "Department Id is required").isInt({ gt: 0 }),
+export const createEmotion = [
+    body("title")
+        .trim()
+        .notEmpty()
+        .withMessage("Title is required")
+        .isIn(['Negative', 'Neutral', 'Positive'])
+        .withMessage("Title must be either 'Negative', 'Neutral', or 'Positive'"),
+
+    body("emotions")
+        .isArray({ min: 9, max: 9 })
+        .withMessage("Emotions must be an array with exactly 9 items"),
+
+    body("emotions.*.icon")
+        .trim()
+        .notEmpty()
+        .withMessage("Each emotion must have an icon"),
+
+    body("emotions.*.label")
+        .trim()
+        .notEmpty()
+        .withMessage("Each emotion must have a label")
+        .isLength({ min: 1, max: 50 })
+        .withMessage("Label must be between 1 and 50 characters"),
+
     async (req: CustomRequest, res: Response, next: NextFunction) => {
-        const errors = validationResult(req).array({ onlyFirstError: true })
-        if (errors.length > 0) return next(createHttpErrors({
-            message: errors[0].msg,
-            status: 400,
-            code: errorCodes.invalid
-        }))
-
-        const emp = req.employee
-        checkEmployeeIfNotExits(emp)
-
-        if (emp.role !== 'SUPERADMIN') return next(createHttpErrors({
-            message: "You are not allowed to do this action",
-            status: 401,
-            code: errorCodes.unauthorized
-        }))
-
-        const { id } = req.body
-
-        const existingDep = await prisma.department.findUnique({
-            where: { id },
-            select: {
-                criticalEmployees: true,
-                employees: true,
-                actionPlans: true,
-                notifications: true,
-            }
-        })
-
-        if (!existingDep) return next(createHttpErrors({
-            message: "Department with provided Id is not existed.",
-            status: 404,
-            code: errorCodes.notFound
-        }))
-
-        if (existingDep.employees.length > 0 ||
-            existingDep.criticalEmployees.length > 0 ||
-            existingDep.actionPlans.length > 0 ||
-            existingDep.notifications.length > 0) {
-            return next(createHttpErrors({
-                message: "Cannot delete department. Please remove all employees, critical employees, action plans, and notifications first.",
+        try {
+            const errors = validationResult(req).array({ onlyFirstError: true });
+            if (errors.length > 0) return next(createHttpErrors({
+                message: errors[0].msg,
                 status: 400,
                 code: errorCodes.invalid
             }))
+
+            const { title, emotions } = req.body;
+
+            const existingCategory = await prisma.emotionCategory.findUnique({
+                where: { title },
+            });
+
+            if (existingCategory) {
+                return res.status(400).json({
+                    message: `Category '${title}' already exists. Use update instead.`,
+                });
+            }
+
+            const orderMap: Record<string, number> = {
+                'Negative': 1,
+                'Neutral': 2,
+                'Positive': 3,
+            };
+
+            await prisma.$transaction(async (tx) => {
+                const newCategory = await tx.emotionCategory.create({
+                    data: {
+                        title,
+                        order: orderMap[title],
+                    },
+                });
+
+                const emotionPromises = emotions.map((emotion: any, index: number) => {
+                    return tx.emotion.create({
+                        data: {
+                            icon: emotion.icon.trim(),
+                            label: emotion.label.trim().toLowerCase(),
+                            order: index,
+                            categoryId: newCategory.id,
+                        },
+                    });
+                });
+
+                await Promise.all(emotionPromises);
+            });
+
+            res.status(201).json({
+                message: "Emotion category created successfully",
+            });
+        } catch (error: any) {
+            console.error('Error creating emotion category:', error);
+
+            if (error.code === 'P2002') {
+                return res.status(400).json({
+                    message: "Duplicate emotion label detected within the category",
+                });
+            }
+
+            res.status(500).json({
+                message: "Failed to create emotion category",
+            });
         }
-
-        const delDep = await prisma.department.delete({
-            where: { id },
-        })
-
-        res.status(200).json({
-            message: `Successfully deleted department with ${delDep.id}`,
-            depId: delDep.id
-        })
     }
-]
+];
+
+export const updateEmotion = [
+    body("title")
+        .trim()
+        .notEmpty()
+        .withMessage("Title is required")
+        .isIn(['Negative', 'Neutral', 'Positive'])
+        .withMessage("Title must be either 'Negative', 'Neutral', or 'Positive'"),
+    body("emotions")
+        .isArray({ min: 9, max: 9 })
+        .withMessage("Emotions must be an array with exactly 9 items"),
+    body("emotions.*.icon")
+        .trim()
+        .notEmpty()
+        .withMessage("Each emotion must have an icon"),
+    body("emotions.*.label")
+        .trim()
+        .notEmpty()
+        .withMessage("Each emotion must have a label")
+        .isLength({ min: 1, max: 50 })
+        .withMessage("Label must be between 1 and 50 characters"),
+
+    async (req: CustomRequest, res: Response, next: NextFunction) => {
+        try {
+            const errors = validationResult(req).array({ onlyFirstError: true });
+            if (errors.length > 0) return next(createHttpErrors({
+                message: errors[0].msg,
+                status: 400,
+                code: errorCodes.invalid
+            }))
+
+            const { title, emotions } = req.body;
+
+            //* Check if category exists
+            const existingCategory = await prisma.emotionCategory.findUnique({
+                where: { title },
+                include: { emotions: true },
+            });
+
+            if (!existingCategory) {
+                return res.status(404).json({
+                    message: `Category '${title}' not found`,
+                });
+            }
+
+            await prisma.$transaction(async (tx) => {
+                await tx.emotion.deleteMany({
+                    where: { categoryId: existingCategory!.id },
+                });
+
+                const emotionPromises = emotions.map((emotion: any, index: number) => {
+                    return tx.emotion.create({
+                        data: {
+                            icon: emotion.icon.trim(),
+                            label: emotion.label.trim().toLowerCase(),
+                            order: index,
+                            categoryId: existingCategory!.id,
+                        },
+                    });
+                });
+
+                await Promise.all(emotionPromises);
+            });
+
+            res.status(200).json({
+                message: "Emotion category updated successfully",
+            });
+        } catch (error: any) {
+            console.error('Error updating emotion category:', error);
+
+            if (error.code === 'P2002') {
+                return res.status(400).json({
+                    message: "Duplicate emotion label detected within the category",
+                });
+            }
+
+            res.status(500).json({
+                message: "Failed to update emotion category",
+            });
+        }
+    }
+];
