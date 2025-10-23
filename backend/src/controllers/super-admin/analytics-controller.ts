@@ -78,7 +78,11 @@ export const getDepartmentsHeatmap = async (req: CustomRequest, res: Response, n
             avgScore: parseFloat(avgScore.toFixed(2)),
             status,
             employees: dept._count.employees,
-            trend: status === 'neutral' ? 'stable' : (status === 'critical' || 'negative') ? 'down' : 'up',
+            trend: status === 'neutral'
+                ? 'stable'
+                : (status === 'critical' || status === 'negative')
+                    ? 'down'
+                    : 'up',
         }
     })
 
@@ -148,13 +152,44 @@ export const getActionAvgReponseTime = async (req: CustomRequest, res: Response,
 export const getTopConcernWords = [
     query("type", "Type is required").trim().escape().optional(),
     query("timeRange", "Invalid Time Range").trim().escape().optional(),
+    query("forceRefresh", "Force refresh flag").trim().escape().optional(),
     async (req: CustomRequest, res: Response, next: NextFunction) => {
         const emp = req.employee
         checkEmployeeIfNotExits(emp)
 
-        const { type = 'concerns', timeRange = '90' } = req.query
+        const {
+            type = 'concerns',
+            timeRange = '7',
+            forceRefresh = 'false'
+        } = req.query
 
         const { start, end } = getDateRangeFromTimeRange(timeRange as string)
+
+        //* Check for cached results -> less than 24 hours old 
+        if (forceRefresh !== 'true') {
+            const cached = await prisma.concernAnalysis.findFirst({
+                where: {
+                    timeRange: timeRange as string,
+                    generatedAt: {
+                        gte: new Date(Date.now() - 24 * 60 * 60 * 1000)
+                    }
+                },
+                orderBy: {
+                    generatedAt: 'desc'
+                }
+            })
+
+            //* If cached return cached for data consistency
+            if (cached) {
+                return res.status(200).json({
+                    message: "Here is Employee Concern Words (cached)",
+                    data: cached.data,
+                    recommendation: cached.recommendation,
+                    generatedAt: cached.generatedAt,
+                    isCached: true
+                })
+            }
+        }
 
         const emotionCheckIns = await prisma.emotionCheckIn.findMany({
             where: {
@@ -176,7 +211,8 @@ export const getTopConcernWords = [
         if (emotionCheckIns.length === 0) {
             return res.status(200).json({
                 message: "No emotion check-ins available",
-                data: []
+                data: [],
+                isCached: false
             })
         }
 
@@ -188,7 +224,8 @@ export const getTopConcernWords = [
             return res.status(200).json({
                 message: "No emotion check-ins with text available",
                 data: [],
-                recommendation: ''
+                recommendation: '',
+                isCached: false
             })
         }
 
@@ -197,7 +234,8 @@ export const getTopConcernWords = [
         if (concerns.length === 0) {
             return res.status(200).json({
                 message: "No concerns identified",
-                data: []
+                data: [],
+                isCached: false
             })
         }
 
@@ -212,10 +250,21 @@ export const getTopConcernWords = [
                 : 1 + Math.round(((concern.count - minCount) / (maxCount - minCount)) * 2)
         })).sort((a, b) => b.count - a.count)
 
+        //* Cache the results every time ai analyzed
+        await prisma.concernAnalysis.create({
+            data: {
+                timeRange: timeRange as string,
+                data: data as any,
+                recommendation
+            }
+        })
+
         res.status(200).json({
             message: "Here is Employee Concern Words",
             data,
-            recommendation
+            recommendation,
+            generatedAt: new Date(),
+            isCached: false
         })
     }
 ]

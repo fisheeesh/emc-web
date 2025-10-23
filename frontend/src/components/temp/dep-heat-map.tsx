@@ -47,7 +47,6 @@ export function DepartmentHeatmap({ depHeatmapData }: { depHeatmapData: DepHeatM
                 </CardDescription>
             </CardHeader>
             <CardContent>
-                {/* Summary Stats */}
                 <div className="grid grid-cols-3 gap-3 mb-6">
                     <div className="flex flex-col items-center gap-1 p-3 rounded-lg bg-blue-50 dark:bg-blue-950/20 border border-blue-100 dark:border-blue-900/30">
                         <p className="text-xs text-gray-600 dark:text-gray-400">Overall Avg</p>
