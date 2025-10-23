@@ -231,6 +231,35 @@ model ActionPlan {
   @@index([departmentId, status, priority, createdAt])
 }
 
+model EmotionCategory {
+  id        Int      @id @default(autoincrement())
+  title     String   @unique
+  order     Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  emotions Emotion[]
+
+  @@map("emotion_categories")
+}
+
+model Emotion {
+  id        Int      @id @default(autoincrement())
+  icon      String
+  label     String
+  image     String?
+  order     Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  categoryId Int
+  category   EmotionCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+
+  @@unique([categoryId, label])
+  @@index([categoryId])
+  @@map("emotions")
+}
+
 model Setting {
   id        Int      @id @default(autoincrement())
   key       String   @unique @db.VarChar(100)

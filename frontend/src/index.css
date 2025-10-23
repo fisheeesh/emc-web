@@ -32,32 +32,6 @@
   --color-link-100: #1da1f2;
 }
 
-@utility primary-gradient {
-  background: linear-gradient(129deg, #ff7000 0%, #e2995f 100%);
-}
-
-@utility dark-gradient {
-  background: linear-gradient(232deg,
-      rgba(23, 28, 35, 0.41) 0%,
-      rgba(19, 22, 28, 0.7) 100%);
-  background: linear-gradient(232deg,
-      rgba(23, 28, 35, 0.41) 0%,
-      rgba(19, 22, 28, 0.7) 100%);
-}
-
-@utility light-gradient {
-  background: linear-gradient(132deg,
-      rgba(247, 249, 255, 0.5) 0%,
-      rgba(229, 237, 255, 0.25) 100%);
-}
-
-@utility primary-text-gradient {
-  background: linear-gradient(129deg, #ff7000 0%, #e2995f 100%);
-  background-clip: text;
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-
 @utility flex-center {
   @apply flex justify-center items-center;
 }
@@ -71,7 +45,7 @@
 }
 
 @utility bg-gradient {
-  @apply bg-gradient-to-r from-purple-400 rounded-full via-pink-500 to-blue-500 font-semibold hover:from-pink-500 hover:via-purple-500 hover:to-blue-400 transition-colors duration-300
+  @apply bg-gradient-to-r from-pink-500 to-purple-600 hover:brightness-110 transition-all duration-300
 }
 
 @utility flex-start {
