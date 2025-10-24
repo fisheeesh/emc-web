@@ -14,6 +14,7 @@ import { getOrSetCache } from "../../utils/cache"
 import { checkEmployeeIfNotExits, createHttpErrors } from "../../utils/check"
 import { critical_body, critical_subject, normal_body, normal_subject } from "../../utils/email-templates"
 import { calculatePositiveStreak, determineReputation } from "../../utils/helplers"
+import { getEmployeeEmails } from "../../services/system-service"
 
 const prisma = new PrismaClient()
 
@@ -184,15 +185,7 @@ export const emotionCheckIn = [
                 try {
                     const bgTasks = [];
 
-                    const adminEmails = await prisma.employee.findMany({
-                        where: {
-                            departmentId: emp!.departmentId,
-                            role: "ADMIN"
-                        },
-                        select: {
-                            email: true
-                        }
-                    })
+                    const adminEmails = await getEmployeeEmails({ departmentId: emp!.departmentId, role: 'ADMIN' })
 
                     //* Cache invalidation
                     bgTasks.push(
@@ -210,7 +203,7 @@ export const emotionCheckIn = [
                             EmailQueue.add("notify-email", {
                                 subject: normal_subject(),
                                 body: normal_body(`${emp?.firstName} ${emp?.lastName}`),
-                                to: adminEmails.map(admin => admin.email)
+                                to: adminEmails
                             }, {
                                 jobId: `email-normal:${emp?.id}:${Date.now()}`
                             })
@@ -222,7 +215,7 @@ export const emotionCheckIn = [
                             EmailQueue.add("notify-email", {
                                 subject: critical_subject(`${emp?.firstName} ${emp?.lastName}`),
                                 body: critical_body(`${emp?.firstName} ${emp?.lastName}`),
-                                to: adminEmails.map(admin => admin.email)
+                                to: adminEmails
                             }, {
                                 jobId: `email-critical:${emp?.id}:${Date.now()}`
                             })

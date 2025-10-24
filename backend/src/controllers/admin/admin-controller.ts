@@ -6,7 +6,7 @@ import { prisma } from "../../config/prisma-client";
 import { EmailQueue } from "../../jobs/queues/email-queue";
 import { getAdminUserData } from "../../services/admin-services";
 import { getEmployeeById } from "../../services/auth-services";
-import { getAllDepartmentsData } from "../../services/system-service";
+import { getAllDepartmentsData, getEmployeeEmails } from "../../services/system-service";
 import { checkEmployeeIfNotExits, createHttpErrors } from "../../utils/check";
 import { completion_body, completion_subject, request_body, request_subject } from "../../utils/email-templates";
 
@@ -14,9 +14,23 @@ interface CustomRequest extends Request {
     employeeId?: number
 }
 
-export const testAdmin = (req: Request, res: Response, next: NextFunction) => {
+export const testAdmin = async (req: CustomRequest, res: Response, next: NextFunction) => {
+    const empId = req.employeeId
+    //* Critical & Normal
+    const adminEmails = await getEmployeeEmails({ departmentId: 1, role: 'ADMIN' })
+    //* Action plans
+    const superAdminEmails = await getEmployeeEmails({ role: "SUPERADMIN" })
+    //* Email marketings by admin
+    const allEmails = await getEmployeeEmails({ departmentId: 1, excludeEmployeeId: empId!, excludeSuperAdmins: true })
+    //* Email marketings by super-admin
+    const AllEmails = await getEmployeeEmails({ excludeSuperAdmins: true })
+
     res.status(200).json({
-        message: "You have permission to access this route"
+        message: "You have permission to access this route",
+        adminEmails,
+        superAdminEmails,
+        allEmails,
+        AllEmails
     })
 }
 
@@ -134,6 +148,8 @@ export const createActionPlan = [
         const emp = await getEmployeeById(empId!)
         checkEmployeeIfNotExits(emp)
 
+        const superAdminEmails = await getEmployeeEmails({ role: "SUPERADMIN" })
+
         const { criticalEmpId, depId, contact, quickAction, actionType, priority, assignTo, dueDate, actionNotes, followUpNotes } = req.body
 
         //* Get the critical employee record
@@ -203,6 +219,7 @@ export const createActionPlan = [
         await EmailQueue.add('notify-email', {
             subject: request_subject(priority),
             body: request_body(criticalEmp.employee.fullName, `${emp?.firstName} ${emp?.lastName}`, criticalEmp.department.name, actionType, priority, dueDate),
+            to: superAdminEmails
         })
 
         res.status(201).json({
@@ -226,6 +243,8 @@ export const markAsCompletedActionPlan = [
         checkEmployeeIfNotExits(emp)
 
         const { id } = req.body
+
+        const superAdminEmails = await getEmployeeEmails({ role: "SUPERADMIN" })
 
         const actionPlan = await prisma.actionPlan.findUnique({
             where: { id },
@@ -297,7 +316,8 @@ export const markAsCompletedActionPlan = [
             body: completion_body(
                 actionPlan.criticalEmployee.employee.fullName,
                 `${emp?.firstName} ${emp?.lastName}`
-            )
+            ),
+            to: superAdminEmails
         })
 
         res.status(200).json({

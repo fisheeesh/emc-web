@@ -6,7 +6,7 @@ import { Resend } from "resend";
 import { redis } from "../../config/redis-client";
 
 const resend = new Resend(process.env.RESEND_API_KEY!);
-const FROM = "onboarding@resend.dev";
+const FROM = process.env.SENDER_EMAIL || "no-reply@emotioncheckinsystem.com"
 
 type JobPayload = {
     subject: string,

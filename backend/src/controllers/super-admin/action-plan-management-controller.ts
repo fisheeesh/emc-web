@@ -153,7 +153,8 @@ export const deleteActionPlanById = [
                     }
                 },
                 status: true,
-                departmentId: true
+                departmentId: true,
+                contact: true
             }
         })
 
@@ -174,7 +175,8 @@ export const deleteActionPlanById = [
             })
             await EmailQueue.add("notify-email", {
                 subject: rejected_delete_subject(actionPlan.criticalEmployee.employee.fullName),
-                body: rejected_delete_body(actionPlan.criticalEmployee.employee.fullName)
+                body: rejected_delete_body(actionPlan.criticalEmployee.employee.fullName),
+                to: [actionPlan.contact]
             })
         }
 
@@ -259,7 +261,8 @@ export const updateActionPlan = [
 
         await EmailQueue.add('notify-email', {
             subject: response_subject(actionPlan.criticalEmployee.employee.fullName, status, emailType),
-            body: response_body(actionPlan.criticalEmployee.employee.fullName, status, emailType)
+            body: response_body(actionPlan.criticalEmployee.employee.fullName, status, emailType),
+            to: [actionPlan.contact]
         })
 
         res.status(200).json({
