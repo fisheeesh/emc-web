@@ -18,6 +18,7 @@ interface State {
 interface Action {
     setNotis: (notis: Notification[]) => void,
     updateNotificationStatus: (id: number, status: "SENT" | "READ") => void,
+    deleteNotification: (id: number) => void,
     clearNotis: () => void
 }
 
@@ -37,6 +38,9 @@ const useNotiStore = create<State & Action>()(
                 if (notification) {
                     notification.status = status
                 }
+            }),
+            deleteNotification: (id: number) => set(state => {
+                state.notifications = state.notifications.filter(noti => noti.id !== id)
             }),
             clearNotis: () => set(initialState)
         })),

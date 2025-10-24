@@ -9,21 +9,31 @@ import {
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { IMG_URL } from "@/lib/constants";
 import useNotiStore from "@/store/noti-store";
-import { Bell, BellOff } from "lucide-react";
+import { Bell, BellOff, Eye, Trash2 } from "lucide-react";
 import moment from "moment";
 import { useState } from "react";
 import { Badge } from "../ui/badge";
 import { Button } from "../ui/button";
 import useMarkAsRead from "@/hooks/ui/use-read-noti";
+import useDeleteNoti from "@/hooks/ui/use-delete-noti";
 import { cn } from "@/lib/utils";
 
 export default function NotiBtn() {
     const { notifications } = useNotiStore()
     const { markAsRead } = useMarkAsRead()
+    const { deleteNoti } = useDeleteNoti()
     const [filter, setFilter] = useState<"all" | "unread">("all")
 
-    const handleMarkAsRead = (notiId: number) => {
+    const handleMarkAsRead = (e: React.MouseEvent, notiId: number) => {
+        e.preventDefault()
+        e.stopPropagation()
         markAsRead(notiId)
+    }
+
+    const handleDelete = (e: React.MouseEvent, notiId: number) => {
+        e.preventDefault()
+        e.stopPropagation()
+        deleteNoti(notiId)
     }
 
     //? Get unread notifications count
@@ -83,8 +93,9 @@ export default function NotiBtn() {
                         filteredNotifications.map((item) => (
                             <DropdownMenuItem
                                 key={item.id}
+                                onSelect={(e) => e.preventDefault()}
                                 className={cn(
-                                    "cursor-pointer flex items-start gap-3 p-3 rounded-md hover:bg-muted/50 group relative",
+                                    "flex items-start gap-3 p-3 rounded-md hover:bg-muted/50 group relative",
                                     item.status === "SENT" && "bg-blue-50 dark:bg-blue-950/20 border border-blue-200 dark:border-blue-900"
                                 )}
                             >
@@ -110,19 +121,35 @@ export default function NotiBtn() {
                                         <p className="text-[11px] text-muted-foreground italic mt-1 font-en">
                                             {moment(item.createdAt).fromNow()}
                                         </p>
-                                        {item.status === "SENT" && (
-                                            <p
-                                                onClick={(e) => {
-                                                    e.stopPropagation()
-                                                    handleMarkAsRead(item.id)
-                                                }}
-                                                className="underline opacity-0 group-hover:opacity-100 
-                                                transition-opacity duration-200 text-[10px] hover:text-blue-600 
-                                                dark:hover:text-blue-400 text-muted-foreground cursor-pointer"
+                                        <div
+                                            className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity duration-200"
+                                            onMouseDown={(e) => e.stopPropagation()}
+                                        >
+                                            {item.status === "SENT" && (
+                                                <Button
+                                                    variant='ghost'
+                                                    size='sm'
+                                                    type="button"
+                                                    onClick={(e) => handleMarkAsRead(e, item.id)}
+                                                    className="p-0 border-0 cursor-pointer bg-transparent"
+                                                >
+                                                    <Eye
+                                                        className="h-3.5 w-3.5 text-muted-foreground"
+                                                    />
+                                                </Button>
+                                            )}
+                                            <Button
+                                                variant='ghost'
+                                                size='sm'
+                                                type="button"
+                                                onClick={(e) => handleDelete(e, item.id)}
+                                                className="p-0 border-0 bg-transparent cursor-pointer"
                                             >
-                                                Mark as read
-                                            </p>
-                                        )}
+                                                <Trash2
+                                                    className="h-3.5 w-3.5 text-muted-foreground h"
+                                                />
+                                            </Button>
+                                        </div>
                                     </div>
                                 </div>
                             </DropdownMenuItem>

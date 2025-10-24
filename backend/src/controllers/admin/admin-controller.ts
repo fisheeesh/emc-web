@@ -125,6 +125,48 @@ export const markAsReadNotification = [
     }
 ]
 
+export const deleteNotification = [
+    body("id", "Notification Id is required").isInt().toInt(),
+    async (req: CustomRequest, res: Response, next: NextFunction) => {
+        const errors = validationResult(req).array({ onlyFirstError: true })
+        if (errors.length > 0) return next(createHttpErrors({
+            message: errors[0].msg,
+            status: 400,
+            code: errorCodes.invalid
+        }))
+
+        const empId = req.employeeId
+        const emp = await getEmployeeById(empId!)
+        checkEmployeeIfNotExits(emp)
+
+        const { id } = req.body
+
+        const notification = await prisma.notification.findUnique({
+            where: { id: Number(id) }
+        })
+
+        if (!notification) return next(createHttpErrors({
+            message: "There is no notification with provided Id.",
+            status: 404,
+            code: errorCodes.notFound
+        }))
+
+        if (notification.departmentId !== emp?.departmentId) return next(createHttpErrors({
+            message: "You are not allowed to delete another department's notification",
+            status: 401,
+            code: errorCodes.unauthorized
+        }))
+
+        await prisma.notification.delete({
+            where: { id: Number(id) }
+        })
+
+        res.status(200).json({
+            message: "Successfully delete a notification"
+        })
+    }
+]
+
 export const createActionPlan = [
     body("criticalEmpId", "Critical Employee Id is required").isInt({ gt: 0 }),
     body("depId", "Department Id is required").isInt({ gt: 0 }),

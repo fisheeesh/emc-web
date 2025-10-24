@@ -1,5 +1,5 @@
 import express from "express"
-import { createActionPlan, getAdminUser, getAllDepartments, getAllNotifications, markAsCompletedActionPlan, markAsReadNotification, testAdmin } from "../../../controllers/admin/admin-controller"
+import { createActionPlan, deleteNotification, getAdminUser, getAllDepartments, getAllNotifications, markAsCompletedActionPlan, markAsReadNotification, testAdmin } from "../../../controllers/admin/admin-controller"
 import { generateAIAnalysis, generateAIRecommendation, regenerateAIAnalysis } from "../../../controllers/admin/ai-controller"
 import { getAttendanceOverView, getCheckInHours, getDailyAttendance } from "../../../controllers/admin/attendance-controller"
 import { deleteCriticalEmpById, deleteWatchlistEmpById, getAllCriticalEmps, getAllWatchlistEmps, getLeaderboards, getMoodOverview, getSenitmentsComparison } from "../../../controllers/admin/sentiments-controller"
@@ -19,6 +19,7 @@ router.get("/admin-user", getAdminUser)
 router.get("/leaderboards", getLeaderboards)
 router.get("/notifications", getAllNotifications)
 router.patch("/notifications", markAsReadNotification)
+router.delete("/notifications", deleteNotification)
 router.get("/critical-emps", getAllCriticalEmps)
 router.delete("/critical-emps", deleteCriticalEmpById)
 router.get("/watchlist-emps", getAllWatchlistEmps)
