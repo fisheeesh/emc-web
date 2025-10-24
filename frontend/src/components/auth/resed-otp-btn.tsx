@@ -44,7 +44,7 @@ export default function ResendOTPBtn() {
     },
     onSuccess: () => {
       toast.success("Success", {
-        description: "OTP has been sent to your email"
+        description: "OTP has been sent to your email."
       })
     },
     onError: (error) => {

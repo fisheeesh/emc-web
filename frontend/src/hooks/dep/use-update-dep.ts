@@ -14,7 +14,7 @@ const useUpdateDep = () => {
         onSuccess: async () => {
             await invalidateDepQueries()
             toast.success('Success', {
-                description: "Department has been updated successfully"
+                description: "Department has been updated successfully."
             });
         },
         onError: (err: any) => {

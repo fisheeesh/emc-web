@@ -5,7 +5,7 @@ const useError = (check: unknown, message: string) => {
     useEffect(() => {
         if (check) {
             toast.error("Error", {
-                description: message || "Something went wrong"
+                description: message || "Something went wrong!"
             })
         }
     }, [check, message])

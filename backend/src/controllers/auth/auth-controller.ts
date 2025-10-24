@@ -15,16 +15,22 @@ interface CustomRequest extends Request {
 }
 
 export const register = [
+    // body("email", "Invalid email format.")
+    //     .trim()
+    //     .notEmpty()
+    //     .isEmail().withMessage("Invalid email format.")
+    //     .custom(value => {
+    //         if (!value.endsWith("@ata.it.th")) {
+    //             throw new Error("Email must be from @ata.it.th domain.")
+    //         }
+    //         return true
+    //     }),
     body("email", "Invalid email format.")
         .trim()
         .notEmpty()
-        .isEmail().withMessage("Invalid email format.")
-        .custom(value => {
-            if (!value.endsWith("@ata.it.th")) {
-                throw new Error("Email must be from @ata.it.th domain.")
-            }
-            return true
-        }),
+        .withMessage("Email is required.")
+        .isEmail()
+        .withMessage("Invalid email format."),
     async (req: Request, res: Response, next: NextFunction) => {
         const errors = validationResult(req).array({ onlyFirstError: true })
         if (errors.length > 0) return next(createHttpErrors({
@@ -107,16 +113,22 @@ export const register = [
 ]
 
 export const verifyOTP = [
-    body("email", "Invalid Email format.")
+    // body("email", "Invalid Email format.")
+    //     .trim()
+    //     .notEmpty()
+    //     .isEmail().withMessage("Invalid email format.")
+    //     .custom(value => {
+    //         if (!value.endsWith("@ata.it.th")) {
+    //             throw new Error("Email must be from @ata.it.th domain.")
+    //         }
+    //         return true
+    //     }),
+    body("email", "Invalid email format.")
         .trim()
         .notEmpty()
-        .isEmail().withMessage("Invalid email format.")
-        .custom(value => {
-            if (!value.endsWith("@ata.it.th")) {
-                throw new Error("Email must be from @ata.it.th domain.")
-            }
-            return true
-        }),
+        .withMessage("Email is required.")
+        .isEmail()
+        .withMessage("Invalid email format."),
     body("otp", "Invalid OTP.")
         .trim()
         .notEmpty()
@@ -219,25 +231,25 @@ export const verifyOTP = [
 ]
 
 export const confirmPassword = [
+    // body("email", "Invalid email format.")
+    //     .trim()
+    //     .notEmpty()
+    //     .isEmail().withMessage("Invalid email format.")
+    //     .custom(value => {
+    //         if (!value.endsWith("@ata.it.th")) {
+    //             throw new Error("Email must be from @ata.it.th domain.")
+    //         }
+    //         return true
+    //     }),
     body("email", "Invalid email format.")
         .trim()
         .notEmpty()
-        .isEmail().withMessage("Invalid email format.")
-        .custom(value => {
-            if (!value.endsWith("@ata.it.th")) {
-                throw new Error("Email must be from @ata.it.th domain.")
-            }
-            return true
-        }),
+        .withMessage("Email is required.")
+        .isEmail()
+        .withMessage("Invalid email format."),
     body("department", "Invalid department.")
         .trim()
         .notEmpty()
-        .custom(value => {
-            if (!DEPARTMENTS.includes(value)) {
-                throw new Error("Invalid department.")
-            }
-            return true
-        })
         .escape(),
     body("password", "Password must be at least 8 digits.")
         .trim()
@@ -353,16 +365,22 @@ export const confirmPassword = [
 ]
 
 export const login = [
+    // body("email", "Invalid email format.")
+    //     .trim()
+    //     .notEmpty()
+    //     .isEmail().withMessage("Invalid email format.")
+    //     .custom((value) => {
+    //         if (!value.endsWith("@ata.it.th")) {
+    //             throw new Error("Email must be from @ata.it.th domain.");
+    //         }
+    //         return true;
+    //     }),
     body("email", "Invalid email format.")
         .trim()
         .notEmpty()
-        .isEmail().withMessage("Invalid email format.")
-        .custom((value) => {
-            if (!value.endsWith("@ata.it.th")) {
-                throw new Error("Email must be from @ata.it.th domain.");
-            }
-            return true;
-        }),
+        .withMessage("Email is required.")
+        .isEmail()
+        .withMessage("Invalid email format."),
     body("password", "Password must be at least 8 digits.")
         .trim()
         .notEmpty()
@@ -574,17 +592,23 @@ export const logout = async (req: Request, res: Response, next: NextFunction) =>
 }
 
 export const forgotPassword = [
-    body("email", "Invalid email format.")
-        .notEmpty()
-        .trim()
-        .isEmail().withMessage("Invalid email format.")
-        .custom((value: string) => {
-            if (!value.endsWith("@ata.it.th")) {
-                throw new Error("Email must from @ata.it.th domain.")
-            }
+    // body("email", "Invalid email format.")
+    //     .notEmpty()
+    //     .trim()
+    //     .isEmail().withMessage("Invalid email format.")
+    //     .custom((value: string) => {
+    //         if (!value.endsWith("@ata.it.th")) {
+    //             throw new Error("Email must from @ata.it.th domain.")
+    //         }
 
-            return true
-        }),
+    //         return true
+    //     }),
+    body("email", "Invalid email format.")
+        .trim()
+        .notEmpty()
+        .withMessage("Email is required.")
+        .isEmail()
+        .withMessage("Invalid email format."),
     async (req: Request, res: Response, next: NextFunction) => {
         const errors = validationResult(req).array({ onlyFirstError: true })
         if (errors.length > 0) return next(createHttpErrors({
@@ -666,16 +690,22 @@ export const forgotPassword = [
 ]
 
 export const veriftyOtpForgot = [
+    // body("email", "Invalid email format.")
+    //     .notEmpty()
+    //     .trim()
+    //     .isEmail().withMessage("Invalid email format.")
+    //     .custom((value: string) => {
+    //         if (!value.endsWith("@ata.it.th")) {
+    //             throw new Error("Email must from @ata.it.th domain.")
+    //         }
+    //         return true
+    //     }),
     body("email", "Invalid email format.")
-        .notEmpty()
         .trim()
-        .isEmail().withMessage("Invalid email format.")
-        .custom((value: string) => {
-            if (!value.endsWith("@ata.it.th")) {
-                throw new Error("Email must from @ata.it.th domain.")
-            }
-            return true
-        }),
+        .notEmpty()
+        .withMessage("Email is required.")
+        .isEmail()
+        .withMessage("Invalid email format."),
     body("otp", "Invalid OTP.")
         .notEmpty()
         .trim()
@@ -785,15 +815,21 @@ export const veriftyOtpForgot = [
 ]
 
 export const resetPassword = [
+    // body("email", "Invalid email format.")
+    //     .trim()
+    //     .notEmpty()
+    //     .custom((value: string) => {
+    //         if (!value.endsWith("@ata.it.th")) {
+    //             throw new Error("Email must from @ata.it.th domain.")
+    //         }
+    //         return true
+    //     }),
     body("email", "Invalid email format.")
         .trim()
         .notEmpty()
-        .custom((value: string) => {
-            if (!value.endsWith("@ata.it.th")) {
-                throw new Error("Email must from @ata.it.th domain.")
-            }
-            return true
-        }),
+        .withMessage("Email is required.")
+        .isEmail()
+        .withMessage("Invalid email format."),
     body("token", "Invalid Token.")
         .trim()
         .notEmpty()

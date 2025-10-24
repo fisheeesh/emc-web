@@ -13,7 +13,7 @@ const useRefreshAIConcerns = () => {
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['top-concern-words'], exact: false })
             toast.success('Success', {
-                description: "AI Anlysis Concrens refreshed",
+                description: "AI Anlysis Concrens refreshed.",
             });
         },
         onError: (err: any) => {

@@ -107,17 +107,17 @@ export default function ActionModal({ employee, action, onClose }: Props) {
                 form.trigger('actionNotes')
 
                 toast.success('Success', {
-                    description: "AI recommendation has been generated",
+                    description: "AI recommendation has been generated.",
                 })
             } else {
                 toast.error('Error', {
-                    description: res?.message || 'Failed to generate AI recommendation'
+                    description: res?.message || 'Failed to generate AI recommendation.'
                 })
             }
         } catch (error) {
             console.error("Error generating AI recommendation:", error)
             toast.error('Error', {
-                description: (error instanceof Error) ? error.message : 'There was a problem generating AI recommendation'
+                description: (error instanceof Error) ? error.message : 'There was a problem generating AI recommendation.'
             })
         }
     }
@@ -170,7 +170,7 @@ export default function ActionModal({ employee, action, onClose }: Props) {
                             variant="outline"
                             size="icon"
                             className="cursor-pointer shrink-0 mr-5"
-                            onClick={() => console.log('Download PDF clicked')}
+                            onClick={() => toast.success("SYP TODO", { description: "Will implement this later on" })}
                         >
                             <Download className="h-4 w-4" />
                         </Button>
@@ -337,21 +337,23 @@ export default function ActionModal({ employee, action, onClose }: Props) {
                                             Note: This action plan has been completed.
                                         </p>
                         }
-                        <DialogClose asChild>
-                            <Button type="button" variant="outline" className="min-h-[44px] cursor-pointer">
-                                Close
-                            </Button>
-                        </DialogClose>
-                        {action.type === 'PROCESSING' && action.status !== 'REJECTED' &&
-                            <Button
-                                onClick={() => onMarkAsCompleted(action.id)}
-                                disabled={updatingAction}
-                                type="button"
-                                className="bg-green-600 hover:bg-green-500 text-white min-h-[44px] cursor-pointer">
-                                <Spinner isLoading={updatingAction} label="Saving...">
-                                    Mark as Completed
-                                </Spinner>
-                            </Button>}
+                        <div className="flex items-center gap-2">
+                            <DialogClose asChild>
+                                <Button type="button" variant="outline" className="min-h-[44px] cursor-pointer">
+                                    Close
+                                </Button>
+                            </DialogClose>
+                            {action.type === 'PROCESSING' && action.status !== 'REJECTED' &&
+                                <Button
+                                    onClick={() => onMarkAsCompleted(action.id)}
+                                    disabled={updatingAction}
+                                    type="button"
+                                    className="bg-green-600 hover:bg-green-500 text-white min-h-[44px] cursor-pointer">
+                                    <Spinner isLoading={updatingAction} label="Saving...">
+                                        Mark as Completed
+                                    </Spinner>
+                                </Button>}
+                        </div>
                     </div>
                 </div>
             </DialogContent>
@@ -498,7 +500,7 @@ export default function ActionModal({ employee, action, onClose }: Props) {
                                                 <Input
                                                     {...field}
                                                     className="min-h-[48px]"
-                                                    placeholder="Manager, HR Representative, etc."
+                                                    placeholder="Enter assignee name"
                                                     disabled={isWorking}
                                                 />
                                             </FormControl>

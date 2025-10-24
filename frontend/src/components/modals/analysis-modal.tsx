@@ -227,13 +227,13 @@ export default function AIAnalysisModal({ analysis: initialAnalysis, empName, cr
                             variant="outline"
                             size="icon"
                             className="cursor-pointer shrink-0 mr-5"
-                            onClick={() => toast.success("Success", { description: "SYP will implement this later on" })}
+                            onClick={() => toast.success("SYP TODO", { description: "Will implement this later on." })}
                         >
                             <Download className="h-4 w-4" />
                         </Button>
                     </DialogHeader>
 
-                    <div id="analysis" className="space-y-6 mt-4">
+                    <div id="analysis" className="space-y-6 mt-4 font-os">
                         {/* Week Range */}
                         <div className="bg-muted/50 rounded-lg p-4">
                             <p className="text-sm text-muted-foreground">Analysis Period</p>

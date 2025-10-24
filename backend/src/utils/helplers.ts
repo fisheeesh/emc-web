@@ -135,7 +135,7 @@ export function roundToHour(date: Date): string {
 }
 
 export const getNotificationContent = (status: string, empName: string, emailType: string) => {
-    if (emailType === 'UPDATE') {
+    if (emailType === 'UPDATE' && status === 'APPROVED') {
         return `Additional suggestions have been added to the action plan for critical employee - ${empName}. Please review the updated recommendations.`;
     }
 

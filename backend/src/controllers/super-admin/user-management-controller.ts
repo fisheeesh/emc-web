@@ -20,13 +20,19 @@ export const createNewEmployee = [
     body("firstName", "First Name is required.").trim().notEmpty().escape(),
     body("lastName", "Last Name is required.").trim().notEmpty().escape(),
     body("phone", "Invalid phone number.").trim().notEmpty().matches(/^[\d]+$/).isLength({ min: 5, max: 12 }),
-    body("email", "Invalid email format.").trim().notEmpty().isEmail().withMessage("Invalid email format.")
-        .custom(value => {
-            if (!value.endsWith("@ata.it.th")) {
-                throw new Error("Email must be from @ata.it.th domain.")
-            }
-            return true
-        }),
+    // body("email", "Invalid email format.").trim().notEmpty().isEmail().withMessage("Invalid email format.")
+    //     .custom(value => {
+    //         if (!value.endsWith("@ata.it.th")) {
+    //             throw new Error("Email must be from @ata.it.th domain.")
+    //         }
+    //         return true
+    //     }),
+    body("email", "Invalid email format.")
+        .trim()
+        .notEmpty()
+        .withMessage("Email is required.")
+        .isEmail()
+        .withMessage("Invalid email format."),
     body("password", "Password must be at least 8 digits.").trim().notEmpty().matches(/^[\d]+$/).isLength({ min: 8, max: 8 }),
     body("position", "Position is required.").trim().notEmpty(),
     body("role", "Role is required.").trim().notEmpty().escape()

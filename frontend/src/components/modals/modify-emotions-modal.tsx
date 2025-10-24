@@ -63,7 +63,7 @@ export default function ModifyEmotionsModal({ onClose, data }: ModifyEmotionsMod
     const handleAddEmotion = (values: z.infer<typeof addEmotionSchema>) => {
         //* Check if already at 9 emotions
         if (emotions[selectedCategory].length >= 9) {
-            toast.error('Maximum 9 emotions allowed per category');
+            toast.error('Maximum 9 emotions allowed per category.');
             return;
         }
 
@@ -73,7 +73,7 @@ export default function ModifyEmotionsModal({ onClose, data }: ModifyEmotionsMod
         );
 
         if (isDuplicate) {
-            toast.error('This emotion already exists in this category');
+            toast.error('This emotion already exists in this category.');
             return;
         }
 
@@ -96,12 +96,12 @@ export default function ModifyEmotionsModal({ onClose, data }: ModifyEmotionsMod
             [selectedCategory]: prev[selectedCategory].filter((_, i) => i !== index)
         }));
 
-        toast.success(`Removed "${deletedEmotion.label}" from ${selectedCategory}`);
+        toast.success(`Removed "${deletedEmotion.label}" from ${selectedCategory}.`);
     };
 
     const handleSubmit = () => {
         if (emotions[selectedCategory].length !== 9) {
-            toast.error(`You must have exactly 9 emotions in the ${selectedCategory} category. Currently: ${emotions[selectedCategory].length}`);
+            toast.error(`You must have exactly 9 emotions in the ${selectedCategory} category. Currently: ${emotions[selectedCategory].length}.`);
             return;
         }
 

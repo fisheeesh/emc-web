@@ -1,19 +1,25 @@
 import { z } from "zod";
 
 export const LogInSchema = z.object({
+    // email: z.string()
+    //     .min(1, { message: "Email is required" })
+    //     .regex(/^[a-zA-Z0-9._%+-]+@ata.it.th$/, { message: "Email must be from @ata.it.th domain" }),
     email: z.string()
         .min(1, { message: "Email is required" })
-        .regex(/^[a-zA-Z0-9._%+-]+@ata.it.th$/, { message: "Email must be from @ata.it.th domain" }),
+        .regex(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/, { message: "Invalid email format" }),
     password: z.string()
         .min(1, { message: "Password is required" })
         .min(8, { message: "Password must be at least 8 digit" })
         .regex(/^\d+$/, "Password must be numbers")
 })
 
-export const RegisterSchema = z.object({
+export const ForgotPasswordSchema = z.object({
+    // email: z.string()
+    //     .min(1, { message: "Email is required" })
+    //     .regex(/^[a-zA-Z0-9._%+-]+@ata.it.th$/, { message: "Email must be from @ata.it.th domain" }),
     email: z.string()
         .min(1, { message: "Email is required" })
-        .regex(/^[a-zA-Z0-9._%+-]+@ata.it.th$/, { message: "Email must be from @ata.it.th domain" }),
+        .regex(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/, { message: "Invalid email format" }),
 })
 
 export const OTPSchema = z.object({
@@ -42,9 +48,12 @@ const WORKSTYLES = ["ONSITE", "REMOTE", "HYBRID", "WFH"] as const;
 const GENDER = ["MALE", "FEMALE", "PERFER_NOT_TO_SAY"] as const;
 
 export const createEmpSchema = z.object({
+    // email: z.string()
+    //     .min(1, { message: "Email is required" })
+    //     .regex(/^[a-zA-Z0-9._%+-]+@ata.it.th$/, { message: "Email must be from @ata.it.th domain" }),
     email: z.string()
         .min(1, { message: "Email is required" })
-        .regex(/^[a-zA-Z0-9._%+-]+@ata.it.th$/, { message: "Email must be from @ata.it.th domain" }),
+        .regex(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/, { message: "Invalid email format" }),
     password: z.string()
         .min(1, { message: "Password is required" })
         .min(8, { message: "Password must be at least 8 digit" })

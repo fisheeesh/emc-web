@@ -21,7 +21,7 @@ const useUpdateActionPlan = () => {
         onSuccess: async () => {
             queryClient.invalidateQueries({ queryKey: ["action-plans", "infinite"], exact: false })
             toast.success('Success', {
-                description: "Saved changes and send back to responsible HR"
+                description: "Saved changes and send back to responsible HR."
             });
         },
         onError: (err: any) => {

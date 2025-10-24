@@ -24,7 +24,8 @@ const chartConfig = {
 } satisfies ChartConfig
 
 export function ResponseTimeChart({ chartData }: { chartData: AvgResponseTime[] }) {
-    const hasValidData = chartData.length > 0 && chartData.some(dept => dept.responseTime > 0)
+    const validData = chartData.filter(dept => dept.responseTime > 0)
+    const hasValidData = validData.length > 0
 
     if (!hasValidData) {
         return (
@@ -46,9 +47,10 @@ export function ResponseTimeChart({ chartData }: { chartData: AvgResponseTime[] 
             </Card>
         )
     }
-    const avgResponseTime = (chartData.reduce((acc, curr) => acc + curr.responseTime, 0) / chartData.length).toFixed(1)
-    const fastestDept = chartData.reduce((min, dept) => dept.responseTime < min.responseTime ? dept : min)
-    const slowestDept = chartData.reduce((max, dept) => dept.responseTime > max.responseTime ? dept : max)
+
+    const avgResponseTime = (validData.reduce((acc, curr) => acc + curr.responseTime, 0) / validData.length).toFixed(1)
+    const fastestDept = validData.reduce((min, dept) => dept.responseTime < min.responseTime ? dept : min)
+    const slowestDept = validData.reduce((max, dept) => dept.responseTime > max.responseTime ? dept : max)
 
     return (
         <Card className="flex flex-col">

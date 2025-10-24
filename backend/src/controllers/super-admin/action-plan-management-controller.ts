@@ -245,7 +245,7 @@ export const updateActionPlan = [
                 data: {
                     suggestions,
                     status: status as RStatus,
-                    type: "PROCESSING"
+                    type: status === 'REJECTED' ? "FAILED" : "PROCESSING"
                 }
             })
 

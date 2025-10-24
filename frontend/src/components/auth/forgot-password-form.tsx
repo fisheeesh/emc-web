@@ -1,6 +1,6 @@
 import useError from "@/hooks/ui/use-error";
 import { cn } from "@/lib/utils";
-import { RegisterSchema } from "@/lib/validators";
+import { ForgotPasswordSchema } from "@/lib/validators";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm, type SubmitHandler } from "react-hook-form";
 import { Link, useActionData, useNavigation, useSubmit } from "react-router";
@@ -19,14 +19,14 @@ export default function ForgetPasswordForm({
     const navigation = useNavigation()
     const actionData = useActionData()
 
-    const form = useForm<z.infer<typeof RegisterSchema>>({
-        resolver: zodResolver(RegisterSchema),
+    const form = useForm<z.infer<typeof ForgotPasswordSchema>>({
+        resolver: zodResolver(ForgotPasswordSchema),
         defaultValues: {
             email: ''
         }
     })
 
-    const onSubmit: SubmitHandler<z.infer<typeof RegisterSchema>> = (data) => {
+    const onSubmit: SubmitHandler<z.infer<typeof ForgotPasswordSchema>> = (data) => {
         submit(data, {
             method: "post",
             action: "."
@@ -70,8 +70,8 @@ export default function ForgetPasswordForm({
                                                     {...field}
                                                 />
                                             </FormControl>
-                                            <FormDescription>Email must be from @ata.it.th domain</FormDescription>
-                                            <FormMessage />
+                                            {/* <FormDescription>Email must be from @ata.it.th domain</FormDescription> */}
+                                            <FormDescription>Email must be Google-registered</FormDescription>                                       <FormMessage />
                                         </FormItem>
                                     )}
                                 />

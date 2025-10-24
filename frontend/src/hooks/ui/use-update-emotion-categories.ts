@@ -14,7 +14,7 @@ const useUpdateEmotionCategories = () => {
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['all-emotion-categories'] });
             toast.success('Success', {
-                description: 'Emotions updated successfully'
+                description: 'Emotions updated successfully.'
             });
         },
         onError: (error: any) => {

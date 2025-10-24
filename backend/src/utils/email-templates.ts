@@ -410,7 +410,7 @@ export const request_body = (cEmpName: string, adminName: string, depName: strin
         `
 
 export const response_subject = (empName: string, status: string, emailType: string) => {
-    if (emailType === 'UPDATE') {
+    if (emailType === 'UPDATE' && status === 'APPROVED') {
         return `📝 Action Plan Updated - Additional Suggestions for ${empName}`;
     }
     if (status === 'APPROVED') return `✅ Action Plan Approved - ${empName}`;
@@ -418,7 +418,7 @@ export const response_subject = (empName: string, status: string, emailType: str
 }
 
 export const response_body = (empName: string, status: string, emailType: string) => {
-    if (emailType === 'UPDATE') {
+    if (emailType === 'UPDATE' && status === 'APPROVED') {
         return `
 <h2>Action Plan Update - Additional Suggestions</h2>
 <p>Upper management has added further suggestions to the action plan for critical employee <strong>${empName}</strong>.</p>

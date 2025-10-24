@@ -15,6 +15,7 @@ import { TiPin } from "react-icons/ti";
 import { useSearchParams } from "react-router";
 import CommonFilter from "../shared/common-filter";
 import Empty from "../ui/empty";
+import { Skeleton } from "../ui/skeleton";
 
 const getWordColor = (index: number) => {
     const colors = [
@@ -47,7 +48,9 @@ export function TopConcernsWordCloud({ concernsData, recommendation, generatedAt
         refreshAIConcerns(query)
     }
 
-    if (!concernsData || concernsData.length === 0) {
+    const isEmpty = !concernsData || concernsData.length === 0
+
+    if (isEmpty && !refreshing) {
         return (
             <Card className="flex flex-col">
                 <CardHeader>
@@ -67,13 +70,14 @@ export function TopConcernsWordCloud({ concernsData, recommendation, generatedAt
             </Card>
         )
     }
-    const totalMentions = concernsData.reduce((acc, curr) => acc + curr.count, 0)
-    const topConcern = concernsData[0]
-    const trendingConcerns = concernsData.slice(0, 3)
+
+    const totalMentions = isEmpty ? 0 : concernsData.reduce((acc, curr) => acc + curr.count, 0)
+    const topConcern = isEmpty ? null : concernsData[0]
+    const trendingConcerns = isEmpty ? [] : concernsData.slice(0, 3)
 
     return (
         <Card className="flex flex-col">
-            <CardHeader className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <CardHeader className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
                 <div>
                     <CardTitle className="text-xl md:text-2xl flex items-center gap-2">
                         <MessageSquare className="size-5" />
@@ -81,7 +85,7 @@ export function TopConcernsWordCloud({ concernsData, recommendation, generatedAt
                     </CardTitle>
                     <CardDescription>
                         Most frequently mentioned keywords from emotion check-in notes
-                        {generatedAt && (
+                        {refreshing ? <Skeleton className="w-48 h-4 mt-1" /> : generatedAt && (
                             <p className="flex items-center gap-2 text-xs mt-1">
                                 {isCached && <TiPin className="text-red-600" />}
                                 Last analyzed:
@@ -116,84 +120,160 @@ export function TopConcernsWordCloud({ concernsData, recommendation, generatedAt
                 <div className="grid grid-cols-3 gap-3 mb-6">
                     <div className="flex flex-col items-center gap-1 p-3 rounded-lg bg-red-50 dark:bg-red-950/20 border border-red-100 dark:border-red-900/30">
                         <p className="text-xs text-gray-600 dark:text-gray-400">Top Concern</p>
-                        <p className="text-lg font-bold text-red-700 dark:text-red-400 capitalize">
-                            {topConcern.word}
-                        </p>
-                        <p className="text-xs text-gray-500 font-en">{topConcern.count} mentions</p>
+                        {refreshing ?
+                            <>
+                                <Skeleton className="w-16 h-6" />
+                                <Skeleton className="w-16 h-6" />
+                            </>
+                            : topConcern ? <>
+                                <p className="text-lg font-bold text-red-700 dark:text-red-400 capitalize">
+                                    {topConcern.word}
+                                </p>
+                                <p className="text-xs text-gray-500 font-en">{topConcern.count} mentions</p>
+                            </> : <p className="text-xs text-gray-400">-</p>}
                     </div>
 
                     <div className="flex flex-col items-center gap-1 p-3 rounded-lg bg-blue-50 dark:bg-blue-950/20 border border-blue-100 dark:border-blue-900/30">
                         <p className="text-xs text-gray-600 dark:text-gray-400">Total Keywords</p>
-                        <p className="text-2xl font-bold text-blue-700 dark:text-blue-400 font-en">
-                            {concernsData.length}
-                        </p>
-                        <p className="text-xs text-gray-500">tracked</p>
+                        {refreshing ?
+                            <>
+                                <Skeleton className="w-16 h-6" />
+                                <Skeleton className="w-16 h-6" />
+                            </>
+                            : <>
+                                <p className="text-2xl font-bold text-blue-700 dark:text-blue-400 font-en">
+                                    {concernsData.length}
+                                </p>
+                                <p className="text-xs text-gray-500">tracked</p>
+                            </>}
                     </div>
 
                     <div className="flex flex-col items-center gap-1 p-3 rounded-lg bg-orange-50 dark:bg-orange-950/20 border border-orange-100 dark:border-orange-900/30">
                         <p className="text-xs text-gray-600 dark:text-gray-400">Total Mentions</p>
-                        <p className="text-2xl font-bold text-orange-700 dark:text-orange-400 font-en">
-                            {totalMentions}
-                        </p>
-                        <p className="text-xs text-gray-500">this month</p>
+                        {refreshing ?
+                            <>
+                                <Skeleton className="w-16 h-6" />
+                                <Skeleton className="w-16 h-6" />
+                            </>
+                            : <>
+                                <p className="text-2xl font-bold text-orange-700 dark:text-orange-400 font-en">
+                                    {totalMentions}
+                                </p>
+                                <p className="text-xs text-gray-500">this month</p>
+                            </>}
                     </div>
                 </div>
 
                 <div className="relative min-h-[280px] border-2 border-dashed rounded-lg p-6 bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900/50 dark:to-gray-800/50 flex items-center justify-center">
-                    <div className="flex flex-wrap gap-4 items-center justify-center max-w-2xl">
-                        {concernsData.map((concern, index) => (
-                            <div
-                                key={concern.word}
-                                className={`font-bold cursor-pointer hover:scale-110 transition-transform ${getWordColor(index)}`}
-                                style={{
-                                    fontSize: `${concern.size * 0.6}rem`,
-                                    opacity: 0.7 + (concern.size / 10)
-                                }}
-                                title={`${concern.count} mentions`}
-                            >
-                                {concern.word}
-                            </div>
-                        ))}
-                    </div>
+                    {refreshing ? (
+                        <div className="flex flex-wrap gap-4 items-center justify-center max-w-2xl">
+                            {/* Generate multiple skeleton items with varying sizes to mimic word cloud */}
+                            <Skeleton className="h-8 w-24" />
+                            <Skeleton className="h-12 w-32" />
+                            <Skeleton className="h-6 w-20" />
+                            <Skeleton className="h-10 w-28" />
+                            <Skeleton className="h-7 w-16" />
+                            <Skeleton className="h-14 w-36" />
+                            <Skeleton className="h-9 w-24" />
+                            <Skeleton className="h-6 w-18" />
+                            <Skeleton className="h-11 w-30" />
+                            <Skeleton className="h-8 w-22" />
+                            <Skeleton className="h-7 w-20" />
+                            <Skeleton className="h-10 w-26" />
+                        </div>
+                    ) : isEmpty ? (
+                        <div className="flex flex-col items-center justify-center gap-3 text-center">
+                            <MessageSquare className="size-12 text-gray-400 dark:text-gray-600" />
+                            <p className="text-sm text-gray-500 dark:text-gray-400 max-w-md">
+                                No concern keywords found. Employees need to submit emotion check-ins with descriptive notes to generate insights.
+                            </p>
+                        </div>
+                    ) : (
+                        <div className="flex flex-wrap gap-4 items-center justify-center max-w-2xl">
+                            {concernsData.map((concern, index) => (
+                                <div
+                                    key={concern.word}
+                                    className={`font-bold cursor-pointer hover:scale-110 transition-transform ${getWordColor(index)}`}
+                                    style={{
+                                        fontSize: `${concern.size * 0.6}rem`,
+                                        opacity: 0.7 + (concern.size / 10)
+                                    }}
+                                    title={`${concern.count} mentions`}
+                                >
+                                    {concern.word}
+                                </div>
+                            ))}
+                        </div>
+                    )}
                 </div>
 
                 <div className="mt-6 p-4 bg-orange-50 dark:bg-orange-950/20 rounded-lg border border-orange-100 dark:border-orange-900/30">
-                    <h4 className="text-sm font-semibold text-orange-900 dark:text-orange-300 mb-3 flex items-center gap-2">
+                    {refreshing ? <Skeleton className="w-48 h-5 mb-3" /> : <h4 className="text-sm font-semibold text-orange-900 dark:text-orange-300 flex mb-3 items-center gap-2">
                         <BsFire className="text-orange-500 dark:text-orange-400 text-base animate-pulse" />
                         Top<span className="font-en">3</span>Trending Concerns
-                    </h4>
+                    </h4>}
                     <div className="space-y-2">
-                        {trendingConcerns.map((concern, index) => (
-                            <div key={concern.word} className="flex items-center justify-between text-sm">
-                                <div className="flex items-center gap-2">
-                                    <span className="font-bold text-orange-700 dark:text-orange-400 font-en">
-                                        #{index + 1}
-                                    </span>
-                                    <span className="capitalize font-medium text-gray-700 dark:text-gray-300">
-                                        {concern.word}
-                                    </span>
-                                </div>
-                                <div className="flex items-center gap-2">
-                                    <div className="w-24 h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
-                                        <div
-                                            className="h-full bg-orange-500"
-                                            style={{ width: `${(concern.count / topConcern.count) * 100}%` }}
-                                        ></div>
+                        {refreshing ? (
+                            // Skeleton for trending concerns
+                            Array.from({ length: 3 }).map((_, index) => (
+                                <div key={index} className="flex items-center justify-between">
+                                    <div className="flex items-center gap-2">
+                                        <Skeleton className="w-6 h-5" />
+                                        <Skeleton className="w-16 h-5" />
                                     </div>
-                                    <span className="text-xs text-gray-600 dark:text-gray-400 font-en min-w-[3rem] text-right">
-                                        {concern.count} times
-                                    </span>
+                                    <div className="flex items-center gap-2">
+                                        <Skeleton className="w-24 h-2" />
+                                        <Skeleton className="w-16 h-2" />
+                                    </div>
                                 </div>
-                            </div>
-                        ))}
+                            ))
+                        ) : isEmpty ? (
+                            <p className="text-xs text-gray-500 dark:text-gray-400 text-center py-4">
+                                No trending concerns available
+                            </p>
+                        ) : (
+                            trendingConcerns.map((concern, index) => (
+                                <div key={concern.word} className="flex items-center justify-between text-sm">
+                                    <div className="flex items-center gap-2">
+                                        <span className="font-bold text-orange-700 dark:text-orange-400 font-en">
+                                            #{index + 1}
+                                        </span>
+                                        <span className="capitalize font-medium text-gray-700 dark:text-gray-300">
+                                            {concern.word}
+                                        </span>
+                                    </div>
+                                    <div className="flex items-center gap-2">
+                                        <div className="w-24 h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+                                            <div
+                                                className="h-full bg-orange-500"
+                                                style={{ width: `${topConcern ? (concern.count / topConcern.count) * 100 : 0}%` }}
+                                            ></div>
+                                        </div>
+                                        <span className="text-xs text-gray-600 dark:text-gray-400 font-en min-w-[3rem] text-right">
+                                            {concern.count} times
+                                        </span>
+                                    </div>
+                                </div>
+                            ))
+                        )}
                     </div>
                 </div>
 
                 <div className="mt-4 p-3 flex items-center gap-2 bg-blue-50 dark:bg-blue-950/20 rounded-lg border border-blue-100 dark:border-blue-900/30">
-                    <HiOutlineSparkles className="size-3.5 text-brand" />
-                    <p className="text-xs text-gray-700 dark:text-gray-300">
-                        <span className="font-semibold">"{topConcern.word}"</span> is mentioned most frequently (<span className="font-en font-semibold">{topConcern.count}</span> times). {recommendation}
-                    </p>
+                    {refreshing ? (
+                        <Skeleton className="w-72 h-4" />
+                    ) : isEmpty ? (
+                        <p className="text-xs text-gray-500 dark:text-gray-400">
+                            AI recommendations will appear here once concern data is available.
+                        </p>
+                    ) : (
+                        <>
+                            <HiOutlineSparkles className="size-3.5 text-brand" />
+                            <p className="text-xs text-gray-700 dark:text-gray-300">
+                                <span className="font-semibold">"{topConcern?.word}"</span> is mentioned most frequently (<span className="font-en font-semibold">{topConcern?.count}</span> times). {recommendation}
+                            </p>
+                        </>
+                    )}
                 </div>
             </CardContent>
         </Card>

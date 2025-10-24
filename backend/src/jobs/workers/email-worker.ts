@@ -11,7 +11,7 @@ const FROM = process.env.SENDER_EMAIL || "no-reply@emotioncheckinsystem.com"
 type JobPayload = {
     subject: string,
     body: string,
-    to?: string[]
+    to: string[]
 };
 
 const emailWorker = new Worker<JobPayload>(
@@ -23,7 +23,7 @@ const emailWorker = new Worker<JobPayload>(
 
         await resend.emails.send({
             from: FROM,
-            to: ["swamyiphyo.dev@gmail.com"],
+            to,
             subject,
             html: body,
         });
