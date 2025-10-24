@@ -36,3 +36,44 @@ export const getAllDepartmentsData = async () => {
 
     return result
 }
+
+type EmailFilterOptions = {
+    departmentId?: number
+    role?: "ADMIN" | "SUPERADMIN"
+    excludeEmployeeId?: number
+    excludeSuperAdmins?: boolean
+}
+
+export const getEmployeeEmails = async (options: EmailFilterOptions = {}) => {
+    const {
+        departmentId,
+        role,
+        excludeEmployeeId,
+        excludeSuperAdmins = false
+    } = options
+
+    const where: any = {}
+
+    if (departmentId !== undefined) {
+        where.departmentId = departmentId
+    }
+
+    if (role) {
+        where.role = role
+    }
+
+    if (excludeEmployeeId !== undefined) {
+        where.id = { notIn: [excludeEmployeeId] }
+    }
+
+    if (excludeSuperAdmins) {
+        where.role = { not: "SUPERADMIN" }
+    }
+
+    const results = await prisma.employee.findMany({
+        where,
+        select: { email: true }
+    })
+
+    return results.map(({ email }) => email)
+}
