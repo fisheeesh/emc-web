@@ -47,7 +47,8 @@ export default function DepartmentTable({ data }: { data: DepartmentData[] }) {
                                 <Button
                                     size='sm'
                                     className="bg-gradient text-white cursor-pointer w-fit">
-                                    <MdAdd className="" />
+                                    <MdAdd />
+                                    <span className="sr-only">Create a new department</span>
                                 </Button>
                             </DialogTrigger>
                             {createOpen && (

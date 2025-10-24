@@ -1,8 +1,10 @@
 import { NextFunction, Request, Response } from "express"
 import { body, query, validationResult } from "express-validator"
 import { prisma } from "../../config/prisma-client"
-import { createHttpErrors } from "../../utils/check"
+import { checkEmployeeIfNotExits, createHttpErrors } from "../../utils/check"
 import { errorCodes } from "../../config/error-codes"
+import { getEmployeeByEmail, getEmployeeById } from "../../services/auth-services"
+import { generateHashedValue } from "../../utils/generate"
 
 interface CustomRequest extends Request {
     employeeId?: number
@@ -444,3 +446,68 @@ export const updateEmotion = [
         }
     }
 ];
+
+export const editEmpCredentials = [
+    body("editType", "Edit Type is required.").trim().notEmpty().escape(),
+    body("id", "EmpId is required.").isInt({ gt: 0 }),
+    body("email")
+        .optional({ nullable: true, checkFalsy: true })
+        .trim()
+        .isEmail()
+        .withMessage("Invalid email format."),
+    body("password")
+        .optional({ nullable: true, checkFalsy: true })
+        .trim()
+        .matches(/^[\d]+$/)
+        .withMessage("Password must contain only digits.")
+        .isLength({ min: 8, max: 8 })
+        .withMessage("Password must be exactly 8 digits."),
+    async (req: CustomRequest, res: Response, next: NextFunction) => {
+        const errors = validationResult(req).array({ onlyFirstError: true })
+        if (errors.length > 0) {
+            return next(createHttpErrors({
+                message: errors[0].msg,
+                status: 400,
+                code: errorCodes.invalid
+            }))
+        }
+
+        const emp = req.employee
+        checkEmployeeIfNotExits(emp)
+
+        const { id, editType, email, password } = req.body
+
+        const existingEmp = await getEmployeeById(+id)
+
+        if (!existingEmp) return next(createHttpErrors({
+            message: "Employee with provided Id is not found",
+            status: 404,
+            code: errorCodes.notFound
+        }))
+
+        let empData: any = {}
+        if (editType === 'email') {
+            const existingEmail = await getEmployeeByEmail(email)
+
+            if (existingEmail) return next(createHttpErrors({
+                message: "Employee with provided email has been registered. Try another one",
+                status: 400,
+                code: errorCodes.invalid
+            }))
+
+            empData.email = email
+        } else {
+            const hashedPassword = await generateHashedValue(password)
+            empData.password = hashedPassword
+        }
+
+        await prisma.employee.update({
+            where: { id },
+            data: empData
+        })
+
+        res.status(200).json({
+            message: "Successfully updated employee credentials"
+        })
+    }
+]

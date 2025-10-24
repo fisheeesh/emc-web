@@ -20,7 +20,6 @@ export default function DepartmentDetailsModal({ department }: { department: Dep
                 </DialogHeader>
 
                 <div className="space-y-4 py-4">
-                    {/* Department Name */}
                     <div className="space-y-2">
                         <h3 className="text-sm font-semibold text-muted-foreground">Department Name</h3>
                         <p className="text-base font-medium">{department.name}</p>
@@ -28,7 +27,6 @@ export default function DepartmentDetailsModal({ department }: { department: Dep
 
                     <Separator />
 
-                    {/* Description */}
                     <div className="space-y-2">
                         <h3 className="text-sm font-semibold text-muted-foreground">Description</h3>
                         <p className="text-sm">{department.description ?? "Not Specified"}</p>
@@ -36,7 +34,6 @@ export default function DepartmentDetailsModal({ department }: { department: Dep
 
                     <Separator />
 
-                    {/* Number of Employees */}
                     <div className="space-y-2">
                         <h3 className="text-sm font-semibold text-muted-foreground">Number of Employees</h3>
                         <p className="text-base font-en font-medium">{department._count.employees}</p>
@@ -44,7 +41,6 @@ export default function DepartmentDetailsModal({ department }: { department: Dep
 
                     <Separator />
 
-                    {/* Status */}
                     <div className="space-y-2">
                         <h3 className="text-sm font-semibold text-muted-foreground">Status</h3>
                         <CustomBadge value={department.isActive ? "ACTIVE" : "INACTIVE"} />
@@ -52,7 +48,6 @@ export default function DepartmentDetailsModal({ department }: { department: Dep
 
                     <Separator />
 
-                    {/* Critical History */}
                     <div className="space-y-2">
                         <h3 className="text-sm font-semibold text-muted-foreground">Critical History</h3>
                         <div className="flex items-center gap-6">
@@ -69,7 +64,6 @@ export default function DepartmentDetailsModal({ department }: { department: Dep
 
                     <Separator />
 
-                    {/* Employees */}
                     <div className="space-y-3">
                         <div className="flex items-center justify-between">
                             <CustomBadge value="ADMIN" />
@@ -107,15 +101,13 @@ export default function DepartmentDetailsModal({ department }: { department: Dep
                     </div>
 
                     <Separator />
-
-                    {/* Created At */}
                     <div className="space-y-2">
                         <h3 className="text-sm font-semibold text-muted-foreground">Created At</h3>
                         <p className="text-sm font-en">{department.createdAt}</p>
                     </div>
                 </div>
                 <DialogFooter className='py-5 border-t mt-5'>
-                    <DialogClose>
+                    <DialogClose asChild>
                         <Button variant='outline' className='cursor-pointer'>Close</Button>
                     </DialogClose>
                 </DialogFooter>

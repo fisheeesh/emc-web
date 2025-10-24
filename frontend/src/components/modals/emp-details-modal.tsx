@@ -137,7 +137,7 @@ export default function EmpDetailsModal({ employee }: { employee: Employee }) {
                 <AttendanceTimeSection data={employee.workSchedule} />
 
                 <DialogFooter className='py-5 border-t mt-5'>
-                    <DialogClose>
+                    <DialogClose asChild>
                         <Button variant='outline' className='cursor-pointer'>Close</Button>
                     </DialogClose>
                 </DialogFooter>

@@ -182,7 +182,7 @@ export default function AnnouncementModal() {
                     />
 
                     <DialogFooter>
-                        <DialogClose>
+                        <DialogClose asChild>
                             <Button
                                 type="button"
                                 className="min-h-[48px] cursor-pointer"

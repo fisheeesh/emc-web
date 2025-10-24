@@ -1,7 +1,7 @@
 import express from "express"
 import { deleteActionPlanById, getAllActionPlans, updateActionPlan } from "../../../controllers/super-admin/action-plan-management-controller"
 import { getActionAvgReponseTime, getActionPlanStatus, getDepartmentsHeatmap, getTopConcernWords } from "../../../controllers/super-admin/analytics-controller"
-import { createEmotion, getEmotions, getSummaryData, testSuperAdmin, updateEmotion, } from "../../../controllers/super-admin/super-admin-controller"
+import { createEmotion, editEmpCredentials, getEmotions, getSummaryData, testSuperAdmin, updateEmotion, } from "../../../controllers/super-admin/super-admin-controller"
 import { bulkRegister, createNewEmployee, deleteEmployee, getAllEmployeesInfinite, updateEmployeeInformation } from "../../../controllers/super-admin/user-management-controller"
 import upload, { uploadCSV } from "../../../middlewares/upload-files-middleware"
 import { createNewDepartment, updateDepartmentById, deleteDepartmentById, getAllDepartmentsData } from "../../../controllers/super-admin/dep-controller"
@@ -31,6 +31,7 @@ router.post("/emps", upload.single("avatar"), createNewEmployee)
 router.patch("/emps", upload.single("avatar"), updateEmployeeInformation)
 router.delete("/emps", deleteEmployee)
 router.post("/bulk-register", uploadCSV.single('csvFile'), bulkRegister)
+router.patch("/emp-credentials", editEmpCredentials)
 
 //* Actoin plans management routes
 router.get("/action-plans", getAllActionPlans)

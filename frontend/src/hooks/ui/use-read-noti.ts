@@ -14,15 +14,29 @@ const useMarkAsRead = () => {
             return res.data
         },
         onMutate: async (id: number) => {
+            //? Cancel outgoing refetches to avoid race conditions
+            await queryClient.cancelQueries({ queryKey: ["notifications"] })
+
+            //? Snapshot the previous status for rollback
+            const notifications = useNotiStore.getState().notifications
+            const previousStatus = notifications.find(n => n.id === id)?.status
+
             //? Optimistically update the UI
             updateNotificationStatus(id, "READ")
+
+            return { previousStatus }
         },
         onSuccess: async () => {
             queryClient.invalidateQueries({ queryKey: ["notifications"] })
         },
-        onError: (err: any, id: number) => {
+        onError: (err: any, id: number, context: any) => {
             //? Revert the optimistic update on error
-            updateNotificationStatus(id, "SENT")
+            if (context?.previousStatus) {
+                updateNotificationStatus(id, context.previousStatus)
+            } else {
+                updateNotificationStatus(id, "SENT")
+            }
+
 
             const msg =
                 err?.response?.data?.message ||

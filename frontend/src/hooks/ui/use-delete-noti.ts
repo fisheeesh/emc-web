@@ -6,7 +6,7 @@ import { useMutation } from "@tanstack/react-query"
 import { toast } from "sonner"
 
 const useDeleteNoti = () => {
-    const { deleteNotification } = useNotiStore()
+    const { deleteNotification, setNotis } = useNotiStore()
 
     const { mutate: deleteNoti, isPending: deleting } = useMutation({
         mutationFn: async (id: number) => {
@@ -19,11 +19,12 @@ const useDeleteNoti = () => {
 
             //? Snapshot the previous value
             const previousNotifications = queryClient.getQueryData(["notifications"])
+            const previousZustandNotis = useNotiStore.getState().notifications
 
             //? Optimistically update the UI
             deleteNotification(id)
 
-            return { previousNotifications }
+            return { previousNotifications, previousZustandNotis }
         },
         onSuccess: async () => {
             queryClient.invalidateQueries({ queryKey: ["notifications"] })
@@ -32,6 +33,10 @@ const useDeleteNoti = () => {
             //? Revert the optimistic update on error
             if (context?.previousNotifications) {
                 queryClient.setQueryData(["notifications"], context.previousNotifications)
+            }
+
+            if (context?.previousZustandNotis) {
+                setNotis(context.previousZustandNotis)
             }
 
             const msg =

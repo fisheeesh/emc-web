@@ -35,6 +35,7 @@ export default function EmotionDisplay({ data }: { data: EmotionCategory[] }) {
                                     className="bg-gradient text-white cursor-pointer w-fit"
                                 >
                                     <MdEdit />
+                                    <span className="sr-only">Edit/Create new emotions per category</span>
                                 </Button>
                             </DialogTrigger>
                             {modifyOpen && (
