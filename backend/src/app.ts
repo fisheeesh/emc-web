@@ -17,7 +17,8 @@ var whitelist = [
     'http://127.0.0.1:5173',
     'http://localhost:4000',
     'http://127.0.0.1:4000',
-    "https://senior-pj-emotion.vercel.app"
+    "https://senior-pj-emotion.vercel.app",
+    "https://emotioncheckinsystem.com"
 ]
 var corsOptions = {
     origin: function (origin: any, callback: (err: Error | null, origin?: any) => void) {
