@@ -1,6 +1,5 @@
 import { DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
-import { TrendingUp, Download, Activity, AlertCircle } from "lucide-react"
-import { Button } from "@/components/ui/button"
+import { TrendingUp, Activity, AlertCircle } from "lucide-react"
 import {
     type ChartConfig,
     ChartContainer,
@@ -15,16 +14,35 @@ interface Props {
 
 export default function WatchlistHistoryModal({ empName, emotionHistory }: Props) {
 
+    //* Map emotion status to fixed Y-axis values
+    const getEmotionValue = (emotion: string): number => {
+        const emotionMap: Record<string, number> = {
+            'critical': 0,
+            'negative': 1,
+            'neutral': 2,
+            'positive': 3
+        };
+        return emotionMap[emotion.toLowerCase()] ?? 2;
+    };
+
+    //* Transform data to use emotion-based values instead of sentiment values
+    const chartData = emotionHistory.map(item => ({
+        ...item,
+        emotionValue: getEmotionValue(item.emotion),
+        emotion: item.emotion,
+        date: item.date
+    }));
+
     //* Check if we have emotion data
-    const hasData = emotionHistory && emotionHistory.length > 0;
+    const hasData = chartData && chartData.length > 0;
 
     //* Check if employee is recovering (all emotions are neutral or positive)
-    const isRecovering = hasData && emotionHistory.every(d => d.value >= -0.5);
-    const hasImprovement = hasData && emotionHistory.length >= 3 &&
-        emotionHistory[emotionHistory.length - 1]?.value > emotionHistory[0]?.value;
+    const isRecovering = hasData && chartData.every(d => d.emotionValue >= 2);
+    const hasImprovement = hasData && chartData.length >= 3 &&
+        chartData[chartData.length - 1]?.emotionValue > chartData[0]?.emotionValue;
 
     const chartConfig = {
-        value: {
+        emotionValue: {
             label: "Emotion",
             color: "var(--chart-1)",
         },
@@ -37,7 +55,7 @@ export default function WatchlistHistoryModal({ empName, emotionHistory }: Props
             neutral: '#a855f7',
             positive: '#22c55e'
         };
-        return colors[emotion] || colors.neutral;
+        return colors[emotion.toLowerCase()] || colors.neutral;
     };
 
     const getGradientColor = () => {
@@ -49,29 +67,18 @@ export default function WatchlistHistoryModal({ empName, emotionHistory }: Props
     return (
         <DialogContent className="w-full mx-auto max-h-[95vh] overflow-visible sm:max-w-[1200px] lg:px-8">
             <div className="max-h-[calc(90vh-2rem)] overflow-y-auto no-scrollbar">
-                <DialogHeader className="flex flex-col md:flex-row items-start justify-between space-y-0 pb-5 border-b">
-                    <div className="space-y-1.5">
-                        <DialogTitle className="text-lg md:text-xl font-bold flex items-center gap-2">
-                            <Activity className="text-blue-600 size-5 md:size-7" />
-                            Watchlist Recovery Tracking - {empName || 'Employee'}
-                        </DialogTitle>
-                        <DialogDescription className="text-xs md:text-sm text-start">
-                            Monitor emotional wellbeing progress after HR intervention action plan.
-                            {isRecovering && <span className="text-green-600 font-semibold ml-1">Ready for removal from watchlist!</span>}
-                        </DialogDescription>
-                    </div>
-                    <Button
-                        variant="outline"
-                        size="icon"
-                        className="cursor-pointer shrink-0 mr-5"
-                        onClick={() => console.log('Download PDF clicked')}
-                    >
-                        <Download className="h-4 w-4" />
-                    </Button>
+                <DialogHeader className="space-y-0 pb-5 border-b">
+                    <DialogTitle className="text-lg md:text-xl font-bold flex items-center gap-2">
+                        <Activity className="text-blue-600 size-5 md:size-7" />
+                        Watchlist Recovery Tracking - {empName || 'Employee'}
+                    </DialogTitle>
+                    <DialogDescription className="text-xs md:text-sm text-start">
+                        Monitor emotional wellbeing progress after HR intervention action plan.
+                        {isRecovering && <span className="text-green-600 font-semibold ml-1">Ready for removal from watchlist!</span>}
+                    </DialogDescription>
                 </DialogHeader>
 
                 <div className="mt-6 space-y-6">
-                    {/* No Data Alert */}
                     {!hasData && (
                         <div className="p-6 rounded-lg border bg-gray-50 dark:bg-gray-900/20 border-gray-200 dark:border-gray-800">
                             <div className="flex items-start gap-3">
@@ -122,86 +129,61 @@ export default function WatchlistHistoryModal({ empName, emotionHistory }: Props
                         </div>
                     )}
 
-                    {/* Key Metrics */}
                     {hasData && (
                         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                             <div className="p-4 rounded-lg bg-purple-50 dark:bg-purple-950/20 border border-purple-100 dark:border-purple-900/30">
                                 <p className="text-xs text-gray-600 dark:text-gray-400 mb-1">Latest Status</p>
-                                <p className="text-lg font-bold capitalize" style={{ color: getEmotionColor(emotionHistory[emotionHistory.length - 1]?.emotion) }}>
-                                    {emotionHistory[emotionHistory.length - 1]?.emotion}
+                                <p className="text-lg font-bold capitalize" style={{ color: getEmotionColor(chartData[chartData.length - 1]?.emotion) }}>
+                                    {chartData[chartData.length - 1]?.emotion}
                                 </p>
                             </div>
-
                             <div className="p-4 rounded-lg bg-blue-50 dark:bg-blue-950/20 border border-blue-100 dark:border-blue-900/30">
-                                <p className="text-xs text-gray-600 dark:text-gray-400 mb-1">First Status</p>
-                                <p className="text-lg font-bold capitalize" style={{ color: getEmotionColor(emotionHistory[0]?.emotion) }}>
-                                    {emotionHistory[0]?.emotion}
-                                </p>
+                                <p className="text-xs text-gray-600 dark:text-gray-400 mb-1">Check-ins</p>
+                                <p className="text-lg font-bold font-en">{chartData.length} / 4</p>
                             </div>
-
                             <div className="p-4 rounded-lg bg-green-50 dark:bg-green-950/20 border border-green-100 dark:border-green-900/30">
                                 <p className="text-xs text-gray-600 dark:text-gray-400 mb-1">Positive Days</p>
-                                <p className="text-lg font-bold text-gray-900 dark:text-gray-100 font-en">
-                                    {emotionHistory.filter(d => d.emotion === 'positive')?.length}/{emotionHistory.length}
-                                </p>
+                                <p className="text-lg font-bold font-en">{chartData.filter(d => d.emotionValue === 3).length}</p>
                             </div>
-
                             <div className="p-4 rounded-lg bg-orange-50 dark:bg-orange-950/20 border border-orange-100 dark:border-orange-900/30">
-                                <p className="text-xs text-gray-600 dark:text-gray-400 mb-1">Check-ins Tracked</p>
-                                <p className="text-lg font-bold text-gray-900 dark:text-gray-100 font-en">
-                                    {emotionHistory.length} / 4
-                                </p>
+                                <p className="text-xs text-gray-600 dark:text-gray-400 mb-1">Needs Attention</p>
+                                <p className="text-lg font-bold font-en">{chartData.filter(d => d.emotionValue <= 1).length}</p>
                             </div>
                         </div>
                     )}
 
-                    {/* Emotion Tracking Chart */}
                     {hasData && (
-                        <div className="border rounded-lg p-4">
-                            <h3 className="text-base font-semibold mb-4">
-                                Emotion Progress After Action Plan
-                            </h3>
-
+                        <div className="border rounded-lg p-6">
+                            <h3 className="text-sm font-semibold mb-4">Emotion Progress After Action Plan</h3>
                             <ChartContainer config={chartConfig} className="h-[300px] w-full">
                                 <AreaChart
-                                    data={emotionHistory}
-                                    margin={{
-                                        left: 12,
-                                        right: 12,
-                                        top: 12,
-                                        bottom: 12
-                                    }}
+                                    data={chartData}
+                                    margin={{ top: 10, right: 10, left: 0, bottom: 0 }}
                                 >
-                                    <CartesianGrid vertical={false} strokeDasharray="3 3" />
+                                    <CartesianGrid strokeDasharray="3 3" vertical={false} />
                                     <XAxis
                                         dataKey="date"
                                         tickLine={false}
                                         axisLine={false}
                                         tickMargin={8}
-                                        style={{
-                                            fontFamily: "Lato",
-                                            fontSize: "12px"
-                                        }}
+                                        className="text-xs font-en"
                                     />
                                     <YAxis
-                                        domain={[0, 5]}
-                                        ticks={[1, 2, 3, 4]}
-                                        tickLine={false}
-                                        axisLine={false}
-                                        tickMargin={8}
-                                        style={{
-                                            fontFamily: "Lato",
-                                            fontSize: "12px"
-                                        }}
+                                        domain={[0, 3]}
+                                        ticks={[0, 1, 2, 3]}
                                         tickFormatter={(value) => {
                                             const labels: Record<number, string> = {
-                                                1: 'Critical',
-                                                2: 'Negative',
-                                                3: 'Neutral',
-                                                4: 'Positive'
+                                                0: 'Critical',
+                                                1: 'Negative',
+                                                2: 'Neutral',
+                                                3: 'Positive'
                                             };
                                             return labels[value] || '';
                                         }}
+                                        tickLine={false}
+                                        axisLine={false}
+                                        tickMargin={8}
+                                        className="text-xs"
                                     />
                                     <ChartTooltip
                                         cursor={false}
@@ -227,7 +209,7 @@ export default function WatchlistHistoryModal({ empName, emotionHistory }: Props
                                         </linearGradient>
                                     </defs>
                                     <Area
-                                        dataKey="value"
+                                        dataKey="emotionValue"
                                         type="monotone"
                                         fill="url(#recoveryGradient)"
                                         stroke={getGradientColor()}
@@ -236,7 +218,6 @@ export default function WatchlistHistoryModal({ empName, emotionHistory }: Props
                                 </AreaChart>
                             </ChartContainer>
 
-                            {/* Legend */}
                             <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mt-6 mb-2">
                                 <div className="flex items-center justify-center gap-2 text-xs">
                                     <div className="w-3 h-3 rounded-full bg-red-500"></div>
@@ -258,7 +239,6 @@ export default function WatchlistHistoryModal({ empName, emotionHistory }: Props
                         </div>
                     )}
 
-                    {/* Action Recommendation */}
                     <div className="border rounded-lg p-4 bg-gray-50 dark:bg-gray-900/20">
                         <h4 className="text-sm font-semibold mb-3 flex items-center gap-2">
                             <Activity className="w-4 h-4" />
