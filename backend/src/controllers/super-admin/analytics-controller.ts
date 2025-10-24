@@ -1,9 +1,9 @@
-import { differenceInDays } from "date-fns"
+import { differenceInCalendarDays, differenceInHours } from "date-fns"
 import { NextFunction, Request, Response } from "express"
+import { query } from "express-validator"
 import { prisma } from "../../config/prisma-client"
 import { checkEmployeeIfNotExits } from "../../utils/check"
 import { analyzeConcernWords, getDateRangeFromTimeRange, getStatusFromScore } from "../../utils/helplers"
-import { query } from "express-validator"
 
 interface CustomRequest extends Request {
     employeeId?: number
@@ -96,7 +96,6 @@ export const getActionAvgReponseTime = async (req: CustomRequest, res: Response,
     const emp = req.employee
     checkEmployeeIfNotExits(emp)
 
-    //* [{ department: "IT", responseTime: 2.5 }, ...]
     const departments = await prisma.department.findMany({
         where: {
             isActive: true
@@ -113,6 +112,9 @@ export const getActionAvgReponseTime = async (req: CustomRequest, res: Response,
                     }
                 }
             },
+        },
+        orderBy: {
+            createdAt: "desc"
         }
     })
 
@@ -120,18 +122,15 @@ export const getActionAvgReponseTime = async (req: CustomRequest, res: Response,
         let totalResponseTime = 0
         let count = 0
 
-        //* For each critical employee, calculate time to their action plan
         dep.criticalEmployees.forEach(criticalEmp => {
-            //* Only calculate if this critical employee has an action plan
             if (criticalEmp.actionPlan) {
-                const daysDifference = differenceInDays(
+                const hoursDifference = differenceInHours(
                     criticalEmp.actionPlan.createdAt,
                     criticalEmp.createdAt
                 )
 
-                //* Only count if action plan was created after critical employee
-                if (daysDifference >= 0) {
-                    totalResponseTime += daysDifference
+                if (hoursDifference >= 0) {
+                    totalResponseTime += hoursDifference
                     count++
                 }
             }
@@ -144,7 +143,7 @@ export const getActionAvgReponseTime = async (req: CustomRequest, res: Response,
     })
 
     res.status(200).json({
-        message: "Here is Action Plan Avgerage Time data",
+        message: "Here is Action Plan Average Time data (in hours)",
         data: transformedData
     })
 }
