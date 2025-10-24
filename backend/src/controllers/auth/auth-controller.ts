@@ -3,12 +3,13 @@ import { NextFunction, Request, Response } from "express"
 import { body, validationResult } from "express-validator"
 import jwt from 'jsonwebtoken'
 import moment from 'moment'
-import { DEPARTMENTS } from '../../config'
 import { errorCodes } from "../../config/error-codes"
+import { EmailQueue } from '../../jobs/queues/email-queue'
 import { createEmployee, createOTP, getEmployeeByEmail, getEmployeeById, getOTPRowByEmail, updateEmployeeData, updateOTP } from "../../services/auth-services"
 import { authorize } from '../../utils/authorize'
 import { checkEmployeeIfExits, checkEmployeeIfNotExits, checkOTPErrorIfSameDate, checkOTPRow, createHttpErrors } from "../../utils/check"
-import { generateHashedValue, generateToken } from "../../utils/generate"
+import { generateHashedValue, generateOTP, generateToken } from "../../utils/generate"
+import { otp_body, otp_subject } from '../../utils/email-templates'
 
 interface CustomRequest extends Request {
     employeeId?: number
@@ -46,7 +47,7 @@ export const register = [
         checkEmployeeIfExits(employee)
 
         // @TODO: generate OTP
-        const otp = 123456
+        const otp = generateOTP()
         //* Have to convert hashValue for security
         const hashedOTP = await generateHashedValue(otp.toString())
         //* generate token which will be necessary in verifity OTP
@@ -103,6 +104,12 @@ export const register = [
                 }
             }
         }
+
+        await EmailQueue.add("send-otp-email", {
+            subject: otp_subject(),
+            body: otp_body(otp.toString(), 2),
+            to: [email]
+        });
 
         res.status(200).json({
             message: `We are sending OTP to ${result.email}.`,
@@ -644,7 +651,7 @@ export const forgotPassword = [
         //* By this time OTP must be in the database
         const otpRow = await getOTPRowByEmail(emp!.email)
 
-        const otp = 123456
+        const otp = generateOTP()
         const hashedOTP = await generateHashedValue(otp.toString())
         const token = generateToken()
 
@@ -680,6 +687,12 @@ export const forgotPassword = [
                 result = await updateOTP(otpRow!.id, otpData)
             }
         }
+
+        await EmailQueue.add("send-otp-email", {
+            subject: otp_subject(),
+            body: otp_body(otp.toString(), 2),
+            to: [email]
+        });
 
         res.status(200).json({
             message: `We are sending OTP to ${emp!.email}. Please check your email.`,

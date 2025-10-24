@@ -1,5 +1,21 @@
 const dashboardLink = `${process.env.DASHBOARD_URL}`
 
+export const otp_subject = () => `🔐 Your One-Time Password (OTP) Code`;
+
+export const otp_body = (otpCode: string, expiryMinutes: number = 10) => `
+    <div style="font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; line-height: 1.6; max-width: 600px; margin: 0 auto;">
+        <h2 style="color: #1e40af;">🔐 Verification Code</h2>
+        <p>Use the following one-time code to complete your login:</p>
+        <div style="background: #dbeafe; border: 2px solid #2563eb; border-radius: 8px; padding: 20px; text-align: center; margin: 20px 0;">
+            <p style="font-size: 32px; font-weight: 700; letter-spacing: 8px; color: #1e3a8a; margin: 0; font-family: 'Courier New', monospace;">${otpCode}</p>
+        </div>
+        <p style="color: #64748b;">⏱️ This code will expire in <strong>${expiryMinutes} minutes</strong>.</p>
+        <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 30px 0;"/>
+        <p style="color: #9ca3af; font-size: 12px;">If you didn't request this code, you can safely ignore this email.</p>
+        <p style="color: #9ca3af; font-size: 12px;">This is an automated notification from the Employee Wellbeing Management & Emotion Check-in System.</p>
+    </div>
+`;
+
 export const critical_subject = (empName: string) => `🚨 Wellness Alert: ${empName} May Need Support`;
 
 export const critical_body = (empName: string) => `

@@ -233,7 +233,7 @@ export default function AIAnalysisModal({ analysis: initialAnalysis, empName, cr
                         </Button>
                     </DialogHeader>
 
-                    <div id="analysis" className="space-y-6 mt-4 font-os">
+                    <div id="analysis" className="space-y-6 mt-4 font-en">
                         {/* Week Range */}
                         <div className="bg-muted/50 rounded-lg p-4">
                             <p className="text-sm text-muted-foreground">Analysis Period</p>

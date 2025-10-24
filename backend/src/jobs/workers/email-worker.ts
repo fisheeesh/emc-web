@@ -17,7 +17,8 @@ type JobPayload = {
 const emailWorker = new Worker<JobPayload>(
     "emailQueue",
     async (job) => {
-        if (job.name !== "notify-email") return;
+        const allowedJobs = ["notify-email", "send-otp-email"];
+        if (!allowedJobs.includes(job.name)) return;
 
         const { subject, body, to } = job.data;
 

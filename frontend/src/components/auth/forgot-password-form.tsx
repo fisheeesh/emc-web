@@ -62,16 +62,15 @@ export default function ForgetPasswordForm({
                                             <FormLabel>Email Address <span className="text-red-600 font-en">*</span></FormLabel>
                                             <FormControl>
                                                 <Input
-                                                    id="phone"
-                                                    type="tel"
-                                                    className="w-full min-h-[48px]"
+                                                    id="email"
+                                                    type="email"
+                                                    className="w-full min-h-[48px] placeholder:font-raleway font-en"
                                                     placeholder="Enter your email address"
-                                                    inputMode="numeric"
                                                     {...field}
                                                 />
                                             </FormControl>
                                             {/* <FormDescription>Email must be from @ata.it.th domain</FormDescription> */}
-                                            <FormDescription>Email must be Google-registered</FormDescription>                                       <FormMessage />
+                                            <FormDescription>ONLY Goolge-registered emails can get email OTP.</FormDescription>                                       <FormMessage />
                                         </FormItem>
                                     )}
                                 />

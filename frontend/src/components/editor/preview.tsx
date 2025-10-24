@@ -32,7 +32,7 @@ export default function Preview({ content }: { content: string }) {
     const processedContent = content.replace(/==(.*?)==/g, '<mark>$1</mark>');
 
     return (
-        <section className="markdown prose break-words font-os">
+        <section className="markdown prose break-words font-en">
             <ReactMarkdown
                 remarkPlugins={[remarkGfm, remarkDirective, remarkAdmonitions]}
                 rehypePlugins={[rehypeRaw]}
