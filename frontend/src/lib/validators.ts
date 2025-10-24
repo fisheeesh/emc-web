@@ -86,13 +86,13 @@ export const actionFormSchema = z.object({
     priority: z.enum(PRIORITY, { message: "Priority is required" }),
     assignTo: z.string().min(1, { message: "Assign To is required" }),
     dueDate: z.string().min(1, { message: "Due Date is required" }),
-    actionNotes: z.string().min(30, { message: "Action notes must be at least thirty characters long." }),
-    followUpNotes: z.string().min(30, { message: "Action notes must be at least thirty characters long." }),
+    actionNotes: z.string().min(30, { message: "Action notes must be at least thirty characters long" }),
+    followUpNotes: z.string().min(30, { message: "Action notes must be at least thirty characters long" }),
 })
 
 export const updateActionFormSchema = z.object({
     status: z.enum(STATUS, { message: "Status is required" }),
-    suggestions: z.string().min(5, { message: "Action notes must be at least five characters long." }),
+    suggestions: z.string().min(5, { message: "Action notes must be at least five characters long" }),
 }).refine(data => data.status !== "PENDING", {
     message: "Status must be either Approved or Rejected",
     path: ["status"]
@@ -106,3 +106,36 @@ export const createDepartmentSchema = z.object({
 export const updateDepartmentSchema = createDepartmentSchema.extend({
     status: z.enum(["ACTIVE", "INACTIVE"], { message: "Department Status is required" })
 })
+
+export const credentialSchema = z.object({
+    editType: z.enum(["email", "password"], {
+        message: "Please select what you want to edit",
+    }),
+    email: z.string().email("Invalid email address").optional().or(z.literal("")),
+    newPassword: z.string().min(8, "Password must be at least 8 characters").optional().or(z.literal("")),
+    confirmPassword: z.string().optional().or(z.literal("")),
+}).refine((data) => {
+    if (data.editType === "email") {
+        return data.email && data.email.length > 0;
+    }
+    return true;
+}, {
+    message: "Email is required",
+    path: ["email"],
+}).refine((data) => {
+    if (data.editType === "password") {
+        return data.newPassword && data.newPassword.length >= 8;
+    }
+    return true;
+}, {
+    message: "New password is required",
+    path: ["newPassword"],
+}).refine((data) => {
+    if (data.editType === "password") {
+        return data.newPassword === data.confirmPassword;
+    }
+    return true;
+}, {
+    message: "Passwords do not match",
+    path: ["confirmPassword"],
+});

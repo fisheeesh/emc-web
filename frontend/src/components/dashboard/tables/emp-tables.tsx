@@ -30,6 +30,8 @@ import { BsEye } from "react-icons/bs";
 import { GrMoreVertical } from "react-icons/gr";
 import { LuUserPen } from "react-icons/lu";
 import { RiDeleteBin5Line } from "react-icons/ri";
+import { MdOutlineSecurity } from "react-icons/md";
+import EditCredentialsModal from "@/components/modals/edit-credentials-modal";
 
 interface Props {
     data: Employee[]
@@ -45,6 +47,7 @@ export default function EmpTables({ data, status, error, isFetchingNextPage, fet
     const { user } = useUserStore()
     const [editingEmp, setEditingEmp] = useState<Employee | null>(null);
     const [viewEmp, setViewEmp] = useState<Employee | null>(null);
+    const [editCredentials, setEditCredentials] = useState<Employee | null>(null);
     const { deleteEmp, deletingEmp } = useDeleteEmp()
 
     return (
@@ -183,6 +186,17 @@ export default function EmpTables({ data, status, error, isFetchingNextPage, fet
                                                                             Edit
                                                                         </Button>
                                                                     </DropdownMenuItem>
+                                                                    <DropdownMenuItem asChild className="cursor-pointer">
+                                                                        <Button
+                                                                            size='icon'
+                                                                            variant='ghost'
+                                                                            className="w-full cursor-pointer flex justify-start gap-2 px-1.5"
+                                                                            onClick={() => setEditCredentials(emp)}
+                                                                        >
+                                                                            <MdOutlineSecurity className="text-black dark:text-white" />
+                                                                            Credentials
+                                                                        </Button>
+                                                                    </DropdownMenuItem>
                                                                     {user?.id !== emp.id && <DropdownMenuItem asChild className="cursor-pointer">
                                                                         <DialogTrigger asChild>
                                                                             <Button
@@ -232,6 +246,17 @@ export default function EmpTables({ data, status, error, isFetchingNextPage, fet
                                             }}
                                             onClose={() => setEditingEmp(null)}
                                         />}
+                                    </Dialog>
+                                    <Dialog open={!!editCredentials} onOpenChange={(o) => !o && setEditCredentials(null)}>
+                                        {
+                                            editCredentials && <EditCredentialsModal
+                                                user={{
+                                                    id: editCredentials.id,
+                                                    name: editCredentials.fullName,
+                                                    email: editCredentials.email
+                                                }}
+                                                onClose={() => setEditCredentials(null)}
+                                            />}
                                     </Dialog>
                                     <Dialog open={!!viewEmp} onOpenChange={(o) => !o && setViewEmp(null)}>
                                         {viewEmp && <EmpDetailsModal employee={viewEmp} />}
