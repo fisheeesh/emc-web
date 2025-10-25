@@ -18,7 +18,7 @@ const useUpdateEmotionCategories = () => {
             });
         },
         onError: (error: any) => {
-            const errorMessage = error.response?.data?.message || 'Failed to update emotions';
+            const errorMessage = error.response?.data?.message || 'Failed to update emotions.';
             toast.error('Error', {
                 description: errorMessage
             });

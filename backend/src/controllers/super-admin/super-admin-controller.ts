@@ -456,9 +456,8 @@ export const editEmpCredentials = [
         .isEmail()
         .withMessage("Invalid email format."),
     body("password", "Password must meet all requirements.")
+        .optional({ nullable: true, checkFalsy: true })
         .trim()
-        .notEmpty()
-        .withMessage("Password is required")
         .isLength({ min: 8, max: 16 })
         .withMessage("Password must be between 8 and 16 characters")
         .matches(/[A-Z]/)

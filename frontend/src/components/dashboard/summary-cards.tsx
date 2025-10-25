@@ -19,7 +19,7 @@ interface Props {
 
 export function SummaryCards({ data, isLoading }: Props) {
     return (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 lg:flex-row w-full">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3 lg:flex-row w-full">
             <Card>
                 <CardHeader>
                     <CardDescription className="flex items-center gap-2">

@@ -170,7 +170,7 @@ export default function ActionModal({ employee, action, onClose }: Props) {
                             variant="outline"
                             size="icon"
                             className="cursor-pointer shrink-0 mr-5"
-                            onClick={() => toast.success("SYP TODO", { description: "Will implement this later on" })}
+                            onClick={() => toast.success("SYP's TODO", { description: "Will implement this later on" })}
                         >
                             <Download className="h-4 w-4" />
                         </Button>

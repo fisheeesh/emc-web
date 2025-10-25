@@ -259,6 +259,7 @@ export const createActionPlan = [
 
         //* notify to upper management
         await EmailQueue.add('notify-email', {
+            customName: `${emp?.firstName} ${emp?.lastName} | ${criticalEmp.department.name}`,
             subject: request_subject(priority),
             body: request_body(criticalEmp.employee.fullName, `${emp?.firstName} ${emp?.lastName}`, criticalEmp.department.name, actionType, priority, dueDate),
             to: superAdminEmails
@@ -301,6 +302,9 @@ export const markAsCompletedActionPlan = [
                             }
                         },
                     }
+                },
+                department: {
+                    select: { name: true }
                 },
                 type: true,
             }
@@ -354,6 +358,7 @@ export const markAsCompletedActionPlan = [
         })
 
         await EmailQueue.add('notify-email', {
+            customName: `${emp?.firstName} ${emp?.lastName} | ${actionPlan.department.name}`,
             subject: completion_subject(actionPlan.criticalEmployee.employee.fullName),
             body: completion_body(
                 actionPlan.criticalEmployee.employee.fullName,
@@ -365,6 +370,63 @@ export const markAsCompletedActionPlan = [
         res.status(200).json({
             message: "Successfully updated action plan"
         })
+    }
+]
+
+export const makeAnnouncement = [
+    body("subject", "Email Subject is required.").trim().notEmpty(),
+    body("body", "Email Body is required.").trim().notEmpty(),
+    async (req: CustomRequest, res: Response, next: NextFunction) => {
+        const errors = validationResult(req).array({ onlyFirstError: true })
+        if (errors.length > 0) return next(createHttpErrors({
+            message: errors[0].msg,
+            status: 400,
+            code: errorCodes.invalid
+        }))
+        const empId = req.employeeId
+        const emp = await prisma.employee.findUnique({
+            where: { id: empId },
+            select: {
+                fullName: true,
+                departmentId: true,
+                role: true,
+                department: { select: { name: true } }
+            }
+        })
+        checkEmployeeIfNotExits(emp)
+
+        const { subject, body } = req.body;
+
+        let emails: string[] = []
+
+        if (emp?.role === 'ADMIN') emails = await getEmployeeEmails({ departmentId: emp.departmentId, excludeEmployeeId: empId!, excludeSuperAdmins: true })
+        if (emp?.role === 'SUPERADMIN') emails = await getEmployeeEmails({ excludeSuperAdmins: true })
+
+        if (emails.length === 0) return next(createHttpErrors({
+            message: "There is no employee in database right now.",
+            status: 400,
+            code: errorCodes.invalid
+        }))
+
+        await EmailQueue.add("announcement-email", {
+            customName: `${emp!.fullName} | ${emp!.department.name}`,
+            subject,
+            body,
+            to: emails,
+            isMarkdown: true
+        },
+            {
+                attempts: 3,
+                backoff: {
+                    type: "exponential",
+                    delay: 2000
+                }
+            }
+        );
+
+        return res.status(200).json({
+            message: `Announcement has been made successfully.`,
+        });
     }
 ]
 

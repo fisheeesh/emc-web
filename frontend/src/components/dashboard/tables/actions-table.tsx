@@ -153,7 +153,7 @@ export default function ActionsTable({ data, status, error, isFetchingNextPage, 
                                                                     </DropdownMenuItem>
                                                                     <DropdownMenuItem asChild className="cursor-pointer">
                                                                         <Button
-                                                                            onClick={() => toast.success("SYP TODO", { description: "Will implement this later on." })}
+                                                                            onClick={() => toast.success("SYP's TODO", { description: "Will implement this later on." })}
                                                                             size='icon'
                                                                             variant='ghost'
                                                                             className="w-full cursor-pointer flex justify-start gap-2 px-1.5"

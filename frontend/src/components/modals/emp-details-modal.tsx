@@ -127,7 +127,7 @@ export default function EmpDetailsModal({ employee }: { employee: Employee }) {
                                 <Mail className="w-5 h-5 text-gray-400" />
                                 <span className="text-sm text-gray-500 w-32">Email</span>
                             </div>
-                            <span className="text-sm font-medium text-brand">{employee.email}</span>
+                            <span className="text-sm font-medium text-brand font-en">{employee.email}</span>
                         </div>
                     </div>
                 </div>

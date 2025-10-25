@@ -1,5 +1,5 @@
 import express from "express"
-import { createActionPlan, deleteNotification, getAdminUser, getAllDepartments, getAllNotifications, markAsCompletedActionPlan, markAsReadNotification, testAdmin } from "../../../controllers/admin/admin-controller"
+import { createActionPlan, deleteNotification, getAdminUser, getAllDepartments, getAllNotifications, makeAnnouncement, markAsCompletedActionPlan, markAsReadNotification, testAdmin } from "../../../controllers/admin/admin-controller"
 import { generateAIAnalysis, generateAIRecommendation, regenerateAIAnalysis } from "../../../controllers/admin/ai-controller"
 import { getAttendanceOverView, getCheckInHours, getDailyAttendance } from "../../../controllers/admin/attendance-controller"
 import { deleteCriticalEmpById, deleteWatchlistEmpById, getAllCriticalEmps, getAllWatchlistEmps, getLeaderboards, getMoodOverview, getSenitmentsComparison } from "../../../controllers/admin/sentiments-controller"
@@ -38,6 +38,9 @@ router.post("/generate-recommendation", generateAIRecommendation)
 //* Action Plans
 router.post("/action-plans", createActionPlan)
 router.patch("/action-plans", markAsCompletedActionPlan)
+
+//* Make Announcement
+router.post("/make-announcement", makeAnnouncement)
 
 
 export default router
