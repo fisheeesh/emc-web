@@ -404,7 +404,7 @@ export const makeAnnouncement = [
         checkEmployeeIfNotExits(emp)
 
         const { subject, body } = req.body;
-        checkUploadFile(req.files && req.files.length > 0)
+        if (req.files && req.files.length > 0) checkUploadFile(req.files && req.files.length > 0)
 
         let emails: string[] = []
 
