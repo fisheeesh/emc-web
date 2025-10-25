@@ -44,7 +44,7 @@ export default function OverViewChart({ percentages }: Props) {
             <CardHeader className="flex flex-col md:flex-row mb-2 justify-center gap-3 md:justify-between w-full">
                 <div>
                     <CardTitle className="text-xl md:text-2xl">Mood Overview</CardTitle>
-                    <CardDescription className="line-clamp-1">Sshowing how employees are feeling</CardDescription>
+                    <CardDescription className="line-clamp-1">Showing how employees are feeling</CardDescription>
                 </div>
                 <CommonFilter
                     filterValue="duration"

@@ -89,12 +89,11 @@ export default function SentimentsDashboardPage() {
             <div className="flex flex-col lg:flex-row items-center justify-center w-full gap-3 lg:h-[420px]">
                 <OverViewChart percentages={overviewData.data} />
                 <SentimentsComparisonChart data={sentimentsComparison.data} />
-
             </div>
             <div className="w-full">
                 <LeaderBoardTable data={leaderboardsData.data} isLoading={isLeaderboardRefetching} />
             </div>
-            <div className="w-full">
+            <div id="critical_table" className="w-full">
                 <CriticalTable
                     data={allCriticals}
                     status={cStatus}

@@ -19,7 +19,7 @@ import { Input } from "@/components/ui/input"
 import { announcementFormSchema } from "@/lib/validators"
 import { zodResolver } from "@hookform/resolvers/zod"
 import '@mdxeditor/editor/style.css'
-import { Upload, X } from "lucide-react"
+import { FileIcon, Upload, X } from "lucide-react"
 import { useRef, useState } from "react"
 import { useForm } from "react-hook-form"
 import { TfiAnnouncement } from "react-icons/tfi"
@@ -29,8 +29,7 @@ import useMakeAnnouncement from "@/hooks/ui/use-make-announcement"
 import Spinner from "../shared/spinner"
 
 export default function AnnouncementModal() {
-    const [imagePreviews, setImagePreviews] = useState<string[]>([])
-    const [imageFiles, setImageFiles] = useState<File[]>([])
+    const [attachmentPreviews, setAttachmentPreviews] = useState<Array<{ file: File, preview?: string, type: string }>>([])
     const { makeAnnouncement, making } = useMakeAnnouncement()
     const closeButtonRef = useRef<HTMLButtonElement>(null)
 
@@ -43,44 +42,70 @@ export default function AnnouncementModal() {
         },
     })
 
-    const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
         const files = Array.from(e.target.files || [])
-        const newPreviews: string[] = []
+        const newPreviews: Array<{ file: File, preview?: string, type: string }> = []
 
         files.forEach(file => {
-            const reader = new FileReader()
-            reader.onloadend = () => {
-                newPreviews.push(reader.result as string)
+            const fileType = file.type.split('/')[0]
+
+            if (fileType === 'image') {
+                const reader = new FileReader()
+                reader.onloadend = () => {
+                    newPreviews.push({
+                        file,
+                        preview: reader.result as string,
+                        type: 'image'
+                    })
+
+                    if (newPreviews.length === files.length) {
+                        setAttachmentPreviews(prev => [...prev, ...newPreviews])
+                    }
+                }
+                reader.readAsDataURL(file)
+            } else {
+                newPreviews.push({
+                    file,
+                    type: 'file'
+                })
+
                 if (newPreviews.length === files.length) {
-                    setImagePreviews(prev => [...prev, ...newPreviews])
+                    setAttachmentPreviews(prev => [...prev, ...newPreviews])
                 }
             }
-            reader.readAsDataURL(file)
         })
 
-        setImageFiles(prev => [...prev, ...files])
-        form.setValue('images', [...imageFiles, ...files])
+        const currentFiles = form.getValues('images') || []
+        form.setValue('images', [...currentFiles, ...files])
     }
 
-    const removeImage = (index: number) => {
-        setImagePreviews(prev => prev.filter((_, i) => i !== index))
-        const newFiles = imageFiles.filter((_, i) => i !== index)
-        setImageFiles(newFiles)
+    const removeAttachment = (index: number) => {
+        setAttachmentPreviews(prev => prev.filter((_, i) => i !== index))
+        const currentFiles = form.getValues('images') || []
+        const newFiles = currentFiles.filter((_, i) => i !== index)
         form.setValue('images', newFiles)
+    }
+
+    const formatFileSize = (bytes: number) => {
+        if (bytes === 0) return '0 Bytes'
+        const k = 1024
+        const sizes = ['Bytes', 'KB', 'MB', 'GB']
+        const i = Math.floor(Math.log(bytes) / Math.log(k))
+        return Math.round(bytes / Math.pow(k, i) * 100) / 100 + ' ' + sizes[i]
     }
 
     const onSubmit = (values: z.infer<typeof announcementFormSchema>) => {
         makeAnnouncement({
             subject: values.subject,
-            body: values.body
+            body: values.body,
+            attachments: values.images
         }, {
             onSuccess: () => {
                 closeButtonRef.current?.click()
             },
             onSettled: () => {
                 form.reset()
-                setImagePreviews([])
-                setImageFiles([])
+                setAttachmentPreviews([])
             }
         })
     }
@@ -141,46 +166,87 @@ export default function AnnouncementModal() {
                         name="images"
                         render={() => (
                             <FormItem>
-                                <FormLabel>Attachments (Images)</FormLabel>
+                                <FormLabel>Attachments <span className="font-en">(Max 4 files, 10MB each)</span></FormLabel>
                                 <FormControl>
                                     <div className="space-y-4">
                                         <div className="flex items-center gap-2">
                                             <Input
                                                 type="file"
-                                                accept="image/*"
+                                                accept="image/*,.pdf,.doc,.docx,.xls,.xlsx,.txt,.zip"
                                                 multiple
-                                                onChange={handleImageUpload}
+                                                onChange={handleFileUpload}
                                                 className="hidden"
-                                                id="image-upload"
+                                                id="file-upload"
+                                                disabled={attachmentPreviews.length >= 4}
                                             />
-                                            <label htmlFor="image-upload">
+                                            <label htmlFor="file-upload">
                                                 <Button
                                                     type="button"
                                                     variant="outline"
-                                                    onClick={() => document.getElementById('image-upload')?.click()}
+                                                    onClick={() => document.getElementById('file-upload')?.click()}
+                                                    disabled={attachmentPreviews.length >= 4}
+                                                    className="cursor-pointer"
                                                 >
                                                     <Upload className="w-4 h-4 mr-2" />
-                                                    Upload Images
+                                                    Upload Files
                                                 </Button>
                                             </label>
+                                            {attachmentPreviews.length > 0 && (
+                                                <span className="text-xs text-muted-foreground font-en">
+                                                    {attachmentPreviews.length} / 4 files
+                                                </span>
+                                            )}
                                         </div>
 
-                                        {imagePreviews.length > 0 && (
-                                            <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                                                {imagePreviews.map((preview, index) => (
+                                        {attachmentPreviews.length > 0 && (
+                                            <div className="space-y-2">
+                                                {attachmentPreviews.map((item, index) => (
                                                     <div key={index} className="relative group">
-                                                        <img
-                                                            src={preview}
-                                                            alt={`Preview ${index + 1}`}
-                                                            className="w-full h-32 object-cover rounded-md border"
-                                                        />
-                                                        <button
-                                                            type="button"
-                                                            onClick={() => removeImage(index)}
-                                                            className="absolute top-2 right-2 cursor-pointer bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
-                                                        >
-                                                            <X className="w-4 h-4" />
-                                                        </button>
+                                                        {item.type === 'image' ? (
+                                                            <div className="relative border rounded-md p-2 flex items-center gap-3 hover:bg-muted/50 transition-colors">
+                                                                <img
+                                                                    src={item.preview}
+                                                                    alt={item.file.name}
+                                                                    className="w-16 h-16 object-cover rounded border"
+                                                                />
+                                                                <div className="flex-1 min-w-0">
+                                                                    <p className="text-sm font-medium truncate">
+                                                                        {item.file.name}
+                                                                    </p>
+                                                                    <p className="text-xs text-muted-foreground font-en">
+                                                                        {formatFileSize(item.file.size)}
+                                                                    </p>
+                                                                </div>
+                                                                <button
+                                                                    type="button"
+                                                                    onClick={() => removeAttachment(index)}
+                                                                    className="cursor-pointer bg-red-500 text-white rounded-full p-1.5 opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-600"
+                                                                >
+                                                                    <X className="w-4 h-4" />
+                                                                </button>
+                                                            </div>
+                                                        ) : (
+                                                            <div className="relative border rounded-md p-3 flex items-center gap-3 hover:bg-muted/50 transition-colors">
+                                                                <div className="bg-blue-100 dark:bg-blue-900/20 p-2 rounded">
+                                                                    <FileIcon className="w-8 h-8 text-blue-600 dark:text-blue-400" />
+                                                                </div>
+                                                                <div className="flex-1 min-w-0">
+                                                                    <p className="text-sm font-medium truncate">
+                                                                        {item.file.name}
+                                                                    </p>
+                                                                    <p className="text-xs text-muted-foreground font-en">
+                                                                        {formatFileSize(item.file.size)}
+                                                                    </p>
+                                                                </div>
+                                                                <button
+                                                                    type="button"
+                                                                    onClick={() => removeAttachment(index)}
+                                                                    className="cursor-pointer bg-red-500 text-white rounded-full p-1.5 opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-600"
+                                                                >
+                                                                    <X className="w-4 h-4" />
+                                                                </button>
+                                                            </div>
+                                                        )}
                                                     </div>
                                                 ))}
                                             </div>

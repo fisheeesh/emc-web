@@ -88,7 +88,7 @@ export default function ManagementsPage() {
                     hasNextPage={hasEmpNextPage}
                 />
             </div>
-            <div className="w-full">
+            <div id="action_table" className="w-full">
                 <ActionsTable
                     data={allActionPlans}
                     status={actionStatus}
