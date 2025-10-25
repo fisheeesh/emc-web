@@ -97,6 +97,34 @@ export const getEmotionRange = (status: string) => {
     }
 };
 
+export const removeFilesMultiple = async (originalFiles: string[], optimizeFiles: string[] | null) => {
+    try {
+        for (const originalFile of originalFiles) {
+            const originalFilePath = path.join(
+                __dirname,
+                '../../..',
+                '/uploads/images',
+                originalFile
+            )
+            await unlink(originalFilePath)
+        }
+
+        if (optimizeFiles) {
+            for (const optimizeFile of optimizeFiles) {
+                const optimizeFilePath = path.join(
+                    __dirname,
+                    '../../..',
+                    '/uploads/optimize',
+                    optimizeFile
+                )
+                await unlink(optimizeFilePath)
+            }
+        }
+    } catch (error) {
+        console.log(error)
+    }
+}
+
 export const removeFiles = async (originalFile: string, optimizeFile?: string | null) => {
     try {
         const originalFilePath = path.join(
@@ -240,22 +268,11 @@ Return ONLY valid JSON in this exact format (no markdown, no extra text):
     }
 }
 
-/**
- * Convert markdown content to HTML for email rendering
- * Handles bold, italic, links, lists, tables, highlights, admonitions, etc.
- */
 export const convertMarkdownToHTML = (markdown: string): string => {
-    // Pre-process markdown to handle custom syntax
     let processedMarkdown = markdown;
 
-    // Convert ==highlight== to <mark>highlight</mark>
     processedMarkdown = processedMarkdown.replace(/==([^=]+)==/g, '<mark>$1</mark>');
-
-    // Convert ~~strikethrough~~ to <del>strikethrough</del>
     processedMarkdown = processedMarkdown.replace(/~~([^~]+)~~/g, '<del>$1</del>');
-
-    // Convert admonitions :::type content ::: to styled divs
-    // Supports: tip, note, info, warning, danger, caution
     processedMarkdown = processedMarkdown.replace(
         /:::(\w+)\s*\n([\s\S]*?):::/g,
         (match, type, content) => {
@@ -267,26 +284,17 @@ export const convertMarkdownToHTML = (markdown: string): string => {
         }
     );
 
-    // Configure marked options
     marked.setOptions({
-        // Convert \n to <br>
         breaks: true,
-        // GitHub Flavored Markdown
         gfm: true,
     });
 
-    // Convert markdown to HTML
     const html = marked(processedMarkdown);
-
-    // Add inline styles for better email compatibility
     const styledHTML = addEmailStyles(html as string);
 
     return styledHTML;
 };
 
-/**
- * Get configuration for admonition types
- */
 const getAdmonitionConfig = (type: string): { title: string; icon: string; color: string; bgColor: string } => {
     const configs: Record<string, { title: string; icon: string; color: string; bgColor: string }> = {
         tip: { title: 'Tip', icon: '💡', color: '#0066cc', bgColor: '#e3f2fd' },
@@ -300,12 +308,7 @@ const getAdmonitionConfig = (type: string): { title: string; icon: string; color
     return configs[type] || configs.note;
 };
 
-/**
- * Add inline CSS styles for email compatibility
- * Most email clients don't support external CSS or <style> tags well
- */
 const addEmailStyles = (html: string): string => {
-    // First, style admonitions with their specific colors
     html = html.replace(
         /<div class="admonition admonition-(\w+)" data-type="(\w+)">/g,
         (match, type) => {
@@ -325,54 +328,28 @@ const addEmailStyles = (html: string): string => {
     );
 
     return html
-        // Style headers - more formal
         .replace(/<h1>/g, '<h1 style="color: #1a1a1a; font-size: 28px; font-weight: 600; margin: 24px 0 16px 0; line-height: 1.3; font-family: -apple-system, BlinkMacSystemFont, \'Segoe UI\', Arial, sans-serif;">')
         .replace(/<h2>/g, '<h2 style="color: #2d2d2d; font-size: 22px; font-weight: 600; margin: 20px 0 12px 0; line-height: 1.4; font-family: -apple-system, BlinkMacSystemFont, \'Segoe UI\', Arial, sans-serif;">')
         .replace(/<h3>/g, '<h3 style="color: #333333; font-size: 18px; font-weight: 600; margin: 16px 0 10px 0; line-height: 1.4; font-family: -apple-system, BlinkMacSystemFont, \'Segoe UI\', Arial, sans-serif;">')
         .replace(/<h4>/g, '<h4 style="color: #404040; font-size: 16px; font-weight: 600; margin: 14px 0 8px 0; line-height: 1.5; font-family: -apple-system, BlinkMacSystemFont, \'Segoe UI\', Arial, sans-serif;">')
-
-        // Style paragraphs - professional spacing
         .replace(/<p>/g, '<p style="color: #333333; font-size: 15px; line-height: 1.7; margin: 0 0 12px 0; font-family: -apple-system, BlinkMacSystemFont, \'Segoe UI\', Arial, sans-serif;">')
-
-        // Style links - professional blue
         .replace(/<a /g, '<a style="color: #0066cc; text-decoration: none; border-bottom: 1px solid #0066cc;" ')
-
-        // Style bold - darker for emphasis
         .replace(/<strong>/g, '<strong style="font-weight: 600; color: #1a1a1a;">')
-
-        // Style italic
         .replace(/<em>/g, '<em style="font-style: italic; color: #555555;">')
-
-        // Style highlight - yellow background
         .replace(/<mark>/g, '<mark style="background-color: #fff59d; color: #000000; padding: 2px 4px; border-radius: 2px;">')
-
-        // Style strikethrough
         .replace(/<del>/g, '<del style="text-decoration: line-through; color: #999999;">')
-
-        // Style underline
         .replace(/<u>/g, '<u style="text-decoration: underline; text-decoration-color: #333333;">')
-
-        // Style lists - professional spacing
         .replace(/<ul>/g, '<ul style="margin: 12px 0; padding-left: 28px; font-family: -apple-system, BlinkMacSystemFont, \'Segoe UI\', Arial, sans-serif;">')
         .replace(/<ol>/g, '<ol style="margin: 12px 0; padding-left: 28px; font-family: -apple-system, BlinkMacSystemFont, \'Segoe UI\', Arial, sans-serif;">')
         .replace(/<li>/g, '<li style="color: #333333; font-size: 15px; margin-bottom: 6px; line-height: 1.7;">')
-
-        // Style blockquotes - formal
         .replace(/<blockquote>/g, '<blockquote style="border-left: 3px solid #0066cc; margin: 16px 0; padding: 12px 20px; color: #555555; font-style: italic; background-color: #f8f9fa; border-radius: 4px;">')
-
-        // Style tables - professional
         .replace(/<table>/g, '<table style="border-collapse: collapse; width: 100%; margin: 16px 0; font-family: -apple-system, BlinkMacSystemFont, \'Segoe UI\', Arial, sans-serif; border: 1px solid #dddddd;">')
         .replace(/<thead>/g, '<thead style="background-color: #f5f5f5;">')
         .replace(/<th>/g, '<th style="border: 1px solid #dddddd; padding: 12px; background-color: #f5f5f5; font-weight: 600; text-align: left; color: #1a1a1a; font-size: 14px;">')
         .replace(/<td>/g, '<td style="border: 1px solid #dddddd; padding: 12px; color: #333333; font-size: 14px;">')
-
-        // Style horizontal rules
         .replace(/<hr>/g, '<hr style="border: none; border-top: 1px solid #dddddd; margin: 24px 0;">');
 };
 
-/**
- * Wrap the HTML content in a formal, professional email template
- */
 export const wrapInEmailTemplate = (htmlContent: string, subject: string): string => {
     return `
 <!DOCTYPE html>

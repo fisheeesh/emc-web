@@ -7,11 +7,13 @@ import { EmailQueue } from "../../jobs/queues/email-queue";
 import { getAdminUserData } from "../../services/admin-services";
 import { getEmployeeById } from "../../services/auth-services";
 import { getAllDepartmentsData, getEmployeeEmails } from "../../services/system-service";
-import { checkEmployeeIfNotExits, createHttpErrors } from "../../utils/check";
+import { checkEmployeeIfNotExits, checkUploadFile, createHttpErrors } from "../../utils/check";
 import { completion_body, completion_subject, request_body, request_subject } from "../../utils/email-templates";
+import { removeFilesMultiple } from "../../utils/helplers";
 
 interface CustomRequest extends Request {
-    employeeId?: number
+    employeeId?: number,
+    files?: any
 }
 
 export const testAdmin = async (req: CustomRequest, res: Response, next: NextFunction) => {
@@ -378,11 +380,17 @@ export const makeAnnouncement = [
     body("body", "Email Body is required.").trim().notEmpty(),
     async (req: CustomRequest, res: Response, next: NextFunction) => {
         const errors = validationResult(req).array({ onlyFirstError: true })
-        if (errors.length > 0) return next(createHttpErrors({
-            message: errors[0].msg,
-            status: 400,
-            code: errorCodes.invalid
-        }))
+        if (errors.length > 0) {
+            if (req.files && req.files.length > 0) {
+                const originalFiles = req.files.map((file: any) => file.filename)
+                await removeFilesMultiple(originalFiles, null)
+            }
+            return next(createHttpErrors({
+                message: errors[0].msg,
+                status: 400,
+                code: errorCodes.invalid
+            }))
+        }
         const empId = req.employeeId
         const emp = await prisma.employee.findUnique({
             where: { id: empId },
@@ -396,6 +404,7 @@ export const makeAnnouncement = [
         checkEmployeeIfNotExits(emp)
 
         const { subject, body } = req.body;
+        checkUploadFile(req.files && req.files.length > 0)
 
         let emails: string[] = []
 
@@ -408,12 +417,21 @@ export const makeAnnouncement = [
             code: errorCodes.invalid
         }))
 
+        const attachments = req.files && req.files.length > 0
+            ? (req.files as Express.Multer.File[]).map(file => ({
+                filename: file.originalname,
+                path: file.path,
+                contentType: file.mimetype
+            }))
+            : undefined;
+
         await EmailQueue.add("announcement-email", {
             customName: `${emp!.fullName} | ${emp!.department.name}`,
             subject,
             body,
             to: emails,
-            isMarkdown: true
+            isMarkdown: true,
+            attachments
         },
             {
                 attempts: 3,

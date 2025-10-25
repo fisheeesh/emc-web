@@ -4,6 +4,7 @@ import { generateAIAnalysis, generateAIRecommendation, regenerateAIAnalysis } fr
 import { getAttendanceOverView, getCheckInHours, getDailyAttendance } from "../../../controllers/admin/attendance-controller"
 import { deleteCriticalEmpById, deleteWatchlistEmpById, getAllCriticalEmps, getAllWatchlistEmps, getLeaderboards, getMoodOverview, getSenitmentsComparison } from "../../../controllers/admin/sentiments-controller"
 import { setMaintenance } from "../../../controllers/admin/system-controller"
+import upload, { uploadAttachments } from "../../../middlewares/upload-files-middleware"
 
 const router = express.Router()
 
@@ -40,7 +41,7 @@ router.post("/action-plans", createActionPlan)
 router.patch("/action-plans", markAsCompletedActionPlan)
 
 //* Make Announcement
-router.post("/make-announcement", makeAnnouncement)
+router.post("/make-announcement", uploadAttachments.array('attachments', 4), makeAnnouncement)
 
 
 export default router
