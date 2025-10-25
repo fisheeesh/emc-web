@@ -14,7 +14,7 @@ import {
     ChartTooltip,
     ChartTooltipContent,
 } from "@/components/ui/chart"
-import Empty from "../ui/empty"
+import Empty from "@/components/ui/empty"
 
 const chartConfig = {
     responseTime: {

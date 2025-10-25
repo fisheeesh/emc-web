@@ -9,16 +9,12 @@ export const LogInSchema = z.object({
         .regex(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/, { message: "Invalid email format" }),
     password: z.string()
         .min(1, { message: "Password is required" })
-        .min(8, { message: "Password must be at least 8 digit" })
-        .regex(/^\d+$/, "Password must be numbers"),
-    // password: z.string()
-    //     .min(1, { message: "Password is required" })
-    //     .min(8, { message: "Password must be at least 8 characters" })
-    //     .max(16, { message: "Password must be at most 16 characters" })
-    //     .regex(/[A-Z]/, { message: "Password must contain at least one uppercase letter" })
-    //     .regex(/[a-z]/, { message: "Password must contain at least one lowercase letter" })
-    //     .regex(/\d/, { message: "Password must contain at least one number" })
-    //     .regex(/[@$!%*?&#^()_+=\-[\]{}|\\:;"'<>,.?/~`]/, { message: "Password must contain at least one special character" }),
+        .min(8, { message: "Password must be at least 8 characters" })
+        .max(16, { message: "Password must be at most 16 characters" })
+        .regex(/[A-Z]/, { message: "Password must contain at least one uppercase letter" })
+        .regex(/[a-z]/, { message: "Password must contain at least one lowercase letter" })
+        .regex(/\d/, { message: "Password must contain at least one number" })
+        .regex(/[@$!%*?&#^()_+=\-[\]{}|\\:;"'<>,.?/~`]/, { message: "Password must contain at least one special character" }),
 })
 
 export const ForgotPasswordSchema = z.object({
