@@ -4,29 +4,38 @@ dotenv.config();
 import { Worker } from "bullmq";
 import { Resend } from "resend";
 import { redis } from "../../config/redis-client";
+import { convertMarkdownToHTML, wrapInEmailTemplate } from "../../utils/helplers";
 
 const resend = new Resend(process.env.RESEND_API_KEY!);
-const FROM = process.env.SENDER_EMAIL || "no-reply@emotioncheckinsystem.com"
+const FROM = process.env.SENDER_EMAIL || "no-reply@emotioncheckinsystem.com";
 
 type JobPayload = {
+    customName?: string,
     subject: string,
     body: string,
-    to: string[]
+    to: string[],
+    isMarkdown?: boolean
 };
 
 const emailWorker = new Worker<JobPayload>(
     "emailQueue",
     async (job) => {
-        const allowedJobs = ["notify-email", "send-otp-email"];
+        const allowedJobs = ["notify-email", "send-otp-email", "announcement-email"];
         if (!allowedJobs.includes(job.name)) return;
 
-        const { subject, body, to } = job.data;
+        const { customName = "EMC", subject, body, to, isMarkdown = false } = job.data;
+
+        let htmlBody = body;
+        if (isMarkdown) {
+            const convertedHTML = convertMarkdownToHTML(body);
+            htmlBody = wrapInEmailTemplate(convertedHTML, subject);
+        }
 
         await resend.emails.send({
-            from: FROM,
+            from: `${customName} <${FROM}>`,
             to,
             subject,
-            html: body,
+            html: htmlBody,
         });
     },
     { connection: redis, concurrency: 5 }
