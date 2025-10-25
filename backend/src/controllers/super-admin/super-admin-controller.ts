@@ -455,13 +455,20 @@ export const editEmpCredentials = [
         .trim()
         .isEmail()
         .withMessage("Invalid email format."),
-    body("password")
-        .optional({ nullable: true, checkFalsy: true })
+    body("password", "Password must meet all requirements.")
         .trim()
-        .matches(/^[\d]+$/)
-        .withMessage("Password must contain only digits.")
-        .isLength({ min: 8, max: 8 })
-        .withMessage("Password must be exactly 8 digits."),
+        .notEmpty()
+        .withMessage("Password is required")
+        .isLength({ min: 8, max: 16 })
+        .withMessage("Password must be between 8 and 16 characters")
+        .matches(/[A-Z]/)
+        .withMessage("Password must contain at least one uppercase letter")
+        .matches(/[a-z]/)
+        .withMessage("Password must contain at least one lowercase letter")
+        .matches(/\d/)
+        .withMessage("Password must contain at least one number")
+        .matches(/[@$!%*?&#^()_+=\-[\]{}|\\:;"'<>,.?/~`]/)
+        .withMessage("Password must contain at least one special character"),
     async (req: CustomRequest, res: Response, next: NextFunction) => {
         const errors = validationResult(req).array({ onlyFirstError: true })
         if (errors.length > 0) {

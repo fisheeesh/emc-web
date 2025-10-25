@@ -33,7 +33,20 @@ export const createNewEmployee = [
         .withMessage("Email is required.")
         .isEmail()
         .withMessage("Invalid email format."),
-    body("password", "Password must be at least 8 digits.").trim().notEmpty().matches(/^[\d]+$/).isLength({ min: 8, max: 8 }),
+    body("password", "Password must meet all requirements.")
+        .trim()
+        .notEmpty()
+        .withMessage("Password is required")
+        .isLength({ min: 8, max: 16 })
+        .withMessage("Password must be between 8 and 16 characters")
+        .matches(/[A-Z]/)
+        .withMessage("Password must contain at least one uppercase letter")
+        .matches(/[a-z]/)
+        .withMessage("Password must contain at least one lowercase letter")
+        .matches(/\d/)
+        .withMessage("Password must contain at least one number")
+        .matches(/[@$!%*?&#^()_+=\-[\]{}|\\:;"'<>,.?/~`]/)
+        .withMessage("Password must contain at least one special character"),
     body("position", "Position is required.").trim().notEmpty(),
     body("role", "Role is required.").trim().notEmpty().escape()
         .custom(value => {
@@ -552,12 +565,14 @@ export const bulkRegister = [
                     continue;
                 }
 
-                //* Validate password (at least 8 characters, only numbers)
-                if (record.password.length < 8 || !/^\d+$/.test(record.password)) {
+                //* Validate password
+                const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&#^()_+=\-[\]{}|\\:;"'<>,.?/~`]).{8,16}$/;
+
+                if (!passwordRegex.test(record.password)) {
                     results.push({
                         status: "failed",
                         email: record.email,
-                        error: "Password must be at least 8 numbers",
+                        error: "Password must be 8-16 characters with at least one uppercase, one lowercase, one number, and one special character",
                     });
                     failureCount++;
                     continue;

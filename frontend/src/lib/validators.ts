@@ -10,7 +10,15 @@ export const LogInSchema = z.object({
     password: z.string()
         .min(1, { message: "Password is required" })
         .min(8, { message: "Password must be at least 8 digit" })
-        .regex(/^\d+$/, "Password must be numbers")
+        .regex(/^\d+$/, "Password must be numbers"),
+    // password: z.string()
+    //     .min(1, { message: "Password is required" })
+    //     .min(8, { message: "Password must be at least 8 characters" })
+    //     .max(16, { message: "Password must be at most 16 characters" })
+    //     .regex(/[A-Z]/, { message: "Password must contain at least one uppercase letter" })
+    //     .regex(/[a-z]/, { message: "Password must contain at least one lowercase letter" })
+    //     .regex(/\d/, { message: "Password must contain at least one number" })
+    //     .regex(/[@$!%*?&#^()_+=\-[\]{}|\\:;"'<>,.?/~`]/, { message: "Password must contain at least one special character" }),
 })
 
 export const ForgotPasswordSchema = z.object({
@@ -32,11 +40,19 @@ export const ConfirmPasswordSchema = z.object({
     password: z.string()
         .min(1, { message: "Password is required" })
         .min(8, { message: "Password must be at least 8 characters" })
-        .regex(/^\d+$/, "Password must be numbers"),
+        .max(16, { message: "Password must be at most 16 characters" })
+        .regex(/[A-Z]/, { message: "Password must contain at least one uppercase letter" })
+        .regex(/[a-z]/, { message: "Password must contain at least one lowercase letter" })
+        .regex(/\d/, { message: "Password must contain at least one number" })
+        .regex(/[@$!%*?&#^()_+=\-[\]{}|\\:;"'<>,.?/~`]/, { message: "Password must contain at least one special character" }),
     confirmPassword: z.string()
-        .min(1, { message: "Confirm password is required" })
-        .min(8, { message: "Confirm password must be at least 8 characters" })
-        .regex(/^\d+$/, "Password must be numbers")
+        .min(1, { message: "Password is required" })
+        .min(8, { message: "Password must be at least 8 characters" })
+        .max(16, { message: "Password must be at most 16 characters" })
+        .regex(/[A-Z]/, { message: "Password must contain at least one uppercase letter" })
+        .regex(/[a-z]/, { message: "Password must contain at least one lowercase letter" })
+        .regex(/\d/, { message: "Password must contain at least one number" })
+        .regex(/[@$!%*?&#^()_+=\-[\]{}|\\:;"'<>,.?/~`]/, { message: "Password must contain at least one special character" })
 }).refine(data => data.password === data.confirmPassword, {
     message: "Passwords do not match",
     path: ["confirmPassword"]
@@ -56,8 +72,12 @@ export const createEmpSchema = z.object({
         .regex(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/, { message: "Invalid email format" }),
     password: z.string()
         .min(1, { message: "Password is required" })
-        .min(8, { message: "Password must be at least 8 digit" })
-        .regex(/^\d+$/, "Password must be numbers"),
+        .min(8, { message: "Password must be at least 8 characters" })
+        .max(16, { message: "Password must be at most 16 characters" })
+        .regex(/[A-Z]/, { message: "Password must contain at least one uppercase letter" })
+        .regex(/[a-z]/, { message: "Password must contain at least one lowercase letter" })
+        .regex(/\d/, { message: "Password must contain at least one number" })
+        .regex(/[@$!%*?&#^()_+=\-[\]{}|\\:;"'<>,.?/~`]/, { message: "Password must contain at least one special character" }),
     firstName: z.string().min(1, "First name is required"),
     lastName: z.string().min(1, "First name is required"),
     phone: z.string().regex(/^\d{9,11}$/, "Phone number must be 9 to 11 digits"),
@@ -112,7 +132,15 @@ export const credentialSchema = z.object({
         message: "Please select what you want to edit",
     }),
     email: z.string().email("Invalid email address").optional().or(z.literal("")),
-    newPassword: z.string().min(8, "Password must be at least 8 characters").optional().or(z.literal("")),
+    newPassword: z.string()
+        .min(1, { message: "Password is required" })
+        .min(8, { message: "Password must be at least 8 characters" })
+        .max(16, { message: "Password must be at most 16 characters" })
+        .regex(/[A-Z]/, { message: "Password must contain at least one uppercase letter" })
+        .regex(/[a-z]/, { message: "Password must contain at least one lowercase letter" })
+        .regex(/\d/, { message: "Password must contain at least one number" })
+        .regex(/[@$!%*?&#^()_+=\-[\]{}|\\:;"'<>,.?/~`]/, { message: "Password must contain at least one special character" })
+        .optional().or(z.literal("")),
     confirmPassword: z.string().optional().or(z.literal("")),
 }).refine((data) => {
     if (data.editType === "email") {
