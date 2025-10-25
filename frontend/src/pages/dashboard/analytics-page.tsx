@@ -1,8 +1,8 @@
 import { actionAvgResponseTimeQuery, actionPlanStatusQuery, depHeatMapQuery, topConcernWordsQuery } from "@/api/super-admin-query";
-import { ActionPlanStatusChart } from "@/components/temp/action-plan-status";
-import { DepartmentHeatmap } from "@/components/temp/dep-heat-map";
-import { ResponseTimeChart } from "@/components/temp/response-time-chart";
-import { TopConcernsWordCloud } from "@/components/temp/top-concern-words";
+import { ActionPlanStatusChart } from "@/components/dashboard/action-plan-status";
+import { DepartmentHeatmap } from "@/components/dashboard/dep-heat-map";
+import { ResponseTimeChart } from "@/components/dashboard/response-time-chart";
+import { TopConcernsWordCloud } from "@/components/dashboard/top-concern-words";
 import useTitle from "@/hooks/ui/use-title";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { useSearchParams } from "react-router";

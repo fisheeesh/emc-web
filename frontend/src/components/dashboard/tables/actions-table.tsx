@@ -36,7 +36,7 @@ export default function ActionsTable({ data, status, error, isFetchingNextPage, 
     const { deleteActionPlan, deletingActionPlan } = useDeleteActionPlan()
 
     return (
-        <Card className="rounded-md flex flex-col gap-5">
+        <Card id="action_table" className="rounded-md flex flex-col gap-5">
             <CardHeader className="space-y-2">
                 <div className="flex flex-col xl:flex-row gap-3 xl:gap-0 justify-between">
                     <div className="flex flex-col items-start gap-2 tracking-wide">

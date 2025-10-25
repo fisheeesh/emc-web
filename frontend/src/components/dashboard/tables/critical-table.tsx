@@ -37,7 +37,7 @@ export default function CriticalTable({ data, status, error, isFetchingNextPage,
     const { deleteCriticalEmp, deletingCriticalEmp } = useDeleteCriticalEmp()
 
     return (
-        <Card className="rounded-md border-destructive border-2 flex flex-col gap-5">
+        <Card id="critical_table" className="rounded-md border-destructive border-2 flex flex-col gap-5">
             <CardHeader className="space-y-2">
                 <div className="flex flex-col xl:flex-row gap-3 xl:gap-0 justify-between">
                     <div className="flex flex-col items-start gap-2 tracking-wide">

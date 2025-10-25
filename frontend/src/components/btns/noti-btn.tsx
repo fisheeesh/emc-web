@@ -7,22 +7,27 @@ import {
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import useDeleteNoti from "@/hooks/ui/use-delete-noti";
+import useMarkAsRead from "@/hooks/ui/use-read-noti";
 import { IMG_URL } from "@/lib/constants";
+import { cn } from "@/lib/utils";
 import useNotiStore from "@/store/noti-store";
 import { Bell, BellOff, Eye, Trash2 } from "lucide-react";
 import moment from "moment";
 import { useState } from "react";
+import { useLocation, useNavigate } from "react-router";
 import { Badge } from "../ui/badge";
 import { Button } from "../ui/button";
-import useMarkAsRead from "@/hooks/ui/use-read-noti";
-import useDeleteNoti from "@/hooks/ui/use-delete-noti";
-import { cn } from "@/lib/utils";
+import useUserStore from "@/store/user-store";
 
 export default function NotiBtn() {
     const { notifications } = useNotiStore()
+    const { user } = useUserStore()
     const { markAsRead } = useMarkAsRead()
     const { deleteNoti } = useDeleteNoti()
     const [filter, setFilter] = useState<"all" | "unread">("all")
+    const location = useLocation()
+    const navigate = useNavigate()
 
     const handleMarkAsRead = (e: React.MouseEvent, notiId: number) => {
         e.preventDefault()
@@ -34,6 +39,30 @@ export default function NotiBtn() {
         e.preventDefault()
         e.stopPropagation()
         deleteNoti(notiId)
+    }
+
+    const handleNotiClick = () => {
+        //? Determine route and section based on user role
+        const targetRoute = user?.role === "SUPERADMIN" ? "/dashboard/managements" : "/dashboard/sentiments"
+        const targetSection = user?.role === "SUPERADMIN" ? "action_table" : "critical_table"
+
+        if (location.pathname === targetRoute) {
+            //? Already on target route, just scroll to the section
+            const element = document.getElementById(targetSection)
+            if (element) {
+                element.scrollIntoView({ behavior: "smooth", block: "start" })
+            }
+        } else {
+            //? Navigate to target route and scroll after navigation
+            navigate(targetRoute)
+            //? Use setTimeout to wait for navigation to complete before scrolling
+            setTimeout(() => {
+                const element = document.getElementById(targetSection)
+                if (element) {
+                    element.scrollIntoView({ behavior: "smooth", block: "start" })
+                }
+            }, 100)
+        }
     }
 
     //? Get unread notifications count
@@ -93,9 +122,9 @@ export default function NotiBtn() {
                         filteredNotifications.map((item) => (
                             <DropdownMenuItem
                                 key={item.id}
-                                onSelect={(e) => e.preventDefault()}
+                                onSelect={handleNotiClick}
                                 className={cn(
-                                    "flex items-start gap-3 p-3 rounded-md hover:bg-muted/50 group relative",
+                                    "flex items-start gap-3 p-3 rounded-md hover:bg-muted/50 group relative cursor-pointer",
                                     item.status === "SENT" && "bg-blue-50 dark:bg-blue-950/20 border border-blue-200 dark:border-blue-900"
                                 )}
                             >
