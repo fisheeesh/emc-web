@@ -72,7 +72,6 @@ export function DepartmentHeatmap({ depHeatmapData }: { depHeatmapData: DepHeatM
                     </div>
                 </div>
 
-                {/* Heatmap Grid */}
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
                     {depHeatmapData.map((dept) => (
                         <div
@@ -105,8 +104,7 @@ export function DepartmentHeatmap({ depHeatmapData }: { depHeatmapData: DepHeatM
                         </div>
                     ))}
                 </div>
-
-                {/* Legend */}
+                
                 <div className="mt-6 flex flex-wrap items-center gap-4 text-xs">
                     <span className="font-semibold text-gray-700 dark:text-gray-300">Status:</span>
                     <div className="flex items-center gap-1.5">

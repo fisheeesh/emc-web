@@ -48,13 +48,11 @@ export default function AttendanceDashboardPage() {
 
     return (
         <section className="flex flex-col justify-center items-center w-full gap-3">
-            {/* Daily Attendance Cards */}
             <div className="flex flex-col lg:flex-row items-center justify-between w-full gap-3">
                 <div className="flex lg:flex-col gap-3 w-full lg:w-1/3">
                     <DisplayCard data={attendanceData.totalEmp} isLoading={isAttendanceRefetching} type='total' />
                     <DisplayCard data={attendanceData.totalPresent} isLoading={isAttendanceRefetching} type='present' />
                 </div>
-                {/* Daily Attendance Bar Chart */}
                 <DailyAttendanceChart dataNum={attendanceData.data} dataPerc={attendanceData.percentages} />
             </div>
 

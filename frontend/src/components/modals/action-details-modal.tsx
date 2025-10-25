@@ -70,9 +70,7 @@ export default function ActionDetailsModal({ action, onClose }: { action: Action
                     </DialogDescription>
                 </DialogHeader>
 
-                {/* Action Plan Details Cards */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 my-6">
-                    {/* Action ID */}
                     <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4 shadow-sm">
                         <div className="flex items-center gap-2 mb-2">
                             <AiOutlineIdcard className="text-indigo-600" size={18} />
@@ -81,7 +79,6 @@ export default function ActionDetailsModal({ action, onClose }: { action: Action
                         <p className="text-sm font-en text-gray-600 dark:text-gray-400 truncate">{action.id}</p>
                     </div>
 
-                    {/* Victim */}
                     <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4 shadow-sm">
                         <div className="flex items-center gap-2 mb-2">
                             <MdOutlineAddReaction className="text-green-600" size={18} />
@@ -90,7 +87,6 @@ export default function ActionDetailsModal({ action, onClose }: { action: Action
                         <p className="text-sm text-gray-600 dark:text-gray-400">{action.quickAction}</p>
                     </div>
 
-                    {/* Department */}
                     <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4 shadow-sm">
                         <div className="flex items-center gap-2 mb-2">
                             <FaRegBuilding className="text-blue-600" size={18} />
@@ -99,7 +95,6 @@ export default function ActionDetailsModal({ action, onClose }: { action: Action
                         <p className="text-sm text-gray-600 dark:text-gray-400">{action.department.name}</p>
                     </div>
 
-                    {/* Assign To */}
                     <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4 shadow-sm">
                         <div className="flex items-center gap-2 mb-2">
                             <FaRegSadTear className="text-red-600" size={18} />
@@ -108,7 +103,6 @@ export default function ActionDetailsModal({ action, onClose }: { action: Action
                         <p className="text-sm text-gray-600 dark:text-gray-400">{action.criticalEmployee.employee.fullName}</p>
                     </div>
 
-                    {/* Contact */}
                     <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4 shadow-sm">
                         <div className="flex items-center gap-2 mb-2">
                             <MdOutlineMailOutline className="text-purple-600" size={18} />
@@ -117,7 +111,6 @@ export default function ActionDetailsModal({ action, onClose }: { action: Action
                         <p className="text-sm text-gray-600 dark:text-gray-400">{action.contact}</p>
                     </div>
 
-                    {/* Priority */}
                     <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4 shadow-sm">
                         <div className="flex items-center gap-2 mb-2">
                             <IoPersonOutline className="text-teal-600" size={18} />
@@ -126,7 +119,6 @@ export default function ActionDetailsModal({ action, onClose }: { action: Action
                         <p className="text-sm text-gray-600 dark:text-gray-400">{action.assignTo}</p>
                     </div>
 
-                    {/* Type */}
                     <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4 shadow-sm">
                         <div className="flex items-center gap-2 mb-2">
                             <LuFlagTriangleRight className="text-indigo-600" size={18} />
@@ -135,7 +127,6 @@ export default function ActionDetailsModal({ action, onClose }: { action: Action
                         <CustomBadge value={action.type} />
                     </div>
 
-                    {/* Due Date */}
                     <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4 shadow-sm">
                         <div className="flex items-center gap-2 mb-2">
                             <MdOutlineStars className="text-orange-600" size={18} />
@@ -144,7 +135,6 @@ export default function ActionDetailsModal({ action, onClose }: { action: Action
                         <CustomBadge value={action.priority} />
                     </div>
 
-                    {/* Quick Action */}
                     <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4 shadow-sm">
                         <div className="flex items-center gap-2 mb-2">
                             <MdOutlineCalendarMonth className="text-rose-600" size={18} />
@@ -161,7 +151,6 @@ export default function ActionDetailsModal({ action, onClose }: { action: Action
                     </div>
                 </div>
 
-                {/* Action Notes */}
                 <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-5 shadow-sm mb-6">
                     <h4 className="font-semibold text-base mb-3 flex items-center gap-2">
                         <GiGlassCelebration className="text-amber-600" size={18} />
@@ -172,7 +161,6 @@ export default function ActionDetailsModal({ action, onClose }: { action: Action
                     </div>
                 </div>
 
-                {/* Follow Up Notes */}
                 <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-5 shadow-sm mb-6">
                     <h4 className="font-semibold text-base mb-3 flex items-center gap-2">
                         <Clock className="text-indigo-600" size={20} />
@@ -183,7 +171,6 @@ export default function ActionDetailsModal({ action, onClose }: { action: Action
                     </div>
                 </div>
 
-                {/* Admin Form */}
                 {user?.role === 'SUPERADMIN' && (
                     <div className="bg-blue-50 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-800 rounded-lg p-5 shadow-sm">
                         <Form {...form}>

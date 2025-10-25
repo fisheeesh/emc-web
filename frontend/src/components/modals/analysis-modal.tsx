@@ -130,17 +130,13 @@ export default function AIAnalysisModal({ analysis: initialAnalysis, empName, cr
             {!analysis && !showProgressBar ? (
                 <div className="min-h-[500px] flex flex-col items-center justify-center p-8">
                     <div className="relative mb-8">
-                        {/* Animated rings */}
                         <div className="absolute inset-0 rounded-full bg-gradient-to-r from-purple-400 via-pink-500 to-blue-500 opacity-20 blur-2xl animate-pulse"></div>
                         <div className="absolute inset-0 rounded-full bg-gradient-to-r from-purple-400 via-pink-500 to-blue-500 opacity-10 blur-3xl animate-pulse" style={{ animationDelay: '1s' }}></div>
-
-                        {/* Main button with shimmer effect */}
                         <div className="relative">
                             <Button
                                 onClick={handleGenerateAnalysis}
                                 className="relative cursor-pointer h-32 w-32 rounded-full bg-gradient-to-r from-purple-500 via-pink-500 to-blue-500 hover:from-purple-600 hover:via-pink-600 hover:to-blue-600 shadow-2xl transition-all duration-300 hover:scale-105 overflow-hidden group"
                             >
-                                {/* Shimmer effect */}
                                 <div className="absolute inset-0 -translate-x-full animate-shimmer bg-gradient-to-r from-transparent via-white/30 to-transparent group-hover:translate-x-full transition-transform duration-1000"></div>
 
                                 <IoSparklesOutline className="text-5xl text-white relative z-10" />
@@ -174,7 +170,6 @@ export default function AIAnalysisModal({ analysis: initialAnalysis, empName, cr
             ) : showProgressBar ? (
                 <div className="min-h-[500px] flex flex-col items-center justify-center p-8">
                     <div className="relative mb-8">
-                        {/* Spinning gradient ring */}
                         <div className="absolute inset-0 rounded-full bg-gradient-to-r from-purple-400 via-pink-500 to-blue-500 opacity-30 blur-xl animate-spin-slow"></div>
 
                         <div className="relative h-32 w-32 rounded-full bg-background flex items-center justify-center border-4 border-muted">
@@ -192,7 +187,6 @@ export default function AIAnalysisModal({ analysis: initialAnalysis, empName, cr
                         <span className="font-semibold text-foreground">{empName}</span>
                     </p>
 
-                    {/* Progress bar */}
                     <div className="w-full max-w-md mb-4">
                         <div className="h-2 bg-muted rounded-full overflow-hidden">
                             <div
@@ -234,13 +228,11 @@ export default function AIAnalysisModal({ analysis: initialAnalysis, empName, cr
                     </DialogHeader>
 
                     <div id="analysis" className="space-y-6 mt-4 font-en">
-                        {/* Week Range */}
                         <div className="bg-muted/50 rounded-lg p-4">
                             <p className="text-sm text-muted-foreground">Analysis Period</p>
                             <p className="text-lg font-semibold font-en">{analysis?.weekRange}</p>
                         </div>
 
-                        {/* Overall Mood */}
                         <div className="space-y-2">
                             <h3 className="text-lg font-semibold flex items-center gap-2">
                                 <span className="h-2 w-2 rounded-full bg-purple-500"></span>
@@ -251,7 +243,6 @@ export default function AIAnalysisModal({ analysis: initialAnalysis, empName, cr
                             </div>
                         </div>
 
-                        {/* Mood Trend */}
                         <div className="space-y-2">
                             <h3 className="text-lg font-semibold flex items-center gap-2">
                                 <span className="h-2 w-2 rounded-full bg-pink-500"></span>
@@ -262,7 +253,6 @@ export default function AIAnalysisModal({ analysis: initialAnalysis, empName, cr
                             </div>
                         </div>
 
-                        {/* Key Insights */}
                         <div className="space-y-2">
                             <h3 className="text-lg font-semibold flex items-center gap-2">
                                 <span className="h-2 w-2 rounded-full bg-blue-500"></span>
@@ -278,7 +268,6 @@ export default function AIAnalysisModal({ analysis: initialAnalysis, empName, cr
                             </div>
                         </div>
 
-                        {/* Recommendations */}
                         <div className="space-y-2">
                             <h3 className="text-lg font-semibold flex items-center gap-2">
                                 <IoSparklesOutline className="text-amber-500" />

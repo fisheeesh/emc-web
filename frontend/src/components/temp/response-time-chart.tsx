@@ -64,7 +64,6 @@ export function ResponseTimeChart({ chartData }: { chartData: AvgResponseTime[] 
                 </CardDescription>
             </CardHeader>
             <CardContent>
-                {/* Key Stats */}
                 <div className="grid grid-cols-3 gap-3 mb-6">
                     <div className="flex flex-col items-center gap-1 p-3 rounded-lg bg-blue-50 dark:bg-blue-950/20 border border-blue-100 dark:border-blue-900/30">
                         <p className="text-xs text-gray-600 dark:text-gray-400">Overall Avg</p>
@@ -94,7 +93,6 @@ export function ResponseTimeChart({ chartData }: { chartData: AvgResponseTime[] 
                     </div>
                 </div>
 
-                {/* Bar Chart */}
                 <ChartContainer config={chartConfig} className="h-[250px] w-full">
                     <BarChart data={chartData}>
                         <CartesianGrid vertical={false} strokeDasharray="3 3" />
@@ -104,7 +102,7 @@ export function ResponseTimeChart({ chartData }: { chartData: AvgResponseTime[] 
                             axisLine={false}
                             tickMargin={8}
                             style={{
-                                fontFamily: "Lato",
+                                fontFamily: "Raleway",
                                 fontSize: "11px"
                             }}
                             angle={-15}
@@ -116,7 +114,7 @@ export function ResponseTimeChart({ chartData }: { chartData: AvgResponseTime[] 
                             axisLine={false}
                             tickMargin={8}
                             style={{
-                                fontFamily: "Lato",
+                                fontFamily: "Open Sans",
                                 fontSize: "12px"
                             }}
                             label={{ value: 'Hours', angle: -90, position: 'insideLeft' }}
@@ -139,7 +137,6 @@ export function ResponseTimeChart({ chartData }: { chartData: AvgResponseTime[] 
                     </BarChart>
                 </ChartContainer>
 
-                {/* Insight */}
                 <div className="mt-4 p-3 flex items-center gap-2 bg-gray-50 dark:bg-gray-900/20 rounded-lg border">
                     <Lightbulb className="size-3.5 text-yellow-500" />
                     <p className="text-xs text-gray-700 dark:text-gray-300">

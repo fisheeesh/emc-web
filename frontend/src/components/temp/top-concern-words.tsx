@@ -167,7 +167,6 @@ export function TopConcernsWordCloud({ concernsData, recommendation, generatedAt
                 <div className="relative min-h-[280px] border-2 border-dashed rounded-lg p-6 bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900/50 dark:to-gray-800/50 flex items-center justify-center">
                     {refreshing ? (
                         <div className="flex flex-wrap gap-4 items-center justify-center max-w-2xl">
-                            {/* Generate multiple skeleton items with varying sizes to mimic word cloud */}
                             <Skeleton className="h-8 w-24" />
                             <Skeleton className="h-12 w-32" />
                             <Skeleton className="h-6 w-20" />

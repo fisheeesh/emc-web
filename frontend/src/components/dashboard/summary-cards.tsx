@@ -20,7 +20,6 @@ interface Props {
 export function SummaryCards({ data, isLoading }: Props) {
     return (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 lg:flex-row w-full">
-            {/* Overall Wellbeing Score */}
             <Card>
                 <CardHeader>
                     <CardDescription className="flex items-center gap-2">
@@ -67,7 +66,6 @@ export function SummaryCards({ data, isLoading }: Props) {
                 </CardFooter>
             </Card>
 
-            {/* Critical Alerts */}
             <Card>
                 <CardHeader>
                     <CardDescription className="flex items-center gap-2">
@@ -114,7 +112,6 @@ export function SummaryCards({ data, isLoading }: Props) {
                 </CardFooter>
             </Card>
 
-            {/* Check-in Rate */}
             <Card>
                 <CardHeader>
                     <CardDescription className="flex items-center gap-2">
@@ -161,7 +158,6 @@ export function SummaryCards({ data, isLoading }: Props) {
                 </CardFooter>
             </Card>
 
-            {/* Positive Rate */}
             <Card>
                 <CardHeader>
                     <CardDescription className="flex items-center gap-2">

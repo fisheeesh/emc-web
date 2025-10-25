@@ -176,7 +176,6 @@ export default function ActionModal({ employee, action, onClose }: Props) {
                         </Button>
                     </DialogHeader>
 
-                    {/* Employee Info Card */}
                     <div className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-950/30 dark:to-indigo-950/30 border border-blue-200 dark:border-blue-800 rounded-lg p-4 mt-4">
                         <div className="flex items-center gap-2 mb-3">
                             <User className="text-blue-600" size={20} />
@@ -198,11 +197,8 @@ export default function ActionModal({ employee, action, onClose }: Props) {
                         </div>
                     </div>
 
-                    {/* Action Plan Details */}
                     <div className="mt-6 space-y-6">
-                        {/* Quick Action & Status Row */}
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            {/* Quick Action */}
                             <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4 shadow-sm">
                                 <div className="flex items-center gap-2 mb-2">
                                     <MessageSquare className="text-purple-600" size={18} />
@@ -211,7 +207,6 @@ export default function ActionModal({ employee, action, onClose }: Props) {
                                 <span className="font-medium">{action.quickAction ?? "Not Specified"}</span>
                             </div>
 
-                            {/* Status */}
                             <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4 shadow-sm">
                                 <div className="flex items-center gap-2 mb-2">
                                     <CheckCircle2 className="text-green-600" size={18} />
@@ -223,9 +218,7 @@ export default function ActionModal({ employee, action, onClose }: Props) {
                             </div>
                         </div>
 
-                        {/* Action Type & Priority Row */}
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                            {/* Action Type */}
                             <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4 shadow-sm">
                                 <div className="flex items-center gap-2 mb-2">
                                     <MdEventNote className="text-blue-600" size={18} />
@@ -234,7 +227,6 @@ export default function ActionModal({ employee, action, onClose }: Props) {
                                 <p className="text-base">{action.actionType}</p>
                             </div>
 
-                            {/* Priority */}
                             <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4 shadow-sm">
                                 <div className="flex items-center gap-2 mb-2">
                                     <MdFlag className="text-orange-600" size={18} />
@@ -245,7 +237,6 @@ export default function ActionModal({ employee, action, onClose }: Props) {
                                 </div>
                             </div>
 
-                            {/* Type Badge */}
                             <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4 shadow-sm">
                                 <div className="flex items-center gap-2 mb-2">
                                     <Clock className="text-indigo-600" size={18} />
@@ -257,7 +248,6 @@ export default function ActionModal({ employee, action, onClose }: Props) {
                             </div>
                         </div>
 
-                        {/* Assign To & Due Date Row */}
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                             <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4 shadow-sm">
                                 <div className="flex items-center gap-2 mb-2">
@@ -284,7 +274,6 @@ export default function ActionModal({ employee, action, onClose }: Props) {
                             </div>
                         </div>
 
-                        {/* Action Notes */}
                         <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-5 shadow-sm">
                             <h4 className="font-semibold text-base mb-3 flex items-center gap-2">
                                 <MdEventNote className="text-blue-600" size={20} />
@@ -295,7 +284,6 @@ export default function ActionModal({ employee, action, onClose }: Props) {
                             </div>
                         </div>
 
-                        {/* Follow-up Notes */}
                         <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-5 shadow-sm">
                             <h4 className="font-semibold text-base mb-3 flex items-center gap-2">
                                 <Clock className="text-indigo-600" size={20} />
@@ -306,7 +294,6 @@ export default function ActionModal({ employee, action, onClose }: Props) {
                             </div>
                         </div>
 
-                        {/* Suggestions */}
                         {action.suggestions && (
                             <div className="bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 rounded-lg p-5 shadow-sm">
                                 <h4 className="font-semibold text-base mb-3 flex items-center gap-2">
@@ -394,7 +381,6 @@ export default function ActionModal({ employee, action, onClose }: Props) {
 
                 <Form {...form}>
                     <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 mt-4">
-                        {/* Quick Actions */}
                         <FormField
                             control={form.control}
                             name="quickAction"
@@ -435,7 +421,6 @@ export default function ActionModal({ employee, action, onClose }: Props) {
                             )}
                         />
 
-                        {/* Action Form */}
                         <div className="space-y-6">
                             <h3 className="text-lg font-semibold">Custom Action Plan</h3>
 

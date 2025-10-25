@@ -38,7 +38,6 @@ export default function AttendanceTimeSection({ data }: { data: WorkSchedule }) 
                     </div>
                 ) : (
                     <>
-                        {/* Key Stats */}
                         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
                             <div className="p-4 rounded-lg bg-blue-50 dark:bg-blue-950/20 border border-blue-100 dark:border-blue-900/30">
                                 <div className="flex items-center gap-2 mb-2">
@@ -81,7 +80,6 @@ export default function AttendanceTimeSection({ data }: { data: WorkSchedule }) 
                             </div>
                         </div>
 
-                        {/* Time Distribution Bar Chart */}
                         {hasAttendanceData ? (
                             <div className="mb-6">
                                 <ChartContainer config={chartConfig} className="h-[280px] w-full">
@@ -146,7 +144,6 @@ export default function AttendanceTimeSection({ data }: { data: WorkSchedule }) 
                             </div>
                         )}
 
-                        {/* Insights */}
                         <div className="p-4 bg-blue-50 dark:bg-blue-950/20 rounded-lg border border-blue-100 dark:border-blue-900/30">
                             <h4 className="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-2 flex items-center gap-2">
                                 <Calendar className="w-4 h-4" />

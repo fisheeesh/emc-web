@@ -21,21 +21,17 @@ export default function EmpEmotionModal({ empName, emoji, textFeeling, checkInTi
             </DialogHeader>
 
             <div className="text-center space-y-6 py-4">
-                {/* Time Section */}
                 <div>
                     <p className="text-sm mb-2">Time</p>
                     <p className="text-3xl font-bold font-en">{checkInTime}</p>
                 </div>
 
-                {/* Emotion */}
                 <div className="text-6xl">{emoji}</div>
 
-                {/* Score */}
                 <div>
                     <p className=" font-medium font-en">Score: {score}</p>
                 </div>
 
-                {/* Feeling Text */}
                 <div>
                     <p className="text-sm leading-relaxed px-4">
                         {textFeeling}

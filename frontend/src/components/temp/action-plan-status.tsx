@@ -103,7 +103,6 @@ export function ActionPlanStatusChart({ chartData }: { chartData: ActionPlanStat
                     </PieChart>
                 </ChartContainer>
 
-                {/* Summary Stats */}
                 <div className="grid grid-cols-3 gap-4 mt-6 pb-6">
                     <div className="flex flex-col items-center gap-1 p-3 rounded-lg bg-purple-50 dark:bg-purple-950/20 border border-purple-100 dark:border-purple-900/30">
                         <p className="text-xs text-gray-600 dark:text-gray-400">Pending</p>

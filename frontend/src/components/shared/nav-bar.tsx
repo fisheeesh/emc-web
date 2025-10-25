@@ -44,7 +44,6 @@ export default function Navbar() {
         <div>
             <nav className='fixed top-0 left-0 right-0 z-50 border-b bg-white/70 backdrop-blur-sm border-gray-100 shadow-sm dark:bg-slate-900/70 dark:border-0 dark:shadow-2xl'>
                 <div className="w-full flex justify-between items-center max-w-[1440px] px-4 mx-auto md:h-20 h-16">
-                    {/* Logo & Links */}
                     <div className="flex items-center cursor-pointer gap-2" onClick={() => navigate('/')}>
                         <img
                             src={theme == 'dark' ? fullLight : fullDark}
@@ -60,7 +59,6 @@ export default function Navbar() {
                         <h1 className="font-mich tracking-wider text-[10px] md:text-xs dark:bg-gradient-to-r dark:from-purple-400 dark:via-pink-500 dark:to-blue-500 dark:bg-clip-text dark:text-transparent">{APP_NAME}</h1>
                     </div>
 
-                    {/* Desktop Right Side */}
                     <div className='hidden min-[860px]:flex items-center gap-3'>
                         {user?.role === 'SUPERADMIN' && <CommonFilter
                             filters={filters.departments}
@@ -74,7 +72,6 @@ export default function Navbar() {
                         <AuthDropdown />
                     </div>
 
-                    {/* Mobile Hamburger Menu */}
                     <div className="min-[860px]:hidden flex items-center mt-2">
                         <button
                             onClick={() => setIsMobMenuOpen(!isMobMenuOpen)}
