@@ -261,7 +261,7 @@ export default function ModifyEmotionsModal({ onClose, data }: ModifyEmotionsMod
                             {
                                 isMaxReached ?
                                     <p className="text-xs text-muted-foreground">
-                                        Maximum 9 emotions reached. You can now save changes.
+                                        Maximum <span className="font-en">9</span> emotions reached. You can now save changes.
                                     </p>
                                     : <p className="text-xs text-muted-foreground">
                                         Enter an emoji and an adjective that describes the emotion (<span className="font-en">{9 - currentEmotionCount}</span> more needed)

@@ -88,7 +88,6 @@ export default function CreateEditEmpModal<T extends z.ZodType<any, any, any>>({
         } else {
             formData.append("id", String(userId))
             formData.append("accType", values.accType)
-            // console.log(Object.fromEntries(formData))
 
             editEmp(formData, {
                 onSettled: () => {
@@ -140,6 +139,7 @@ export default function CreateEditEmpModal<T extends z.ZodType<any, any, any>>({
                                                 {
                                                     field.name === "accType" ? (
                                                         <Select
+                                                            disabled={isWorking}
                                                             onValueChange={field.onChange}
                                                             defaultValue={field.value}
                                                         >
@@ -154,6 +154,7 @@ export default function CreateEditEmpModal<T extends z.ZodType<any, any, any>>({
                                                     ) :
                                                         field.name === "role" ? (
                                                             <Select
+                                                                disabled={isWorking}
                                                                 onValueChange={field.onChange}
                                                                 defaultValue={field.value}
                                                             >
@@ -169,6 +170,7 @@ export default function CreateEditEmpModal<T extends z.ZodType<any, any, any>>({
                                                         ) :
                                                             field.name === "gender" ? (
                                                                 <Select
+                                                                    disabled={isWorking}
                                                                     onValueChange={field.onChange}
                                                                     defaultValue={field.value}
                                                                 >
@@ -184,6 +186,7 @@ export default function CreateEditEmpModal<T extends z.ZodType<any, any, any>>({
                                                             ) :
                                                                 field.name === "workStyle" ? (
                                                                     <Select
+                                                                        disabled={isWorking}
                                                                         onValueChange={field.onChange}
                                                                         defaultValue={field.value}
                                                                     >
@@ -200,6 +203,7 @@ export default function CreateEditEmpModal<T extends z.ZodType<any, any, any>>({
                                                                 ) :
                                                                     field.name === "country" ? (
                                                                         <Select
+                                                                            disabled={isWorking}
                                                                             onValueChange={field.onChange}
                                                                             defaultValue={field.value}
                                                                         >
@@ -227,7 +231,7 @@ export default function CreateEditEmpModal<T extends z.ZodType<any, any, any>>({
                                                                     ) :
                                                                         field.name === "birthdate" ? (
                                                                             <Popover open={open} onOpenChange={setOpen}>
-                                                                                <PopoverTrigger asChild>
+                                                                                <PopoverTrigger asChild disabled={isWorking}>
                                                                                     <FormControl>
                                                                                         <Button
                                                                                             disabled={isWorking}
@@ -261,6 +265,7 @@ export default function CreateEditEmpModal<T extends z.ZodType<any, any, any>>({
                                                                         ) :
                                                                             field.name === "jobType" ? (
                                                                                 <Select
+                                                                                    disabled={isWorking}
                                                                                     onValueChange={field.onChange}
                                                                                     defaultValue={field.value}
                                                                                 >
@@ -287,6 +292,7 @@ export default function CreateEditEmpModal<T extends z.ZodType<any, any, any>>({
                                                                                                     onChange={field.onChange}
                                                                                                 />
                                                                                                 <Button
+                                                                                                    disabled={isWorking}
                                                                                                     size='sm'
                                                                                                     type="button"
                                                                                                     variant='outline'
@@ -302,6 +308,7 @@ export default function CreateEditEmpModal<T extends z.ZodType<any, any, any>>({
                                                                                             </>
                                                                                         ) : (
                                                                                             <Select
+                                                                                                disabled={isWorking}
                                                                                                 onValueChange={(value) => {
                                                                                                     if (value === "OTHER") {
                                                                                                         setIsCustomDepartment(true);

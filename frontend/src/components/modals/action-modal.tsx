@@ -600,11 +600,11 @@ export default function ActionModal({ employee, action, onClose }: Props) {
                             <p className="text-muted-foreground italic text-sm md:text-base">Note: Once created, this action plan cannot be modified.</p>
                             <div className="flex items-center gap-3">
                                 <DialogClose asChild>
-                                    <Button disabled={isWorking} type="button" variant="outline" className="min-h-[44px] cursor-pointer">
+                                    <Button disabled={isWorking || generating} type="button" variant="outline" className="min-h-[44px] cursor-pointer">
                                         Cancel
                                     </Button>
                                 </DialogClose>
-                                <Button disabled={isWorking} type="submit" className="bg-blue-600 hover:bg-blue-700 text-white min-h-[44px] cursor-pointer">
+                                <Button disabled={isWorking || generating} type="submit" className="bg-blue-600 hover:bg-blue-700 text-white min-h-[44px] cursor-pointer">
                                     <Spinner isLoading={isWorking} label="Submitting...">
                                         Create Action Plan
                                     </Spinner>

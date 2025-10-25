@@ -152,7 +152,15 @@ export default function CSVUploadModal() {
                                 <li>Maximum file size: <span className="font-en">5</span>MB</li>
                                 <li>First row must be headers: <code className="bg-gray-200 dark:bg-slate-700 px-1 rounded">firstName,lastName,email,password,position,department</code></li>
                                 <li>All columns are required in exact order</li>
-                                <li>Password must be at least <span className="font-en">8</span> numbers</li>
+                                <li><code className="bg-gray-200 dark:bg-slate-700 px-1 rounded">password</code> requirements:
+                                    <ul className="ml-6 list-disc list-inside mt-1 space-y-0.5">
+                                        <li>Must be between <span className="font-en">8-16</span> characters</li>
+                                        <li>Must contain at least one uppercase letter (A-Z)</li>
+                                        <li>Must contain at least one lowercase letter (a-z)</li>
+                                        <li>Must contain at least one number (<span className="font-en">0-9</span>)</li>
+                                        <li>Must contain at least one special character</li>
+                                    </ul>
+                                </li>
                             </ul>
                         </div>
 

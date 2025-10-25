@@ -148,3 +148,33 @@
 [data-radix-popper-content-wrapper] {
     z-index: 9999 !important;
 }
+
+/* Link color fixes for both light and dark modes */
+.mdxeditor a,
+.mdxeditor-root-contenteditable a,
+.markdown-editor a {
+    color: #3085FE !important;
+    text-decoration: underline;
+}
+
+.dark .mdxeditor a,
+.dark .mdxeditor-root-contenteditable a,
+.dark .markdown-editor a,
+.dark-editor a {
+    color: #3085FE !important;
+    text-decoration: underline;
+}
+
+/* Hover state for links */
+.mdxeditor a:hover,
+.mdxeditor-root-contenteditable a:hover,
+.markdown-editor a:hover {
+    color: #2563eb !important;
+}
+
+.dark .mdxeditor a:hover,
+.dark .mdxeditor-root-contenteditable a:hover,
+.dark .markdown-editor a:hover,
+.dark-editor a:hover {
+    cursor: pointer;
+}

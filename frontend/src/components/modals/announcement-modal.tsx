@@ -111,7 +111,7 @@ export default function AnnouncementModal() {
     }
 
     return (
-        <DialogContent className="sm:max-w-[750px] max-h-[90vh] overflow-y-auto no-scrollbar">
+        <DialogContent className="sm:max-w-[800px] max-h-[90vh] overflow-y-auto no-scrollbar">
             <DialogHeader>
                 <DialogTitle className="text-lg md:text-xl font-bold flex items-center gap-2">
                     <TfiAnnouncement className="text-blue-600 size-5 md:size-7" />
@@ -132,6 +132,7 @@ export default function AnnouncementModal() {
                                 <FormLabel>Subject <span className="font-en text-red-600">*</span></FormLabel>
                                 <FormControl>
                                     <Input
+                                        disabled={making}
                                         className="min-h-[48px]"
                                         placeholder="Enter email subject"
                                         {...field}
@@ -261,6 +262,7 @@ export default function AnnouncementModal() {
                     <DialogFooter>
                         <DialogClose asChild>
                             <Button
+                                disabled={making}
                                 ref={closeButtonRef}
                                 type="button"
                                 className="min-h-[48px] cursor-pointer"
@@ -269,7 +271,7 @@ export default function AnnouncementModal() {
                                 Cancel
                             </Button>
                         </DialogClose>
-                        <Button type="submit" className="min-h-[48px] cursor-pointer bg-brand text-white hover:bg-blue-600">
+                        <Button disabled={making} type="submit" className="min-h-[48px] cursor-pointer bg-brand text-white hover:bg-blue-600">
                             <Spinner isLoading={making} label="Sending...">
                                 Send Announcement
                             </Spinner>

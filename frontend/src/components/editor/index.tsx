@@ -3,11 +3,11 @@ import {
     BlockTypeSelect,
     BoldItalicUnderlineToggles,
     ConditionalContents,
+    CreateLink,
     diffSourcePlugin,
     directivesPlugin,
     headingsPlugin,
     HighlightToggle,
-    imagePlugin,
     InsertAdmonition,
     InsertTable,
     InsertThematicBreak,
@@ -50,7 +50,6 @@ const Editor = forwardRef<MDXEditorMethods, EditorProps>(({ value = "", onChange
                 thematicBreakPlugin(),
                 markdownShortcutPlugin(),
                 tablePlugin(),
-                imagePlugin(),
                 directivesPlugin({
                     directiveDescriptors: [AdmonitionDirectiveDescriptor]
                 }),
@@ -72,6 +71,7 @@ const Editor = forwardRef<MDXEditorMethods, EditorProps>(({ value = "", onChange
                                             <ListsToggle />
                                             <Separator />
                                             <InsertTable />
+                                            <CreateLink />
                                             <InsertAdmonition />
                                             <InsertThematicBreak />
                                         </>
