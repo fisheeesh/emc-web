@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button"
 import {
+    DialogClose,
     DialogContent,
     DialogDescription,
     DialogFooter,
@@ -15,28 +16,26 @@ import {
     FormMessage,
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
+import { announcementFormSchema } from "@/lib/validators"
 import { zodResolver } from "@hookform/resolvers/zod"
 import '@mdxeditor/editor/style.css'
-import { DialogClose } from "@radix-ui/react-dialog"
 import { Upload, X } from "lucide-react"
-import { useState } from "react"
+import { useRef, useState } from "react"
 import { useForm } from "react-hook-form"
 import { TfiAnnouncement } from "react-icons/tfi"
-import * as z from "zod"
 import Editor from "../editor"
-
-const formSchema = z.object({
-    subject: z.string().min(1, "Subject is required"),
-    body: z.string().min(1, "Message body is required"),
-    images: z.array(z.instanceof(File)).optional(),
-})
+import type z from "zod"
+import useMakeAnnouncement from "@/hooks/ui/use-make-announcement"
+import Spinner from "../shared/spinner"
 
 export default function AnnouncementModal() {
     const [imagePreviews, setImagePreviews] = useState<string[]>([])
     const [imageFiles, setImageFiles] = useState<File[]>([])
+    const { makeAnnouncement, making } = useMakeAnnouncement()
+    const closeButtonRef = useRef<HTMLButtonElement>(null)
 
-    const form = useForm<z.infer<typeof formSchema>>({
-        resolver: zodResolver(formSchema),
+    const form = useForm<z.infer<typeof announcementFormSchema>>({
+        resolver: zodResolver(announcementFormSchema),
         defaultValues: {
             subject: "",
             body: "",
@@ -70,8 +69,20 @@ export default function AnnouncementModal() {
         form.setValue('images', newFiles)
     }
 
-    const onSubmit = (values: z.infer<typeof formSchema>) => {
-        console.log(values)
+    const onSubmit = (values: z.infer<typeof announcementFormSchema>) => {
+        makeAnnouncement({
+            subject: values.subject,
+            body: values.body
+        }, {
+            onSuccess: () => {
+                closeButtonRef.current?.click()
+            },
+            onSettled: () => {
+                form.reset()
+                setImagePreviews([])
+                setImageFiles([])
+            }
+        })
     }
 
     return (
@@ -166,7 +177,7 @@ export default function AnnouncementModal() {
                                                         <button
                                                             type="button"
                                                             onClick={() => removeImage(index)}
-                                                            className="absolute top-2 right-2 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                                                            className="absolute top-2 right-2 cursor-pointer bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
                                                         >
                                                             <X className="w-4 h-4" />
                                                         </button>
@@ -184,6 +195,7 @@ export default function AnnouncementModal() {
                     <DialogFooter>
                         <DialogClose asChild>
                             <Button
+                                ref={closeButtonRef}
                                 type="button"
                                 className="min-h-[48px] cursor-pointer"
                                 variant="outline"
@@ -192,7 +204,9 @@ export default function AnnouncementModal() {
                             </Button>
                         </DialogClose>
                         <Button type="submit" className="min-h-[48px] cursor-pointer bg-brand text-white hover:bg-blue-600">
-                            Send Announcement
+                            <Spinner isLoading={making} label="Sending...">
+                                Send Announcement
+                            </Spinner>
                         </Button>
                     </DialogFooter>
                 </form>
