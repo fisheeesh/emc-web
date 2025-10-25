@@ -1,4 +1,4 @@
-import { DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import { DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { TrendingUp, Activity, AlertCircle } from "lucide-react"
 import {
     type ChartConfig,
@@ -6,6 +6,11 @@ import {
     ChartTooltip,
 } from "@/components/ui/chart";
 import { Area, AreaChart, CartesianGrid, XAxis, YAxis } from 'recharts';
+import { FaExclamation } from "react-icons/fa6";
+import { IoMdCheckmark } from "react-icons/io";
+import { MdOutlineArrowRightAlt } from "react-icons/md";
+import { DialogClose } from "@radix-ui/react-dialog";
+import { Button } from "../ui/button";
 
 interface Props {
     empName: string,
@@ -36,8 +41,14 @@ export default function WatchlistHistoryModal({ empName, emotionHistory }: Props
     //* Check if we have emotion data
     const hasData = chartData && chartData.length > 0;
 
-    //* Check if employee is recovering (all emotions are neutral or positive)
-    const isRecovering = hasData && chartData.every(d => d.emotionValue >= 2);
+    //* Check if employee is recovering -> calculate good days which are only neutal and positive
+    const goodDays = hasData ? chartData.filter(d => d.emotionValue >= 2).length : 0;
+    //* Get lastest day emtion and enuse which is not critical
+    const latestEmotion = hasData && chartData.length > 0 ? chartData[chartData.length - 1]?.emotionValue : 0;
+    const isNotCritical = latestEmotion >= 1;
+    //* Flag true to isRecovering when has check-in datas, have 3 days data, 60% of total days are good days and lastest check-in is not cirital
+    const isRecovering = hasData && goodDays >= Math.ceil(chartData.length * 0.6) && isNotCritical && chartData.length >= 3;
+    //* Track lastest day of check-in data is first day of data
     const hasImprovement = hasData && chartData.length >= 3 &&
         chartData[chartData.length - 1]?.emotionValue > chartData[0]?.emotionValue;
 
@@ -94,7 +105,6 @@ export default function WatchlistHistoryModal({ empName, emotionHistory }: Props
                         </div>
                     )}
 
-                    {/* Status Alert */}
                     {hasData && (
                         <div className={`p-4 rounded-lg border ${isRecovering
                             ? 'bg-green-50 dark:bg-green-950/20 border-green-200 dark:border-green-900/30'
@@ -263,45 +273,45 @@ export default function WatchlistHistoryModal({ empName, emotionHistory }: Props
                             ) : isRecovering ? (
                                 <>
                                     <li className="flex items-start gap-2">
-                                        <span className="text-green-600 mt-0.5">✓</span>
+                                        <IoMdCheckmark className="text-green-600 mt-0.5" />
                                         <span>Employee shows consistent positive/neutral emotions - ready to be removed from watchlist</span>
                                     </li>
                                     <li className="flex items-start gap-2">
-                                        <span className="text-green-600 mt-0.5">✓</span>
+                                        <IoMdCheckmark className="text-green-600 mt-0.5" />
                                         <span>Schedule a final check-in meeting to confirm wellbeing status</span>
                                     </li>
                                     <li className="flex items-start gap-2">
-                                        <span className="text-green-600 mt-0.5">✓</span>
+                                        <IoMdCheckmark className="text-green-600 mt-0.5" />
                                         <span>Document the recovery process for future reference</span>
                                     </li>
                                 </>
                             ) : hasImprovement ? (
                                 <>
                                     <li className="flex items-start gap-2">
-                                        <span className="text-blue-600 mt-0.5">→</span>
+                                        <MdOutlineArrowRightAlt className="text-blue-600 mt-0.5" />
                                         <span>Continue monitoring until all <span className="font-en">4</span> check-ins are completed to ensure sustained improvement</span>
                                     </li>
                                     <li className="flex items-start gap-2">
-                                        <span className="text-blue-600 mt-0.5">→</span>
+                                        <MdOutlineArrowRightAlt className="text-blue-600 mt-0.5" />
                                         <span>Conduct a brief check-in to assess ongoing support needs</span>
                                     </li>
                                     <li className="flex items-start gap-2">
-                                        <span className="text-blue-600 mt-0.5">→</span>
+                                        <MdOutlineArrowRightAlt className="text-blue-600 mt-0.5" />
                                         <span>If improvement continues, prepare for watchlist removal</span>
                                     </li>
                                 </>
                             ) : (
                                 <>
-                                    <li className="flex items-start gap-2">
-                                        <span className="text-orange-600 mt-0.5">!</span>
+                                    <li className="flex items-start gap-1">
+                                        <FaExclamation className="text-orange-600 mt-0.5" />
                                         <span>Schedule immediate follow-up meeting with HR and manager</span>
                                     </li>
-                                    <li className="flex items-start gap-2">
-                                        <span className="text-orange-600 mt-0.5">!</span>
+                                    <li className="flex items-start gap-1">
+                                        <FaExclamation className="text-orange-600 mt-0.5" />
                                         <span>Review and potentially adjust the current action plan</span>
                                     </li>
-                                    <li className="flex items-start gap-2">
-                                        <span className="text-orange-600 mt-0.5">!</span>
+                                    <li className="flex items-start gap-1">
+                                        <FaExclamation className="text-orange-600 mt-0.5" />
                                         <span>Consider additional resources or professional mental health support</span>
                                     </li>
                                 </>
@@ -309,6 +319,16 @@ export default function WatchlistHistoryModal({ empName, emotionHistory }: Props
                         </ul>
                     </div>
                 </div>
+            <DialogFooter className="flex justify-end mt-5 pt-5 border-t">
+                <DialogClose asChild>
+                    <Button
+                        variant='outline'
+                        type="button"
+                        className="cursor-pointer min-h-[44px]">
+                        Close
+                    </Button>
+                </DialogClose>
+            </DialogFooter>
             </div>
         </DialogContent>
     );
