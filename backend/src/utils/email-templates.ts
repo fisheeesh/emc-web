@@ -518,3 +518,125 @@ export const rejected_delete_body = (empName: string) => `
     <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 30px 0;">
     <p style="color: #9ca3af; font-size: 12px;">This is an automated notification from the Employee Wellbeing Management & Emotion Check-in System.</p>
 `;
+
+export const due_tomorrow_subject = (empName: string) => `⏰ Action Plan Due Tomorrow - ${empName}`
+
+export const due_tomorrow_body = (empName: string, adminName: string, dueDate: string, priority: string) => `
+    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+        <h2 style="color: #f59e0b;">⏰ Action Plan Due Tomorrow</h2>
+        
+        <div style="background: #fef3c7; border-left: 4px solid #f59e0b; padding: 16px; margin: 20px 0;">
+            <p style="margin: 0; font-weight: bold;">Friendly Reminder</p>
+        </div>
+        
+        <p>Hi <strong>${adminName}</strong>,</p>
+        
+        <p>This is a friendly reminder that your action plan for <strong>${empName}</strong> is due tomorrow.</p>
+        
+        <table style="width: 100%; border-collapse: collapse; margin: 20px 0;">
+            <tr>
+                <td style="padding: 8px; border-bottom: 1px solid #e5e7eb;"><strong>Critical Employee:</strong></td>
+                <td style="padding: 8px; border-bottom: 1px solid #e5e7eb;">${empName}</td>
+            </tr>
+            <tr>
+                <td style="padding: 8px; border-bottom: 1px solid #e5e7eb;"><strong>Priority:</strong></td>
+                <td style="padding: 8px; border-bottom: 1px solid #e5e7eb;">${priority}</td>
+            </tr>
+            <tr>
+                <td style="padding: 8px; border-bottom: 1px solid #e5e7eb;"><strong>Due Date:</strong></td>
+                <td style="padding: 8px; border-bottom: 1px solid #e5e7eb;"><span style="color: #f59e0b; font-weight: bold;">${new Date(dueDate).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</span></td>
+            </tr>
+        </table>
+        
+        <p style="color: #6b7280;">Please ensure all necessary actions are completed on time.</p>
+        
+        <a href="${dashboardLink}/dashboard/sentiments" style="display: inline-block; background: #f59e0b; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; margin: 20px 0;">View Action Plan</a>
+        
+        <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 30px 0;">
+        
+        <p style="color: #9ca3af; font-size: 12px;">This is an automated notification from the Employee Wellbeing Management & Emotion Check-in System.</p>
+    </div>
+`
+
+export const action_overdue_subject = (empName: string) => `🚨 Action Plan Overdue - ${empName}`
+
+export const action_overdue_body = (empName: string, adminName: string, dueDate: string, priority: string) => `
+    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+        <h2 style="color: #dc2626;">🚨 Action Plan Overdue</h2>
+        
+        <div style="background: #fee2e2; border-left: 4px solid #dc2626; padding: 16px; margin: 20px 0;">
+            <p style="margin: 0; font-weight: bold;">Urgent: Immediate Action Required</p>
+        </div>
+        
+        <p>Hi <strong>${adminName}</strong>,</p>
+        
+        <p style="color: #dc2626; font-weight: bold;">Your action plan for <strong>${empName}</strong> is now overdue.</p>
+        
+        <table style="width: 100%; border-collapse: collapse; margin: 20px 0;">
+            <tr>
+                <td style="padding: 8px; border-bottom: 1px solid #e5e7eb;"><strong>Critical Employee:</strong></td>
+                <td style="padding: 8px; border-bottom: 1px solid #e5e7eb;">${empName}</td>
+            </tr>
+            <tr>
+                <td style="padding: 8px; border-bottom: 1px solid #e5e7eb;"><strong>Priority:</strong></td>
+                <td style="padding: 8px; border-bottom: 1px solid #e5e7eb;">${priority}</td>
+            </tr>
+            <tr>
+                <td style="padding: 8px; border-bottom: 1px solid #e5e7eb;"><strong>Was Due On:</strong></td>
+                <td style="padding: 8px; border-bottom: 1px solid #e5e7eb;"><span style="color: #dc2626; font-weight: bold;">${new Date(dueDate).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</span></td>
+            </tr>
+        </table>
+        
+        <p style="color: #dc2626; font-weight: bold;">Please contact upper management immediately to discuss this overdue action plan.</p>
+        
+        <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 30px 0;">
+        
+        <p style="color: #9ca3af; font-size: 12px;">This is an automated notification from the Employee Wellbeing Management & Emotion Check-in System.</p>
+    </div>
+`
+export const superadmin_overdue_subject = (empName: string) => `🚨 Overdue Action Plan Requires Attention - ${empName}`
+
+export const superadmin_overdue_body = (empName: string, adminName: string, dueDate: string, priority: string, depName: string) => `
+    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+        <h2 style="color: #dc2626;">🚨 Action Plan Overdue - Admin Follow-Up Required</h2>
+        
+        <div style="background: #fee2e2; border-left: 4px solid #dc2626; padding: 16px; margin: 20px 0;">
+            <p style="margin: 0; font-weight: bold;">Attention Required</p>
+        </div>
+        
+        <p>Dear Management,</p>
+        
+        <p>An action plan for critical employee <strong>${empName}</strong> is now overdue and requires your attention.</p>
+        
+        <table style="width: 100%; border-collapse: collapse; margin: 20px 0;">
+            <tr>
+                <td style="padding: 8px; border-bottom: 1px solid #e5e7eb;"><strong>Critical Employee:</strong></td>
+                <td style="padding: 8px; border-bottom: 1px solid #e5e7eb;">${empName}</td>
+            </tr>
+            <tr>
+                <td style="padding: 8px; border-bottom: 1px solid #e5e7eb;"><strong>Department:</strong></td>
+                <td style="padding: 8px; border-bottom: 1px solid #e5e7eb;">${depName}</td>
+            </tr>
+            <tr>
+                <td style="padding: 8px; border-bottom: 1px solid #e5e7eb;"><strong>Responsible Admin:</strong></td>
+                <td style="padding: 8px; border-bottom: 1px solid #e5e7eb;">${adminName}</td>
+            </tr>
+            <tr>
+                <td style="padding: 8px; border-bottom: 1px solid #e5e7eb;"><strong>Priority:</strong></td>
+                <td style="padding: 8px; border-bottom: 1px solid #e5e7eb;"><span style="color: #dc2626; font-weight: bold;">${priority}</span></td>
+            </tr>
+            <tr>
+                <td style="padding: 8px; border-bottom: 1px solid #e5e7eb;"><strong>Was Due On:</strong></td>
+                <td style="padding: 8px; border-bottom: 1px solid #e5e7eb;"><span style="color: #dc2626; font-weight: bold;">${new Date(dueDate).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</span></td>
+            </tr>
+        </table>
+        
+        <p style="color: #6b7280;">The responsible admin has been notified. Please wait for them to reach out for further guidance.</p>
+        
+        <a href="${dashboardLink}/dashboard/managements" style="display: inline-block; background: #dc2626; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; margin: 20px 0;">View Action Plan</a>
+        
+        <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 30px 0;">
+        
+        <p style="color: #9ca3af; font-size: 12px;">This is an automated notification from the Employee Wellbeing Management & Emotion Check-in System.</p>
+    </div>
+`
