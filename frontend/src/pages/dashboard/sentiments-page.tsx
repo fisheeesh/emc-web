@@ -88,7 +88,7 @@ export default function SentimentsDashboardPage() {
         <section className="flex flex-col items-center justify-center w-full gap-3">
             <div className="flex flex-col lg:flex-row items-center justify-center w-full gap-3 lg:h-[420px]">
                 {/* Overview Chart */}
-                <OverViewChart percentages={overviewData.data} duration={duration} />
+                <OverViewChart percentages={overviewData.data} />
 
                 {/* Sentiments Comparison Chart */}
                 <SentimentsComparisonChart data={sentimentsComparison.data} />

@@ -32,12 +32,12 @@ export const getMoodPercentages = async (uDepartmentId: number, qDepartmentId: s
             orderBy: {
                 createdAt: 'desc'
             },
-            distinct: ['employeeId'],
             select: {
                 employeeId: true,
                 emotionScore: true
             }
         })
+        console.log(recentCheckIns)
 
         //* Count total employees in the department
         const totalEmp = await prismaClient.employee.count({
@@ -51,6 +51,8 @@ export const getMoodPercentages = async (uDepartmentId: number, qDepartmentId: s
             }
         })
 
+        console.log(totalEmp)
+
         let posi = 0, neu = 0, nega = 0, crit = 0;
 
         for (const row of recentCheckIns) {
@@ -63,6 +65,8 @@ export const getMoodPercentages = async (uDepartmentId: number, qDepartmentId: s
         }
 
         const denom = Math.max(totalEmp, 1)
+
+        console.log(denom)
 
         //*  Make sure the final result is an array of numbers instead of strings. Since .toFixed() returns a string
         const percentages = [

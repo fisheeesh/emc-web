@@ -13,10 +13,9 @@ import CustomLegends from "../custom-legends";
 
 interface Props {
     percentages: number[],
-    duration: string | null
 }
 
-export default function OverViewChart({ percentages, duration }: Props) {
+export default function OverViewChart({ percentages }: Props) {
     const labels = COMMON_DATAS.map((data) => data.label)
 
     const isEmpty = percentages.every(el => el === 0)
@@ -45,7 +44,7 @@ export default function OverViewChart({ percentages, duration }: Props) {
             <CardHeader className="flex flex-col md:flex-row mb-2 justify-center gap-3 md:justify-between w-full">
                 <div>
                     <CardTitle className="text-xl md:text-2xl">Mood Overview</CardTitle>
-                    <CardDescription className="line-clamp-1">Sshowing how employees are feeling {duration === 'today' ? 'today' : 'this month'}</CardDescription>
+                    <CardDescription className="line-clamp-1">Sshowing how employees are feeling</CardDescription>
                 </div>
                 <CommonFilter
                     filterValue="duration"
