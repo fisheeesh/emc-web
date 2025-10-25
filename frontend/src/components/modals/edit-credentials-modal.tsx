@@ -269,7 +269,7 @@ export default function EditCredentialsModal({ user, onClose }: EditCredentialsM
                                         type="button"
                                         variant="outline"
                                         className="min-h-[44px] cursor-pointer"
-                                    >
+                                        disabled={editingCredentials}>
                                         Cancel
                                     </Button>
                                 </DialogClose>

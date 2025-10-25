@@ -88,7 +88,7 @@ export default function WatchListTable({ data, status, error, isFetchingNextPage
                                                     <span className="whitespace-nowrap">{emp.department.name}</span>
                                                 </TableCell>
                                                 <TableCell>
-                                                    <span className="whitespace-nowrap">{emp.email}</span>
+                                                    <span className="whitespace-nowrap font-en">{emp.email}</span>
                                                 </TableCell>
                                                 <TableCell className="text-center">
                                                     <span className="whitespace-nowrap font-en">{emp.avgScore}</span>

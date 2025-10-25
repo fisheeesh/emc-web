@@ -3,8 +3,8 @@ import { body, query, validationResult } from "express-validator"
 import { prisma } from "../../config/prisma-client"
 import { checkEmployeeIfNotExits, createHttpErrors } from "../../utils/check"
 import { errorCodes } from "../../config/error-codes"
-import { getEmployeeByEmail, getEmployeeById } from "../../services/auth-services"
-import { generateHashedValue } from "../../utils/generate"
+import { getEmployeeByEmail, getEmployeeById, getOTPRowByEmail } from "../../services/auth-services"
+import { generateHashedValue, generateToken } from "../../utils/generate"
 
 interface CustomRequest extends Request {
     employeeId?: number
@@ -491,6 +491,18 @@ export const editEmpCredentials = [
             code: errorCodes.notFound
         }))
 
+        const otpRow = await getOTPRowByEmail(email)
+        if (!otpRow) {
+            const otp = 123456
+            const hashedOTP = await generateHashedValue(otp.toString())
+            const otpData = {
+                email,
+                otp: hashedOTP,
+                rememberToken: generateToken(),
+                count: 1
+            }
+        }
+
         let empData: any = {}
         if (editType === 'email') {
             const existingEmail = await getEmployeeByEmail(email)
@@ -507,9 +519,28 @@ export const editEmpCredentials = [
             empData.password = hashedPassword
         }
 
-        await prisma.employee.update({
-            where: { id },
-            data: empData
+        const otp = 123456
+        const hashedOTP = await generateHashedValue(otp.toString())
+        const otpData = {
+            email,
+            otp: hashedOTP,
+            rememberToken: generateToken(),
+            count: 1
+        }
+
+        await prisma.$transaction(async (tx) => {
+            await tx.employee.update({
+                where: { id },
+                data: empData
+            })
+
+            if (editType === 'email') {
+                if (!otpRow) await tx.otp.create({ data: otpData })
+                else await tx.otp.update({
+                    where: { email: existingEmp.email },
+                    data: otpData
+                })
+            }
         })
 
         res.status(200).json({

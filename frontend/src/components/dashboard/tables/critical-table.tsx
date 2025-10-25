@@ -101,7 +101,7 @@ export default function CriticalTable({ data, status, error, isFetchingNextPage,
                                                     <span className="whitespace-nowrap">{emp.department.name}</span>
                                                 </TableCell>
                                                 <TableCell>
-                                                    <span className="whitespace-nowrap">{emp.employee.email}</span>
+                                                    <span className="whitespace-nowrap font-en">{emp.employee.email}</span>
                                                 </TableCell>
                                                 <TableCell className="text-center">
                                                     <span className="whitespace-nowrap font-en">{emp.emotionScore}</span>
