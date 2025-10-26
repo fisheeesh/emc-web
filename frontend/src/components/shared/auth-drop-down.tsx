@@ -42,11 +42,11 @@ export default function AuthDropdown() {
                         </Avatar>
                     </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent className="w-70" align="end" forceMount>
+                <DropdownMenuContent className="w-85" align="end" forceMount>
                     <DropdownMenuLabel className="font-normal mb-1 flex items-center justify-between">
                         <div className="flex flex-col space-y-1">
                             <p className="text-sm font-medium leading-none truncate">{user?.fullName}</p>
-                            <p className="text-xs leading-none text-muted-foreground truncate">{user?.email}</p>
+                            <p className="text-xs leading-none text-muted-foreground truncate font-en">{user?.email}</p>
                         </div>
                         <CustomBadge value={user?.role as string} />
                     </DropdownMenuLabel>
