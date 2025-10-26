@@ -1,13 +1,3 @@
-export const DEPARTMENTS = [
-    "HR",
-    "Sales",
-    "Marketing",
-    "IT",
-    "Finance",
-    "Operations",
-    "Customer Service"
-]
-
 export const CRITICAL_POINT = -0.8
 
 export const MOOD_THRESHOLDS = {

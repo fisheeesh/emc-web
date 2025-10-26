@@ -1,9 +1,9 @@
 import { NextFunction, Request, Response } from "express";
 import { body, validationResult } from "express-validator";
-import { errorCodes } from "../../config/error-codes";
-import { createHttpErrors } from "../../utils/check";
-import { createOrUpdateSettingStatus } from "../../services/system-service";
 import { PrismaClient } from "../../../generated/prisma";
+import { errorCodes } from "../../config/error-codes";
+import { createOrUpdateSettingStatus } from "../../services/system-service";
+import { createHttpErrors } from "../../utils/check";
 
 interface CustomRequest extends Request {
     userId?: number

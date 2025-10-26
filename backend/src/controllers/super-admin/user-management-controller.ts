@@ -16,6 +16,21 @@ interface CustomRequest extends Request {
     employee?: any
 }
 
+interface CSVRow {
+    firstName: string;
+    lastName: string;
+    email: string;
+    password: string;
+    position: string;
+    department: string;
+}
+
+interface UploadResult {
+    status: "success" | "failed";
+    email: string;
+    error?: string;
+}
+
 export const createNewEmployee = [
     body("firstName", "First Name is required.").trim().notEmpty().escape(),
     body("lastName", "Last Name is required.").trim().notEmpty().escape(),
@@ -123,12 +138,6 @@ export const createNewEmployee = [
                 width: 300,
                 height: 300,
                 quality: 100
-            }, {
-                attempts: 3,
-                backoff: {
-                    type: "exponential",
-                    delay: 1000
-                }
             })
         }
 
@@ -393,12 +402,6 @@ export const updateEmployeeInformation = [
                 width: 300,
                 height: 300,
                 quality: 80
-            }, {
-                attempts: 3,
-                backoff: {
-                    type: "exponential",
-                    delay: 1000
-                }
             })
 
             const optimizeFile = emp.avatar?.split(".")[0] + ".webp"
@@ -459,21 +462,6 @@ export const deleteEmployee = [
         })
     }
 ]
-
-interface CSVRow {
-    firstName: string;
-    lastName: string;
-    email: string;
-    password: string;
-    position: string;
-    department: string;
-}
-
-interface UploadResult {
-    status: "success" | "failed";
-    email: string;
-    error?: string;
-}
 
 export const bulkRegister = [
     async (req: CustomRequest, res: Response, next: NextFunction) => {

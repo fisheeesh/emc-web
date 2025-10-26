@@ -9,12 +9,12 @@ import { EmailQueue } from "../../jobs/queues/email-queue"
 import { ScoreQueue, ScoreQueueEvents } from "../../jobs/queues/score-queue"
 import { getEmployeeById } from "../../services/auth-services"
 import { getAllEmpEmotionHistory } from "../../services/emp-services"
+import { getEmployeeEmails } from "../../services/system-service"
 import { authorize } from "../../utils/authorize"
 import { getOrSetCache } from "../../utils/cache"
 import { checkEmployeeIfNotExits, createHttpErrors } from "../../utils/check"
 import { critical_body, critical_subject, normal_body, normal_subject } from "../../utils/email-templates"
 import { calculatePositiveStreak, determineReputation } from "../../utils/helplers"
-import { getEmployeeEmails } from "../../services/system-service"
 
 const prisma = new PrismaClient()
 
@@ -71,17 +71,11 @@ export const emotionCheckIn = [
         checkEmployeeIfNotExits(emp)
 
         //* Split emoji and text for db schema format
-        const [emoji, textFeeling] = moodMessage.split(',')
+        const [emoji, textFeeling] = moodMessage.split('//')
 
         //* Let Ai to calculate score
         const job = await ScoreQueue.add("calculate-score", {
             moodMessage
-        }, {
-            attempts: 3,
-            backoff: {
-                type: 'exponential',
-                delay: 1000
-            }
         })
 
         const raw = await job.waitUntilFinished(ScoreQueueEvents)

@@ -2,10 +2,10 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 import { Worker } from "bullmq";
+import fs from "fs";
 import { Resend } from "resend";
 import { redis } from "../../config/redis-client";
 import { convertMarkdownToHTML, wrapInEmailTemplate } from "../../utils/helplers";
-import fs from "fs";
 
 const resend = new Resend(process.env.RESEND_API_KEY!);
 const FROM = process.env.SENDER_EMAIL || "no-reply@emotioncheckinsystem.com";

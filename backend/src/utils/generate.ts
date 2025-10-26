@@ -1,5 +1,5 @@
+import * as bcrypt from "bcrypt";
 import { randomBytes } from "crypto";
-import * as bcrypt from "bcrypt"
 
 export const generateOTP = () => {
     return parseInt(randomBytes(3).toString('hex'), 16) % 900000 + 100000

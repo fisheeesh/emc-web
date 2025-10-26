@@ -1,7 +1,7 @@
 import { Worker } from "bullmq";
-import { redis } from "../../config/redis-client";
 import path from "path";
 import sharp from "sharp";
+import { redis } from "../../config/redis-client";
 
 const imageWorker = new Worker("imageQueue", async (job) => {
     const { filePath, fileName, width, height, quality } = job.data

@@ -8,8 +8,8 @@ import { EmailQueue } from '../../jobs/queues/email-queue'
 import { createEmployee, createOTP, getEmployeeByEmail, getEmployeeById, getOTPRowByEmail, updateEmployeeData, updateOTP } from "../../services/auth-services"
 import { authorize } from '../../utils/authorize'
 import { checkEmployeeIfExits, checkEmployeeIfNotExits, checkOTPErrorIfSameDate, checkOTPRow, createHttpErrors } from "../../utils/check"
-import { generateHashedValue, generateOTP, generateToken } from "../../utils/generate"
 import { otp_body, otp_subject } from '../../utils/email-templates'
+import { generateHashedValue, generateOTP, generateToken } from "../../utils/generate"
 
 interface CustomRequest extends Request {
     employeeId?: number

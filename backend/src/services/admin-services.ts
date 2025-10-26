@@ -1,7 +1,4 @@
-import { PrismaClient } from "../../generated/prisma";
 import { prisma } from "../config/prisma-client";
-
-const prismaClient = new PrismaClient()
 
 export const getAdminUserData = async (id: number) => {
     return await prisma.employee.findFirst({

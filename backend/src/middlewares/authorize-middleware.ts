@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from "express"
+import { errorCodes } from "../config/error-codes"
 import { getEmployeeById } from "../services/auth-services"
 import { createHttpErrors } from "../utils/check"
-import { errorCodes } from "../config/error-codes"
 
 interface CustomRequest extends Request {
     employeeId?: number,

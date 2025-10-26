@@ -1,12 +1,12 @@
 import { NextFunction, Request, Response } from "express"
 import { body, query, validationResult } from "express-validator"
-import { Prisma, Priority, RStatus, RType } from "../../../generated/prisma"
-import { getAllActionPlansInfinite } from "../../services/action-plan-services"
-import { checkEmployeeIfNotExits, createHttpErrors } from "../../utils/check"
+import { Priority, Prisma, RStatus, RType } from "../../../generated/prisma"
 import { errorCodes } from "../../config/error-codes"
 import { prisma } from "../../config/prisma-client"
 import { EmailQueue } from "../../jobs/queues/email-queue"
-import { response_subject, response_body, rejected_delete_subject, rejected_delete_body } from "../../utils/email-templates"
+import { getAllActionPlansInfinite } from "../../services/action-plan-services"
+import { checkEmployeeIfNotExits, createHttpErrors } from "../../utils/check"
+import { rejected_delete_body, rejected_delete_subject, response_body, response_subject } from "../../utils/email-templates"
 import { getNotificationContent } from "../../utils/helplers"
 
 interface CustomRequest extends Request {
@@ -178,6 +178,12 @@ export const deleteActionPlanById = [
                 subject: rejected_delete_subject(actionPlan.criticalEmployee.employee.fullName),
                 body: rejected_delete_body(actionPlan.criticalEmployee.employee.fullName),
                 to: [actionPlan.contact]
+            }, {
+                attempts: 3,
+                backoff: {
+                    type: "exponential",
+                    delay: 2000
+                }
             })
         }
 
@@ -265,6 +271,12 @@ export const updateActionPlan = [
             subject: response_subject(actionPlan.criticalEmployee.employee.fullName, status, emailType),
             body: response_body(actionPlan.criticalEmployee.employee.fullName, status, emailType),
             to: [actionPlan.contact]
+        }, {
+            attempts: 3,
+            backoff: {
+                type: "exponential",
+                delay: 2000
+            }
         })
 
         res.status(200).json({

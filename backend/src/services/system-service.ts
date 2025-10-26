@@ -1,8 +1,8 @@
-import { startOfTomorrow, endOfTomorrow, startOfToday } from "date-fns";
+import { endOfTomorrow, startOfToday, startOfTomorrow } from "date-fns";
 import { PrismaClient } from "../../generated/prisma";
-import { EmailQueue } from "../jobs/queues/email-queue";
-import { due_tomorrow_subject, due_tomorrow_body, action_overdue_subject, action_overdue_body, superadmin_overdue_subject, superadmin_overdue_body } from "../utils/email-templates";
 import { prisma } from "../config/prisma-client";
+import { EmailQueue } from "../jobs/queues/email-queue";
+import { action_overdue_body, action_overdue_subject, due_tomorrow_body, due_tomorrow_subject, superadmin_overdue_body, superadmin_overdue_subject } from "../utils/email-templates";
 
 const prismaClient = new PrismaClient()
 
@@ -151,12 +151,6 @@ export const cronCheckActionPlans = async () => {
                             plan.priority
                         ),
                         to: [plan.contact],
-                    }, {
-                        attempts: 3,
-                        backoff: {
-                            type: "exponential",
-                            delay: 2000
-                        }
                     })
                 );
             }
@@ -183,12 +177,6 @@ export const cronCheckActionPlans = async () => {
                             plan.priority
                         ),
                         to: [plan.contact],
-                    }, {
-                        attempts: 3,
-                        backoff: {
-                            type: "exponential",
-                            delay: 2000
-                        }
                     })
                 );
 
@@ -205,12 +193,6 @@ export const cronCheckActionPlans = async () => {
                                 plan.department.name
                             ),
                             to: superAdminEmails,
-                        }, {
-                            attempts: 3,
-                            backoff: {
-                                type: "exponential",
-                                delay: 2000
-                            }
                         })
                     );
                 }

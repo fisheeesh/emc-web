@@ -4,9 +4,9 @@ import { body, validationResult } from "express-validator";
 import { errorCodes } from "../../config/error-codes";
 import { prisma } from "../../config/prisma-client";
 import { AnalysisQueue, AnalysisQueueEvents } from "../../jobs/queues/analysis-queue";
+import { RecommendationQueue, RecommendationQueueEvents } from "../../jobs/queues/recommendation-queue";
 import { getEmployeeById } from "../../services/auth-services";
 import { checkEmployeeIfNotExits, createHttpErrors } from "../../utils/check";
-import { RecommendationQueue, RecommendationQueueEvents } from "../../jobs/queues/recommendation-queue";
 
 interface CustomRequest extends Request {
     employeeId?: number
@@ -94,14 +94,6 @@ export const generateAIAnalysis = [
                 code: errorCodes.notFound
             }))
         }
-
-        //* Map emotionScore to status for AI analysis
-        // const checkInsWithStatus = emotionCheckIns.map(checkIn => ({
-        //     textFeeling: checkIn.textFeeling,
-        //     emoji: checkIn.emoji,
-        //     checkInTime: checkIn.checkInTime,
-        //     status: checkIn.status
-        // }))
 
         const employeeName = `${criticalEmp.employee.fullName}`.trim() || "Employee"
 

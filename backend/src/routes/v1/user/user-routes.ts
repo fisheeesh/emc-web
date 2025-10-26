@@ -1,6 +1,6 @@
 import express from "express"
-import { auth } from "../../../middlewares/auth-middleware"
 import { emotionCheckIn, getEmpCheckInHistory, test } from "../../../controllers/user/user-controller"
+import { auth } from "../../../middlewares/auth-middleware"
 
 const router = express.Router()
 

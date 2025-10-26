@@ -1,11 +1,11 @@
+import dotenv from "dotenv";
+dotenv.config();
+
+import { groq } from '@ai-sdk/groq';
+import { generateText } from 'ai';
 import { Worker } from "bullmq";
 import { redis } from "../../config/redis-client";
-import { groq } from '@ai-sdk/groq'
-import { generateText } from 'ai'
-
-import dotenv from "dotenv";
 import { createScorePrompt, createScoreSystemPrompt } from "../../utils/ai-promts";
-dotenv.config();
 
 const scoreWorker = new Worker("scoreQueue", async (job) => {
     const { moodMessage } = job.data

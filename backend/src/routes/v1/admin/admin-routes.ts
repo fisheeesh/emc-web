@@ -1,10 +1,10 @@
 import express from "express"
-import { createActionPlan, deleteNotification, getAdminUser, getAllDepartments, getAllNotifications, makeAnnouncement, markAsCompletedActionPlan, markAsReadNotification, testAdmin } from "../../../controllers/admin/admin-controller"
+import { deleteNotification, getAdminUser, getAllDepartments, getAllNotifications, makeAnnouncement, markAsReadNotification, testAdmin } from "../../../controllers/admin/admin-controller"
 import { generateAIAnalysis, generateAIRecommendation, regenerateAIAnalysis } from "../../../controllers/admin/ai-controller"
 import { getAttendanceOverView, getCheckInHours, getDailyAttendance } from "../../../controllers/admin/attendance-controller"
-import { deleteCriticalEmpById, deleteWatchlistEmpById, getAllCriticalEmps, getAllWatchlistEmps, getLeaderboards, getMoodOverview, getSenitmentsComparison } from "../../../controllers/admin/sentiments-controller"
+import { createActionPlan, deleteCriticalEmpById, deleteWatchlistEmpById, getAllCriticalEmps, getAllWatchlistEmps, getLeaderboards, getMoodOverview, getSenitmentsComparison, markAsCompletedActionPlan } from "../../../controllers/admin/sentiments-controller"
 import { setMaintenance } from "../../../controllers/admin/system-controller"
-import upload, { uploadAttachments } from "../../../middlewares/upload-files-middleware"
+import { uploadAttachments } from "../../../middlewares/upload-files-middleware"
 
 const router = express.Router()
 

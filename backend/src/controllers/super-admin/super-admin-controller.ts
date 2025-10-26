@@ -1,9 +1,9 @@
 import { NextFunction, Request, Response } from "express"
 import { body, query, validationResult } from "express-validator"
-import { prisma } from "../../config/prisma-client"
-import { checkEmployeeIfNotExits, createHttpErrors } from "../../utils/check"
 import { errorCodes } from "../../config/error-codes"
+import { prisma } from "../../config/prisma-client"
 import { getEmployeeByEmail, getEmployeeById, getOTPRowByEmail } from "../../services/auth-services"
+import { checkEmployeeIfNotExits, createHttpErrors } from "../../utils/check"
 import { generateHashedValue, generateToken } from "../../utils/generate"
 
 interface CustomRequest extends Request {

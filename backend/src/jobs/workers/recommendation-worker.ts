@@ -1,10 +1,11 @@
-import { Worker } from "bullmq";
-import { redis } from "../../config/redis-client";
+import dotenv from "dotenv";
+dotenv.config();
+
 import { groq } from "@ai-sdk/groq";
 import { generateText } from "ai";
-import dotenv from "dotenv";
+import { Worker } from "bullmq";
+import { redis } from "../../config/redis-client";
 import { createRecommendationPrompt, createRecommendationSystemPrompt, EmotionCheckIn } from "../../utils/ai-promts";
-dotenv.config();
 
 interface JobData {
     empName: string,

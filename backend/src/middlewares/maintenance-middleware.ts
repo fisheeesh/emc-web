@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from "express";
+import { errorCodes } from "../config/error-codes";
 import { getSettingStatus } from "../services/system-service";
 import { createHttpErrors } from "../utils/check";
-import { errorCodes } from "../config/error-codes";
 
 const whiteLists = ["127.0.0.1"]
 
