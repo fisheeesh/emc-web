@@ -447,8 +447,8 @@ export const deleteEmployee = [
 
         if (emp.role === 'SUPERADMIN') return next(createHttpErrors({
             message: "Cannot delete Super Admin account.",
-            status: 403,
-            code: errorCodes.forbidden
+            status: 400,
+            code: errorCodes.invalid
         }))
 
         const deletedEmp = await deleteEmployeeById(+id)

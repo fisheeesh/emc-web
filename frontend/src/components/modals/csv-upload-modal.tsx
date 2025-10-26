@@ -182,7 +182,7 @@ export default function CSVUploadModal() {
                                         Selected file:
                                     </p>
                                     <div className="flex items-center justify-center gap-2">
-                                        <span className="text-blue-600 dark:text-blue-400">
+                                        <span className="text-blue-600 dark:text-blue-400 font-en">
                                             {selectedFile.name}
                                         </span>
                                         <Button
