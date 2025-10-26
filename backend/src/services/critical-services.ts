@@ -1,5 +1,5 @@
 import { format } from "date-fns"
-import { PrismaClient } from "../../generated/prisma"
+import { PrismaClient } from "../..//prisma/generated/prisma"
 import { prisma } from "../config/prisma-client"
 
 const prismaClient = new PrismaClient()

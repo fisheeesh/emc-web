@@ -31,24 +31,12 @@
   --color-link-100: #1da1f2;
 }
 
-@utility flex-center {
-  @apply flex justify-center items-center;
-}
-
-@utility flex-between {
-  @apply flex justify-between items-center;
-}
-
 @utility text-gradient {
   @apply bg-gradient-to-r from-purple-400 via-pink-500 to-blue-500 bg-clip-text text-transparent
 }
 
 @utility bg-gradient {
   @apply bg-gradient-to-r from-pink-500 to-purple-600 hover:brightness-110 transition-all duration-300
-}
-
-@utility flex-start {
-  @apply flex justify-start items-center;
 }
 
 @utility markdown {

@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from "express"
 import { body, query, validationResult } from "express-validator"
-import { Priority, Prisma, RStatus, RType } from "../../../generated/prisma"
+import { Priority, Prisma, RStatus, RType } from "../../../prisma/generated/prisma"
 import { errorCodes } from "../../config/error-codes"
 import { prisma } from "../../config/prisma-client"
 import { EmailQueue } from "../../jobs/queues/email-queue"

@@ -1,6 +1,6 @@
 import { eachDayOfInterval, format, getHours, getMinutes, startOfDay, subDays } from "date-fns"
 import jwt from 'jsonwebtoken'
-import { PrismaClient } from "../../generated/prisma"
+import { PrismaClient } from "../../prisma/generated/prisma"
 import { prisma } from "../config/prisma-client"
 import { getEmotionRange } from "../utils/helplers"
 

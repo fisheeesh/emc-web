@@ -166,6 +166,6 @@ export const credentialSchema = z.object({
 
 export const announcementFormSchema = z.object({
     subject: z.string().min(1, "Subject is required"),
-    body: z.string().min(1, "Message body is required"),
+    body: z.string().min(1, "Message body is required").min(20, "Message body must be twenty characters long"),
     images: z.array(z.instanceof(File)).optional(),
 })

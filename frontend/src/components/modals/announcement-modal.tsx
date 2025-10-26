@@ -16,22 +16,21 @@ import {
     FormMessage,
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
+import useMakeAnnouncement from "@/hooks/ui/use-make-announcement"
 import { announcementFormSchema } from "@/lib/validators"
 import { zodResolver } from "@hookform/resolvers/zod"
 import '@mdxeditor/editor/style.css'
 import { FileIcon, Upload, X } from "lucide-react"
-import { useRef, useState } from "react"
+import { useState } from "react"
 import { useForm } from "react-hook-form"
 import { TfiAnnouncement } from "react-icons/tfi"
-import Editor from "../editor"
 import type z from "zod"
-import useMakeAnnouncement from "@/hooks/ui/use-make-announcement"
+import Editor from "../editor"
 import Spinner from "../shared/spinner"
 
-export default function AnnouncementModal() {
+export default function AnnouncementModal({ onClose }: { onClose: () => void }) {
     const [attachmentPreviews, setAttachmentPreviews] = useState<Array<{ file: File, preview?: string, type: string }>>([])
     const { makeAnnouncement, making } = useMakeAnnouncement()
-    const closeButtonRef = useRef<HTMLButtonElement>(null)
 
     const form = useForm<z.infer<typeof announcementFormSchema>>({
         resolver: zodResolver(announcementFormSchema),
@@ -100,12 +99,10 @@ export default function AnnouncementModal() {
             body: values.body,
             attachments: values.images
         }, {
-            onSuccess: () => {
-                closeButtonRef.current?.click()
-            },
             onSettled: () => {
                 form.reset()
                 setAttachmentPreviews([])
+                onClose()
             }
         })
     }
@@ -211,20 +208,23 @@ export default function AnnouncementModal() {
                                                                     className="w-16 h-16 object-cover rounded border"
                                                                 />
                                                                 <div className="flex-1 min-w-0">
-                                                                    <p className="text-sm font-medium truncate">
+                                                                    <p className="text-sm font-medium truncate font-en">
                                                                         {item.file.name}
                                                                     </p>
                                                                     <p className="text-xs text-muted-foreground font-en">
                                                                         {formatFileSize(item.file.size)}
                                                                     </p>
                                                                 </div>
-                                                                <button
+                                                                <Button
+                                                                    disabled={making}
                                                                     type="button"
+                                                                    size='icon'
+                                                                    variant='destructive'
                                                                     onClick={() => removeAttachment(index)}
-                                                                    className="cursor-pointer bg-red-500 text-white rounded-full p-1.5 opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-600"
+                                                                    className="cursor-pointer rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
                                                                 >
                                                                     <X className="w-4 h-4" />
-                                                                </button>
+                                                                </Button>
                                                             </div>
                                                         ) : (
                                                             <div className="relative border rounded-md p-3 flex items-center gap-3 hover:bg-muted/50 transition-colors">
@@ -232,20 +232,23 @@ export default function AnnouncementModal() {
                                                                     <FileIcon className="w-8 h-8 text-blue-600 dark:text-blue-400" />
                                                                 </div>
                                                                 <div className="flex-1 min-w-0">
-                                                                    <p className="text-sm font-medium truncate">
+                                                                    <p className="text-sm font-medium truncate font-en">
                                                                         {item.file.name}
                                                                     </p>
                                                                     <p className="text-xs text-muted-foreground font-en">
                                                                         {formatFileSize(item.file.size)}
                                                                     </p>
                                                                 </div>
-                                                                <button
+                                                                <Button
+                                                                    disabled={making}
                                                                     type="button"
+                                                                    size='icon'
+                                                                    variant='destructive'
                                                                     onClick={() => removeAttachment(index)}
-                                                                    className="cursor-pointer bg-red-500 text-white rounded-full p-1.5 opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-600"
+                                                                    className="cursor-pointer rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
                                                                 >
                                                                     <X className="w-4 h-4" />
-                                                                </button>
+                                                                </Button>
                                                             </div>
                                                         )}
                                                     </div>
@@ -263,7 +266,6 @@ export default function AnnouncementModal() {
                         <DialogClose asChild>
                             <Button
                                 disabled={making}
-                                ref={closeButtonRef}
                                 type="button"
                                 className="min-h-[48px] cursor-pointer"
                                 variant="outline"

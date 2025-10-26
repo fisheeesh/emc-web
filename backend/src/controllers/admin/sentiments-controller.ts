@@ -1,7 +1,7 @@
 import { endOfDay, startOfDay, startOfMonth, subDays } from "date-fns";
 import { NextFunction, Request, Response } from "express";
 import { body, query, validationResult } from "express-validator";
-import { Prisma, PrismaClient, Status } from "../../../generated/prisma";
+import { Prisma, PrismaClient, Status } from "../../../prisma/generated/prisma";
 import { errorCodes } from "../../config/error-codes";
 import { prisma } from "../../config/prisma-client";
 import { EmailQueue } from "../../jobs/queues/email-queue";

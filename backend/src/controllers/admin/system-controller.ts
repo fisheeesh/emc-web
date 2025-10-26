@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import { body, validationResult } from "express-validator";
-import { PrismaClient } from "../../../generated/prisma";
+import { PrismaClient } from "../../..//prisma/generated/prisma";
 import { errorCodes } from "../../config/error-codes";
 import { createOrUpdateSettingStatus } from "../../services/system-service";
 import { createHttpErrors } from "../../utils/check";

@@ -1,5 +1,5 @@
 import { eachDayOfInterval, endOfDay, format, startOfDay } from "date-fns";
-import { PrismaClient } from "../../generated/prisma";
+import { PrismaClient } from "../../prisma/generated/prisma";
 import { MOOD_THRESHOLDS } from "../config";
 import { prisma } from "../config/prisma-client";
 import { departmentFilter, roundToHour } from "../utils/helplers";

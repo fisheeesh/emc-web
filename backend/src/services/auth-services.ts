@@ -1,5 +1,4 @@
-import { PrismaClient } from "../../generated/prisma";
-
+import { PrismaClient } from "../../prisma/generated/prisma"
 const prismaClient = new PrismaClient()
 
 export const getEmployeeByEmail = async (email: string) => {

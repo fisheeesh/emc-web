@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from "express"
 import { body, validationResult } from "express-validator"
 import sanitizeHtml from 'sanitize-html'
-import { PrismaClient } from "../../../generated/prisma"
+import { PrismaClient } from "../../..//prisma/generated/prisma"
 import { CRITICAL_POINT } from "../../config"
 import { errorCodes } from "../../config/error-codes"
 import { CacheQueue } from "../../jobs/queues/cache-queue"

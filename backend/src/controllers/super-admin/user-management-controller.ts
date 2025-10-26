@@ -1,7 +1,7 @@
 import { parse } from "csv-parse/sync"
 import { NextFunction, Request, Response } from "express"
 import { body, query, validationResult } from "express-validator"
-import { AccType, Gender, JobType, Prisma, Role, WorkStyle } from "../../../generated/prisma"
+import { AccType, Gender, JobType, Prisma, Role, WorkStyle } from "../../..//prisma/generated/prisma"
 import { errorCodes } from "../../config/error-codes"
 import { prisma } from "../../config/prisma-client"
 import { ImageQueue } from "../../jobs/queues/image-queue"

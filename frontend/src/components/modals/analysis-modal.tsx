@@ -130,16 +130,16 @@ export default function AIAnalysisModal({ analysis: initialAnalysis, empName, cr
             {!analysis && !showProgressBar ? (
                 <div className="min-h-[500px] flex flex-col items-center justify-center p-8">
                     <div className="relative mb-8">
-                        <div className="absolute inset-0 rounded-full bg-gradient-to-r from-purple-400 via-pink-500 to-blue-500 opacity-20 blur-2xl animate-pulse"></div>
-                        <div className="absolute inset-0 rounded-full bg-gradient-to-r from-purple-400 via-pink-500 to-blue-500 opacity-10 blur-3xl animate-pulse" style={{ animationDelay: '1s' }}></div>
+                        <div className="absolute inset-0 rounded-full bg-gradient-to-r from-pink-500 to-purple-600 opacity-20 blur-2xl animate-pulse"></div>
+                        <div className="absolute inset-0 rounded-full bg-gradient-to-r from-pink-500 to-purple-600 opacity-10 blur-3xl animate-pulse" style={{ animationDelay: '1s' }}></div>
                         <div className="relative">
                             <Button
                                 onClick={handleGenerateAnalysis}
-                                className="relative cursor-pointer h-32 w-32 rounded-full bg-gradient-to-r from-purple-500 via-pink-500 to-blue-500 hover:from-purple-600 hover:via-pink-600 hover:to-blue-600 shadow-2xl transition-all duration-300 hover:scale-105 overflow-hidden group"
+                                className="relative cursor-pointer h-32 w-32 rounded-full bg-gradient-to-r from-pink-500 to-purple-600 hover:brightness-110 shadow-2xl transition-all duration-300 hover:scale-105 overflow-hidden group"
                             >
                                 <div className="absolute inset-0 -translate-x-full animate-shimmer bg-gradient-to-r from-transparent via-white/30 to-transparent group-hover:translate-x-full transition-transform duration-1000"></div>
 
-                                <IoSparklesOutline className="text-5xl text-white relative z-10" />
+                                <IoSparklesOutline className="size-6 text-white relative z-10" />
                             </Button>
                         </div>
                     </div>
@@ -201,7 +201,8 @@ export default function AIAnalysisModal({ analysis: initialAnalysis, empName, cr
 
                     <div className="bg-amber-500/10 border border-amber-500/20 rounded-lg p-4 max-w-md">
                         <p className="text-sm text-amber-600 dark:text-amber-400 text-center">
-                            Please don't refresh or close this modal. This will take <span className="font-en">10-15</span> seconds.
+                            Please don't refresh or close this modal. <br />
+                            This will take <span className="font-en">10-15</span> seconds.
                         </p>
                     </div>
                 </div>

@@ -1,5 +1,5 @@
 import { endOfTomorrow, startOfToday, startOfTomorrow } from "date-fns";
-import { PrismaClient } from "../../generated/prisma";
+import { PrismaClient } from "../../prisma/generated/prisma";
 import { prisma } from "../config/prisma-client";
 import { EmailQueue } from "../jobs/queues/email-queue";
 import { action_overdue_body, action_overdue_subject, due_tomorrow_body, due_tomorrow_subject, superadmin_overdue_body, superadmin_overdue_subject } from "../utils/email-templates";
