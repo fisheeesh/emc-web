@@ -85,7 +85,6 @@ export default function AuthForm<T extends z.ZodType<any, any, any>>({
                                                         disabled={isWorking}
                                                         className={'w-full min-h-[48px] placeholder:font-raleway font-en'}
                                                         placeholder={field.name === 'email' ? 'Email Address' : 'Password'}
-                                                        inputMode="numeric"
                                                         type={(field.name === 'password' || field.name === 'confirmPassword') && showPassword[field.name] ? 'text' : (field.name === 'password' || field.name === 'confirmPassword') ? 'password' : 'text'}
                                                         {...field}
                                                     />

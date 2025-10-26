@@ -67,7 +67,6 @@ export function ResetPasswordForm({
                                                         type={showPassword[field.name] ? 'text' : 'password'}
                                                         placeholder="Create a new password"
                                                         {...field}
-                                                        inputMode="numeric"
                                                         className="w-full min-h-[48px] font-en placeholder:font-raleway"
                                                     />
                                                     <button
@@ -101,7 +100,6 @@ export function ResetPasswordForm({
                                                         type={showPassword[field.name] ? 'text' : 'password'}
                                                         placeholder="Repeat your new password"
                                                         {...field}
-                                                        inputMode="numeric"
                                                         className="w-full min-h-[48px] font-en placeholder:font-raleway"
                                                     />
                                                     <button
