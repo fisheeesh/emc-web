@@ -27,7 +27,7 @@ model Employee {
   role            Role               @default(EMPLOYEE)
   status          Status             @default(NORMAL)
   errorLoginCount Int                @default(0) @db.SmallInt
-  rndToken        String
+  rndToken        String             @db.Text
   avatar          String?
   departmentId    Int
   createdAt       DateTime           @default(now())
@@ -75,11 +75,11 @@ model Employee {
 model Otp {
   id            Int      @id @default(autoincrement())
   email         String   @unique @db.VarChar(100)
-  otp           String
-  rememberToken String
+  otp           String   @db.VarChar(6)
+  rememberToken String   @db.Text
   count         Int      @default(0) @db.SmallInt
   error         Int      @default(0) @db.SmallInt
-  verifyToken   String?
+  verifyToken   String?  @db.Text
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 }
@@ -88,7 +88,7 @@ model EmotionCheckIn {
   id           Int      @id @default(autoincrement())
   employeeId   Int
   emoji        String
-  textFeeling  String   @db.Text
+  textFeeling  String   @db.VarChar(100)
   points       BigInt?
   emotionScore Decimal  @db.Decimal(3, 2)
   createdAt    DateTime @default(now())
@@ -261,7 +261,7 @@ model Emotion {
 }
 
 model ConcernAnalysis {
-  id             String   @id @default(cuid())
+  id             String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   timeRange      String
   data           Json
   recommendation String
