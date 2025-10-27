@@ -127,11 +127,11 @@ export default function CSVUploadModal() {
     return (
         <DialogContent className="w-full mx-auto max-h-[95vh] overflow-y-auto sm:max-w-[850px] no-scrollbar">
             <DialogHeader>
-                <DialogTitle className="flex items-center gap-2 text-xl text-blue-700">
+                <DialogTitle className="text-xl font-bold flex text-brand items-center gap-2">
                     <MdOutlineFileUpload className="text-2xl" />
                     <span>Bulk Upload Users</span>
                 </DialogTitle>
-                <DialogDescription>
+                <DialogDescription className="text-start">
                     Upload a CSV file to register multiple users at once
                 </DialogDescription>
             </DialogHeader>
@@ -246,7 +246,7 @@ export default function CSVUploadModal() {
                 ) : (
                     <>
                         <div className="space-y-4">
-                            <div className="grid grid-cols-2 gap-4">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div className="p-4 bg-green-50 dark:bg-green-900/20 rounded-md">
                                     <p className="text-sm text-gray-600 dark:text-gray-400">Successful</p>
                                     <p className="text-2xl font-bold text-green-600 dark:text-green-400 font-en">{successCount}</p>
@@ -258,12 +258,12 @@ export default function CSVUploadModal() {
                             </div>
 
                             {failureCount > 0 && (
-                                <div className="max-h-60 overflow-auto border dark:border-slate-700 rounded-md">
+                                <div className="max-h-72 overflow-y-auto border dark:border-slate-700 rounded-md">
                                     <Table>
                                         <TableHeader>
                                             <TableRow>
-                                                <TableHead>Email</TableHead>
-                                                <TableHead>Error</TableHead>
+                                                <TableHead className="bg-white dark:bg-slate-900 whitespace-nowrap md:w-1/3">Email</TableHead>
+                                                <TableHead className="bg-white dark:bg-slate-900 whitespace-nowrap md:w-2/3">Error</TableHead>
                                             </TableRow>
                                         </TableHeader>
                                         <TableBody>
@@ -271,8 +271,10 @@ export default function CSVUploadModal() {
                                                 .filter(r => r.status === 'failed')
                                                 .map((result, index) => (
                                                     <TableRow key={index}>
-                                                        <TableCell>{result.email}</TableCell>
-                                                        <TableCell className="text-red-600 dark:text-red-400">
+                                                        <TableCell className="font-en md:w-1/3 whitespace-nowrap text-xs align-top py-3 w-full">
+                                                            {result.email}
+                                                        </TableCell>
+                                                        <TableCell className="text-red-600 md:w-2/3 whitespace-nowrap dark:text-red-400 text-xs align-top py-3 w-full">
                                                             {result.error}
                                                         </TableCell>
                                                     </TableRow>
@@ -289,7 +291,7 @@ export default function CSVUploadModal() {
                                     variant='outline'
                                     type="button"
                                     onClick={handleClose}
-                                    className="cursor-pointer"
+                                    className="cursor-pointer min-h-[44px] w-fit"
                                 >
                                     Done
                                 </Button>

@@ -38,7 +38,7 @@ export function DepartmentHeatmap({ depHeatmapData }: { depHeatmapData: DepHeatM
     return (
         <Card className="flex flex-col">
             <CardHeader>
-                <CardTitle className="text-xl md:text-2xl flex items-center gap-2">
+                <CardTitle className="text-xl md:text-2xl flex items-center gap-2 line-clamp-1">
                     <BsBuildings />
                     Departments Wellbeing Heatmap
                 </CardTitle>
@@ -104,7 +104,7 @@ export function DepartmentHeatmap({ depHeatmapData }: { depHeatmapData: DepHeatM
                         </div>
                     ))}
                 </div>
-                
+
                 <div className="mt-6 flex flex-wrap items-center gap-4 text-xs">
                     <span className="font-semibold text-gray-700 dark:text-gray-300">Status:</span>
                     <div className="flex items-center gap-1.5">

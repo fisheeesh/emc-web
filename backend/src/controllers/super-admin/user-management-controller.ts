@@ -4,7 +4,6 @@ import { body, query, validationResult } from "express-validator"
 import { AccType, Gender, JobType, Prisma, Role, WorkStyle } from "../../..//prisma/generated/prisma"
 import cloudinary from "../../config/cloudinary"
 import { errorCodes } from "../../config/error-codes"
-import { prisma } from "../../config/prisma-client"
 import { getEmployeeByEmail, getEmployeeById } from "../../services/auth-services"
 import { createEmployeeWithOTP, deleteEmployeeById, getEmployeesInfiniteData, updateEmpDataById } from "../../services/emp-services"
 import { checkEmployeeIfExits, checkEmployeeIfNotExits, createHttpErrors } from "../../utils/check"
@@ -115,24 +114,6 @@ export const createNewEmployee = [
 
         const existEmp = await getEmployeeByEmail(email)
         checkEmployeeIfExits(existEmp)
-
-        const activeDepartments = await prisma.department.findMany({
-            where: { isActive: true },
-            select: { name: true }
-        });
-
-        const activeDeptNames = new Set(activeDepartments.map(d => d.name));
-
-        if (!activeDeptNames.has(department)) {
-            if (req.file) {
-                await cloudinary.uploader.destroy((req.file as any).filename);
-            }
-            return next(createHttpErrors({
-                message: `Department '${department}' is inactive. Please activate it before adding employees.`,
-                status: 400,
-                code: errorCodes.invalid
-            }))
-        }
 
         const otp = 123456
         const hashedOTP = await generateHashedValue(otp.toString())
@@ -507,13 +488,6 @@ export const bulkRegister = [
             });
         }
 
-        const activeDepartments = await prisma.department.findMany({
-            where: { isActive: true },
-            select: { name: true }
-        });
-
-        const activeDeptNames = new Set(activeDepartments.map(d => d.name));
-
         const results: UploadResult[] = [];
         let successCount = 0;
         let failureCount = 0;
@@ -539,16 +513,6 @@ export const bulkRegister = [
                         status: "failed",
                         email: record.email,
                         error: "Invalid email format",
-                    });
-                    failureCount++;
-                    continue;
-                }
-
-                if (!activeDeptNames.has(record.department)) {
-                    results.push({
-                        status: 'failed',
-                        email: record.email,
-                        error: `Department '${record.department}' is inactive. Please activate it before adding employees.`
                     });
                     failureCount++;
                     continue;

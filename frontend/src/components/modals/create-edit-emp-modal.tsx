@@ -425,7 +425,7 @@ export default function CreateEditEmpModal<T extends z.ZodType<any, any, any>>({
                                                                                     ) : (
                                                                                         <div className="relative">
                                                                                             <Input
-                                                                                                className={`min-h-[44px] placeholder:font-raleway ${field.name === 'password' || field.name === 'phone' ? 'font-en' : ''}`}
+                                                                                                className={`min-h-[44px] placeholder:font-raleway ${field.name === 'password' || field.name === 'phone' || field.name === 'email' ? 'font-en' : ''}`}
                                                                                                 placeholder={`Enter ${field.name}`}
                                                                                                 disabled={isWorking}
                                                                                                 type={field.name === 'password' ? showPassword ? 'text' : 'password' : 'text'}

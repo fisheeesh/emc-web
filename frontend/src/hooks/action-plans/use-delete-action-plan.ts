@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { superApi } from "@/api"
 import queryClient from "@/api/query"
 import { useMutation } from "@tanstack/react-query"
@@ -16,11 +17,15 @@ const useDeleteActionPlan = () => {
                 description: `Action Plan has been deleted successfully.`
             })
         },
-        onError: (error) => {
-            toast.error("Error", {
-                description: error instanceof Error ? error.message : "Something went wrong. Please try again."
-            })
-        }
+        onError: (err: any) => {
+            const msg =
+                err?.response?.data?.message ||
+                err?.message ||
+                "Failed to delete action plan. Please try again.";
+            toast.error('Error', {
+                description: msg,
+            });
+        },
     })
 
     return { deleteActionPlan, deletingActionPlan }
