@@ -4,6 +4,7 @@ import { createHttpErrors } from "../utils/check";
 
 import jwt from 'jsonwebtoken';
 import { getEmployeeById } from "../services/auth-services";
+import { cookieConfig } from "../config/cookies.config";
 
 interface CustomRequest extends Request {
     employeeId?: number
@@ -77,19 +78,8 @@ export const auth = async (req: CustomRequest, res: Response, next: NextFunction
             res.setHeader("x-access-token", newAccessToken);
             res.setHeader("x-refresh-token", newRefreshToken);
         } else {
-            res.cookie("accessToken", newAccessToken, {
-                httpOnly: true,
-                secure: process.env.NODE_ENV === 'production',
-                sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'strict',
-                maxAge: 1000 * 60 * 15,
-                path: '/'
-            }).cookie("refreshToken", newRefreshToken, {
-                httpOnly: true,
-                secure: process.env.NODE_ENV === 'production',
-                sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'strict',
-                maxAge: 1000 * 60 * 60 * 24 * 30,
-                path: '/'
-            })
+            res.cookie("accessToken", accessToken, cookieConfig.accessToken)
+                .cookie("refreshToken", refreshToken, cookieConfig.refreshToken)
         }
 
         console.log("rotation done")

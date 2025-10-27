@@ -7,7 +7,7 @@ import { cn } from "@/lib/utils";
 import useCountryStore from "@/store/country-store";
 import useFilterStore from "@/store/filter-store";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { ChevronDownIcon, Eye, EyeOff } from "lucide-react";
+import { ChevronDownIcon, Eye, EyeOff, X } from "lucide-react";
 import { useRef, useState } from "react";
 import { useForm, type ControllerRenderProps, type DefaultValues, type Path, type SubmitHandler } from "react-hook-form";
 import { FaUserPen, FaUserPlus } from "react-icons/fa6";
@@ -47,12 +47,47 @@ export default function CreateEditEmpModal<T extends z.ZodType<any, any, any>>({
 
     const [showPassword, setShowPassword] = useState(false);
     const [open, setOpen] = useState(false)
-    const [selectedFileName, setSelectedFileName] = useState<string>("No file chosen");
+    const [selectedFileName, setSelectedFileName] = useState<string>("");
+    const [imagePreview, setImagePreview] = useState<string | null>(null);
 
     const form = useForm({
         resolver: zodResolver(schema) as any,
         defaultValues: defaultValues as DefaultValues<FormData>,
     })
+
+    const handleFileChange = () => {
+        const file = fileInputRef.current?.files?.[0] ?? null;
+
+        if (file) {
+            // Set the file name
+            setSelectedFileName(file.name);
+
+            // Create preview URL
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                setImagePreview(reader.result as string);
+            };
+            reader.readAsDataURL(file);
+
+            // Set form value
+            form.setValue('image' as Path<FormData>, file as any);
+        } else {
+            setSelectedFileName("");
+            setImagePreview(null);
+        }
+    };
+
+    const handleRemoveFile = () => {
+        // Clear the file input
+        if (fileInputRef.current) {
+            fileInputRef.current.value = "";
+        }
+
+        // Clear states
+        setSelectedFileName("");
+        setImagePreview(null);
+        form.setValue('image' as Path<FormData>, null as any);
+    };
 
     const onHandleSubmit: SubmitHandler<FormData> = async (values) => {
         const formData = new FormData()
@@ -338,30 +373,54 @@ export default function CreateEditEmpModal<T extends z.ZodType<any, any, any>>({
                                                                                 ) :
                                                                                     field.name === "avatar" ? (
                                                                                         <div className="w-full">
-                                                                                            <button
-                                                                                                type="button"
-                                                                                                disabled={isWorking}
-                                                                                                className="inline-block min-h-[44px] text-white font-medium disabled:cursor-not-allowed px-4 py-1.5 rounded-md cursor-pointer transition bg-brand disabled:bg-blue-400 hover:bg-own-hover"
-                                                                                            >
-                                                                                                Choose File
-                                                                                                <Input
-                                                                                                    ref={fileInputRef}
-                                                                                                    disabled={isWorking}
-                                                                                                    accept="image/*"
-                                                                                                    type="file"
-                                                                                                    className="hidden"
-                                                                                                    onChange={() => {
-                                                                                                        //* Set the actual File object as the value for the image field
-                                                                                                        const file = fileInputRef.current?.files?.[0] ?? null;
-                                                                                                        form.setValue('image' as Path<FormData>, file as any);
-                                                                                                        //* Update the selected file name
-                                                                                                        setSelectedFileName(file ? file.name : "No file chosen");
-                                                                                                    }}
-                                                                                                />
-                                                                                            </button>
-                                                                                            <span className="ml-3 text-sm">
-                                                                                                {selectedFileName}
-                                                                                            </span>
+                                                                                            <div className="flex items-center gap-3">
+                                                                                                <label
+                                                                                                    className={cn(
+                                                                                                        "inline-block text-white font-medium px-4 py-1.5 rounded-md cursor-pointer transition bg-brand hover:bg-own-hover",
+                                                                                                        isWorking && "cursor-not-allowed bg-blue-400 hover:bg-blue-400"
+                                                                                                    )}
+                                                                                                >
+                                                                                                    Choose File
+                                                                                                    <Input
+                                                                                                        ref={fileInputRef}
+                                                                                                        disabled={isWorking}
+                                                                                                        accept="image/*"
+                                                                                                        type="file"
+                                                                                                        className="hidden"
+                                                                                                        onChange={handleFileChange}
+                                                                                                    />
+                                                                                                </label>
+
+                                                                                                {!selectedFileName ? (
+                                                                                                    <span className="text-sm text-muted-foreground">
+                                                                                                        No file chosen
+                                                                                                    </span>
+                                                                                                ) : (
+                                                                                                    <div className="flex items-center gap-2">
+                                                                                                        {imagePreview && (
+                                                                                                            <img
+                                                                                                                src={imagePreview}
+                                                                                                                alt="Preview"
+                                                                                                                className="w-6 h-6 rounded-full object-cover"
+                                                                                                            />
+                                                                                                        )}
+                                                                                                        <span className="text-sm truncate font-en line-clamp-1 max-w-[200px]">
+                                                                                                            {selectedFileName}
+                                                                                                        </span>
+                                                                                                        <Button
+                                                                                                            type="button"
+                                                                                                            variant="ghost"
+                                                                                                            size="icon"
+                                                                                                            disabled={isWorking}
+                                                                                                            onClick={handleRemoveFile}
+                                                                                                            className="h-6 w-6 cursor-pointer rounded-full hover:bg-destructive/10"
+                                                                                                            title="Remove file"
+                                                                                                        >
+                                                                                                            <X className="h-4 w-4 text-destructive" />
+                                                                                                        </Button>
+                                                                                                    </div>
+                                                                                                )}
+                                                                                            </div>
                                                                                         </div>
                                                                                     ) : (
                                                                                         <div className="relative">

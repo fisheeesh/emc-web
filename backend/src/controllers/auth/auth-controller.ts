@@ -10,6 +10,7 @@ import { authorize } from '../../utils/authorize'
 import { checkEmployeeIfExits, checkEmployeeIfNotExits, checkOTPErrorIfSameDate, checkOTPRow, createHttpErrors } from "../../utils/check"
 import { otp_body, otp_subject } from '../../utils/email-templates'
 import { generateHashedValue, generateOTP, generateToken } from "../../utils/generate"
+import { cookieConfig } from '../../config/cookies.config'
 
 interface CustomRequest extends Request {
     employeeId?: number
@@ -361,22 +362,13 @@ export const confirmPassword = [
 
         await updateEmployeeData(newEmp!.id, updatedEmployeeData)
 
-        res.cookie("accessToken", accessToken, {
-            httpOnly: true,
-            sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'strict',
-            secure: process.env.NODE_ENV === 'production',
-            maxAge: 1000 * 60 * 15,
-            path: '/'
-        }).cookie("refreshToken", refreshToken, {
-            httpOnly: true,
-            sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'strict',
-            secure: process.env.NODE_ENV === 'production',
-            maxAge: 1000 * 60 * 60 * 24 * 30,
-            path: '/'
-        }).status(201).json({
-            message: "Successfully created an account.",
-            empId: newEmp.id
-        })
+        res.cookie("accessToken", accessToken, cookieConfig.accessToken)
+            .cookie("refreshToken", refreshToken, cookieConfig.refreshToken)
+            .status(201)
+            .json({
+                message: "Successfully created an account.",
+                empId: newEmp.id
+            })
     }
 ]
 
@@ -518,22 +510,13 @@ export const login = [
                 refreshToken,
             });
         } else {
-            res.cookie("accessToken", accessToken, {
-                httpOnly: true,
-                secure: process.env.NODE_ENV === 'production',
-                sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'strict',
-                maxAge: 1000 * 60 * 15,
-                path: '/'
-            }).cookie("refreshToken", refreshToken, {
-                httpOnly: true,
-                secure: process.env.NODE_ENV === 'production',
-                sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'strict',
-                maxAge: 1000 * 60 * 60 * 24 * 30,
-                path: '/'
-            }).status(200).json({
-                message: "Successfully logged in from web.",
-                employeeId: employee!.id
-            })
+            res.cookie("accessToken", accessToken, cookieConfig.accessToken)
+                .cookie("refreshToken", refreshToken, cookieConfig.refreshToken)
+                .status(200)
+                .json({
+                    message: "Successfully logged in from web.",
+                    employeeId: employee!.id
+                })
         }
     }
 ]
@@ -969,22 +952,13 @@ export const resetPassword = [
 
         const updatedEmp = await updateEmployeeData(emp!.id, updatedData)
 
-        res.cookie("accessToken", accessToken, {
-            httpOnly: true,
-            sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'strict',
-            secure: process.env.NODE_ENV === 'production',
-            maxAge: 1000 * 60 * 15,
-            path: '/'
-        }).cookie("refreshToken", refreshToken, {
-            httpOnly: true,
-            sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'strict',
-            secure: process.env.NODE_ENV === 'production',
-            maxAge: 1000 * 60 * 60 * 24 * 30,
-            path: '/'
-        }).status(200).json({
-            message: "Successfully reset password.",
-            empId: updatedEmp.id
-        })
+        res.cookie("accessToken", accessToken, cookieConfig.accessToken)
+            .cookie("refreshToken", refreshToken, cookieConfig.refreshToken)
+            .status(200)
+            .json({
+                message: "Successfully reset password.",
+                empId: updatedEmp.id
+            })
     }
 ]
 
