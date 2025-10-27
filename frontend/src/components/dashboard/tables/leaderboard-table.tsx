@@ -111,7 +111,7 @@ export default function LeaderBoardTable({ data, isLoading }: Props) {
                                                 </div>
                                             </TableCell>
                                             <TableCell>
-                                                <span className="whitespace-nowrap">{emp.email}</span>
+                                                <span className="whitespace-nowrap font-en">{emp.email}</span>
                                             </TableCell>
                                             <TableCell>
                                                 <span className="whitespace-nowrap">{emp.department.name}</span>

@@ -15,6 +15,8 @@ export const invalidateEmpQueries = async () => {
 
 export const invalidateDepQueries = async () => {
     await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ['emps', 'infinite'], exact: false }),
+        queryClient.invalidateQueries({ queryKey: ["action-plans", "infinite"], exact: false }),
         queryClient.invalidateQueries({ queryKey: ['departments'] }),
         queryClient.invalidateQueries({ queryKey: ['all-dep-data'] }),
         queryClient.invalidateQueries({ queryKey: ['summary'], exact: false }),
