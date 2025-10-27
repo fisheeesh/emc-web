@@ -1,37 +1,42 @@
 import { Request } from "express";
 import multer, { FileFilterCallback } from "multer";
-
-const fileStorage = multer.diskStorage({
-    destination: function (req, file, cb) {
-        cb(null, 'uploads/images')
-    },
-    filename: function (req, file, cb) {
-        const ext = file.mimetype.split('/')[1]
-        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9) + '.' + ext
-        cb(null, uniqueSuffix)
-    }
-})
+import { CloudinaryStorage } from "multer-storage-cloudinary";
+import cloudinary from "../config/cloudinary";
 
 //* Image file filter
 const fileFilter = (req: Request, file: Express.Multer.File, cb: FileFilterCallback) => {
     if (file.mimetype === 'image/jpeg' || file.mimetype === 'image/png' || file.mimetype === 'image/jpg' || file.mimetype === 'image/webp') {
-        cb(null, true)
+        cb(null, true);
     } else {
-        cb(null, false)
+        cb(null, false);
     }
-}
+};
+
+//* Cloudinary storage for employee images
+const fileStorage = new CloudinaryStorage({
+    cloudinary: cloudinary,
+    params: {
+        folder: 'employees/avatars',
+        allowed_formats: ['jpg', 'jpeg', 'png', 'webp'],
+        transformation: [{ width: 300, height: 300, crop: 'fill', quality: 'auto' }],
+        public_id: (req: any, file: Express.Multer.File) => {
+            const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+            return `avatar-${uniqueSuffix}`;
+        }
+    } as any
+});
 
 const upload = multer({
     storage: fileStorage,
     fileFilter,
     limits: { fileSize: 1024 * 1024 * 10 }
-})
+});
 
 export const uploadMemory = multer({
     storage: multer.memoryStorage(),
     fileFilter,
     limits: { fileSize: 1024 * 1024 * 10 }
-})
+});
 
 //* CSV file filter 
 const csvFileFilter = (req: Request, file: Express.Multer.File, cb: FileFilterCallback) => {
@@ -41,20 +46,20 @@ const csvFileFilter = (req: Request, file: Express.Multer.File, cb: FileFilterCa
         file.mimetype === 'application/csv' ||
         file.mimetype === 'text/plain'
     ) {
-        cb(null, true)
+        cb(null, true);
     } else {
-        cb(new Error('Only CSV files are allowed!') as any, false)
+        cb(new Error('Only CSV files are allowed!') as any, false);
     }
-}
+};
 
 //* Multer configuration for CSV uploads
 export const uploadCSV = multer({
     storage: multer.memoryStorage(),
     fileFilter: csvFileFilter,
     limits: { fileSize: 1024 * 1024 * 5 }
-})
+});
 
-//* Attachment file filter for email attachments such as images, pdfs, docs, etc...
+//* Attachment file filter for email attachments
 const attachmentFileFilter = (req: Request, file: Express.Multer.File, cb: FileFilterCallback) => {
     const allowedMimeTypes = [
         'image/jpeg',
@@ -76,24 +81,28 @@ const attachmentFileFilter = (req: Request, file: Express.Multer.File, cb: FileF
     } else {
         cb(new Error('File type not supported for attachments!') as any, false);
     }
-}
+};
 
-const attachmentStorage = multer.diskStorage({
-    destination: function (req, file, cb) {
-        cb(null, 'uploads/attachments')
-    },
-    filename: function (req, file, cb) {
-        const ext = file.originalname.split('.').pop()
-        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9) + '.' + ext
-        cb(null, uniqueSuffix)
-    }
-})
+//* Cloudinary storage for attachments
+const attachmentStorage = new CloudinaryStorage({
+    cloudinary: cloudinary,
+    params: {
+        folder: 'employees/attachments',
+        allowed_formats: ['jpg', 'jpeg', 'png', 'webp', 'pdf', 'doc', 'docx', 'xls', 'xlsx', 'txt', 'zip'],
+        resource_type: 'auto',
+        public_id: (req: any, file: Express.Multer.File) => {
+            const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+            const originalName = file.originalname.split('.')[0];
+            return `${originalName}-${uniqueSuffix}`;
+        }
+    } as any
+});
 
 //* Multer configuration for email attachments
 export const uploadAttachments = multer({
     storage: attachmentStorage,
     fileFilter: attachmentFileFilter,
     limits: { fileSize: 1024 * 1024 * 10 }
-})
+});
 
-export default upload
+export default upload;
