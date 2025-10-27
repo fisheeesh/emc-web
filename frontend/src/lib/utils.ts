@@ -56,13 +56,8 @@ export const formatPhoneNumber = (phone: string): string => {
     return `+${cleaned.slice(0, 3)} ${cleaned.slice(3, 6)} ${cleaned.slice(6, 9)} ${cleaned.slice(9)}`;
   }
 
-  if (cleaned.startsWith("09") && cleaned.length === 11) {
+  if (cleaned.startsWith("09")) {
     return `${cleaned.slice(0, 2)} ${cleaned.slice(2, 5)} ${cleaned.slice(5, 8)} ${cleaned.slice(8)}`;
-  }
-
-  //* US format (10 digits)
-  if (cleaned.length === 10) {
-    return `(${cleaned.slice(0, 3)}) ${cleaned.slice(3, 6)}-${cleaned.slice(6)}`;
   }
 
   //* International format (more than 10 digits)

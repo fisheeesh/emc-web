@@ -83,14 +83,12 @@ interface AttendanceOverviewData {
     checkInTime: string,
     status: "positive" | "neutral" | "negative" | "critical",
     employee: Employee,
-    points: number
 }
 
 interface LeaderboardData {
     rank: number,
     email: string,
     streak: number,
-    points: number,
     avatar: string,
     department: {
         id: number,

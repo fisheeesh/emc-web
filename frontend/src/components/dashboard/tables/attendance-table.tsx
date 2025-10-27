@@ -1,14 +1,14 @@
-import LocalSearch from "@/components/shared/local-search";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { EMOTION_FILTER, IMG_URL, TSFILTER } from "@/lib/constants";
 import CommonFilter from "@/components/shared/common-filter";
 import CustomBadge from "@/components/shared/custom-badge";
 import CustomCalendar from "@/components/shared/custom-calendar";
+import LocalSearch from "@/components/shared/local-search";
 import TableSkeleton from "@/components/shared/table-skeleton";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import Empty from "@/components/ui/empty";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { EMOTION_FILTER, TSFILTER } from "@/lib/constants";
 import { getInitialName } from "@/lib/utils";
 import { BsCalendar2Check } from "react-icons/bs";
 
@@ -80,7 +80,7 @@ export default function AttendanceTable({ data, status, error, isFetchingNextPag
                                                 <TableCell className="py-6">
                                                     <div className="flex items-center gap-2">
                                                         <Avatar className="size-9">
-                                                            <AvatarImage src={IMG_URL + att.employee.avatar} alt={att.employee.fullName} />
+                                                            <AvatarImage src={att.employee.avatar} alt={att.employee.fullName} />
                                                             <AvatarFallback>{getInitialName(att.employee.fullName)}</AvatarFallback>
                                                         </Avatar>
                                                         <span className="whitespace-nowrap">{att.employee.fullName}</span>
@@ -97,9 +97,6 @@ export default function AttendanceTable({ data, status, error, isFetchingNextPag
                                                 </TableCell>
                                                 <TableCell>
                                                     <span className="whitespace-nowrap font-en">{att.checkInTime}</span>
-                                                </TableCell>
-                                                <TableCell>
-                                                    <span className="whitespace-nowrap font-en">{att.points}</span>
                                                 </TableCell>
                                                 {/* <TableCell className="space-x-2 text-center">
                                                     <Dialog>

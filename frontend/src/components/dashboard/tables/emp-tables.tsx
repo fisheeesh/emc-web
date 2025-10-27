@@ -1,12 +1,13 @@
+import CreateEmpBtn from "@/components/btns/create-emp-btn";
+import UploadCSVBtn from "@/components/btns/upload-csv-btn";
 import ConfirmModal from "@/components/modals/confirm-modal";
 import CreateEditEmpModal from "@/components/modals/create-edit-emp-modal";
+import EditCredentialsModal from "@/components/modals/edit-credentials-modal";
 import EmpDetailsModal from "@/components/modals/emp-details-modal";
 import CommonFilter from "@/components/shared/common-filter";
-import CreateEmpBtn from "@/components/btns/create-emp-btn";
 import CustomBadge from "@/components/shared/custom-badge";
 import LocalSearch from "@/components/shared/local-search";
 import TableSkeleton from "@/components/shared/table-skeleton";
-import UploadCSVBtn from "@/components/btns/upload-csv-btn";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -21,7 +22,7 @@ import {
 import Empty from "@/components/ui/empty";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import useDeleteEmp from "@/hooks/emps/use-delete-emp";
-import { ACC_FILTER, EMOTION_FILTER, IMG_URL, JOBS_FILTER, ROLES_FILTER, TSFILTER } from "@/lib/constants";
+import { ACC_FILTER, EMOTION_FILTER, JOBS_FILTER, ROLES_FILTER, TSFILTER } from "@/lib/constants";
 import { getInitialName } from "@/lib/utils";
 import { updateEmpSchema } from "@/lib/validators";
 import useUserStore from "@/store/user-store";
@@ -29,9 +30,8 @@ import { useState } from "react";
 import { BsEye } from "react-icons/bs";
 import { GrMoreVertical } from "react-icons/gr";
 import { LuUserPen } from "react-icons/lu";
-import { RiDeleteBin5Line } from "react-icons/ri";
 import { MdOutlineSecurity } from "react-icons/md";
-import EditCredentialsModal from "@/components/modals/edit-credentials-modal";
+import { RiDeleteBin5Line } from "react-icons/ri";
 
 interface Props {
     data: Employee[]
@@ -127,7 +127,7 @@ export default function EmpTables({ data, status, error, isFetchingNextPage, fet
                                                 <TableCell>
                                                     <div className="flex items-center gap-2">
                                                         <Avatar className="size-9">
-                                                            <AvatarImage src={IMG_URL + emp.avatar} alt={emp.fullName} />
+                                                            <AvatarImage src={emp.avatar} alt={emp.fullName} />
                                                             <AvatarFallback>{getInitialName(emp.fullName)}</AvatarFallback>
                                                         </Avatar>
                                                         <span className="whitespace-nowrap">{emp.fullName}</span>
@@ -239,7 +239,7 @@ export default function EmpTables({ data, status, error, isFetchingNextPage, fet
                                                 jobType: editingEmp.jobType as "FULLTIME" | "PARTTIME" | "CONTRACT" | "INTERNSHIP",
                                                 accType: editingEmp.accType as "ACTIVE" | "FREEZE",
                                                 gender: "MALE",
-                                                birthdate: "",
+                                                birthdate: editingEmp.birthdate,
                                                 workStyle: "ONSITE",
                                                 country: "Thailand",
                                                 avatar: undefined,

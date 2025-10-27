@@ -6,14 +6,12 @@ import LocalSearch from "@/components/shared/local-search";
 import StreakFireIcon from "@/components/shared/streak-fire-icon";
 import TableSkeleton from "@/components/shared/table-skeleton";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import Empty from "@/components/ui/empty";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { IMG_URL, LEADERBOARD_FILTER } from "@/lib/constants";
+import { LEADERBOARD_FILTER } from "@/lib/constants";
 import { getInitialName } from "@/lib/utils";
 import { GiChampions } from "react-icons/gi";
-import { MdOutlineEmail } from "react-icons/md";
 
 interface Props {
     data: LeaderboardData[],
@@ -86,11 +84,10 @@ export default function LeaderBoardTable({ data, isLoading }: Props) {
                     <TableHeader>
                         <TableRow>
                             <TableHead className="whitespace-nowrap font-semibold w-32 text-center">#</TableHead>
-                            <TableHead className="whitespace-nowrap font-semibold w-2/4">Employee's Name</TableHead>
+                            <TableHead className="whitespace-nowrap font-semibold w-2/5">Employee's Name</TableHead>
+                            <TableHead className="whitespace-nowrap font-semibold">Contact</TableHead>
                             <TableHead className="whitespace-nowrap font-semibold">Department</TableHead>
-                            <TableHead className="whitespace-nowrap text-center font-semibold">Total Points</TableHead>
                             <TableHead className="whitespace-nowrap text-center font-semibold">Streak</TableHead>
-                            <TableHead className="whitespace-nowrap text-center font-semibold">Contact</TableHead>
                         </TableRow>
                     </TableHeader>
 
@@ -104,31 +101,26 @@ export default function LeaderBoardTable({ data, isLoading }: Props) {
                                             <TableCell className="py-6 w-32 text-center">
                                                 {renderRank(emp.rank)}
                                             </TableCell>
-                                            <TableCell className="w-2/4">
+                                            <TableCell className="w-2/5">
                                                 <div className="flex items-center gap-4">
                                                     <Avatar className="size-9">
-                                                        <AvatarImage src={IMG_URL + emp.avatar} alt={emp.fullName} />
+                                                        <AvatarImage src={emp.avatar} alt={emp.fullName} />
                                                         <AvatarFallback>{getInitialName(emp.fullName)}</AvatarFallback>
                                                     </Avatar>
                                                     <span className="whitespace-nowrap">{emp.fullName}</span>
                                                 </div>
                                             </TableCell>
                                             <TableCell>
-                                                <span className="whitespace-nowrap">{emp.department.name}</span>
+                                                <span className="whitespace-nowrap">{emp.email}</span>
                                             </TableCell>
-                                            <TableCell className="text-center">
-                                                <span className="whitespace-nowrap font-en">{emp.points}</span>
+                                            <TableCell>
+                                                <span className="whitespace-nowrap">{emp.department.name}</span>
                                             </TableCell>
                                             <TableCell className="text-center">
                                                 {!emp.streak ?
                                                     <span className="whitespace-nowrap font-en text-gray-400">—</span>
                                                     : <StreakFireIcon value={emp.streak} />
                                                 }
-                                            </TableCell>
-                                            <TableCell className="text-center">
-                                                <Button size='icon' className="p-2 rounded-full bg-muted dark:text-white text-black cursor-pointer hover:bg-gray-200 dark:hover:bg-slate-700">
-                                                    <MdOutlineEmail />
-                                                </Button>
                                             </TableCell>
                                         </TableRow>
                                     ))

@@ -65,7 +65,7 @@ export default function CreateEditEmpModal<T extends z.ZodType<any, any, any>>({
         formData.append('jobType', values.jobType)
         formData.append("department", values.department)
         formData.append("gender", values.gender)
-        formData.append("birthdate", values.birthdate)
+        formData.append("birthdate", new Date(values.birthdate).toISOString())
         formData.append("workStyle", values.workStyle)
         formData.append("country", values.country)
 
@@ -132,7 +132,7 @@ export default function CreateEditEmpModal<T extends z.ZodType<any, any, any>>({
                                             <div className="flex items-center gap-1 justify-between">
                                                 <FormLabel>
                                                     {field.name.charAt(0).toUpperCase() + field.name.slice(1)}
-                                                    <span className="text-red-600 font-en">*</span>
+                                                    {field.name !== 'avatar' && <span className="text-red-600 font-en">*</span>}
                                                 </FormLabel>
                                             </div>
                                             <FormControl>
@@ -338,7 +338,11 @@ export default function CreateEditEmpModal<T extends z.ZodType<any, any, any>>({
                                                                                 ) :
                                                                                     field.name === "avatar" ? (
                                                                                         <div className="w-full">
-                                                                                            <label className="inline-block text-white font-medium px-4 py-1.5 rounded-md cursor-pointer transition bg-brand hover:bg-own-hover">
+                                                                                            <button
+                                                                                                type="button"
+                                                                                                disabled={isWorking}
+                                                                                                className="inline-block min-h-[44px] text-white font-medium disabled:cursor-not-allowed px-4 py-1.5 rounded-md cursor-pointer transition bg-brand disabled:bg-blue-400 hover:bg-own-hover"
+                                                                                            >
                                                                                                 Choose File
                                                                                                 <Input
                                                                                                     ref={fileInputRef}
@@ -354,7 +358,7 @@ export default function CreateEditEmpModal<T extends z.ZodType<any, any, any>>({
                                                                                                         setSelectedFileName(file ? file.name : "No file chosen");
                                                                                                     }}
                                                                                                 />
-                                                                                            </label>
+                                                                                            </button>
                                                                                             <span className="ml-3 text-sm">
                                                                                                 {selectedFileName}
                                                                                             </span>

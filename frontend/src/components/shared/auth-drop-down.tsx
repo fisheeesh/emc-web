@@ -13,18 +13,16 @@ import {
     DropdownMenuShortcut,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { IMG_URL } from "@/lib/constants";
 import useUserStore from "@/store/user-store";
 import { FaRegCalendarCheck } from "react-icons/fa";
 import { IoMdLogOut } from "react-icons/io";
 import { LuLayoutDashboard } from "react-icons/lu";
-import { MdOutlineSettings } from "react-icons/md";
+import { MdOutlineAnalytics, MdOutlineSettings } from "react-icons/md";
 import { Link } from "react-router";
 import LogoutModal from "../modals/log-out-modal";
 import { Button } from "../ui/button";
 import { Dialog, DialogTrigger } from "../ui/dialog";
 import CustomBadge from "./custom-badge";
-import { MdOutlineAnalytics } from "react-icons/md";
 
 export default function AuthDropdown() {
     const { user } = useUserStore()
@@ -37,7 +35,7 @@ export default function AuthDropdown() {
                 <DropdownMenuTrigger asChild>
                     <Button variant="secondary" className="size-8 rounded-full cursor-pointer">
                         <Avatar className="size-9">
-                            <AvatarImage src={IMG_URL + user?.avatar} alt={user?.fullName} />
+                            <AvatarImage src={user?.avatar} alt={user?.fullName} />
                             <AvatarFallback>{initialName}</AvatarFallback>
                         </Avatar>
                     </Button>

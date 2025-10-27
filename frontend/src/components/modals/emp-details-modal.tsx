@@ -1,7 +1,6 @@
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { IMG_URL } from '@/lib/constants';
 import { formatPhoneNumber, generateEmployeeId, getInitialName } from '@/lib/utils';
 import { DialogClose } from '@radix-ui/react-dialog';
 import { Briefcase, Calendar, Globe, Mail, MapPinned, Phone, User } from 'lucide-react';
@@ -16,7 +15,7 @@ export default function EmpDetailsModal({ employee }: { employee: Employee }) {
                 <DialogHeader className="flex flex-col gap-4 md:flex-row items-start justify-between">
                     <div className="flex gap-4">
                         <Avatar className="size-16">
-                            <AvatarImage src={IMG_URL + employee.avatar} alt={employee.fullName} />
+                            <AvatarImage src={employee.avatar} alt={employee.fullName} />
                             <AvatarFallback>{getInitialName(employee.fullName)}</AvatarFallback>
                         </Avatar>
                         <div className='items-start flex-col'>

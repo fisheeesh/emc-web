@@ -10,8 +10,8 @@ export default function LoginPage() {
                 formType='LOGIN'
                 schema={LogInSchema}
                 defaultValues={{
-                    email: 'koswam779@gmail.com',
-                    password: '12345678'
+                    email: 'swanphyo444@gmail.com',
+                    password: 'Swamyi162$'
                 }}
             />
         </section>

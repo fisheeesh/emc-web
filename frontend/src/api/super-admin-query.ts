@@ -7,6 +7,7 @@ export const invalidateEmpQueries = async () => {
     await Promise.all([
         queryClient.invalidateQueries({ queryKey: ['emps', 'infinite'], exact: false }),
         queryClient.invalidateQueries({ queryKey: ['departments'] }),
+        queryClient.invalidateQueries({ queryKey: ['admin-user'] }),
         queryClient.invalidateQueries({ queryKey: ['all-dep-data'] }),
         queryClient.invalidateQueries({ queryKey: ['summary'], exact: false }),
     ]);

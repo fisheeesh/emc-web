@@ -12,7 +12,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem,
 import Empty from "@/components/ui/empty";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import useDeleteCriticalEmp from "@/hooks/emps/use-delete-critical-emp";
-import { CRITICALSTATUS, IMG_URL } from "@/lib/constants";
+import { CRITICALSTATUS } from "@/lib/constants";
 import { getInitialName } from "@/lib/utils";
 import { useState } from "react";
 import { GrMoreVertical, GrNotes } from "react-icons/gr";
@@ -91,7 +91,7 @@ export default function CriticalTable({ data, status, error, isFetchingNextPage,
                                                 <TableCell className="py-6">
                                                     <div className="flex items-center gap-2">
                                                         <Avatar className="size-9">
-                                                            <AvatarImage src={IMG_URL + emp.employee.avatar} alt={emp.employee.fullName} />
+                                                            <AvatarImage src={emp.employee.avatar} alt={emp.employee.fullName} />
                                                             <AvatarFallback>{getInitialName(emp.employee.fullName)}</AvatarFallback>
                                                         </Avatar>
                                                         <span className="whitespace-nowrap">{emp.employee.fullName}</span>

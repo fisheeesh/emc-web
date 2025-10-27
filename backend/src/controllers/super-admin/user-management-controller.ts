@@ -2,12 +2,12 @@ import { parse } from "csv-parse/sync"
 import { NextFunction, Request, Response } from "express"
 import { body, query, validationResult } from "express-validator"
 import { AccType, Gender, JobType, Prisma, Role, WorkStyle } from "../../..//prisma/generated/prisma"
+import cloudinary from "../../config/cloudinary"
 import { errorCodes } from "../../config/error-codes"
 import { prisma } from "../../config/prisma-client"
-import { ImageQueue } from "../../jobs/queues/image-queue"
 import { getEmployeeByEmail, getEmployeeById } from "../../services/auth-services"
 import { createEmployeeWithOTP, deleteEmployeeById, getEmployeesInfiniteData, updateEmpDataById } from "../../services/emp-services"
-import { checkEmployeeIfExits, checkEmployeeIfNotExits, checkUploadFile, createHttpErrors } from "../../utils/check"
+import { checkEmployeeIfExits, checkEmployeeIfNotExits, createHttpErrors } from "../../utils/check"
 import { generateHashedValue, generateToken } from "../../utils/generate"
 import { removeFiles } from "../../utils/helplers"
 
@@ -98,7 +98,8 @@ export const createNewEmployee = [
         const errors = validationResult(req).array({ onlyFirstError: true })
         if (errors.length > 0) {
             if (req.file) {
-                await removeFiles(req.file.filename, null)
+                const publicId = (req.file as any).filename.split('.')[0];
+                await cloudinary.uploader.destroy(`employees/avatars/${publicId}`);
             }
             return next(createHttpErrors({
                 message: errors[0].msg,
@@ -122,23 +123,15 @@ export const createNewEmployee = [
 
         const activeDeptNames = new Set(activeDepartments.map(d => d.name));
 
-        if (!activeDeptNames.has(department)) return next(createHttpErrors({
-            message: `Department '${department}' is inactive. Please activate it before adding employees.`,
-            status: 400,
-            code: errorCodes.invalid
-        }))
-
-        if (req.file) {
-            checkUploadFile(req.file)
-
-            const splitFileName = req.file?.filename?.split(".")[0]
-            await ImageQueue.add("optimize-image", {
-                filePath: req.file?.path,
-                fileName: `${splitFileName}.webp`,
-                width: 300,
-                height: 300,
-                quality: 100
-            })
+        if (!activeDeptNames.has(department)) {
+            if (req.file) {
+                await cloudinary.uploader.destroy((req.file as any).filename);
+            }
+            return next(createHttpErrors({
+                message: `Department '${department}' is inactive. Please activate it before adding employees.`,
+                status: 400,
+                code: errorCodes.invalid
+            }))
         }
 
         const otp = 123456
@@ -161,7 +154,8 @@ export const createNewEmployee = [
             country,
             birthdate,
             rndToken: token,
-            avatar: req.file?.filename
+            avatar: req.file ? (req.file as any).path : null,
+            avatarPublicId: req.file ? (req.file as any).filename : null
         }
 
         const otpData = {
@@ -348,7 +342,11 @@ export const updateEmployeeInformation = [
         const errors = validationResult(req).array({ onlyFirstError: true })
         if (errors.length > 0) {
             if (req.file) {
-                await removeFiles(req.file.filename, null)
+                try {
+                    await cloudinary.uploader.destroy((req.file as any).filename);
+                } catch (error) {
+                    console.error('Error deleting file from Cloudinary:', error);
+                }
             }
             return next(createHttpErrors({
                 message: errors[0].msg,
@@ -366,7 +364,11 @@ export const updateEmployeeInformation = [
 
         if (!emp) {
             if (req.file) {
-                await removeFiles(req.file.filename, null)
+                try {
+                    await cloudinary.uploader.destroy((req.file as any).filename);
+                } catch (error) {
+                    console.error('Error deleting file from Cloudinary:', error);
+                }
             }
             return next(createHttpErrors({
                 message: "Employee not found.",
@@ -392,20 +394,19 @@ export const updateEmployeeInformation = [
         }
 
         if (req.file) {
-            data.avatar = req.file.filename
+            //* Store the new Cloudinary URL and public_id
+            data.avatar = (req.file as any).path;
+            data.avatarPublicId = (req.file as any).filename;
 
-            const splitFileName = req.file.filename?.split(".")[0]
-
-            await ImageQueue.add("optimize-image", {
-                filePath: req.file.path,
-                fileName: `${splitFileName}.webp`,
-                width: 300,
-                height: 300,
-                quality: 80
-            })
-
-            const optimizeFile = emp.avatar?.split(".")[0] + ".webp"
-            await removeFiles(emp.avatar!, optimizeFile)
+            //* Delete the old image from Cloudinary if it exists
+            if (emp.avatarPublicId) {
+                try {
+                    await cloudinary.uploader.destroy(emp.avatarPublicId);
+                    console.log('Old avatar deleted from Cloudinary:', emp.avatarPublicId);
+                } catch (error) {
+                    console.error('Error deleting old avatar from Cloudinary:', error);
+                }
+            }
         }
 
         const updatedEmp = await updateEmpDataById(+id, data)

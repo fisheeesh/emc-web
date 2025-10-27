@@ -1,4 +1,4 @@
-import { adminUserDataQuery, criticalQuery, leaderboardsQuery, moodOverviewQuery, notificationQuery, sentimentsComparisonQuery, watchlistQuery } from "@/api/query";
+import { criticalQuery, leaderboardsQuery, moodOverviewQuery, notificationQuery, sentimentsComparisonQuery, watchlistQuery } from "@/api/query";
 import OverViewChart from "@/components/dashboard/charts/overview-chart";
 import SentimentsComparisonChart from "@/components/dashboard/charts/sentiments-comparison-chart";
 import CriticalTable from "@/components/dashboard/tables/critical-table";
@@ -17,7 +17,7 @@ ChartJS.register(ArcElement, Tooltip, Legend, CategoryScale, LinearScale, PointE
 export default function SentimentsDashboardPage() {
     useTitle("Sentiments Dashboard")
 
-    const { user, setUser } = useUserStore()
+    const { user } = useUserStore()
     const { setNotis } = useNotiStore()
     const [searchParams] = useSearchParams()
 
@@ -33,8 +33,6 @@ export default function SentimentsDashboardPage() {
     const isResolved = searchParams.get("cStatus") || "all"
 
     const dep = user?.role === 'SUPERADMIN' ? gDep : user?.departmentId.toString()
-
-    const { data: adminUserData } = useSuspenseQuery(adminUserDataQuery())
     const { data: overviewData } = useSuspenseQuery(moodOverviewQuery(duration, dep))
     const { data: sentimentsComparison } = useSuspenseQuery(sentimentsComparisonQuery(sentimentsFilter, dep))
     const { data: leaderboardsData } = useSuspenseQuery(leaderboardsQuery(lKw, dep, lduration))
@@ -71,18 +69,7 @@ export default function SentimentsDashboardPage() {
         if (notificationsData) {
             setNotis(notificationsData.data)
         }
-
-        if (adminUserData) {
-            setUser({
-                id: adminUserData.data.id,
-                fullName: adminUserData.data.fullName,
-                email: adminUserData.data.email,
-                avatar: adminUserData.data.avatar,
-                role: adminUserData.data.role,
-                departmentId: adminUserData.data.departmentId
-            })
-        }
-    }, [adminUserData, setUser, notificationsData, setNotis])
+    }, [notificationsData, setNotis])
 
     return (
         <section className="flex flex-col items-center justify-center w-full gap-3">

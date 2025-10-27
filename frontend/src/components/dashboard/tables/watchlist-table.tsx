@@ -1,5 +1,6 @@
 import ActionModal from "@/components/modals/action-modal";
 import ConfirmModal from "@/components/modals/confirm-modal";
+import WathclistHistoryModal from "@/components/modals/wathlist-history-modal";
 import LocalSearch from "@/components/shared/local-search";
 import TableSkeleton from "@/components/shared/table-skeleton";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -9,15 +10,13 @@ import { Dialog, DialogTrigger } from "@/components/ui/dialog";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import Empty from "@/components/ui/empty";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { IMG_URL } from "@/lib/constants";
+import useDeleteWatchlistEmp from "@/hooks/emps/use-delete-watchlist-emp";
 import { getInitialName } from "@/lib/utils";
 import { useState } from "react";
 import { GiBinoculars } from "react-icons/gi";
 import { GrMoreVertical, GrNotes } from "react-icons/gr";
-import { RiDeleteBin5Line } from "react-icons/ri";
 import { MdHistory } from "react-icons/md";
-import useDeleteWatchlistEmp from "@/hooks/emps/use-delete-watchlist-emp";
-import WathclistHistoryModal from "@/components/modals/wathlist-history-modal";
+import { RiDeleteBin5Line } from "react-icons/ri";
 
 interface Props {
     data: WatchlistEmployee[]
@@ -78,7 +77,7 @@ export default function WatchListTable({ data, status, error, isFetchingNextPage
                                                 <TableCell className="py-6">
                                                     <div className="flex items-center gap-2">
                                                         <Avatar className="size-9">
-                                                            <AvatarImage src={IMG_URL + emp.avatar} alt={emp.fullName} />
+                                                            <AvatarImage src={emp.avatar} alt={emp.fullName} />
                                                             <AvatarFallback>{getInitialName(emp.fullName)}</AvatarFallback>
                                                         </Avatar>
                                                         <span className="whitespace-nowrap">{emp.fullName}</span>

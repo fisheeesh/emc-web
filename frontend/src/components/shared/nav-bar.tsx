@@ -1,22 +1,20 @@
 import fullDark from '@/assets/full-dark.png'
-import halfDark from '@/assets/half-dark.png'
 import fullLight from '@/assets/full-light.png'
-import halfLight from '@/assets/half-dark.png'
+import { default as halfDark, default as halfLight } from '@/assets/half-dark.png'
 import { APP_NAME, NAVLINKS } from '@/lib/constants'
 import useFilterStore from '@/store/filter-store'
 import useUserStore from '@/store/user-store'
 import { useState } from 'react'
-import { IoMdLogOut } from "react-icons/io";
+import { IoMdLogOut } from "react-icons/io"
 import { NavLink, useNavigate } from 'react-router'
+import AnnouncementBtn from '../btns/announcement-btn'
+import NotiBtn from '../btns/noti-btn'
 import LogoutModal from '../modals/log-out-modal'
 import { Button } from '../ui/button'
 import { Dialog, DialogTrigger } from '../ui/dialog'
-import AnnouncementBtn from '../btns/announcement-btn'
 import AuthDropdown from './auth-drop-down'
 import CommonFilter from './common-filter'
-import LngBtn from '../btns/lng-btn'
 import { ModeToggle } from './mode-toggle'
-import NotiBtn from '../btns/noti-btn'
 import { useTheme } from './theme-provider'
 
 export default function Navbar() {
@@ -66,7 +64,6 @@ export default function Navbar() {
                             otherClasses="min-h-[36px] sm:min-w-[100px]"
                         />}
                         <NotiBtn />
-                        <LngBtn />
                         <AnnouncementBtn />
                         <ModeToggle />
                         <AuthDropdown />
@@ -98,7 +95,6 @@ export default function Navbar() {
                                     />}
                                     <div className='flex items-center gap-3'>
                                         <NotiBtn />
-                                        <LngBtn />
                                         <AnnouncementBtn />
                                         <ModeToggle />
                                         <DialogTrigger asChild>

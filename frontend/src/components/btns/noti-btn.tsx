@@ -9,16 +9,15 @@ import {
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import useDeleteNoti from "@/hooks/ui/use-delete-noti";
 import useMarkAsRead from "@/hooks/ui/use-read-noti";
-import { IMG_URL } from "@/lib/constants";
 import { cn } from "@/lib/utils";
 import useNotiStore from "@/store/noti-store";
+import useUserStore from "@/store/user-store";
 import { Bell, BellOff, Eye, Trash2 } from "lucide-react";
 import moment from "moment";
 import { useState } from "react";
 import { useLocation, useNavigate } from "react-router";
 import { Badge } from "../ui/badge";
 import { Button } from "../ui/button";
-import useUserStore from "@/store/user-store";
 
 export default function NotiBtn() {
     const { notifications } = useNotiStore()
@@ -133,7 +132,7 @@ export default function NotiBtn() {
                                 )}
 
                                 <Avatar className="h-10 w-10">
-                                    <AvatarImage src={IMG_URL + item.avatar} alt={item.avatar} />
+                                    <AvatarImage src={item.avatar} alt={item.avatar} />
                                     <AvatarFallback>
                                         <img src={defaultPfp} alt="default_pfp" className="dark:invert" />
                                     </AvatarFallback>
