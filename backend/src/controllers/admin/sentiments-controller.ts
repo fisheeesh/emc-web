@@ -11,6 +11,7 @@ import { getMoodPercentages, getSentimentsComparisonData } from "../../services/
 import { getEmployeeEmails } from "../../services/system-service";
 import { checkEmployeeIfNotExits, createHttpErrors } from "../../utils/check";
 import { completion_body, completion_subject, request_body, request_subject } from "../../utils/email-templates";
+import { calculatePositiveStreak } from "../../utils/helplers";
 
 interface CustomRequest extends Request {
     employeeId?: number
@@ -119,8 +120,7 @@ export const getLeaderboards = [
                 email: true,
                 avatar: true,
                 firstName: true,
-                streak: true,
-                points: true,
+                longestStreak: true,
                 department: true,
                 checkIns: isAllTime ? false : {
                     where: {
@@ -130,38 +130,46 @@ export const getLeaderboards = [
                         }
                     },
                     select: {
-                        points: true
+                        emotionScore: true,
+                        createdAt: true
+                    },
+                    orderBy: {
+                        createdAt: 'desc'
                     }
                 }
             }
         })
 
-        //* Calculate points based on filter type
+        //* Calculate metric based on filter type
         const results = employees.map(employee => {
-            const periodPoints = isAllTime
-                ? employee.points
-                : employee.checkIns.reduce((sum, checkIn) => {
-                    return sum + (checkIn.points ? Number(checkIn.points) : 0)
-                }, 0)
+            let metric: number;
+            let calculatedStreak: number = 0;
+
+            if (isAllTime) {
+                // *For all time, use longestStreak
+                metric = employee.longestStreak || 0;
+            } else {
+                //* For 7 or 30 days, calculate streak from checkIns
+                const scores = employee.checkIns.map(c => +c.emotionScore);
+                calculatedStreak = calculatePositiveStreak(scores);
+                metric = calculatedStreak;
+            }
 
             return {
                 fullName: employee.fullName,
                 email: employee.email,
                 avatar: employee.avatar,
                 department: employee.department,
-                streak: employee.streak,
-                points: periodPoints,
+                streak: isAllTime ? employee.longestStreak || 0 : calculatedStreak,
+                metric: metric,
                 firstName: employee.firstName
             }
         })
 
-        //* Sort by points (desc), streak (desc), firstName (asc)
+        //* Sort by metric (desc), then firstName (asc)
         results.sort((a, b) => {
-            if (b.points !== a.points) {
-                return b.points - a.points
-            }
-            if (b.streak !== a.streak) {
-                return (b.streak || 0) - (a.streak || 0)
+            if (b.metric !== a.metric) {
+                return b.metric - a.metric
             }
             return (a.firstName || '').localeCompare(b.firstName || '')
         })
@@ -171,26 +179,26 @@ export const getLeaderboards = [
 
         //* Add ranking with tie handling
         let currentRank = 1
-        let previousPoints: number | null = null
+        let previousMetric: number | null = null
         let employeesWithSameRank = 0
 
         const rankedResults = top7.map((employee) => {
-            if (previousPoints !== null && employee.points < previousPoints) {
-                //* Points changed, update rank
+            if (previousMetric !== null && employee.metric < previousMetric) {
+                //* Metric changed, update rank
                 currentRank += employeesWithSameRank
                 employeesWithSameRank = 1
-            } else if (previousPoints === employee.points) {
-                //* Same points, increment counter
+            } else if (previousMetric === employee.metric) {
+                //* Same metric, increment counter
                 employeesWithSameRank++
             } else {
                 //* First employee
                 employeesWithSameRank = 1
             }
 
-            previousPoints = employee.points
+            previousMetric = employee.metric
 
-            //* Remove firstName from final result
-            const { firstName, ...employeeData } = employee
+            //* Remove internal fields from final result
+            const { firstName, metric, ...employeeData } = employee
 
             return {
                 ...employeeData,
@@ -200,7 +208,7 @@ export const getLeaderboards = [
 
         res.status(200).json({
             message: "Here is Leaderboards data.",
-            data: rankedResults
+            data: rankedResults,
         })
     }
 ]

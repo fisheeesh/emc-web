@@ -10,12 +10,6 @@ export const prisma = new PrismaClient().$extends({
                     return `${employee.firstName} ${employee.lastName}`
                 }
             },
-            avatar: {
-                needs: { avatar: true, },
-                compute(employee) {
-                    return `/optimizes/${employee.avatar?.split(".")[0]}.webp`
-                }
-            },
             status: {
                 needs: { avgScore: true },
                 compute(employee) {
@@ -30,12 +24,6 @@ export const prisma = new PrismaClient().$extends({
                     const ageDifMs = Date.now() - birthDate.getTime();
                     const ageDate = new Date(ageDifMs);
                     return Math.abs(ageDate.getUTCFullYear() - 1970);
-                }
-            },
-            points: {
-                needs: { points: true },
-                compute(employee) {
-                    return Number(employee.points)
                 }
             },
             birthdate: {
@@ -63,14 +51,6 @@ export const prisma = new PrismaClient().$extends({
                 }
             }
         },
-        notification: {
-            avatar: {
-                needs: { avatar: true, },
-                compute(notification) {
-                    return `/optimizes/${notification.avatar?.split(".")[0]}.webp`
-                }
-            },
-        },
         emotionCheckIn: {
             checkInTime: {
                 needs: { createdAt: true },
@@ -79,12 +59,6 @@ export const prisma = new PrismaClient().$extends({
                         year: "numeric", month: "long", day: "numeric", hour: "numeric", minute: "numeric"
                     })
                 },
-            },
-            points: {
-                needs: { points: true },
-                compute(employee) {
-                    return Number(employee.points)
-                }
             },
             status: {
                 needs: { emotionScore: true },

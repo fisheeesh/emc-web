@@ -14,7 +14,7 @@ import { authorize } from "../../utils/authorize"
 import { getOrSetCache } from "../../utils/cache"
 import { checkEmployeeIfNotExits, createHttpErrors } from "../../utils/check"
 import { critical_body, critical_subject, normal_body, normal_subject } from "../../utils/email-templates"
-import { calculatePositiveStreak, determineReputation } from "../../utils/helplers"
+import { calculatePositiveStreak } from "../../utils/helplers"
 
 const prisma = new PrismaClient()
 
@@ -43,7 +43,7 @@ export const test = async (req: CustomRequest, res: Response, next: NextFunction
 }
 
 export const emotionCheckIn = [
-    body("moodMessage", "Moode Message is required.")
+    body("moodMessage", "Mood Message is required.")
         .trim()
         .notEmpty()
         .customSanitizer(value => sanitizeHtml(value)).notEmpty(),
@@ -55,7 +55,7 @@ export const emotionCheckIn = [
             code: errorCodes.invalid
         }))
 
-        //* Recieve emp's today mood message
+        //* Receive emp's today mood message
         const { moodMessage } = req.body
         const empId = req.employeeId
         const emp = await prisma.employee.findUnique({
@@ -64,7 +64,7 @@ export const emotionCheckIn = [
                 checkIns: {
                     select: { emotionScore: true },
                     orderBy: { createdAt: 'desc' },
-                    take: 9
+                    take: 100  // Increased from 13 to capture longer streaks
                 }
             }
         });
@@ -73,7 +73,7 @@ export const emotionCheckIn = [
         //* Split emoji and text for db schema format
         const [emoji, textFeeling] = moodMessage.split('//')
 
-        //* Let Ai to calculate score
+        //* Let AI calculate score
         const job = await ScoreQueue.add("calculate-score", {
             moodMessage
         })
@@ -84,151 +84,146 @@ export const emotionCheckIn = [
         //* Get the score and format it
         const score = match ? parseFloat(match[0]) : null;
 
-        const last9Scores = emp!.checkIns.map(e => +e.emotionScore);
-        const last10Scores = [+score!, ...last9Scores];
+        const last13Scores = emp!.checkIns.slice(0, 13).map(e => +e.emotionScore);
+        const last14Scores = [+score!, ...last13Scores];
 
-        const isValid = last10Scores.slice(0, 5).every(s => s >= -0.5);
+        const isValid = last14Scores.every(s => s >= -0.5);
 
-        const positiveStreak = calculatePositiveStreak(last10Scores);
+        //* Calculate current streak from all recent check-ins
+        const allRecentScores = [+score!, ...emp!.checkIns.map(e => +e.emotionScore)];
+        const currentStreak = calculatePositiveStreak(allRecentScores);
 
-        try {
-            //* Calculate avgScore upfront
-            const newEmotionSum = +emp!.emotionSum + score!;
-            const newEmotionCount = emp!.emotionCount + 1;
-            const avgScore = newEmotionSum / newEmotionCount;
-            const isCritical = avgScore <= CRITICAL_POINT;
-            const isRecovered = emp!.status === 'WATCHLIST' && isValid
-            const isNewCritical = avgScore <= CRITICAL_POINT && emp!.status !== "CRITICAL" && emp!.status !== "WATCHLIST"
+        const sureCritical = last14Scores.slice(0, 5).every(s => s >= CRITICAL_POINT)
 
-            const earnedPoints = determineReputation(score!, positiveStreak);
+        //* Calculate avgScore upfront
+        const newEmotionSum = +emp!.emotionSum + score!;
+        const newEmotionCount = emp!.emotionCount + 1;
+        const avgScore = newEmotionSum / newEmotionCount;
+        const isRecovered = emp!.status === 'WATCHLIST' && isValid
+        const isNewCritical = avgScore <= CRITICAL_POINT && sureCritical && emp!.status !== "CRITICAL" && emp!.status !== "WATCHLIST"
 
-            //* Optimized transaction - only critical DB operations
-            await prisma.$transaction(async (tx) => {
-                //* Single combined update instead of multiple queries
-                const statusUpdate = isRecovered ? "NORMAL" : (isNewCritical ? "CRITICAL" : undefined);
+        //* Update longestStreak if current is better
+        const newLongestStreak = Math.max(emp!.longestStreak || 0, currentStreak);
 
-                const updates = await Promise.all([
-                    //* 1. Insert emotion check-in
-                    tx.emotionCheckIn.create({
+        //* Optimized transaction - only critical DB operations
+        await prisma.$transaction(async (tx) => {
+            //* Single combined update instead of multiple queries
+            const statusUpdate = isRecovered ? "NORMAL" : (isNewCritical ? "CRITICAL" : undefined);
+
+            const updates = await Promise.all([
+                //* 1. Insert emotion check-in
+                tx.emotionCheckIn.create({
+                    data: {
+                        employeeId: emp!.id,
+                        emoji: emoji.trim(),
+                        textFeeling: textFeeling.trim(),
+                        emotionScore: score!,
+                    }
+                }),
+
+                //* 2. Update employee - combined in ONE query
+                tx.employee.update({
+                    where: { id: emp!.id },
+                    data: {
+                        emotionSum: newEmotionSum,
+                        emotionCount: newEmotionCount,
+                        longestStreak: newLongestStreak,
+                        avgScore,
+                        ...(statusUpdate && { status: statusUpdate }),
+                        ...(isNewCritical && { lastCritical: new Date() })
+                    }
+                })
+            ]);
+
+            //* 3. Handle status-specific DB operations (only if needed)
+            if (isRecovered) {
+                await tx.notification.create({
+                    data: {
+                        avatar: emp!.avatar! ?? "",
+                        type: 'NORMAL',
+                        content: `🎉 Good news!!!. ${emp?.firstName} ${emp?.lastName} is back to normal. Yay!!!🙌`,
+                        department: { connect: { id: emp?.departmentId } }
+                    }
+                });
+            }
+
+            if (isNewCritical) {
+                await Promise.all([
+                    tx.criticalEmployee.create({
                         data: {
-                            employeeId: emp!.id,
-                            emoji: emoji.trim(),
-                            textFeeling: textFeeling.trim(),
-                            emotionScore: score!,
-                            points: earnedPoints
+                            employee: { connect: { id: emp!.id } },
+                            department: { connect: { id: emp!.departmentId } },
+                            emotionScore: avgScore,
                         }
                     }),
-
-                    //* 2. Update employee - combined in ONE query
-                    tx.employee.update({
-                        where: { id: emp!.id },
+                    tx.notification.create({
                         data: {
-                            emotionSum: newEmotionSum,
-                            emotionCount: newEmotionCount,
-                            streak: positiveStreak,
-                            avgScore,
-                            points: { increment: earnedPoints },
-                            ...(statusUpdate && { status: statusUpdate }),
-                            ...(isNewCritical && { lastCritical: new Date() })
+                            avatar: emp!.avatar! ?? "",
+                            type: 'CRITICAL',
+                            content: `${emp?.firstName} ${emp?.lastName}'s sentiments has dropped to critical. Please review.`,
+                            department: { connect: { id: emp?.departmentId } }
                         }
                     })
                 ]);
+            }
 
-                //* 3. Handle status-specific DB operations (only if needed)
+            return { updates, avgScore };
+        });
+
+        //* Response immediately - Don't wait for background tasks
+        res.status(200).json({
+            message: "Successfully checked in.",
+            currentStreak: currentStreak,
+            longestStreak: newLongestStreak
+        });
+
+        //* Move all notifications to background
+        setImmediate(async () => {
+            try {
+                const bgTasks = [];
+
+                const adminEmails = await getEmployeeEmails({ departmentId: emp!.departmentId, role: 'ADMIN' })
+
+                //* Cache invalidation
+                bgTasks.push(
+                    CacheQueue.add("invalidate-emotion-cache", {
+                        pattern: "emotion-*"
+                    }, {
+                        jobId: `invalidate-${Date.now()}`,
+                        priority: 1
+                    })
+                );
+
+                //* Email notifications (only if status changed)
                 if (isRecovered) {
-                    await tx.notification.create({
-                        data: {
-                            avatar: emp!.avatar! ?? "",
-                            type: 'NORMAL',
-                            content: `🎉 Good news!!!. ${emp?.firstName} ${emp?.lastName} is back to normal. Yay!!!🙌`,
-                            department: { connect: { id: emp?.departmentId } }
-                        }
-                    });
+                    bgTasks.push(
+                        EmailQueue.add("notify-email", {
+                            subject: normal_subject(),
+                            body: normal_body(`${emp?.firstName} ${emp?.lastName}`),
+                            to: adminEmails
+                        }, {
+                            jobId: `email-normal:${emp?.id}:${Date.now()}`
+                        })
+                    );
                 }
 
                 if (isNewCritical) {
-                    await Promise.all([
-                        tx.criticalEmployee.create({
-                            data: {
-                                employee: { connect: { id: emp!.id } },
-                                department: { connect: { id: emp!.departmentId } },
-                                emotionScore: avgScore,
-                            }
-                        }),
-                        tx.notification.create({
-                            data: {
-                                avatar: emp!.avatar! ?? "",
-                                type: 'CRITICAL',
-                                content: `${emp?.firstName} ${emp?.lastName}'s sentiments has dropped to critical. Please review.`,
-                                department: { connect: { id: emp?.departmentId } }
-                            }
-                        })
-                    ]);
-                }
-
-                return { updates, avgScore };
-            });
-
-            //* Response immdiately - Don't wait for background tasks
-            res.status(200).json({
-                message: "Successfully checked in.",
-            });
-
-            //* Move all notifications to background
-            setImmediate(async () => {
-                try {
-                    const bgTasks = [];
-
-                    const adminEmails = await getEmployeeEmails({ departmentId: emp!.departmentId, role: 'ADMIN' })
-
-                    //* Cache invalidation
                     bgTasks.push(
-                        CacheQueue.add("invalidate-emotion-cache", {
-                            pattern: "emotion-*"
+                        EmailQueue.add("notify-email", {
+                            subject: critical_subject(`${emp?.firstName} ${emp?.lastName}`),
+                            body: critical_body(`${emp?.firstName} ${emp?.lastName}`),
+                            to: adminEmails
                         }, {
-                            jobId: `invalidate-${Date.now()}`,
-                            priority: 1
+                            jobId: `email-critical:${emp?.id}:${Date.now()}`
                         })
                     );
-
-                    //* Email notifications (only if status changed)
-                    if (isRecovered) {
-                        bgTasks.push(
-                            EmailQueue.add("notify-email", {
-                                subject: normal_subject(),
-                                body: normal_body(`${emp?.firstName} ${emp?.lastName}`),
-                                to: adminEmails
-                            }, {
-                                jobId: `email-normal:${emp?.id}:${Date.now()}`
-                            })
-                        );
-                    }
-
-                    if (isNewCritical) {
-                        bgTasks.push(
-                            EmailQueue.add("notify-email", {
-                                subject: critical_subject(`${emp?.firstName} ${emp?.lastName}`),
-                                body: critical_body(`${emp?.firstName} ${emp?.lastName}`),
-                                to: adminEmails
-                            }, {
-                                jobId: `email-critical:${emp?.id}:${Date.now()}`
-                            })
-                        );
-                    }
-
-                    await Promise.all(bgTasks);
-                } catch (bgError) {
-                    console.error('Background task error:', bgError);
                 }
-            });
 
-        } catch (err: any) {
-            return next(createHttpErrors({
-                message: err.message,
-                status: 500,
-                code: errorCodes.server
-            }))
-        }
+                await Promise.all(bgTasks);
+            } catch (bgError) {
+                console.error('Background task error:', bgError);
+            }
+        });
     }
 ]
 

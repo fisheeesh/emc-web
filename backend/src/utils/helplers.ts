@@ -6,6 +6,18 @@ import { marked } from 'marked';
 import { unlink } from "node:fs/promises";
 import path from "path";
 import { TIMEZONE } from '../config';
+import cloudinary from "../config/cloudinary";
+
+export const deleteCloudinaryImage = async (publicId: string) => {
+    try {
+        const result = await cloudinary.uploader.destroy(publicId);
+        console.log('Deleted from Cloudinary:', result);
+        return result;
+    } catch (error) {
+        console.error('Error deleting from Cloudinary:', error);
+        throw error;
+    }
+};
 
 export const calculatePositiveStreak = (scores: number[]): number => {
     let streak = 0;
@@ -13,10 +25,10 @@ export const calculatePositiveStreak = (scores: number[]): number => {
         if (s >= 0.3) {
             streak++;
         } else {
-            return 0
+            break;
         }
     }
-    return streak >= 3 ? streak : 0
+    return streak >= 3 ? streak : 0;
 };
 
 export const getDateRangeFromTimeRange = (timeRange: string | number) => {
