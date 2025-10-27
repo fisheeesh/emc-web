@@ -20,8 +20,7 @@ model Employee {
   workStyle       WorkStyle          @default(ONSITE)
   country         String?
   position        String?
-  points          BigInt?            @default(1000)
-  streak          Int?
+  longestStreak   Int?
   accType         AccType            @default(ACTIVE)
   jobType         JobType            @default(FULLTIME)
   role            Role               @default(EMPLOYEE)
@@ -29,13 +28,14 @@ model Employee {
   errorLoginCount Int                @default(0) @db.SmallInt
   rndToken        String             @db.Text
   avatar          String?
+  avatarPublicId  String?
   departmentId    Int
   createdAt       DateTime           @default(now())
   updatedAt       DateTime           @updatedAt
   lastCritical    DateTime?
-  avgScore        Decimal            @default(1) @db.Decimal(3, 2)
-  emotionCount    Int                @default(1)
-  emotionSum      Decimal            @default(1) @db.Decimal(6, 2)
+  avgScore        Decimal            @default(0) @db.Decimal(3, 2)
+  emotionCount    Int                @default(0)
+  emotionSum      Decimal            @default(0) @db.Decimal(6, 2)
   criticalTimes   CriticalEmployee[]
   checkIns        EmotionCheckIn[]
   department      Department         @relation(fields: [departmentId], references: [id], onDelete: Restrict)
@@ -75,7 +75,7 @@ model Employee {
 model Otp {
   id            Int      @id @default(autoincrement())
   email         String   @unique @db.VarChar(100)
-  otp           String   @db.VarChar(6)
+  otp           String   @db.Text
   rememberToken String   @db.Text
   count         Int      @default(0) @db.SmallInt
   error         Int      @default(0) @db.SmallInt
@@ -89,7 +89,6 @@ model EmotionCheckIn {
   employeeId   Int
   emoji        String
   textFeeling  String   @db.VarChar(100)
-  points       BigInt?
   emotionScore Decimal  @db.Decimal(3, 2)
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
@@ -154,16 +153,17 @@ model AIAnalysis {
 }
 
 model Notification {
-  id           Int        @id @default(autoincrement())
-  departmentId Int
-  content      String     @db.Text
-  avatar       String?
-  status       NotiStatus @default(SENT)
-  type         NotifType  @default(CRITICAL)
-  toSAdmin     Boolean    @default(false)
-  createdAt    DateTime   @default(now())
-  updatedAt    DateTime   @updatedAt
-  department   Department @relation(fields: [departmentId], references: [id], onDelete: Cascade)
+  id             Int        @id @default(autoincrement())
+  departmentId   Int
+  content        String     @db.Text
+  avatar         String?
+  avatarPublicId String?
+  status         NotiStatus @default(SENT)
+  type           NotifType  @default(CRITICAL)
+  toSAdmin       Boolean    @default(false)
+  createdAt      DateTime   @default(now())
+  updatedAt      DateTime   @updatedAt
+  department     Department @relation(fields: [departmentId], references: [id], onDelete: Cascade)
 }
 
 model Department {
