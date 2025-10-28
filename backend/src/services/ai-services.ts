@@ -1,31 +1,29 @@
-import dotenv from "dotenv";
-dotenv.config();
-
 import { groq } from "@ai-sdk/groq";
 import { generateText } from "ai";
-import { Worker } from "bullmq";
-import { prisma } from "../../config/prisma-client";
-import { redis } from "../../config/redis-client";
-import { createAnalysisPrompt, createAnalysisSystemPrompt } from "../../utils/ai-promts";
+import { prisma } from "../config/prisma-client";
+import {
+    AnalysisData,
+    createAnalysisPrompt,
+    createAnalysisSystemPrompt,
+    createRecommendationPrompt,
+    createRecommendationSystemPrompt,
+    createScorePrompt,
+    createScoreSystemPrompt,
+    RecommendationData
+} from "../utils/ai-promts";
+import { parseScore } from "../utils/helplers";
 
-interface CheckInData {
-    textFeeling: string;
-    emoji: string;
-    checkInTime: string;
-    status: string;
+export const calculateEmotionScoreWithAI = async (moodMessage: string) => {
+    const { text } = await generateText({
+        model: groq("llama-3.3-70b-versatile"),
+        prompt: createScorePrompt(moodMessage),
+        system: createScoreSystemPrompt()
+    })
+
+    return parseScore(text);
 }
 
-interface JobData {
-    checkIns: CheckInData[];
-    employeeName: string;
-    startDate: string;
-    endDate: string;
-    criticalEmpId: number;
-}
-
-const analysisWorker = new Worker("analysisQueue", async (job) => {
-    const { checkIns, employeeName, startDate, endDate, criticalEmpId }: JobData = job.data
-
+export const generateAIAnalysisData = async ({ checkIns, employeeName, startDate, endDate, criticalEmpId }: AnalysisData) => {
     //* Format check-ins for the prompt
     const formattedCheckIns = checkIns.map((checkIn, index) =>
         `${index + 1}. ${checkIn.checkInTime} - Status: ${checkIn.status.toUpperCase()}
@@ -87,24 +85,24 @@ const analysisWorker = new Worker("analysisQueue", async (job) => {
         recommendations: analysis.recommendations,
         weekRange: savedAnalysis.weekRange
     }
-}, {
-    connection: redis,
-    limiter: {
-        max: 10,
-        duration: 60000
+}
+
+export const genereateAIRecommendationData = async ({ empName, emotionCheckIns }: RecommendationData) => {
+    try {
+        if (!emotionCheckIns || emotionCheckIns.length === 0) {
+            throw new Error("No emotion check-ins found for analysis");
+        }
+
+        const { text } = await generateText({
+            model: groq("llama-3.3-70b-versatile"),
+            prompt: createRecommendationPrompt(empName, emotionCheckIns),
+            system: createRecommendationSystemPrompt(),
+        });
+
+        return text
+
+    } catch (error: any) {
+        console.error("Error generating AI recommendation:", error);
+        throw error;
     }
-})
-
-analysisWorker.on("completed", (job) => {
-    console.log(`Analysis Job ${job.id} completed successfully`)
-})
-
-analysisWorker.on("failed", (job: any, err) => {
-    console.error(`Analysis Job ${job.id} failed:`, err.message)
-})
-
-analysisWorker.on("progress", (job, progress) => {
-    console.log(`Analysis Job ${job.id} progress: ${progress}%`)
-})
-
-export default analysisWorker
+}

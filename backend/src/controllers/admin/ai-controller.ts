@@ -3,8 +3,7 @@ import { NextFunction, Request, Response } from "express";
 import { body, validationResult } from "express-validator";
 import { errorCodes } from "../../config/error-codes";
 import { prisma } from "../../config/prisma-client";
-import { AnalysisQueue, AnalysisQueueEvents } from "../../jobs/queues/analysis-queue";
-import { RecommendationQueue, RecommendationQueueEvents } from "../../jobs/queues/recommendation-queue";
+import { generateAIAnalysisData, genereateAIRecommendationData } from "../../services/ai-services";
 import { getEmployeeById } from "../../services/auth-services";
 import { checkEmployeeIfNotExits, createHttpErrors } from "../../utils/check";
 
@@ -12,11 +11,6 @@ interface CustomRequest extends Request {
     employeeId?: number
 }
 
-/**
- * body ka ny cEmp nae pat tat tae info ta khu khu u ml
- * ae dr nae cEmp yae last 7 days emotionCheck-in to track ml
- * ae dr ko input a ny nae ai ko pay p response pyn u ml return pyn ml
- */
 export const generateAIAnalysis = [
     body("criticalEmpId", "Critical Employee Id is required.").isInt({ gt: 0 }),
     async (req: CustomRequest, res: Response, next: NextFunction) => {
@@ -98,17 +92,13 @@ export const generateAIAnalysis = [
         const employeeName = `${criticalEmp.employee.fullName}`.trim() || "Employee"
 
         try {
-            //* Add job to queue
-            const job = await AnalysisQueue.add("generateAnalysis", {
+            const result = await generateAIAnalysisData({
                 checkIns: emotionCheckIns,
                 employeeName,
                 startDate: start.toISOString(),
                 endDate: end.toISOString(),
                 criticalEmpId: criticalEmpId
             })
-
-            //* Wait for the job to finish (with timeout of 30 seconds)
-            const result = await job.waitUntilFinished(AnalysisQueueEvents, 30000)
 
             res.status(200).json({
                 message: "AI Analysis generated successfully",
@@ -248,14 +238,13 @@ export const generateAIRecommendation = [
         }
 
         try {
-            //* Add job to the queue
-            const job = await RecommendationQueue.add('generate-recommendation', {
+            const result = await genereateAIRecommendationData({
                 empName: criticalEmp.employee.fullName,
-                emotionCheckIns
+                emotionCheckIns: emotionCheckIns.map(checkIn => ({
+                    ...checkIn,
+                    checkInTime: new Date(checkIn.checkInTime)
+                }))
             })
-
-            //* Wait for the job to complete using QueueEvents
-            const result = await job.waitUntilFinished(RecommendationQueueEvents, 60000)
 
             //* Return the generated markdown directly
             res.status(200).json({
