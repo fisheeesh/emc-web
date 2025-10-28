@@ -76,7 +76,7 @@ export default function EmpEmotionChart({ emotionChartData }: Props) {
                                     axisLine={false}
                                     tickMargin={8}
                                     style={{
-                                        fontFamily: "Lato"
+                                        fontFamily: "Open Sans",
                                     }}
                                 />
                                 <YAxis
@@ -94,8 +94,8 @@ export default function EmpEmotionChart({ emotionChartData }: Props) {
                                     tickLine={false}
                                     axisLine={false}
                                     style={{
-                                        fontFamily: "Lato",
-                                        fontSize: 12
+                                        fontFamily: "Open Sans",
+                                        fontSize: "12px"
                                     }}
                                 />
                                 <ChartTooltip

@@ -99,7 +99,7 @@ export default function AttendanceTimeSection({ data }: { data: WorkSchedule }) 
                                             axisLine={false}
                                             tickMargin={8}
                                             style={{
-                                                fontFamily: "Lato",
+                                                fontFamily: "Open Sans",
                                                 fontSize: "12px"
                                             }}
                                         />
@@ -108,7 +108,7 @@ export default function AttendanceTimeSection({ data }: { data: WorkSchedule }) 
                                             axisLine={false}
                                             tickMargin={8}
                                             style={{
-                                                fontFamily: "Lato",
+                                                fontFamily: "Open Sans",
                                                 fontSize: "12px"
                                             }}
                                             label={{ value: 'Days', angle: -90, position: 'insideLeft' }}

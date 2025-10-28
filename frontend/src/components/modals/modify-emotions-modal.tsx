@@ -1,4 +1,3 @@
-
 import { Button } from "@/components/ui/button";
 import { DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Form, FormControl, FormField, FormItem, FormMessage } from "@/components/ui/form";
@@ -34,6 +33,9 @@ export default function ModifyEmotionsModal({ onClose, data }: ModifyEmotionsMod
         Positive: [],
     });
 
+    //* Track which categories exist in database for POST vs PATCH decision
+    const [existingCategories, setExistingCategories] = useState<Set<string>>(new Set());
+
     const { updateEmotionCate, updating } = useUpdateEmotionCategories()
 
     const form = useForm({
@@ -52,11 +54,18 @@ export default function ModifyEmotionsModal({ onClose, data }: ModifyEmotionsMod
                 Positive: [],
             };
 
+            const existing = new Set<string>();
+
             data.forEach((category) => {
                 emotionsMap[category.title] = category.emotions || [];
+                //* Mark this category as existing in database
+                if (category.emotions && category.emotions.length > 0) {
+                    existing.add(category.title);
+                }
             });
 
             setEmotions(emotionsMap);
+            setExistingCategories(existing);
         }
     }, [data]);
 
@@ -105,9 +114,15 @@ export default function ModifyEmotionsModal({ onClose, data }: ModifyEmotionsMod
             return;
         }
 
+        const isExisting = existingCategories.has(selectedCategory);
+        const method = isExisting ? "PATCH" : "POST";
+
         updateEmotionCate({
-            title: selectedCategory,
-            emotions: emotions[selectedCategory],
+            data: {
+                title: selectedCategory,
+                emotions: emotions[selectedCategory],
+            },
+            method: method
         }, {
             onSettled: () => {
                 form.reset()
@@ -119,6 +134,7 @@ export default function ModifyEmotionsModal({ onClose, data }: ModifyEmotionsMod
     const currentEmotionCount = emotions[selectedCategory].length;
     const isMaxReached = currentEmotionCount >= 9;
     const canSubmit = currentEmotionCount === 9;
+    const isExistingCategory = existingCategories.has(selectedCategory);
 
     return (
         <DialogContent className="sm:max-w-[700px] max-h-[90vh] overflow-y-auto no-scrollbar">
@@ -178,6 +194,14 @@ export default function ModifyEmotionsModal({ onClose, data }: ModifyEmotionsMod
                             </SelectItem>
                         </SelectContent>
                     </Select>
+                    {/* Optional: Show status badge */}
+                    <p className="text-xs text-muted-foreground">
+                        {isExistingCategory ? (
+                            <span className="text-blue-600 font-medium">Updating existing category</span>
+                        ) : (
+                            <span className="text-green-600 font-medium">Creating new category</span>
+                        )}
+                    </p>
                 </div>
 
                 <div className="space-y-2">
@@ -286,8 +310,8 @@ export default function ModifyEmotionsModal({ onClose, data }: ModifyEmotionsMod
                     className="min-h-[44px] bg-gradient text-white cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                     disabled={!canSubmit || updating}
                 >
-                    <Spinner isLoading={updating} label="Saving...">
-                        Save Changes
+                    <Spinner isLoading={updating} label={isExistingCategory ? "Updating..." : "Creating..."}>
+                        {isExistingCategory ? "Update Changes" : "Create Category"}
                     </Spinner>
                 </Button>
             </div>

@@ -2,6 +2,7 @@ import CommonFilter from "@/components/shared/common-filter";
 import CustomBadge from "@/components/shared/custom-badge";
 import CustomCalendar from "@/components/shared/custom-calendar";
 import LocalSearch from "@/components/shared/local-search";
+import StreakFireIcon from "@/components/shared/streak-fire-icon";
 import TableSkeleton from "@/components/shared/table-skeleton";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -57,8 +58,8 @@ export default function AttendanceTable({ data, status, error, isFetchingNextPag
                             <TableHead className="whitespace-nowrap font-semibold">Position</TableHead>
                             <TableHead className="whitespace-nowrap font-semibold">Job Type</TableHead>
                             <TableHead className="whitespace-nowrap font-semibold">Emotion</TableHead>
-                            <TableHead className="whitespace-nowrap font-semibold">Check-in Time</TableHead>
-                            <TableHead className="whitespace-nowrap font-semibold">Points</TableHead>
+                            <TableHead className="whitespace-nowrap font-semibold text-center">Streak</TableHead>
+                            <TableHead className="whitespace-nowrap font-semibold text-center">Check-in Time</TableHead>
                         </TableRow>
                     </TableHeader>
 
@@ -95,19 +96,15 @@ export default function AttendanceTable({ data, status, error, isFetchingNextPag
                                                 <TableCell>
                                                     <CustomBadge value={att.status} />
                                                 </TableCell>
-                                                <TableCell>
+                                                <TableCell className="text-center">
+                                                    {att.employee.recentStreak === 0 ?
+                                                        <span className="whitespace-nowrap font-en text-gray-400">—</span>
+                                                        : <StreakFireIcon value={att.employee.recentStreak} />
+                                                    }
+                                                </TableCell>
+                                                <TableCell className="text-center">
                                                     <span className="whitespace-nowrap font-en">{att.checkInTime}</span>
                                                 </TableCell>
-                                                {/* <TableCell className="space-x-2 text-center">
-                                                    <Dialog>
-                                                        <DialogTrigger asChild>
-                                                            <Button variant='outline' className="cursor-pointer">
-                                                                Details
-                                                            </Button>
-                                                        </DialogTrigger>
-                                                        <EmpEmotionModal empName={att.employee.fullName} emoji={att.emoji} textFeeling={att.textFeeling} checkInTime={att.checkInTime} score={att.emotionScore} />
-                                                    </Dialog>
-                                                </TableCell> */}
                                             </TableRow>
                                         ))
                                     }

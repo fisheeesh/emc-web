@@ -117,7 +117,7 @@ export default function LeaderBoardTable({ data, isLoading }: Props) {
                                                 <span className="whitespace-nowrap">{emp.department.name}</span>
                                             </TableCell>
                                             <TableCell className="text-center">
-                                                {!emp.streak ?
+                                                {emp.streak === 0 ?
                                                     <span className="whitespace-nowrap font-en text-gray-400">—</span>
                                                     : <StreakFireIcon value={emp.streak} />
                                                 }
