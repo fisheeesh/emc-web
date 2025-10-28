@@ -4,12 +4,22 @@ import queryClient from "@/api/query";
 import { useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
 
+interface EmotionCategories {
+    data: {
+        title: string,
+        emotions: Emotion[]
+    },
+    method: "POST" | "PATCH"
+}
+
 const useUpdateEmotionCategories = () => {
     const { mutate: updateEmotionCate, isPending: updating } = useMutation({
-        mutationFn: async (data: { title: string; emotions: Emotion[] }) => {
-            const res = await superApi.patch('/super-admin/emotion-categories', data);
+        mutationFn: async ({ data, method }: EmotionCategories) => {
+            let res;
+            if (method === 'POST') res = await superApi.post('/super-admin/emotion-categories', data);
+            if (method === 'PATCH') res = await superApi.patch('/super-admin/emotion-categories', data);
 
-            return res.data;
+            return res?.data;
         },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['all-emotion-categories'] });
