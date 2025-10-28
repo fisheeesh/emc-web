@@ -93,7 +93,7 @@ export const emotionCheckIn = [
         const allRecentScores = [+score!, ...emp!.checkIns.map(e => +e.emotionScore)];
         const currentStreak = calculatePositiveStreak(allRecentScores);
 
-        const sureCritical = last14Scores.slice(0, 5).every(s => s >= CRITICAL_POINT)
+        const sureCritical = last14Scores.length >= 5 && last14Scores.slice(0, 5).every(s => s >= CRITICAL_POINT)
 
         //* Calculate avgScore upfront
         const newEmotionSum = +emp!.emotionSum + score!;
