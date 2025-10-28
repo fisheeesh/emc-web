@@ -18,7 +18,7 @@ export default function EmotionDisplay({ data }: { data: EmotionCategory[] }) {
     return (
         <Card className="rounded-md max-h-[600px] flex flex-col gap-5">
             <CardHeader className="space-y-2">
-                <div className="flex flex-col xl:flex-row gap-3 xl:gap-0 justify-between">
+                <div className="flex flex-col md:flex-row gap-3 xl:gap-0 justify-between">
                     <div className="flex flex-col items-start gap-2 tracking-wide">
                         <CardTitle className="text-xl md:text-2xl text-gradient line-clamp-1">
                             Emotion Categories

@@ -10,7 +10,7 @@ export const NAVLINKS = [
     { to: "dashboard/sentiments", name: "Sentiments Dashboard" },
     { to: "dashboard/attendance", name: "Attendance Dashboard" },
     { to: "dashboard/analytics", name: "Analytics Dashboard" },
-    { to: "dashboard/managements", name: "Mangements" },
+    { to: "dashboard/managements", name: "General Mangements" },
 ]
 
 export const DEPARTMENTS_FILTER = [
