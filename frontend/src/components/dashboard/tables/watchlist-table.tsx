@@ -1,6 +1,6 @@
 import ActionModal from "@/components/modals/action-modal";
 import ConfirmModal from "@/components/modals/confirm-modal";
-import WathclistHistoryModal from "@/components/modals/wathlist-history-modal";
+import WatchlistHistoryModal from "@/components/modals/watchlist-history-modal";
 import LocalSearch from "@/components/shared/local-search";
 import TableSkeleton from "@/components/shared/table-skeleton";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -166,7 +166,7 @@ export default function WatchListTable({ data, status, error, isFetchingNextPage
                                         />}
                                     </Dialog>
                                     <Dialog open={!!viewHistory} onOpenChange={(o) => !o && setHistory(null)}>
-                                        {viewHistory && <WathclistHistoryModal
+                                        {viewHistory && <WatchlistHistoryModal
                                             empName={viewHistory.fullName}
                                             emotionHistory={viewHistory.emotionHistory}
                                         />}

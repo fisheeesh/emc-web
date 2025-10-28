@@ -49,7 +49,7 @@ export default function WatchlistHistoryModal({ empName, emotionHistory }: Props
     //* Flag true to isRecovering when has check-in datas, have 3 days data, 60% of total days are good days and lastest check-in is not cirital
     const isRecovering = hasData && goodDays >= Math.ceil(chartData.length * 0.6) && isNotCritical && chartData.length >= 3;
     //* Track lastest day of check-in data is first day of data
-    const hasImprovement = hasData && chartData.length >= 3 &&
+    const hasImprovement = hasData && chartData.length >= 10 &&
         chartData[chartData.length - 1]?.emotionValue > chartData[0]?.emotionValue;
 
     const chartConfig = {
