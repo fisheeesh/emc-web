@@ -5,6 +5,7 @@ import { prisma } from "../../config/prisma-client"
 import { getEmployeeByEmail, getEmployeeById, getOTPRowByEmail } from "../../services/auth-services"
 import { checkEmployeeIfNotExits, createHttpErrors } from "../../utils/check"
 import { generateHashedValue, generateToken } from "../../utils/generate"
+import { getSystemSettingsData } from "../../services/system-service"
 
 interface CustomRequest extends Request {
     employeeId?: number
@@ -491,17 +492,7 @@ export const editEmpCredentials = [
             code: errorCodes.notFound
         }))
 
-        const otpRow = await getOTPRowByEmail(email)
-        if (!otpRow) {
-            const otp = 123456
-            const hashedOTP = await generateHashedValue(otp.toString())
-            const otpData = {
-                email,
-                otp: hashedOTP,
-                rememberToken: generateToken(),
-                count: 1
-            }
-        }
+        const otpRow = await getOTPRowByEmail(existingEmp.email)
 
         let empData: any = {}
         if (editType === 'email') {
@@ -546,5 +537,135 @@ export const editEmpCredentials = [
         res.status(200).json({
             message: "Successfully updated employee credentials"
         })
+    }
+]
+
+export const getSystemSettings = async (req: CustomRequest, res: Response, next: NextFunction) => {
+    const emp = req.employee
+    checkEmployeeIfNotExits(emp)
+
+    const settings = await getSystemSettingsData()
+
+    res.status(200).json({
+        message: "Here is system settings.",
+        data: settings
+    })
+}
+
+export const updateSettings = [
+    body("positiveMin")
+        .notEmpty().withMessage("Positive Minimum is required.")
+        .isDecimal({ decimal_digits: '1' }).withMessage("Positive Minimum must be a decimal with 1 decimal place.")
+        .custom((value) => {
+            const num = parseFloat(value);
+            if (num < -99.9 || num > 99.9) {
+                throw new Error("Positive Minimum must be between -99.9 and 99.9.");
+            }
+            return true;
+        }),
+
+    body("neutralMin")
+        .notEmpty().withMessage("Neutral Minimum is required.")
+        .isDecimal({ decimal_digits: '1' }).withMessage("Neutral Minimum must be a decimal with 1 decimal place.")
+        .custom((value) => {
+            const num = parseFloat(value);
+            if (num < -99.9 || num > 99.9) {
+                throw new Error("Neutral Minimum must be between -99.9 and 99.9.");
+            }
+            return true;
+        }),
+
+    body("negativeMin")
+        .notEmpty().withMessage("Negative Minimum is required.")
+        .isDecimal({ decimal_digits: '1' }).withMessage("Negative Minimum must be a decimal with 1 decimal place.")
+        .custom((value) => {
+            const num = parseFloat(value);
+            if (num < -99.9 || num > 99.9) {
+                throw new Error("Negative Minimum must be between -99.9 and 99.9.");
+            }
+            return true;
+        }),
+
+    body("criticalMin")
+        .notEmpty().withMessage("Critical Minimum is required.")
+        .isDecimal({ decimal_digits: '1' }).withMessage("Critical Minimum must be a decimal with 1 decimal place.")
+        .custom((value) => {
+            const num = parseFloat(value);
+            if (num < -99.9 || num > 99.9) {
+                throw new Error("Critical Minimum must be between -99.9 and 99.9.");
+            }
+            return true;
+        }),
+
+    body("watchlistTrackMin")
+        .notEmpty().withMessage("Watchlist Track Minimum is required.")
+        .isInt({ min: 1, max: 365 }).withMessage("Watchlist Track Minimum must be an integer between 1 and 365."),
+
+    async (req: CustomRequest, res: Response, next: NextFunction) => {
+        const errors = validationResult(req).array({ onlyFirstError: true })
+        if (errors.length > 0) return next(createHttpErrors({
+            message: errors[0].msg,
+            status: 400,
+            code: errorCodes.invalid
+        }))
+
+        const emp = req.employee
+        checkEmployeeIfNotExits(emp)
+
+        const { positiveMin, negativeMin, neutralMin, criticalMin, watchlistTrackMin } = req.body
+
+        const positive = parseFloat(positiveMin);
+        const neutral = parseFloat(neutralMin);
+        const negative = parseFloat(negativeMin);
+        const critical = parseFloat(criticalMin);
+
+        //* Ensure logical ordering -> critical < negative < neutral < positive
+        if (critical >= negative) {
+            return next(createHttpErrors({
+                message: "Critical Minimum must be less than Negative Minimum.",
+                status: 400,
+                code: errorCodes.invalid
+            }))
+        }
+
+        if (negative >= neutral) {
+            return next(createHttpErrors({
+                message: "Negative Minimum must be less than Neutral Minimum.",
+                status: 400,
+                code: errorCodes.invalid
+            }))
+        }
+
+        if (neutral >= positive) {
+            return next(createHttpErrors({
+                message: "Neutral Minimum must be less than Positive Minimum.",
+                status: 400,
+                code: errorCodes.invalid
+            }))
+        }
+
+        try {
+            await prisma.setting.update({
+                where: { id: 1 },
+                data: {
+                    positiveMin,
+                    negativeMin,
+                    neutralMin,
+                    criticalMin,
+                    watchlistTrackMin
+                }
+            })
+
+            res.status(200).json({
+                message: "Successfully updated system settings."
+            })
+        } catch (error: any) {
+            console.error("Error updating settings:", error)
+            return next(createHttpErrors({
+                message: "Failed to update settings. Please try again.",
+                status: 500,
+                code: errorCodes.server
+            }))
+        }
     }
 ]

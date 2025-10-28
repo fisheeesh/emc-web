@@ -1,22 +1,14 @@
 import { endOfTomorrow, startOfToday, startOfTomorrow } from "date-fns";
-import { PrismaClient } from "../../prisma/generated/prisma";
+import { PrismaClient, RType } from "../../prisma/generated/prisma";
 import { prisma } from "../config/prisma-client";
 import { EmailQueue } from "../jobs/queues/email-queue";
 import { action_overdue_body, action_overdue_subject, due_tomorrow_body, due_tomorrow_subject, superadmin_overdue_body, superadmin_overdue_subject } from "../utils/email-templates";
 
 const prismaClient = new PrismaClient()
 
-export const getSettingStatus = async (key: string) => {
-    return await prismaClient.setting.findUnique({
-        where: { key }
-    })
-}
-
-export const createOrUpdateSettingStatus = async (key: string, value: string) => {
-    return await prismaClient.setting.upsert({
-        where: { key },
-        update: { value },
-        create: { key, value }
+export const getSystemSettingsData = async () => {
+    return await prisma.setting.findUnique({
+        where: { id: 1 }
     })
 }
 
@@ -92,7 +84,7 @@ export const cronCheckActionPlans = async () => {
                     lte: endOfTomorrow()
                 },
                 type: {
-                    not: 'COMPLETED'
+                    not: RType.COMPLETED
                 }
             },
             include: {
@@ -115,7 +107,7 @@ export const cronCheckActionPlans = async () => {
                     lt: startOfToday()
                 },
                 type: {
-                    not: 'COMPLETED'
+                    not: RType.COMPLETED
                 }
             },
             include: {
@@ -163,7 +155,7 @@ export const cronCheckActionPlans = async () => {
                 await prisma.actionPlan.update({
                     where: { id: plan.id },
                     data: {
-                        type: "FAILED"
+                        type: RType.FAILED
                     }
                 })
                 //* Email to responsible admin

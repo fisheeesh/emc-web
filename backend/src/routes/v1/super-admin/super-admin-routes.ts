@@ -2,7 +2,7 @@ import express from "express"
 import { deleteActionPlanById, getAllActionPlans, updateActionPlan } from "../../../controllers/super-admin/action-plan-management-controller"
 import { getActionAvgReponseTime, getActionPlanStatus, getDepartmentsHeatmap, getTopConcernWords } from "../../../controllers/super-admin/analytics-controller"
 import { createNewDepartment, deleteDepartmentById, getAllDepartmentsData, updateDepartmentById } from "../../../controllers/super-admin/dep-controller"
-import { createEmotion, editEmpCredentials, getEmotions, getSummaryData, testSuperAdmin, updateEmotion, } from "../../../controllers/super-admin/super-admin-controller"
+import { createEmotion, editEmpCredentials, getEmotions, getSummaryData, getSystemSettings, testSuperAdmin, updateEmotion, updateSettings, } from "../../../controllers/super-admin/super-admin-controller"
 import { bulkRegister, createNewEmployee, deleteEmployee, getAllEmployeesInfinite, updateEmployeeInformation } from "../../../controllers/super-admin/user-management-controller"
 import upload, { uploadCSV } from "../../../middlewares/upload-files-middleware"
 
@@ -43,5 +43,9 @@ router.get("/action-plan-status", getActionPlanStatus)
 router.get("/departments-heatmap", getDepartmentsHeatmap)
 router.get("/action-avg-response-time", getActionAvgReponseTime)
 router.get("/top-concern-words", getTopConcernWords)
+
+//* System Settings
+router.get("/system-settings", getSystemSettings)
+router.patch("/system-settings", updateSettings)
 
 export default router
