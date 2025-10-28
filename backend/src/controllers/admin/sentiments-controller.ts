@@ -92,11 +92,14 @@ export const getLeaderboards = [
         const emp = await getEmployeeById(empId!)
         checkEmployeeIfNotExits(emp)
 
-        const kwFilter: Prisma.EmployeeWhereInput = kw ? {
-            OR: [
-                { firstName: { contains: kw as string, mode: 'insensitive' } },
-                { lastName: { contains: kw as string, mode: 'insensitive' } }
-            ] as Prisma.EmployeeWhereInput[]
+        const keywords = kw ? kw.toString().trim().split(/\s+/) : [];
+        const kwFilter: Prisma.EmployeeWhereInput = keywords.length > 0 ? {
+            AND: keywords.map((word: string) => ({
+                OR: [
+                    { firstName: { contains: word, mode: 'insensitive' } },
+                    { lastName: { contains: word, mode: 'insensitive' } }
+                ] as Prisma.EmployeeWhereInput[]
+            }))
         } : {}
 
         const isAllTime = duration === 'all'
@@ -240,10 +243,12 @@ export const getAllCriticalEmps = [
                 ...statusFilter,
                 ...(kw && {
                     employee: {
-                        OR: [
-                            { firstName: { contains: kw as string, mode: 'insensitive' } },
-                            { lastName: { contains: kw as string, mode: 'insensitive' } }
-                        ]
+                        AND: kw.toString().trim().split(/\s+/).map(word => ({
+                            OR: [
+                                { firstName: { contains: word, mode: 'insensitive' } },
+                                { lastName: { contains: word, mode: 'insensitive' } }
+                            ]
+                        }))
                     }
                 }),
                 department: {
@@ -360,11 +365,14 @@ export const getAllWatchlistEmps = [
 
         const { limit = 7, cursor: lastCursor, dep, kw, ts = 'desc' } = req.query
 
-        const kwFilter: Prisma.EmployeeWhereInput = kw ? {
-            OR: [
-                { firstName: { contains: kw as string, mode: "insensitive" } },
-                { lastName: { contains: kw as string, mode: 'insensitive' } }
-            ]
+        const keywords = kw ? kw.toString().trim().split(/\s+/) : [];
+        const kwFilter: Prisma.EmployeeWhereInput = keywords.length > 0 ? {
+            AND: keywords.map((word: string) => ({
+                OR: [
+                    { firstName: { contains: word, mode: "insensitive" } },
+                    { lastName: { contains: word, mode: 'insensitive' } }
+                ]
+            }))
         } : {}
 
         const options = {

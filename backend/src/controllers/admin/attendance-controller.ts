@@ -109,11 +109,14 @@ export const getAttendanceOverView = [
 
         const kwTrimmed = (kw || "").toString().trim();
         if (kwTrimmed.length > 0) {
-            employeeWhere.OR = [
-                { firstName: { contains: kwTrimmed, mode: "insensitive" } },
-                { lastName: { contains: kwTrimmed, mode: "insensitive" } },
-                { position: { contains: kwTrimmed, mode: "insensitive" } },
-            ];
+            const keywords = kwTrimmed.split(/\s+/);
+            employeeWhere.AND = keywords.map(word => ({
+                OR: [
+                    { firstName: { contains: word, mode: "insensitive" } },
+                    { lastName: { contains: word, mode: "insensitive" } },
+                    { position: { contains: word, mode: "insensitive" } },
+                ]
+            }));
         }
 
         if (Object.keys(employeeWhere).length > 0) {
@@ -140,6 +143,7 @@ export const getAttendanceOverView = [
                         fullName: true,
                         position: true,
                         jobType: true,
+                        avatar: true,
                         recentStreak: true
                     }
                 }

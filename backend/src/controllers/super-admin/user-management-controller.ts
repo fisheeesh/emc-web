@@ -180,13 +180,16 @@ export const getAllEmployeesInfinite = [
 
         const { limit = 7, cursor: lastCursor, kw, dep, role, jobType, accType, status, ts = 'desc' } = req.query
 
-        const kwFilter: Prisma.EmployeeWhereInput = kw ? {
-            OR: [
-                { firstName: { contains: kw as string, mode: 'insensitive' } },
-                { lastName: { contains: kw as string, mode: 'insensitive' } },
-                { email: { contains: kw as string, mode: 'insensitive' } },
-                { position: { contains: kw as string, mode: 'insensitive' } },
-            ] as Prisma.EmployeeWhereInput[]
+        const keywords = kw ? kw.toString().trim().split(/\s+/) : [];
+        const kwFilter: Prisma.EmployeeWhereInput = keywords.length > 0 ? {
+            AND: keywords.map((word: string) => ({
+                OR: [
+                    { firstName: { contains: word, mode: 'insensitive' } },
+                    { lastName: { contains: word, mode: 'insensitive' } },
+                    { email: { contains: word, mode: 'insensitive' } },
+                    { position: { contains: word, mode: 'insensitive' } },
+                ]
+            }))
         } : {}
 
         const roleFilter: Prisma.EmployeeWhereInput =

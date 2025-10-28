@@ -67,10 +67,12 @@ export const getAllActionPlans = [
                 ...(kw && {
                     criticalEmployee: {
                         employee: {
-                            OR: [
-                                { firstName: { contains: kw as string, mode: 'insensitive' } },
-                                { lastName: { contains: kw as string, mode: 'insensitive' } },
-                            ]
+                            AND: kw.toString().trim().split(/\s+/).map(word => ({
+                                OR: [
+                                    { firstName: { contains: word, mode: 'insensitive' } },
+                                    { lastName: { contains: word, mode: 'insensitive' } },
+                                ]
+                            }))
                         }
                     }
                 })
