@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from "express"
 import { body, query, validationResult } from "express-validator"
-import { Priority, Prisma, RStatus, RType } from "../../../prisma/generated/prisma"
+import { NotifType, Priority, Prisma, RStatus, RType } from "../../../prisma/generated/prisma"
 import { errorCodes } from "../../config/error-codes"
 import { prisma } from "../../config/prisma-client"
 import { EmailQueue } from "../../jobs/queues/email-queue"
@@ -164,11 +164,11 @@ export const deleteActionPlanById = [
             code: errorCodes.notFound
         }))
 
-        if (actionPlan.status === 'REJECTED') {
+        if (actionPlan.status === RStatus.REJECTED) {
             await prisma.notification.create({
                 data: {
                     avatar: emp!.avatar! ?? "",
-                    type: "REJECTED_DELETE",
+                    type: NotifType.REJECTED_DELETE,
                     content: getNotificationContent(actionPlan.status, actionPlan.criticalEmployee.employee.fullName, "REJECTED_DELETE"),
                     departmentId: actionPlan.departmentId
                 }
@@ -240,7 +240,7 @@ export const updateActionPlan = [
             code: errorCodes.notFound
         }))
 
-        if (actionPlan.type === 'COMPLETED') return next(createHttpErrors({
+        if (actionPlan.type === RType.COMPLETED) return next(createHttpErrors({
             message: "You cannot update completed action plan.",
             status: 400,
             code: errorCodes.invalid
@@ -252,7 +252,7 @@ export const updateActionPlan = [
                 data: {
                     suggestions,
                     status: status as RStatus,
-                    type: status === 'REJECTED' ? "FAILED" : "PROCESSING"
+                    type: status === RStatus.REJECTED ? RType.FAILED : RType.PROCESSING
                 }
             })
 

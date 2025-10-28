@@ -9,6 +9,26 @@ export interface EmotionCheckIn {
     createdAt: Date;
 }
 
+export interface CheckInData {
+    textFeeling: string;
+    emoji: string;
+    checkInTime: string;
+    status: string;
+}
+
+export interface AnalysisData {
+    checkIns: CheckInData[];
+    employeeName: string;
+    startDate: string;
+    endDate: string;
+    criticalEmpId: number;
+}
+
+export interface RecommendationData {
+    empName: string,
+    emotionCheckIns: EmotionCheckIn[];
+}
+
 export const createScorePrompt = (moodMessage: string) => {
     return `
             The user has submitted a mood check-in: "${moodMessage}"

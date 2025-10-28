@@ -139,7 +139,8 @@ export const getAttendanceOverView = [
                         id: true,
                         fullName: true,
                         position: true,
-                        jobType: true
+                        jobType: true,
+                        recentStreak: true
                     }
                 }
             },

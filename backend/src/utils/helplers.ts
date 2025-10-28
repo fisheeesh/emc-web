@@ -8,6 +8,11 @@ import path from "path";
 import { TIMEZONE } from '../config';
 import cloudinary from "../config/cloudinary";
 
+export const parseScore = (text: string): number | null => {
+    const match = text.match(/-?\d+(\.\d+)?$/);
+    return match ? parseFloat(match[0]) : null;
+}
+
 export const deleteCloudinaryImage = async (publicId: string) => {
     try {
         const result = await cloudinary.uploader.destroy(publicId);

@@ -1,7 +1,7 @@
 import { endOfDay, startOfDay, startOfMonth, subDays } from "date-fns";
 import { NextFunction, Request, Response } from "express";
 import { body, query, validationResult } from "express-validator";
-import { Prisma, PrismaClient, Status } from "../../../prisma/generated/prisma";
+import { NotifType, Prisma, PrismaClient, RType, Status } from "../../../prisma/generated/prisma";
 import { errorCodes } from "../../config/error-codes";
 import { prisma } from "../../config/prisma-client";
 import { EmailQueue } from "../../jobs/queues/email-queue";
@@ -373,7 +373,7 @@ export const getAllWatchlistEmps = [
             cursor: lastCursor ? { id: +lastCursor } : undefined,
             where: {
                 ...kwFilter,
-                status: 'WATCHLIST',
+                status: Status.WATCHLIST,
                 department: {
                     isActive: true
                 },
@@ -472,7 +472,7 @@ export const deleteWatchlistEmpById = [
             }
         })
 
-        if (!wEmp || wEmp.status !== 'WATCHLIST') return next(createHttpErrors({
+        if (!wEmp || wEmp.status !== Status.WATCHLIST) return next(createHttpErrors({
             message: "Watchlist employee record not found.",
             status: 404,
             code: errorCodes.notFound
@@ -486,7 +486,7 @@ export const deleteWatchlistEmpById = [
 
         const updatedEmp = await prisma.employee.update({
             where: { id },
-            data: { status: 'NORMAL' }
+            data: { status: Status.NORMAL }
         })
 
         res.status(200).json({
@@ -579,7 +579,7 @@ export const createActionPlan = [
                 data: {
                     avatar: emp!.avatar! ?? "",
                     toSAdmin: true,
-                    type: 'REQUEST',
+                    type: NotifType.REQUEST,
                     content: `🚨 Action Plan Approval Required | ${criticalEmp.employee.fullName} from ${criticalEmp.department.name} has been flagged as critical. ${emp!.firstName} ${emp!.lastName} (${criticalEmp.department.name} HR) has submitted a ${priority} priority action plan for review. Click to review the full mental health assessment and approve or reject this intervention plan.`,
                     departmentId: depId
                 }
@@ -645,7 +645,7 @@ export const markAsCompletedActionPlan = [
             code: errorCodes.notFound
         }))
 
-        if (actionPlan.type === 'COMPLETED' || actionPlan.type === 'PENDING') return next(createHttpErrors({
+        if (actionPlan.type === RType.COMPLETED || actionPlan.type === RType.PENDING) return next(createHttpErrors({
             message: "You cannot mark as completed to Pending/Completed type action plan.",
             status: 400,
             code: errorCodes.invalid
@@ -655,7 +655,7 @@ export const markAsCompletedActionPlan = [
             await tx.actionPlan.update({
                 where: { id },
                 data: {
-                    type: "COMPLETED",
+                    type: RType.COMPLETED,
                     completedAt: new Date()
                 }
             })
@@ -679,7 +679,7 @@ export const markAsCompletedActionPlan = [
                 data: {
                     avatar: emp!.avatar! ?? "",
                     toSAdmin: true,
-                    type: "UPDATE",
+                    type: NotifType.UPDATE,
                     content: `Action plan for critical employee - ${actionPlan.criticalEmployee.employee.fullName} has been completed by ${emp?.firstName} ${emp?.lastName}. All necessary actions have been taken. ✅`,
                     departmentId: emp!.departmentId
                 }

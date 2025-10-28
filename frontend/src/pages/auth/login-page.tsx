@@ -10,7 +10,7 @@ export default function LoginPage() {
                 formType='LOGIN'
                 schema={LogInSchema}
                 defaultValues={{
-                    email: 'admin@ata-it-th.com',
+                    email: 'admin@ata.it.th',
                     password: 'Admin1234$'
                 }}
             />

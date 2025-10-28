@@ -51,7 +51,7 @@ export const getAllDepartmentsData = async (req: CustomRequest, res: Response, n
 }
 
 export const createNewDepartment = [
-    body("name", "Department name is required").trim().notEmpty().escape(),
+    body("name", "Department name is required").trim().notEmpty(),
     body("description", "Department description is required").trim().notEmpty(),
     async (req: CustomRequest, res: Response, next: NextFunction) => {
         const errors = validationResult(req).array({ onlyFirstError: true })
@@ -85,7 +85,7 @@ export const createNewDepartment = [
 
 export const updateDepartmentById = [
     body("id", "Department Id is required").isInt({ gt: 0 }),
-    body("name", "Department name is required").trim().optional().escape(),
+    body("name", "Department name is required").trim().optional(),
     body("description", "Department description is required").trim().optional(),
     body("status", "Department Status is required").trim().optional().trim(),
     async (req: CustomRequest, res: Response, next: NextFunction) => {

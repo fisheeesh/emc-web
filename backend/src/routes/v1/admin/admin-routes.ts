@@ -3,14 +3,12 @@ import { deleteNotification, getAdminUser, getAllDepartments, getAllNotification
 import { generateAIAnalysis, generateAIRecommendation, regenerateAIAnalysis } from "../../../controllers/admin/ai-controller"
 import { getAttendanceOverView, getCheckInHours, getDailyAttendance } from "../../../controllers/admin/attendance-controller"
 import { createActionPlan, deleteCriticalEmpById, deleteWatchlistEmpById, getAllCriticalEmps, getAllWatchlistEmps, getLeaderboards, getMoodOverview, getSenitmentsComparison, markAsCompletedActionPlan } from "../../../controllers/admin/sentiments-controller"
-import { setMaintenance } from "../../../controllers/admin/system-controller"
 import { uploadAttachments } from "../../../middlewares/upload-files-middleware"
 
 const router = express.Router()
 
 //* System routes
 router.get("/test", testAdmin)
-router.post("/maintenance", setMaintenance)
 
 //* Sentiments routes
 router.get("/mood-overview", getMoodOverview)

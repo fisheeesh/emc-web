@@ -55,7 +55,7 @@ export const getMoodPercentages = async (uDepartmentId: number, qDepartmentId: s
         for (const row of recentCheckIns) {
             const score = Number(row.emotionScore) ?? 0
 
-            if (score >= MOOD_THRESHOLDS.positive) posi++
+            if (score >= MOOD_THRESHOLDS.positiveMin) posi++
             else if (score >= MOOD_THRESHOLDS.neutralMin) neu++
             else if (score >= MOOD_THRESHOLDS.negativeMin) nega++
             else crit++
@@ -116,7 +116,7 @@ export const getSentimentsComparisonData = async (uDepartmentId: number, qDepart
             const score = Number(entry.emotionScore)
 
             //* Increase count based on entry's emotionScore
-            if (score >= MOOD_THRESHOLDS.positive) dayMap[checkInDate].positive++
+            if (score >= MOOD_THRESHOLDS.positiveMin) dayMap[checkInDate].positive++
             else if (score >= MOOD_THRESHOLDS.neutralMin) dayMap[checkInDate].neutral++
             else if (score >= MOOD_THRESHOLDS.negativeMin) dayMap[checkInDate].negative++
             else dayMap[checkInDate].critical++

@@ -1,36 +1,11 @@
-import { NextFunction, Request, Response } from "express";
-import { body, validationResult } from "express-validator";
+import { Request, Response } from "express";
 import { PrismaClient } from "../../..//prisma/generated/prisma";
-import { errorCodes } from "../../config/error-codes";
-import { createOrUpdateSettingStatus } from "../../services/system-service";
-import { createHttpErrors } from "../../utils/check";
 
 interface CustomRequest extends Request {
     userId?: number
 }
 
 const prisma = new PrismaClient();
-
-export const setMaintenance = [
-    body("mode", "Mode must be boolean").isBoolean(),
-    async (req: CustomRequest, res: Response, next: NextFunction) => {
-        const errors = validationResult(req).array({ onlyFirstError: true })
-        if (errors.length > 0) return next(createHttpErrors({
-            message: errors[0].msg,
-            status: 400,
-            code: errorCodes.invalid
-        }))
-
-        const { mode } = req.body
-
-        const value = mode ? 'true' : 'false'
-        const message = mode ? 'Successfully set Maintenance mode.' : 'Successfully turn off Maintenance mode.'
-
-        await createOrUpdateSettingStatus("maintenance", value)
-
-        res.status(200).json({ message })
-    }
-]
 
 const recentErrors: Array<{ time: number; message: string }> = [];
 const MAX_STORED_ERRORS = 50;

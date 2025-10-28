@@ -1,12 +1,12 @@
 import { NextFunction, Request, Response } from "express"
 import { body, validationResult } from "express-validator"
 import sanitizeHtml from 'sanitize-html'
-import { PrismaClient } from "../../..//prisma/generated/prisma"
+import { NotifType, PrismaClient, Status } from "../../..//prisma/generated/prisma"
 import { CRITICAL_POINT } from "../../config"
 import { errorCodes } from "../../config/error-codes"
 import { CacheQueue } from "../../jobs/queues/cache-queue"
 import { EmailQueue } from "../../jobs/queues/email-queue"
-import { ScoreQueue, ScoreQueueEvents } from "../../jobs/queues/score-queue"
+import { calculateEmotionScoreWithAI } from "../../services/ai-services"
 import { getEmployeeById } from "../../services/auth-services"
 import { getAllEmpEmotionHistory } from "../../services/emp-services"
 import { getEmployeeEmails } from "../../services/system-service"
@@ -64,7 +64,7 @@ export const emotionCheckIn = [
                 checkIns: {
                     select: { emotionScore: true },
                     orderBy: { createdAt: 'desc' },
-                    take: 100  // Increased from 13 to capture longer streaks
+                    take: 100
                 }
             }
         });
@@ -74,15 +74,15 @@ export const emotionCheckIn = [
         const [emoji, textFeeling] = moodMessage.split('//')
 
         //* Let AI calculate score
-        const job = await ScoreQueue.add("calculate-score", {
-            moodMessage
-        })
+        const score = await calculateEmotionScoreWithAI(moodMessage)
 
-        const raw = await job.waitUntilFinished(ScoreQueueEvents)
-        //* Find last number in string
-        const match = raw.match(/-?\d+(\.\d+)?$/);
-        //* Get the score and format it
-        const score = match ? parseFloat(match[0]) : null;
+        if (score === null) {
+            return next(createHttpErrors({
+                message: "Failed to parse emotion score from AI response.",
+                status: 500,
+                code: errorCodes.server
+            }))
+        }
 
         const last13Scores = emp!.checkIns.slice(0, 13).map(e => +e.emotionScore);
         const last14Scores = [+score!, ...last13Scores];
@@ -99,8 +99,8 @@ export const emotionCheckIn = [
         const newEmotionSum = +emp!.emotionSum + score!;
         const newEmotionCount = emp!.emotionCount + 1;
         const avgScore = newEmotionSum / newEmotionCount;
-        const isRecovered = emp!.status === 'WATCHLIST' && isValid
-        const isNewCritical = avgScore <= CRITICAL_POINT && sureCritical && emp!.status !== "CRITICAL" && emp!.status !== "WATCHLIST"
+        const isRecovered = emp!.status === Status.WATCHLIST && isValid
+        const isNewCritical = avgScore <= CRITICAL_POINT && sureCritical && emp!.status !== Status.CRITICAL && emp!.status !== Status.WATCHLIST
 
         //* Update longestStreak if current is better
         const newLongestStreak = Math.max(emp!.longestStreak || 0, currentStreak);
@@ -108,7 +108,7 @@ export const emotionCheckIn = [
         //* Optimized transaction - only critical DB operations
         await prisma.$transaction(async (tx) => {
             //* Single combined update instead of multiple queries
-            const statusUpdate = isRecovered ? "NORMAL" : (isNewCritical ? "CRITICAL" : undefined);
+            const statusUpdate = isRecovered ? Status.NORMAL : (isNewCritical ? Status.CRITICAL : undefined);
 
             const updates = await Promise.all([
                 //* 1. Insert emotion check-in
@@ -128,6 +128,7 @@ export const emotionCheckIn = [
                         emotionSum: newEmotionSum,
                         emotionCount: newEmotionCount,
                         longestStreak: newLongestStreak,
+                        recentStreak: currentStreak,
                         avgScore,
                         ...(statusUpdate && { status: statusUpdate }),
                         ...(isNewCritical && { lastCritical: new Date() })
@@ -140,7 +141,7 @@ export const emotionCheckIn = [
                 await tx.notification.create({
                     data: {
                         avatar: emp!.avatar! ?? "",
-                        type: 'NORMAL',
+                        type: NotifType.NORMAL,
                         content: `🎉 Good news!!!. ${emp?.firstName} ${emp?.lastName} is back to normal. Yay!!!🙌`,
                         department: { connect: { id: emp?.departmentId } }
                     }
@@ -159,7 +160,7 @@ export const emotionCheckIn = [
                     tx.notification.create({
                         data: {
                             avatar: emp!.avatar! ?? "",
-                            type: 'CRITICAL',
+                            type: NotifType.CRITICAL,
                             content: `${emp?.firstName} ${emp?.lastName}'s sentiments has dropped to critical. Please review.`,
                             department: { connect: { id: emp?.departmentId } }
                         }
@@ -170,7 +171,7 @@ export const emotionCheckIn = [
             return { updates, avgScore };
         });
 
-        //* Response immediately - Don't wait for background tasks
+        //* Response immediately, dun wait for background tasks
         res.status(200).json({
             message: "Successfully checked in.",
             currentStreak: currentStreak,

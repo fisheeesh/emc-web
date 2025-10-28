@@ -1,5 +1,5 @@
 import { format } from "date-fns"
-import { PrismaClient } from "../..//prisma/generated/prisma"
+import { PrismaClient, Status } from "../..//prisma/generated/prisma"
 import { prisma } from "../config/prisma-client"
 
 const prismaClient = new PrismaClient()
@@ -9,7 +9,7 @@ export const createCriticalEmp = async (empId: number, avgScore: number) => {
         await tx.employee.update({
             where: { id: empId },
             data: {
-                status: "CRITICAL",
+                status: Status.CRITICAL,
                 lastCritical: new Date(),
                 avgScore
             }
@@ -30,10 +30,10 @@ export const getAllWatchlistInfinite = async (options: any) => {
         let emotionHistory: any[] = [];
 
         if (actionPlan?.updatedAt && emp.checkIns) {
-            // *Get the updatedAt date
+            //* Get the updatedAt date
             const actionUpdatedDate = new Date(actionPlan.updatedAt);
 
-            //* Filter check-ins that happened AFTER the action plan was updated
+            //* Filter check-ins that happened After the action plan was updated
             const checkInsAfterAction = emp.checkIns
                 .filter((checkIn: any) => {
                     const checkInDate = new Date(checkIn.createdAt);
@@ -43,8 +43,8 @@ export const getAllWatchlistInfinite = async (options: any) => {
                     return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
                 });
 
-            //* Take the first 4 check-ins after the action plan
-            const trackingCheckIns = checkInsAfterAction.slice(0, 4);
+            //* Take the first 14 check-ins after the action plan
+            const trackingCheckIns = checkInsAfterAction.slice(0, 14);
 
             //* Map to emotion data format
             emotionHistory = trackingCheckIns.map((checkIn: any) => {
