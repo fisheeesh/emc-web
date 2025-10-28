@@ -6,7 +6,9 @@ import {
     CardTitle,
 } from "@/components/ui/card";
 import { AlertCircle, CheckCircle, TrendingUp } from "lucide-react";
-import { BsBuildings } from "react-icons/bs"
+import { BsBuildings } from "react-icons/bs";
+import { GoArrowBoth } from "react-icons/go";
+import { PiGreaterThanLight } from "react-icons/pi";
 
 const getStatusColor = (status: string) => {
     const colors = {
@@ -38,8 +40,8 @@ export function DepartmentHeatmap({ depHeatmapData }: { depHeatmapData: DepHeatM
     return (
         <Card className="flex flex-col">
             <CardHeader>
-                <CardTitle className="text-xl md:text-2xl flex items-center gap-2 line-clamp-1">
-                    <BsBuildings />
+                <CardTitle className="text-xl md:text-2xl flex items-center gap-2">
+                    <BsBuildings className="hidden md:block" />
                     Departments Wellbeing Heatmap
                 </CardTitle>
                 <CardDescription>
@@ -107,21 +109,26 @@ export function DepartmentHeatmap({ depHeatmapData }: { depHeatmapData: DepHeatM
 
                 <div className="mt-6 flex flex-wrap items-center gap-4 text-xs">
                     <span className="font-semibold text-gray-700 dark:text-gray-300">Status:</span>
-                    <div className="flex items-center gap-1.5">
+                    <div className="flex items-center gap-1">
                         <div className="w-3 h-3 rounded-full bg-green-500"></div>
-                        <span className="text-gray-600 dark:text-gray-400">Positive <span className="font-en">(0.4 ↔ 1.0)</span></span>
+                        <p className="text-gray-600 dark:text-gray-400 flex items-center gap-1">
+                            Positive <span className="font-en flex items-center gap-1">(0.4 <GoArrowBoth /> 1.0)</span>
+                        </p>
                     </div>
-                    <div className="flex items-center gap-1.5">
+                    <div className="flex items-center gap-1">
                         <div className="w-3 h-3 rounded-full bg-purple-500"></div>
-                        <span className="text-gray-600 dark:text-gray-400">Neutral <span className="font-en">(-0.3 ↔ 0.3)</span></span>
+                        <span className="text-gray-600 dark:text-gray-400 flex items-center gap-1">
+                            Neutral <span className="font-en flex items-center gap-1">(-0.3 <GoArrowBoth /> 0.3)</span></span>
                     </div>
-                    <div className="flex items-center gap-1.5">
+                    <div className="flex items-center gap-1">
                         <div className="w-3 h-3 rounded-full bg-orange-500"></div>
-                        <span className="text-gray-600 dark:text-gray-400">Negative <span className="font-en">(-0.7 ↔ -0.4)</span></span>
+                        <span className="text-gray-600 dark:text-gray-400 flex items-center gap-1">
+                            Negative <span className="font-en flex items-center gap-1">(-0.7 <GoArrowBoth /> -0.4)</span></span>
                     </div>
-                    <div className="flex items-center gap-1.5">
+                    <div className="flex items-center gap-1">
                         <div className="w-3 h-3 rounded-full bg-red-500"></div>
-                        <span className="text-gray-600 dark:text-gray-400">Critical <span className="font-en">(&gt;-0.8)</span></span>
+                        <span className="text-gray-600 dark:text-gray-400 flex items-center gap-1">
+                            Critical <span className="font-en flex items-center gap-1">(<PiGreaterThanLight />-0.8)</span></span>
                     </div>
                 </div>
             </CardContent>

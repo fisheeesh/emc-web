@@ -46,7 +46,7 @@ export function formatId(id: string) {
  * - "09123456789" -> "09 123 456 789"
  */
 export const formatPhoneNumber = (phone: string): string => {
-  if (!phone) return "";
+  if (!phone) return "NULL";
 
   //* Remove all non-digit characters
   const cleaned = phone.replace(/\D/g, "");
