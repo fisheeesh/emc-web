@@ -159,6 +159,17 @@ export const allEmotionCategoriesQuery = () => ({
     queryFn: fetchAllEmotionCategories
 })
 
+const fetchSystemSettings = async () => {
+    const res = await superApi.get("/super-admin/system-settings")
+
+    return res.data
+}
+
+export const systemSettingsQuery = () => ({
+    queryKey: ['system-settings'],
+    queryFn: fetchSystemSettings
+})
+
 const fetchCountries = async () => {
     const res = await axios.get("https://restcountries.com/v2/all?fields=name,flag")
 

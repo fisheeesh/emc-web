@@ -1,5 +1,5 @@
 import queryClient from "@/api/query"
-import { actionAvgResponseTimeQuery, actionPlansQuery, actionPlanStatusQuery, allDepartmentsDataQuery, allEmotionCategoriesQuery, countriesQuery, depHeatMapQuery, empInfiniteQuery, summaryDataQuery, topConcernWordsQuery } from "@/api/super-admin-query"
+import { actionAvgResponseTimeQuery, actionPlansQuery, actionPlanStatusQuery, allDepartmentsDataQuery, allEmotionCategoriesQuery, countriesQuery, depHeatMapQuery, empInfiniteQuery, summaryDataQuery, systemSettingsQuery, topConcernWordsQuery } from "@/api/super-admin-query"
 
 export const managementsLoader = async () => {
     await Promise.all([
@@ -8,7 +8,8 @@ export const managementsLoader = async () => {
         queryClient.ensureQueryData(summaryDataQuery()),
         queryClient.ensureQueryData(countriesQuery()),
         queryClient.ensureQueryData(allDepartmentsDataQuery()),
-        queryClient.ensureQueryData(allEmotionCategoriesQuery())
+        queryClient.ensureQueryData(allEmotionCategoriesQuery()),
+        queryClient.ensureQueryData(systemSettingsQuery()),
     ])
 
     return null

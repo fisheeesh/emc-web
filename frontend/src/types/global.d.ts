@@ -44,6 +44,8 @@ interface Employee {
     avatar: string,
     createdAt: string,
     lastCritical: string,
+    longestStrek: number,
+    recentStreak: numberm
     status: string,
     _count: {
         criticalTimes: number
@@ -266,4 +268,15 @@ interface Emotion {
 interface EmotionCategory {
     title: string;
     emotions: Emotion[];
+}
+
+interface SystemSettings {
+    id: number,
+    positiveMin: number,
+    neutralMin: number,
+    negativeMin: number,
+    criticalMin: number,
+    watchlistTrackMin: number,
+    createdAt: string
+    updatedAt: string
 }
