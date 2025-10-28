@@ -8,6 +8,7 @@ import { getEmployeeById } from "../../services/auth-services";
 import { getAllDepartmentsData, getEmployeeEmails } from "../../services/system-service";
 import { checkEmployeeIfNotExits, checkUploadFile, createHttpErrors } from "../../utils/check";
 import { removeFilesMultiple } from "../../utils/helplers";
+import { NotiStatus } from "../../../prisma/generated/prisma";
 
 interface CustomRequest extends Request {
     employeeId?: number,
@@ -115,7 +116,7 @@ export const markAsReadNotification = [
         await prisma.notification.update({
             where: { id: Number(id) },
             data: {
-                status: "READ"
+                status: NotiStatus.READ
             }
         })
 

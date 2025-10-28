@@ -21,6 +21,7 @@ model Employee {
   country         String?
   position        String?
   longestStreak   Int?
+  recentStreak    Int?
   accType         AccType            @default(ACTIVE)
   jobType         JobType            @default(FULLTIME)
   role            Role               @default(EMPLOYEE)
@@ -271,11 +272,14 @@ model ConcernAnalysis {
 }
 
 model Setting {
-  id        Int      @id @default(autoincrement())
-  key       String   @unique @db.VarChar(100)
-  value     String   @db.Text
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id                Int      @id @default(autoincrement())
+  positiveMin       Decimal  @db.Decimal(3, 1)
+  neutralMin        Decimal  @db.Decimal(3, 1)
+  negativeMin       Decimal  @db.Decimal(3, 1)
+  criticalMin       Decimal  @db.Decimal(3, 1)
+  watchlistTrackMin Int      @default(14)
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
 }
 
 enum Priority {

@@ -1,10 +1,6 @@
 import 'dotenv/config';
 import { app } from "./app";
-import './jobs/workers/analysis-worker'
-import './jobs/workers/image-worker'
 import './jobs/workers/email-worker'
-import './jobs/workers/recommendation-worker'
-import './jobs/workers/score-worker'
 
 const PORT = process.env.PORT || 4000
 
