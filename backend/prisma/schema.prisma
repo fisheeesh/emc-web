@@ -274,9 +274,13 @@ model ConcernAnalysis {
 model Setting {
   id                Int      @id @default(autoincrement())
   positiveMin       Decimal  @db.Decimal(3, 1)
+  positiveMax       Decimal  @default(1) @db.Decimal(3, 1)
   neutralMin        Decimal  @db.Decimal(3, 1)
+  neutralMax        Decimal  @default(0.3) @db.Decimal(3, 1)
   negativeMin       Decimal  @db.Decimal(3, 1)
+  negativeMax       Decimal  @default(-0.4) @db.Decimal(3, 1)
   criticalMin       Decimal  @db.Decimal(3, 1)
+  criticalMax       Decimal  @default(-1) @db.Decimal(3, 1)
   watchlistTrackMin Int      @default(14)
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt

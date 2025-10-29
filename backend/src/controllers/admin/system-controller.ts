@@ -1,10 +1,6 @@
 import { Request, Response } from "express";
 import { PrismaClient } from "../../..//prisma/generated/prisma";
 
-interface CustomRequest extends Request {
-    userId?: number
-}
-
 const prisma = new PrismaClient();
 
 const recentErrors: Array<{ time: number; message: string }> = [];

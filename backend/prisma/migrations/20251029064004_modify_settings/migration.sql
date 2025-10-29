@@ -1,0 +1,5 @@
+-- AlterTable
+ALTER TABLE "Setting" ADD COLUMN     "criticalMax" DECIMAL(3,1) NOT NULL DEFAULT -1,
+ADD COLUMN     "negativeMax" DECIMAL(3,1) NOT NULL DEFAULT -0.4,
+ADD COLUMN     "neutralMax" DECIMAL(3,1) NOT NULL DEFAULT 0.3,
+ADD COLUMN     "positiveMax" DECIMAL(3,1) NOT NULL DEFAULT 1;

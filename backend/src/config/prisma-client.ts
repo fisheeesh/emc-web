@@ -73,6 +73,56 @@ export const prisma = new PrismaClient().$extends({
                 }
             }
         },
+        setting: {
+            positiveMin: {
+                needs: { positiveMin: true },
+                compute(setting) {
+                    return Number(setting.positiveMin)
+                }
+            },
+            positiveMax: {
+                needs: { positiveMax: true },
+                compute(setting) {
+                    return Number(setting.positiveMax)
+                }
+            },
+            negativeMin: {
+                needs: { negativeMin: true },
+                compute(setting) {
+                    return Number(setting.negativeMin)
+                }
+            },
+            negativeMax: {
+                needs: { negativeMax: true },
+                compute(setting) {
+                    return Number(setting.negativeMax)
+                }
+            },
+            neutralMin: {
+                needs: { neutralMin: true },
+                compute(setting) {
+                    return Number(setting.neutralMin)
+                }
+            },
+            neutralMax: {
+                needs: { neutralMax: true },
+                compute(setting) {
+                    return Number(setting.neutralMax)
+                }
+            },
+            criticalMin: {
+                needs: { criticalMin: true },
+                compute(setting) {
+                    return Number(setting.criticalMin)
+                }
+            },
+            criticalMax: {
+                needs: { criticalMax: true },
+                compute(setting) {
+                    return Number(setting.criticalMax)
+                }
+            },
+        },
         department: {
             createdAt: {
                 needs: { createdAt: true },
