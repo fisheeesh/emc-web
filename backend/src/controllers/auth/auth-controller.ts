@@ -583,19 +583,14 @@ export const logout = async (req: Request, res: Response, next: NextFunction) =>
             message: "Successfully logged out from mobile. See you soon.!"
         });
     } else {
-        res.clearCookie('accessToken', {
-            httpOnly: true,
-            secure: process.env.NODE_ENV === 'production',
-            sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'strict',
-            path: '/'
-        }).clearCookie('refreshToken', {
-            httpOnly: true,
-            secure: process.env.NODE_ENV === 'production',
-            sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'strict',
-            path: '/'
-        }).status(200).json({
-            message: "Successfully logged out from web. See you soon.!"
-        })
+        const { maxAge, expires, ...clearOptions } = cookieConfig.accessToken;
+
+        res.clearCookie('accessToken', clearOptions)
+            .clearCookie('refreshToken', clearOptions)
+            .status(200)
+            .json({
+                message: "Successfully logged out from web. See you soon.!"
+            })
     }
 }
 
