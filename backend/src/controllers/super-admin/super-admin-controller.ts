@@ -3,9 +3,9 @@ import { body, query, validationResult } from "express-validator"
 import { errorCodes } from "../../config/error-codes"
 import { prisma } from "../../config/prisma-client"
 import { getEmployeeByEmail, getEmployeeById, getOTPRowByEmail } from "../../services/auth-services"
+import { getSystemSettingsData } from "../../services/system-service"
 import { checkEmployeeIfNotExits, createHttpErrors } from "../../utils/check"
 import { generateHashedValue, generateToken } from "../../utils/generate"
-import { getSystemSettingsData } from "../../services/system-service"
 
 interface CustomRequest extends Request {
     employeeId?: number
@@ -168,6 +168,7 @@ export const getSummaryData = [
                 : 0;
 
             //* Positive Emotion Rate (emotions >= 0.4 this month)
+            const settings = await getSystemSettingsData()
             const thisMonthEmotions = await prisma.emotionCheckIn.groupBy({
                 by: ['emotionScore'],
                 where: {
@@ -181,7 +182,7 @@ export const getSummaryData = [
 
             const totalEmotionsThisMonth = thisMonthEmotions.reduce((sum, item) => sum + item._count, 0);
             const positiveEmotionsThisMonth = thisMonthEmotions
-                .filter(item => Number(item.emotionScore) >= 0.4)
+                .filter(item => Number(item.emotionScore) >= settings!.positiveMin)
                 .reduce((sum, item) => sum + item._count, 0);
 
             const positiveRate = totalEmotionsThisMonth > 0
@@ -203,7 +204,7 @@ export const getSummaryData = [
 
             const totalEmotionsLastMonth = lastMonthEmotions.reduce((sum, item) => sum + item._count, 0);
             const positiveEmotionsLastMonth = lastMonthEmotions
-                .filter(item => Number(item.emotionScore) >= 0.4)
+                .filter(item => Number(item.emotionScore) >= settings!.positiveMin)
                 .reduce((sum, item) => sum + item._count, 0);
 
             const lastMonthPositiveRate = totalEmotionsLastMonth > 0
@@ -553,53 +554,9 @@ export const getSystemSettings = async (req: CustomRequest, res: Response, next:
 }
 
 export const updateSettings = [
-    body("positiveMin")
-        .notEmpty().withMessage("Positive Minimum is required.")
-        .isDecimal({ decimal_digits: '1' }).withMessage("Positive Minimum must be a decimal with 1 decimal place.")
-        .custom((value) => {
-            const num = parseFloat(value);
-            if (num < -99.9 || num > 99.9) {
-                throw new Error("Positive Minimum must be between -99.9 and 99.9.");
-            }
-            return true;
-        }),
-
-    body("neutralMin")
-        .notEmpty().withMessage("Neutral Minimum is required.")
-        .isDecimal({ decimal_digits: '1' }).withMessage("Neutral Minimum must be a decimal with 1 decimal place.")
-        .custom((value) => {
-            const num = parseFloat(value);
-            if (num < -99.9 || num > 99.9) {
-                throw new Error("Neutral Minimum must be between -99.9 and 99.9.");
-            }
-            return true;
-        }),
-
-    body("negativeMin")
-        .notEmpty().withMessage("Negative Minimum is required.")
-        .isDecimal({ decimal_digits: '1' }).withMessage("Negative Minimum must be a decimal with 1 decimal place.")
-        .custom((value) => {
-            const num = parseFloat(value);
-            if (num < -99.9 || num > 99.9) {
-                throw new Error("Negative Minimum must be between -99.9 and 99.9.");
-            }
-            return true;
-        }),
-
-    body("criticalMin")
-        .notEmpty().withMessage("Critical Minimum is required.")
-        .isDecimal({ decimal_digits: '1' }).withMessage("Critical Minimum must be a decimal with 1 decimal place.")
-        .custom((value) => {
-            const num = parseFloat(value);
-            if (num < -99.9 || num > 99.9) {
-                throw new Error("Critical Minimum must be between -99.9 and 99.9.");
-            }
-            return true;
-        }),
-
     body("watchlistTrackMin")
         .notEmpty().withMessage("Watchlist Track Minimum is required.")
-        .isInt({ min: 1, max: 365 }).withMessage("Watchlist Track Minimum must be an integer between 1 and 365."),
+        .isInt({ min: 14, max: 365 }).withMessage("Watchlist Track Minimum must be an integer between 14 and 365."),
 
     async (req: CustomRequest, res: Response, next: NextFunction) => {
         const errors = validationResult(req).array({ onlyFirstError: true })
@@ -612,46 +569,12 @@ export const updateSettings = [
         const emp = req.employee
         checkEmployeeIfNotExits(emp)
 
-        const { positiveMin, negativeMin, neutralMin, criticalMin, watchlistTrackMin } = req.body
-
-        const positive = parseFloat(positiveMin);
-        const neutral = parseFloat(neutralMin);
-        const negative = parseFloat(negativeMin);
-        const critical = parseFloat(criticalMin);
-
-        //* Ensure logical ordering -> critical < negative < neutral < positive
-        if (critical >= negative) {
-            return next(createHttpErrors({
-                message: "Critical Minimum must be less than Negative Minimum.",
-                status: 400,
-                code: errorCodes.invalid
-            }))
-        }
-
-        if (negative >= neutral) {
-            return next(createHttpErrors({
-                message: "Negative Minimum must be less than Neutral Minimum.",
-                status: 400,
-                code: errorCodes.invalid
-            }))
-        }
-
-        if (neutral >= positive) {
-            return next(createHttpErrors({
-                message: "Neutral Minimum must be less than Positive Minimum.",
-                status: 400,
-                code: errorCodes.invalid
-            }))
-        }
+        const { watchlistTrackMin } = req.body
 
         try {
             await prisma.setting.update({
                 where: { id: 1 },
                 data: {
-                    positiveMin,
-                    negativeMin,
-                    neutralMin,
-                    criticalMin,
                     watchlistTrackMin
                 }
             })

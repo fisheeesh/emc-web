@@ -6,6 +6,7 @@ import { MdEdit } from "react-icons/md";
 import { useState } from "react";
 import EditSystemSettingsModal from "@/components/modals/edit-system-settings.modal";
 import moment from "moment";
+import { FcLock } from "react-icons/fc";
 
 interface SystemSettingsProps {
     data: SystemSettings
@@ -17,36 +18,40 @@ export default function SystemSettingsCard({ data }: SystemSettingsProps) {
     const settings = [
         {
             icon: TrendingUp,
-            label: "Positive Threshold",
-            value: data.positiveMin,
-            description: "Minimum score for positive emotions",
+            label: "Positive Range",
+            min: data.positiveMin,
+            max: data.positiveMax,
+            description: "Score range for positive emotions",
             color: "from-green-500 to-emerald-500",
             bgColor: "bg-green-100 dark:bg-green-950",
             iconColor: "text-green-600 dark:text-green-400"
         },
         {
             icon: Minus,
-            label: "Neutral Threshold",
-            value: data.neutralMin,
-            description: "Minimum score for neutral emotions",
+            label: "Neutral Range",
+            min: data.neutralMin,
+            max: data.neutralMax,
+            description: "Score range for neutral emotions",
             color: "from-purple-500 to-violet-500",
             bgColor: "bg-purple-100 dark:bg-purple-950",
             iconColor: "text-purple-600 dark:text-purple-400",
         },
         {
             icon: TrendingDown,
-            label: "Negative Threshold",
-            value: data.negativeMin,
-            description: "Minimum score for negative emotions",
+            label: "Negative Range",
+            min: data.negativeMin,
+            max: data.negativeMax,
+            description: "Score range for negative emotions",
             color: "from-orange-500 to-amber-500",
             bgColor: "bg-orange-100 dark:bg-orange-950",
             iconColor: "text-orange-600 dark:text-orange-400"
         },
         {
             icon: AlertTriangle,
-            label: "Critical Threshold",
-            value: data.criticalMin,
-            description: "Minimum score triggering critical alerts",
+            label: "Critical Range",
+            min: data.criticalMin,
+            max: data.criticalMax,
+            description: "Score range triggering critical alerts",
             color: "from-red-500 to-rose-500",
             bgColor: "bg-red-100 dark:bg-red-950",
             iconColor: "text-red-600 dark:text-red-400"
@@ -73,7 +78,7 @@ export default function SystemSettingsCard({ data }: SystemSettingsProps) {
                             System Settings
                         </CardTitle>
                         <CardDescription className="line-clamp-1">
-                            Configure emotion scoring thresholds and tracking parameters
+                            Emotion scoring ranges and tracking parameters
                         </CardDescription>
                     </div>
                     <div className="flex flex-col xl:flex-row xl:items-center gap-2">
@@ -115,9 +120,15 @@ export default function SystemSettingsCard({ data }: SystemSettingsProps) {
                                     </div>
 
                                     <div>
-                                        <p className={`text-3xl font-bold font-en bg-gradient-to-r ${setting.color} bg-clip-text text-transparent`}>
-                                            {setting.value}{setting.suffix || ''}
-                                        </p>
+                                        {setting.value !== undefined ? (
+                                            <p className={`text-3xl font-bold font-en bg-gradient-to-r ${setting.color} bg-clip-text text-transparent`}>
+                                                {setting.value}{setting.suffix || ''}
+                                            </p>
+                                        ) : (
+                                            <p className={`text-2xl font-bold font-en bg-gradient-to-r ${setting.color} bg-clip-text text-transparent`}>
+                                                {setting.min} to {setting.max}
+                                            </p>
+                                        )}
                                     </div>
 
                                     <div>
@@ -135,9 +146,14 @@ export default function SystemSettingsCard({ data }: SystemSettingsProps) {
                 </div>
 
                 <div className="mt-6 pt-4 border-t border-gray-200 dark:border-gray-700">
-                    <p className="text-xs text-muted-foreground text-center">
-                        Last updated: <span className="font-en font-medium">{moment(data.updatedAt).format('LLLL')}</span>
-                    </p>
+                    <div className="flex flex-col sm:flex-row items-center justify-between gap-2">
+                        <p className="text-xs text-muted-foreground">
+                            Last updated: <span className="font-en font-medium">{moment(data.updatedAt).format('LLLL')}</span>
+                        </p>
+                        <p className="text-xs text-amber-600 dark:text-amber-400 font-medium flex items-center gap-1.5">
+                            <FcLock className="mb-0.5 size-3.5" /> Emotion thresholds are locked to preserve data integrity
+                        </p>
+                    </div>
                 </div>
             </CardContent>
         </Card>

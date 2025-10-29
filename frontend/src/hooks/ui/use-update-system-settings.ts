@@ -5,10 +5,6 @@ import { useMutation } from "@tanstack/react-query"
 import { toast } from "sonner";
 
 interface Payload {
-    positiveMin: number,
-    neutralMin: number,
-    negativeMin: number,
-    criticalMin: number,
     watchlistTrackMin: number
 }
 
@@ -26,7 +22,7 @@ const useUpdateSystemSettings = () => {
             })
         },
         onError: (error: any) => {
-            const errorMessage = error.response?.data?.message || 'Failed to update emotions.';
+            const errorMessage = error.response?.data?.message || 'Failed to update settings.';
             toast.error('Error', {
                 description: errorMessage
             });

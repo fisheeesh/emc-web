@@ -1,4 +1,3 @@
-
 import { Button } from "@/components/ui/button";
 import { DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
@@ -11,6 +10,7 @@ import { Settings } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import Spinner from "../shared/spinner";
+import { IoWarning } from "react-icons/io5";
 
 interface EditSystemSettingsModalProps {
     data: SystemSettings;
@@ -23,20 +23,12 @@ export default function EditSystemSettingsModal({ data, onClose }: EditSystemSet
     const form = useForm<z.infer<typeof settingsSchema>>({
         resolver: zodResolver(settingsSchema),
         defaultValues: {
-            positiveMin: data.positiveMin.toString(),
-            neutralMin: data.neutralMin.toString(),
-            negativeMin: data.negativeMin.toString(),
-            criticalMin: data.criticalMin.toString(),
             watchlistTrackMin: data.watchlistTrackMin.toString(),
         },
     });
 
     const onSubmit = async (values: z.infer<typeof settingsSchema>) => {
         updateSystemSettings({
-            positiveMin: +values.positiveMin,
-            negativeMin: +values.negativeMin,
-            neutralMin: +values.neutralMin,
-            criticalMin: +values.criticalMin,
             watchlistTrackMin: +values.watchlistTrackMin
         }, {
             onSettled: () => {
@@ -49,120 +41,144 @@ export default function EditSystemSettingsModal({ data, onClose }: EditSystemSet
     const isWorking = form.formState.isSubmitting || updating
 
     return (
-        <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto no-scrollbar">
+        <DialogContent className="sm:max-w-[700px] max-h-[90vh] overflow-y-auto no-scrollbar">
             <DialogHeader>
                 <DialogTitle className="text-lg md:text-xl font-bold flex items-center gap-2">
                     <Settings className="size-5 md:size-7" />
-                    Edit System Settings
+                    System Settings
                 </DialogTitle>
                 <DialogDescription className="text-xs md:text-sm text-start">
-                    Configure emotion scoring thresholds and tracking parameters. <br />
-                    Values must follow: Critical &lt; Negative &lt; Neutral &lt; Positive
+                    Configure system parameters. Emotion thresholds are locked to maintain data integrity. <br />
+                    <span className="text-amber-600 mt-2 dark:text-amber-400 font-medium flex items-center gap-1">
+                        <IoWarning className="mb-[1px]" />
+                        Changing thresholds would invalidate all historical analytics data.
+                    </span>
                 </DialogDescription>
             </DialogHeader>
 
             <Form {...form}>
                 <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 py-4">
-                    <FormField
-                        control={form.control}
-                        name="positiveMin"
-                        render={({ field }) => (
-                            <FormItem>
-                                <FormLabel className="text-green-600 dark:text-green-400 font-semibold">
-                                    Positive Threshold
-                                </FormLabel>
-                                <FormControl>
-                                    <Input
-                                        type="number"
-                                        step="0.1"
-                                        placeholder="0.5"
-                                        {...field}
-                                        className="min-h-[44px] font-en"
-                                    />
-                                </FormControl>
-                                <FormDescription className="text-xs">
-                                    Minimum score for classifying emotions as positive <span className="font-en">(-99.9 to 99.9)</span>
-                                </FormDescription>
-                                <FormMessage />
-                            </FormItem>
-                        )}
-                    />
+                    {/* Positive Threshold - Disabled */}
+                    <div className="space-y-3">
+                        <FormLabel className="text-green-600 dark:text-green-400 font-semibold">
+                            Positive Threshold (Locked)
+                        </FormLabel>
+                        <div className="grid grid-cols-2 gap-4">
+                            <div>
+                                <FormLabel className="text-xs text-muted-foreground">Minimum</FormLabel>
+                                <Input
+                                    type="number"
+                                    value={data.positiveMin.toString()}
+                                    disabled
+                                    className="min-h-[44px] font-en bg-muted cursor-not-allowed"
+                                />
+                            </div>
+                            <div>
+                                <FormLabel className="text-xs text-muted-foreground">Maximum</FormLabel>
+                                <Input
+                                    type="number"
+                                    value={data.positiveMax.toString()}
+                                    disabled
+                                    className="min-h-[44px] font-en bg-muted cursor-not-allowed"
+                                />
+                            </div>
+                        </div>
+                        <FormDescription className="text-xs">
+                            Score range for classifying emotions as positive
+                        </FormDescription>
+                    </div>
 
-                    <FormField
-                        control={form.control}
-                        name="neutralMin"
-                        render={({ field }) => (
-                            <FormItem>
-                                <FormLabel className="text-purple-600 dark:text-purple-400 font-semibold">
-                                    Neutral Threshold
-                                </FormLabel>
-                                <FormControl>
-                                    <Input
-                                        type="number"
-                                        step="0.1"
-                                        placeholder="0.0"
-                                        {...field}
-                                        className="min-h-[44px] font-en"
-                                    />
-                                </FormControl>
-                                <FormDescription className="text-xs">
-                                    Minimum score for classifying emotions as neutral <span className="font-en">(-99.9 to 99.9)</span>
-                                </FormDescription>
-                                <FormMessage />
-                            </FormItem>
-                        )}
-                    />
+                    {/* Neutral Threshold - Disabled */}
+                    <div className="space-y-3">
+                        <FormLabel className="text-purple-600 dark:text-purple-400 font-semibold">
+                            Neutral Threshold (Locked)
+                        </FormLabel>
+                        <div className="grid grid-cols-2 gap-4">
+                            <div>
+                                <FormLabel className="text-xs text-muted-foreground">Minimum</FormLabel>
+                                <Input
+                                    type="number"
+                                    value={data.neutralMin.toString()}
+                                    disabled
+                                    className="min-h-[44px] font-en bg-muted cursor-not-allowed"
+                                />
+                            </div>
+                            <div>
+                                <FormLabel className="text-xs text-muted-foreground">Maximum</FormLabel>
+                                <Input
+                                    type="number"
+                                    value={data.neutralMax.toString()}
+                                    disabled
+                                    className="min-h-[44px] font-en bg-muted cursor-not-allowed"
+                                />
+                            </div>
+                        </div>
+                        <FormDescription className="text-xs">
+                            Score range for classifying emotions as neutral
+                        </FormDescription>
+                    </div>
 
-                    <FormField
-                        control={form.control}
-                        name="negativeMin"
-                        render={({ field }) => (
-                            <FormItem>
-                                <FormLabel className="text-orange-600 dark:text-orange-400 font-semibold">
-                                    Negative Threshold
-                                </FormLabel>
-                                <FormControl>
-                                    <Input
-                                        type="number"
-                                        step="0.1"
-                                        placeholder="-0.5"
-                                        {...field}
-                                        className="min-h-[44px] font-en"
-                                    />
-                                </FormControl>
-                                <FormDescription className="text-xs">
-                                    Minimum score for classifying emotions as negative <span className="font-en">(-99.9 to 99.9)</span>
-                                </FormDescription>
-                                <FormMessage />
-                            </FormItem>
-                        )}
-                    />
+                    {/* Negative Threshold - Disabled */}
+                    <div className="space-y-3">
+                        <FormLabel className="text-orange-600 dark:text-orange-400 font-semibold">
+                            Negative Threshold (Locked)
+                        </FormLabel>
+                        <div className="grid grid-cols-2 gap-4">
+                            <div>
+                                <FormLabel className="text-xs text-muted-foreground">Minimum</FormLabel>
+                                <Input
+                                    type="number"
+                                    value={data.negativeMin.toString()}
+                                    disabled
+                                    className="min-h-[44px] font-en bg-muted cursor-not-allowed"
+                                />
+                            </div>
+                            <div>
+                                <FormLabel className="text-xs text-muted-foreground">Maximum</FormLabel>
+                                <Input
+                                    type="number"
+                                    value={data.negativeMax.toString()}
+                                    disabled
+                                    className="min-h-[44px] font-en bg-muted cursor-not-allowed"
+                                />
+                            </div>
+                        </div>
+                        <FormDescription className="text-xs">
+                            Score range for classifying emotions as negative
+                        </FormDescription>
+                    </div>
 
-                    <FormField
-                        control={form.control}
-                        name="criticalMin"
-                        render={({ field }) => (
-                            <FormItem>
-                                <FormLabel className="text-red-600 dark:text-red-400 font-semibold">
-                                    Critical Threshold
-                                </FormLabel>
-                                <FormControl>
-                                    <Input
-                                        type="number"
-                                        step="0.1"
-                                        placeholder="-1.0"
-                                        {...field}
-                                        className="min-h-[44px] font-en"
-                                    />
-                                </FormControl>
-                                <FormDescription className="text-xs">
-                                    Minimum score triggering critical alerts <span className="font-en">(-99.9 to 99.9)</span>
-                                </FormDescription>
-                                <FormMessage />
-                            </FormItem>
-                        )}
-                    />
+                    {/* Critical Threshold - Disabled */}
+                    <div className="space-y-3">
+                        <FormLabel className="text-red-600 dark:text-red-400 font-semibold">
+                            Critical Threshold (Locked)
+                        </FormLabel>
+                        <div className="grid grid-cols-2 gap-4">
+                            <div>
+                                <FormLabel className="text-xs text-muted-foreground">Minimum</FormLabel>
+                                <Input
+                                    type="number"
+                                    value={data.criticalMin.toString()}
+                                    disabled
+                                    className="min-h-[44px] font-en bg-muted cursor-not-allowed"
+                                />
+                            </div>
+                            <div>
+                                <FormLabel className="text-xs text-muted-foreground">Maximum</FormLabel>
+                                <Input
+                                    type="number"
+                                    value={data.criticalMax.toString()}
+                                    disabled
+                                    className="min-h-[44px] font-en bg-muted cursor-not-allowed"
+                                />
+                            </div>
+                        </div>
+                        <FormDescription className="text-xs">
+                            Score range triggering critical alerts
+                        </FormDescription>
+                    </div>
 
+                    {/* Watchlist Duration - Editable */}
                     <FormField
                         control={form.control}
                         name="watchlistTrackMin"
@@ -180,7 +196,7 @@ export default function EditSystemSettingsModal({ data, onClose }: EditSystemSet
                                     />
                                 </FormControl>
                                 <FormDescription className="text-xs">
-                                    Number of days to track employees on watchlist <span className="font-en">(1 to 365)</span>
+                                    Number of days to track employees on watchlist <span className="font-en">(14 to 365)</span>
                                 </FormDescription>
                                 <FormMessage />
                             </FormItem>
