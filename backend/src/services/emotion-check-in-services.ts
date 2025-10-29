@@ -1,8 +1,8 @@
 import { eachDayOfInterval, endOfDay, format, startOfDay } from "date-fns";
 import { PrismaClient } from "../../prisma/generated/prisma";
-import { MOOD_THRESHOLDS } from "../config";
 import { prisma } from "../config/prisma-client";
 import { departmentFilter, roundToHour } from "../utils/helplers";
+import { getSystemSettingsData } from "./system-service";
 
 const prismaClient = new PrismaClient()
 
@@ -50,14 +50,17 @@ export const getMoodPercentages = async (uDepartmentId: number, qDepartmentId: s
             }
         })
 
+        //* Get system settings to compute scores
+        const systemSettings = await getSystemSettingsData()
+
         let posi = 0, neu = 0, nega = 0, crit = 0;
 
         for (const row of recentCheckIns) {
             const score = Number(row.emotionScore) ?? 0
 
-            if (score >= MOOD_THRESHOLDS.positiveMin) posi++
-            else if (score >= MOOD_THRESHOLDS.neutralMin) neu++
-            else if (score >= MOOD_THRESHOLDS.negativeMin) nega++
+            if (score >= systemSettings!.positiveMin) posi++
+            else if (score >= systemSettings!.neutralMin) neu++
+            else if (score >= systemSettings!.negativeMin) nega++
             else crit++
         }
 
@@ -94,6 +97,9 @@ export const getSentimentsComparisonData = async (uDepartmentId: number, qDepart
             }
         })
 
+        //* Get system settings to compute scores
+        const systemSettings = await getSystemSettingsData()
+
         //* Set sample output
         const dayMap: Record<
             string,
@@ -116,9 +122,9 @@ export const getSentimentsComparisonData = async (uDepartmentId: number, qDepart
             const score = Number(entry.emotionScore)
 
             //* Increase count based on entry's emotionScore
-            if (score >= MOOD_THRESHOLDS.positiveMin) dayMap[checkInDate].positive++
-            else if (score >= MOOD_THRESHOLDS.neutralMin) dayMap[checkInDate].neutral++
-            else if (score >= MOOD_THRESHOLDS.negativeMin) dayMap[checkInDate].negative++
+            if (score >= systemSettings!.positiveMin) dayMap[checkInDate].positive++
+            else if (score >= systemSettings!.neutralMin) dayMap[checkInDate].neutral++
+            else if (score >= systemSettings!.negativeMin) dayMap[checkInDate].negative++
             else dayMap[checkInDate].critical++
         }
 

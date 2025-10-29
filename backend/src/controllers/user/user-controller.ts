@@ -2,14 +2,13 @@ import { NextFunction, Request, Response } from "express"
 import { body, validationResult } from "express-validator"
 import sanitizeHtml from 'sanitize-html'
 import { NotifType, PrismaClient, Status } from "../../..//prisma/generated/prisma"
-import { CRITICAL_POINT } from "../../config"
 import { errorCodes } from "../../config/error-codes"
 import { CacheQueue } from "../../jobs/queues/cache-queue"
 import { EmailQueue } from "../../jobs/queues/email-queue"
 import { calculateEmotionScoreWithAI } from "../../services/ai-services"
 import { getEmployeeById } from "../../services/auth-services"
 import { getAllEmpEmotionHistory } from "../../services/emp-services"
-import { getEmployeeEmails } from "../../services/system-service"
+import { getEmployeeEmails, getSystemSettingsData } from "../../services/system-service"
 import { authorize } from "../../utils/authorize"
 import { getOrSetCache } from "../../utils/cache"
 import { checkEmployeeIfNotExits, createHttpErrors } from "../../utils/check"
@@ -70,6 +69,8 @@ export const emotionCheckIn = [
         });
         checkEmployeeIfNotExits(emp)
 
+        const systemSettings = await getSystemSettingsData()
+
         //* Split emoji and text for db schema format
         const [emoji, textFeeling] = moodMessage.split('//')
 
@@ -84,23 +85,24 @@ export const emotionCheckIn = [
             }))
         }
 
-        const last13Scores = emp!.checkIns.slice(0, 13).map(e => +e.emotionScore);
-        const last14Scores = [+score!, ...last13Scores];
+        const trackWindow = systemSettings!.watchlistTrackMin;
+        const previousScores = emp!.checkIns.slice(0, trackWindow - 1).map(e => +e.emotionScore);
+        const recentScoresWithCurrent = [+score!, ...previousScores];
 
-        const isValid = last14Scores.every(s => s >= -0.5);
+        const isValid = recentScoresWithCurrent.every(s => s >= systemSettings!.neutralMin);
 
         //* Calculate current streak from all recent check-ins
         const allRecentScores = [+score!, ...emp!.checkIns.map(e => +e.emotionScore)];
-        const currentStreak = calculatePositiveStreak(allRecentScores);
+        const currentStreak = calculatePositiveStreak(allRecentScores, systemSettings!.positiveMin);
 
-        const sureCritical = last14Scores.length >= 5 && last14Scores.slice(0, 5).every(s => s >= CRITICAL_POINT)
+        const sureCritical = recentScoresWithCurrent.length >= 5 && recentScoresWithCurrent.slice(0, 5).every(s => s >= systemSettings!.criticalMin)
 
         //* Calculate avgScore upfront
         const newEmotionSum = +emp!.emotionSum + score!;
         const newEmotionCount = emp!.emotionCount + 1;
         const avgScore = newEmotionSum / newEmotionCount;
         const isRecovered = emp!.status === Status.WATCHLIST && isValid
-        const isNewCritical = avgScore <= CRITICAL_POINT && sureCritical && emp!.status !== Status.CRITICAL && emp!.status !== Status.WATCHLIST
+        const isNewCritical = avgScore >= systemSettings!.criticalMin && sureCritical && emp!.status !== Status.CRITICAL && emp!.status !== Status.WATCHLIST
 
         //* Update longestStreak if current is better
         const newLongestStreak = Math.max(emp!.longestStreak || 0, currentStreak);

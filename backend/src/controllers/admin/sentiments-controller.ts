@@ -8,7 +8,7 @@ import { EmailQueue } from "../../jobs/queues/email-queue";
 import { getEmployeeById } from "../../services/auth-services";
 import { getAllCriticalInfinite, getAllWatchlistInfinite } from "../../services/critical-services";
 import { getMoodPercentages, getSentimentsComparisonData } from "../../services/emotion-check-in-services";
-import { getEmployeeEmails } from "../../services/system-service";
+import { getEmployeeEmails, getSystemSettingsData } from "../../services/system-service";
 import { checkEmployeeIfNotExits, createHttpErrors } from "../../utils/check";
 import { completion_body, completion_subject, request_body, request_subject } from "../../utils/email-templates";
 import { calculatePositiveStreak } from "../../utils/helplers";
@@ -105,43 +105,46 @@ export const getLeaderboards = [
         const isAllTime = duration === 'all'
 
         //* Fetch employees with conditional check-ins query
-        const employees = await prisma.employee.findMany({
-            where: {
-                department: {
-                    isActive: true,
+        const [employees, settings] = await Promise.all([
+            prisma.employee.findMany({
+                where: {
+                    department: {
+                        isActive: true,
+                    },
+                    departmentId:
+                        emp!.role !== 'SUPERADMIN'
+                            ? emp!.departmentId
+                            : dep && dep !== 'all'
+                                ? Number(dep)
+                                : undefined,
+                    ...kwFilter
                 },
-                departmentId:
-                    emp!.role !== 'SUPERADMIN'
-                        ? emp!.departmentId
-                        : dep && dep !== 'all'
-                            ? Number(dep)
-                            : undefined,
-                ...kwFilter
-            },
-            select: {
-                fullName: true,
-                email: true,
-                avatar: true,
-                firstName: true,
-                longestStreak: true,
-                department: true,
-                checkIns: isAllTime ? false : {
-                    where: {
-                        createdAt: {
-                            gte: startOfDay(subDays(new Date(), +duration - 1)),
-                            lte: endOfDay(new Date())
+                select: {
+                    fullName: true,
+                    email: true,
+                    avatar: true,
+                    firstName: true,
+                    longestStreak: true,
+                    department: true,
+                    checkIns: isAllTime ? false : {
+                        where: {
+                            createdAt: {
+                                gte: startOfDay(subDays(new Date(), +duration - 1)),
+                                lte: endOfDay(new Date())
+                            }
+                        },
+                        select: {
+                            emotionScore: true,
+                            createdAt: true
+                        },
+                        orderBy: {
+                            createdAt: 'desc'
                         }
-                    },
-                    select: {
-                        emotionScore: true,
-                        createdAt: true
-                    },
-                    orderBy: {
-                        createdAt: 'desc'
                     }
                 }
-            }
-        })
+            }),
+            getSystemSettingsData(),
+        ])
 
         //* Calculate metric based on filter type
         const results = employees.map(employee => {
@@ -154,7 +157,7 @@ export const getLeaderboards = [
             } else {
                 //* For 7 or 30 days, calculate streak from checkIns
                 const scores = employee.checkIns.map(c => +c.emotionScore);
-                calculatedStreak = calculatePositiveStreak(scores);
+                calculatedStreak = calculatePositiveStreak(scores, settings!.positiveMin);
                 metric = calculatedStreak;
             }
 

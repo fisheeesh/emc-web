@@ -5,7 +5,6 @@ import { toZonedTime } from 'date-fns-tz';
 import { marked } from 'marked';
 import { unlink } from "node:fs/promises";
 import path from "path";
-import { TIMEZONE } from '../config';
 import cloudinary from "../config/cloudinary";
 
 export const parseScore = (text: string): number | null => {
@@ -24,10 +23,10 @@ export const deleteCloudinaryImage = async (publicId: string) => {
     }
 };
 
-export const calculatePositiveStreak = (scores: number[]): number => {
+export const calculatePositiveStreak = (scores: number[], positiveScore: number): number => {
     let streak = 0;
     for (const s of scores) {
-        if (s >= 0.3) {
+        if (s >= positiveScore) {
             streak++;
         } else {
             break;
@@ -169,7 +168,7 @@ export const removeFiles = async (originalFile: string, optimizeFile?: string | 
 
 export function roundToHour(date: Date): string {
     //* UTC -> Thai
-    const zoned = toZonedTime(date, TIMEZONE);
+    const zoned = toZonedTime(date, 'Asia/Bangkok');
 
     let h = zoned.getHours();
     const m = zoned.getMinutes();
