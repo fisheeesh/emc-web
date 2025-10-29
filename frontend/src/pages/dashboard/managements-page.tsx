@@ -7,6 +7,7 @@ import DepartmentTable from "@/components/dashboard/tables/dep-table"
 import EmpTables from "@/components/dashboard/tables/emp-tables"
 import useTitle from "@/hooks/ui/use-title"
 import useCountryStore from "@/store/country-store"
+import useSystemStore from "@/store/system-store"
 import { useInfiniteQuery, useIsFetching, useSuspenseQuery } from "@tanstack/react-query"
 import { useEffect } from "react"
 import { useSearchParams } from "react-router"
@@ -15,6 +16,7 @@ export default function ManagementsPage() {
     useTitle("General Mangements")
     const [searchParams] = useSearchParams()
     const { setCountries } = useCountryStore()
+    const { setSystemSettings } = useSystemStore()
 
     const kw = searchParams.get("kw")
     const dep = searchParams.get("gDep")
@@ -56,19 +58,31 @@ export default function ManagementsPage() {
     const { data: allEmotionCate } = useSuspenseQuery(allEmotionCategoriesQuery())
     const { data: systemSettings } = useSuspenseQuery(systemSettingsQuery())
 
-    console.log(systemSettings)
-
     const allEmps = empData?.pages.flatMap(page => page.data) ?? []
     const allActionPlans = actionData?.pages.flatMap(page => page.data) ?? []
 
     useEffect(() => {
+        if (systemSettings) {
+            setSystemSettings({
+                positiveMin: systemSettings.data.positiveMin,
+                positiveMax: systemSettings.data.positiveMax,
+                neutralMin: systemSettings.data.neutralMin,
+                neutralMax: systemSettings.data.neutralMax,
+                negativeMin: systemSettings.data.negativeMin,
+                negativeMax: systemSettings.data.negativeMax,
+                criticalMin: systemSettings.data.criticalMin,
+                criticalMax: systemSettings.data.criticalMax,
+                watchlistTrackMin: systemSettings.data.watchlistTrackMin,
+            })
+        }
+
         if (countriesData) {
             setCountries(countriesData.map((country: Country) => ({
                 name: country.name,
                 value: country.name
             })))
         }
-    }, [countriesData, setCountries])
+    }, [countriesData, setCountries, systemSettings, setSystemSettings])
 
     const isSummaryRefetching = useIsFetching({
         queryKey: ['summary'],

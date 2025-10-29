@@ -171,69 +171,11 @@ export const announcementFormSchema = z.object({
 })
 
 export const settingsSchema = z.object({
-    positiveMin: z.string()
-        .min(1, "Positive threshold is required")
-        .refine((val) => !isNaN(parseFloat(val)), "Must be a valid number")
-        .refine((val) => {
-            const num = parseFloat(val);
-            return num >= -99.9 && num <= 99.9;
-        }, "Must be between -99.9 and 99.9"),
-
-    neutralMin: z.string()
-        .min(1, "Neutral threshold is required")
-        .refine((val) => !isNaN(parseFloat(val)), "Must be a valid number")
-        .refine((val) => {
-            const num = parseFloat(val);
-            return num >= -99.9 && num <= 99.9;
-        }, "Must be between -99.9 and 99.9"),
-
-    negativeMin: z.string()
-        .min(1, "Negative threshold is required")
-        .refine((val) => !isNaN(parseFloat(val)), "Must be a valid number")
-        .refine((val) => {
-            const num = parseFloat(val);
-            return num >= -99.9 && num <= 99.9;
-        }, "Must be between -99.9 and 99.9"),
-
-    criticalMin: z.string()
-        .min(1, "Critical threshold is required")
-        .refine((val) => !isNaN(parseFloat(val)), "Must be a valid number")
-        .refine((val) => {
-            const num = parseFloat(val);
-            return num >= -99.9 && num <= 99.9;
-        }, "Must be between -99.9 and 99.9"),
-
     watchlistTrackMin: z.string()
         .min(1, "Watchlist duration is required")
         .refine((val) => !isNaN(parseInt(val)), "Must be a valid integer")
         .refine((val) => {
             const num = parseInt(val);
-            return num >= 1 && num <= 365;
-        }, "Must be between 1 and 365 days"),
-}).refine((data) => {
-    // const positive = parseFloat(data.positiveMin);
-    // const neutral = parseFloat(data.neutralMin);
-    const negative = parseFloat(data.negativeMin);
-    const critical = parseFloat(data.criticalMin);
-
-    return critical < negative;
-}, {
-    message: "Critical threshold must be less than Negative threshold",
-    path: ["criticalMin"]
-}).refine((data) => {
-    const neutral = parseFloat(data.neutralMin);
-    const negative = parseFloat(data.negativeMin);
-
-    return negative < neutral;
-}, {
-    message: "Negative threshold must be less than Neutral threshold",
-    path: ["negativeMin"]
-}).refine((data) => {
-    const positive = parseFloat(data.positiveMin);
-    const neutral = parseFloat(data.neutralMin);
-
-    return neutral < positive;
-}, {
-    message: "Neutral threshold must be less than Positive threshold",
-    path: ["neutralMin"]
+            return num >= 14 && num <= 365;
+        }, "Must be between 14 and 365 days"),
 });

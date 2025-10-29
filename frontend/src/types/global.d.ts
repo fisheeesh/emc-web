@@ -137,7 +137,7 @@ interface WatchlistEmployee {
 interface EmotionHistory {
     date: string,
     emotion: string,
-    value: number
+    value: number,
 }
 
 interface Analysis {
@@ -273,9 +273,13 @@ interface EmotionCategory {
 interface SystemSettings {
     id: number,
     positiveMin: number,
+    positiveMax: number,
     neutralMin: number,
+    neutralMax: number,
     negativeMin: number,
+    negativeMax: number,
     criticalMin: number,
+    criticalMax: number,
     watchlistTrackMin: number,
     createdAt: string
     updatedAt: string

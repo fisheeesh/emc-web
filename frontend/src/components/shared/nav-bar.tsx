@@ -1,6 +1,7 @@
 import fullDark from '@/assets/full-dark.png'
 import fullLight from '@/assets/full-light.png'
-import { default as halfDark, default as halfLight } from '@/assets/half-dark.png'
+import halfDark from '@/assets/half-dark.png'
+import halfLight from '@/assets/half-light.png'
 import { APP_NAME, NAVLINKS } from '@/lib/constants'
 import useFilterStore from '@/store/filter-store'
 import useUserStore from '@/store/user-store'
@@ -53,7 +54,7 @@ export default function Navbar() {
                             alt="ata_logo"
                             className='w-[60px] md:hidden'
                         />
-                        <div className="w-[1px] mt-0.5 h-6 bg-gray-300"></div>
+                        <div className="w-[1px] mt-0.5 h-6 bg-gray-400"></div>
                         <h1 className="font-mich tracking-wider text-[10px] md:text-xs dark:bg-gradient-to-r dark:from-purple-400 dark:via-pink-500 dark:to-blue-500 dark:bg-clip-text dark:text-transparent">{APP_NAME}</h1>
                     </div>
 

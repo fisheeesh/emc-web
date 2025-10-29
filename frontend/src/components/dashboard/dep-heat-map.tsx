@@ -5,10 +5,10 @@ import {
     CardHeader,
     CardTitle,
 } from "@/components/ui/card";
+import useSystemStore from "@/store/system-store";
 import { AlertCircle, CheckCircle, TrendingUp } from "lucide-react";
 import { BsBuildings } from "react-icons/bs";
 import { GoArrowBoth } from "react-icons/go";
-import { PiGreaterThanLight } from "react-icons/pi";
 
 const getStatusColor = (status: string) => {
     const colors = {
@@ -33,6 +33,7 @@ const getTrendIcon = (trend: string) => {
 }
 
 export function DepartmentHeatmap({ depHeatmapData }: { depHeatmapData: DepHeatMap[] }) {
+    const { settings } = useSystemStore()
     const criticalCount = depHeatmapData.filter(d => d.status === 'critical').length
     const positiveCount = depHeatmapData.filter(d => d.status === 'positive').length
     const avgOverall = (depHeatmapData.reduce((acc, curr) => acc + curr.avgScore, 0) / depHeatmapData.length).toFixed(2)
@@ -75,7 +76,7 @@ export function DepartmentHeatmap({ depHeatmapData }: { depHeatmapData: DepHeatM
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
-                    {depHeatmapData.map((dept) => (
+                    {depHeatmapData.sort((a, b) => b.avgScore - a.avgScore).map((dept) => (
                         <div
                             key={dept.name}
                             className={`p-4 rounded-lg border-2 ${getStatusColor(dept.status)}`}
@@ -95,7 +96,7 @@ export function DepartmentHeatmap({ depHeatmapData }: { depHeatmapData: DepHeatM
                                     <span className="text-2xl font-bold font-en">
                                         {dept.avgScore.toFixed(1)}
                                     </span>
-                                    <span className="text-xs opacity-70 font-en">/1.0</span>
+                                    <span className="text-xs opacity-70 font-en">/{settings.positiveMax}.0</span>
                                 </div>
 
                                 <div className="flex items-center justify-between text-xs opacity-80">
@@ -112,23 +113,23 @@ export function DepartmentHeatmap({ depHeatmapData }: { depHeatmapData: DepHeatM
                     <div className="flex items-center gap-1">
                         <div className="w-3 h-3 rounded-full bg-green-500"></div>
                         <p className="text-gray-600 dark:text-gray-400 flex items-center gap-1">
-                            Positive <span className="font-en flex items-center gap-1">(0.4 <GoArrowBoth /> 1.0)</span>
+                            Positive <span className="font-en flex items-center gap-1">({settings.positiveMin} <GoArrowBoth /> {settings.positiveMax}.0)</span>
                         </p>
                     </div>
                     <div className="flex items-center gap-1">
                         <div className="w-3 h-3 rounded-full bg-purple-500"></div>
                         <span className="text-gray-600 dark:text-gray-400 flex items-center gap-1">
-                            Neutral <span className="font-en flex items-center gap-1">(-0.3 <GoArrowBoth /> 0.3)</span></span>
+                            Neutral <span className="font-en flex items-center gap-1">({settings.neutralMin} <GoArrowBoth /> {settings.neutralMax})</span></span>
                     </div>
                     <div className="flex items-center gap-1">
                         <div className="w-3 h-3 rounded-full bg-orange-500"></div>
                         <span className="text-gray-600 dark:text-gray-400 flex items-center gap-1">
-                            Negative <span className="font-en flex items-center gap-1">(-0.7 <GoArrowBoth /> -0.4)</span></span>
+                            Negative <span className="font-en flex items-center gap-1">({settings.negativeMin} <GoArrowBoth /> {settings.negativeMax})</span></span>
                     </div>
                     <div className="flex items-center gap-1">
                         <div className="w-3 h-3 rounded-full bg-red-500"></div>
                         <span className="text-gray-600 dark:text-gray-400 flex items-center gap-1">
-                            Critical <span className="font-en flex items-center gap-1">(<PiGreaterThanLight />-0.8)</span></span>
+                            Critical <span className="font-en flex items-center gap-1">({settings.criticalMin}.0 <GoArrowBoth /> {settings.criticalMax})</span></span>
                     </div>
                 </div>
             </CardContent>

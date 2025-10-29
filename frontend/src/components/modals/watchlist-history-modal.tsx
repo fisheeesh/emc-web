@@ -11,6 +11,7 @@ import { IoMdCheckmark } from "react-icons/io";
 import { MdOutlineArrowRightAlt } from "react-icons/md";
 import { DialogClose } from "@radix-ui/react-dialog";
 import { Button } from "../ui/button";
+import useSystemStore from "@/store/system-store";
 
 interface Props {
     empName: string,
@@ -18,7 +19,7 @@ interface Props {
 }
 
 export default function WatchlistHistoryModal({ empName, emotionHistory }: Props) {
-
+    const { settings } = useSystemStore()
     //* Map emotion status to fixed Y-axis values
     const getEmotionValue = (emotion: string): number => {
         const emotionMap: Record<string, number> = {
@@ -35,7 +36,7 @@ export default function WatchlistHistoryModal({ empName, emotionHistory }: Props
         ...item,
         emotionValue: getEmotionValue(item.emotion),
         emotion: item.emotion,
-        date: item.date
+        date: item.date,
     }));
 
     //* Check if we have emotion data
@@ -46,10 +47,10 @@ export default function WatchlistHistoryModal({ empName, emotionHistory }: Props
     //* Get lastest day emtion and enuse which is not critical
     const latestEmotion = hasData && chartData.length > 0 ? chartData[chartData.length - 1]?.emotionValue : 0;
     const isNotCritical = latestEmotion >= 1;
-    //* Flag true to isRecovering when has check-in datas, have 3 days data, 60% of total days are good days and lastest check-in is not cirital
-    const isRecovering = hasData && goodDays >= Math.ceil(chartData.length * 0.6) && isNotCritical && chartData.length >= 3;
+    //* Flag true to isRecovering when has check-in datas, have watchlistTrackMin - 4 days data, 60% of total days are good days and lastest check-in is not cirital
+    const isRecovering = chartData.length >= settings.watchlistTrackMin - 4 && hasData && goodDays >= Math.ceil(chartData.length * 0.6) && isNotCritical;
     //* Track lastest day of check-in data is first day of data
-    const hasImprovement = hasData && chartData.length >= 10 &&
+    const hasImprovement = hasData && chartData.length >= 7 &&
         chartData[chartData.length - 1]?.emotionValue > chartData[0]?.emotionValue;
 
     const chartConfig = {
@@ -149,7 +150,7 @@ export default function WatchlistHistoryModal({ empName, emotionHistory }: Props
                             </div>
                             <div className="p-4 rounded-lg bg-blue-50 dark:bg-blue-950/20 border border-blue-100 dark:border-blue-900/30">
                                 <p className="text-xs text-gray-600 dark:text-gray-400 mb-1">Check-ins</p>
-                                <p className="text-lg font-bold font-en">{chartData.length} / 4</p>
+                                <p className="text-lg font-bold font-en">{chartData.length} / {settings.watchlistTrackMin}</p>
                             </div>
                             <div className="p-4 rounded-lg bg-green-50 dark:bg-green-950/20 border border-green-100 dark:border-green-900/30">
                                 <p className="text-xs text-gray-600 dark:text-gray-400 mb-1">Positive Days</p>
@@ -319,16 +320,16 @@ export default function WatchlistHistoryModal({ empName, emotionHistory }: Props
                         </ul>
                     </div>
                 </div>
-            <DialogFooter className="flex justify-end mt-5 pt-5 border-t">
-                <DialogClose asChild>
-                    <Button
-                        variant='outline'
-                        type="button"
-                        className="cursor-pointer min-h-[44px]">
-                        Close
-                    </Button>
-                </DialogClose>
-            </DialogFooter>
+                <DialogFooter className="flex justify-end mt-5 pt-5 border-t">
+                    <DialogClose asChild>
+                        <Button
+                            variant='outline'
+                            type="button"
+                            className="cursor-pointer min-h-[44px]">
+                            Close
+                        </Button>
+                    </DialogClose>
+                </DialogFooter>
             </div>
         </DialogContent>
     );
