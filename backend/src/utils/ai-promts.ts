@@ -31,42 +31,108 @@ export interface RecommendationData {
 
 export const createScorePrompt = (moodMessage: string) => {
     return `
-            The user has submitted a mood check-in: "${moodMessage}"
+You are an emotion analysis expert. Analyze the user's mood check-in and return a precise emotion score.
 
-            This message may contain:
-            - An emoji (e.g., 😊, 😢, 😐, 🙂, 😤, 😔)
-            - A brief text description (e.g., "Just a normal day", "Feeling great!", "Not doing well")
-            - Or both combined (e.g., "🙂 Just a normal day", "😔 Feeling really down")
+USER INPUT: "${moodMessage}"
 
-            Analyze BOTH the emoji and text together to determine the user's emotional state.
+The input may contain an emoji, text description, or both. Analyze BOTH components together to determine emotional state.
 
-            Scoring Guidelines:
-            
-            **Positive Range (0.1 to 1.0):**
-            - 0.9 to 1.0: Extremely happy, euphoric, best day ever (😍, 🥳, "I'm so happy I could cry!")
-            - 0.7 to 0.8: Very happy, excited, great mood (😊, 😄, "Feeling amazing today!")
-            - 0.5 to 0.6: Happy, content, good vibes (🙂, 😌, "Things are going well")
-            - 0.3 to 0.4: Slightly positive, mild contentment (🙂, "It's okay", "Decent day")
-            - 0.1 to 0.2: Barely positive, neutral-leaning-good (🙂, "Just a normal day", "Nothing special")
+═══════════════════════════════════════════════════════════════════
 
-            **Neutral Range (-0.2 to 0.2):**
-            - -0.2 to 0.2: Truly neutral, indifferent, "meh" (😐, 😶, "Just existing", "Whatever")
+SCORING SCALE (-1.0 to 1.0):
 
-            **Negative Range (-1.0 to -0.1):**
-            - -0.1 to -0.2: Slightly off, minor discomfort (🙁, "Not my best day")
-            - -0.3 to -0.4: Somewhat negative, frustrated, tired (😕, 😞, "Feeling drained")
-            - -0.5 to -0.6: Clearly negative, angry, sad, stressed (😠, 😤, 😔, "Really frustrated", "Feeling angry")
-            - -0.7 to -0.8: Very negative, deeply sad, depressed (😭, 😢, "I feel awful", "Everything hurts")
-            - -0.9 to -1.0: Extremely negative, hopeless, suicidal thoughts (💔, "I can't do this anymore", "I want to give up")
+┌─ POSITIVE RANGE (0.4 to 1.0) ─┐
+│ 0.9 - 1.0  │ Peak happiness, euphoric, life-changing joy
+│            │ Examples: 😍🥳✨ "Best day ever!" "I'm so blessed!"
+│            │
+│ 0.7 - 0.8  │ Very happy, excited, energized
+│            │ Examples: 😊😄🎉 "Feeling amazing!" "Everything's great!"
+│            │
+│ 0.5 - 0.6  │ Happy, content, satisfied
+│            │ Examples: 🙂😌☺️ "Good vibes" "Things are going well"
+│            │
+│ 0.4        │ Mildly positive, slight contentment
+│            │ Examples: 🙂 "It's okay" "Decent enough"
+└────────────┴──────────────────────────────────────────────────────┘
 
-            **Special Considerations:**
-            - "Just a normal day" with 🙂 = around 0.1 to 0.2 (neutral-to-slightly-positive)
-            - If emoji contradicts text, weight the emoji slightly more (emojis often reveal true feelings)
-            - Anger/frustration should range from -0.5 to -0.7 depending on intensity
-            - Sarcasm or irony should be detected when possible (e.g., "Great day 🙄" is negative)
+┌─ NEUTRAL RANGE (-0.3 to 0.3) ─┐
+│ 0.1 - 0.3  │ Slightly positive, calm, stable
+│            │ Examples: 🙂😊 "Just a normal day" "Nothing special"
+│            │
+│ -0.2 - 0.0 │ Truly neutral, indifferent, "meh"
+│            │ Examples: 😐😶 "Whatever" "Just existing"
+│            │
+│ -0.3       │ Slightly negative, minor discomfort, mild unease
+│            │ Examples: 😕 "Eh, not great" "A bit off"
+└────────────┴──────────────────────────────────────────────────────┘
 
-            Output ONLY a single number between -1 and 1 (e.g., 0.15, -0.6, 0.8).
-            No explanations, no words, just the number.
+┌─ NEGATIVE RANGE (-0.4 to -0.7) ─┐
+│ -0.4       │ Clearly negative, noticeably upset
+│            │ Examples: 🙁☹️ "Not my best day" "Feeling low"
+│            │
+│ -0.5 - -0.6│ Very negative, frustrated, angry, sad
+│            │ Examples: 😠😤😔 "Really frustrated" "I'm so angry"
+│            │
+│ -0.7       │ Deeply negative, distressed, overwhelmed
+│            │ Examples: 😢😞💔 "Feeling awful" "Can't take this"
+└────────────┴──────────────────────────────────────────────────────┘
+
+┌─ CRITICAL RANGE (-0.8 to -1.0) ─┐
+│ -0.8       │ Severe distress, hopeless, breaking point
+│            │ Examples: 😭💔 "I can't do this" "Everything hurts"
+│            │
+│ -0.9 - -1.0│ Extreme crisis, suicidal ideation, emergency
+│            │ Examples: 🖤💀 "I want to give up" "Can't go on"
+│            │ ⚠️ IMMEDIATE INTERVENTION NEEDED
+└────────────┴──────────────────────────────────────────────────────┘
+
+═══════════════════════════════════════════════════════════════════
+
+ANALYSIS RULES:
+
+1. **Emoji Priority**: When emoji contradicts text, weight the emoji more heavily
+    - Emojis often reveal true feelings better than words
+    - Example: "I'm fine 😢" → Score negative, person is masking pain
+
+2. **Context Matters**: Consider intensity modifiers
+    - "really", "extremely", "so" → Increase magnitude by 0.1-0.2
+    - "a bit", "kinda", "somewhat" → Decrease magnitude by 0.1-0.2
+
+3. **Detect Sarcasm/Irony**: Look for contradictory patterns
+    - "Great day 🙄" → Negative score (-0.4 to -0.6)
+    - "Wonderful... just wonderful 😑" → Negative score
+
+4. **Ambiguity Handling**: 
+    - "Just a normal day" with 🙂 → 0.1 to 0.2 (neutral-slightly positive)
+    - "Fine" alone → 0.0 (truly neutral, may be masking)
+    - "Okay I guess" → -0.1 to 0.0 (slightly uncertain)
+
+5. **Anger vs Sadness**: Both are negative but different
+    - Anger/Frustration: -0.4 to -0.7 (active negative emotion)
+    - Sadness/Grief: -0.5 to -0.8 (passive negative emotion)
+
+6. **Physical vs Emotional**: Consider both
+    - "Tired but happy" → 0.3 to 0.5 (net positive)
+    - "Exhausted and done" → -0.5 to -0.7 (net negative)
+
+═══════════════════════════════════════════════════════════════════
+
+OUTPUT FORMAT:
+Return ONLY a single decimal number between -1.0 and 1.0 with one decimal place.
+
+Examples of valid output:
+0.8
+-0.6
+0.2
+-0.9
+
+Do NOT include:
+- Explanations
+- Words
+- Additional text
+- Multiple numbers
+
+Just the score.
         `.trim()
 }
 
@@ -167,6 +233,20 @@ Based on this data, generate a comprehensive mental health assessment and action
 - Highlight key resources (e.g., ==Employee Assistance Program==, ==Mental Health Professional==)
 - Use highlights sparingly (3-7 highlights total) for maximum impact
 - Only highlight genuinely important information, not general advice
+
+**Tone Guidelines:**
+- Professional and empathetic
+- Action-oriented, not diagnostic
+- Avoid stigmatizing language
+- Focus on support, not surveillance
+- Respect confidentiality boundaries
+
+**What to AVOID:**
+❌ Quoting or referencing specific emotional messages
+❌ Making clinical diagnoses
+❌ Sharing information that could identify specific check-in content
+❌ Using judgmental or alarmist language
+❌ Suggesting HR "investigate" the employee's personal life
 
 Return ONLY the markdown-formatted report, nothing else.
 `.trim();
