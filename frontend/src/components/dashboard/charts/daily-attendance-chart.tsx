@@ -98,7 +98,7 @@ export default function DailyAttendanceChart({ dataNum, dataPerc }: Props) {
     };
 
     return (
-        <Card className="w-full lg:w-2/3 h-[400px] rounded-md">
+        <Card className="col-span-2 h-[400px] rounded-md">
             <CardHeader className="flex justify-between flex-col md:flex-row gap-2">
                 <div>
                     <CardTitle className="text-xl md:text-2xl">

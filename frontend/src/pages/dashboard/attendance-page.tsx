@@ -48,8 +48,8 @@ export default function AttendanceDashboardPage() {
 
     return (
         <section className="flex flex-col justify-center items-center w-full gap-3">
-            <div className="flex flex-col lg:flex-row items-center justify-between w-full gap-3">
-                <div className="flex lg:flex-col gap-3 w-full lg:w-1/3">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-y-3 lg:gap-x-3 lg:gap-y-0 w-full">
+                <div className="flex flex-col md:flex-row lg:flex-col gap-3 col-span-1">
                     <DisplayCard data={attendanceData.totalEmp} isLoading={isAttendanceRefetching} type='total' />
                     <DisplayCard data={attendanceData.totalPresent} isLoading={isAttendanceRefetching} type='present' />
                 </div>
