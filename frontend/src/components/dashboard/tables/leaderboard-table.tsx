@@ -55,12 +55,10 @@ export default function LeaderBoardTable({ data, isLoading }: Props) {
                                 Top <span className="font-en">9</span> employees excelling in mental health and wellbeing initiatives
                             </CardDescription>
                         </div>
-                    </div>
-                    <div className="flex flex-col lg:flex-row gap-2">
                         <CommonFilter
                             filterValue="lduration"
                             filters={LEADERBOARD_FILTER}
-                            otherClasses="min-h-[44px] sm:min-w-[90px]"
+                            otherClasses="min-h-[44px] sm:min-w-[90px] w-fit"
                         />
                     </div>
                 </CardHeader>
@@ -89,12 +87,10 @@ export default function LeaderBoardTable({ data, isLoading }: Props) {
                                 Top <span className="font-en">9</span> employees excelling in mental health and wellbeing initiatives
                             </CardDescription>
                         </div>
-                    </div>
-                    <div className="flex flex-col lg:flex-row gap-2">
                         <CommonFilter
                             filterValue="lduration"
                             filters={LEADERBOARD_FILTER}
-                            otherClasses="min-h-[44px] sm:min-w-[90px]"
+                            otherClasses="min-h-[44px] sm:min-w-[90px] w-fit"
                         />
                     </div>
                 </CardHeader>

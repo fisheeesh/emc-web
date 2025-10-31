@@ -32,7 +32,7 @@ export const calculatePositiveStreak = (scores: number[], positiveScore: number)
             break;
         }
     }
-    return streak >= 3 ? streak : 0;
+    return streak >= 2 ? streak : 0;
 };
 
 export const getDateRangeFromTimeRange = (timeRange: string | number) => {

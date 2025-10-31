@@ -24,7 +24,6 @@ export default function SentimentsDashboardPage() {
     const gDep = searchParams.get('gDep') || 'all'
     const duration = searchParams.get('duration') || '1'
     const sentimentsFilter = searchParams.get("sentiments") || '7'
-    const lKw = searchParams.get('lKw')
     const lduration = searchParams.get("lduration")
     const cKw = searchParams.get("cKw")
     const wKw = searchParams.get("wKw")
@@ -35,7 +34,7 @@ export default function SentimentsDashboardPage() {
     const dep = user?.role === 'SUPERADMIN' ? gDep : user?.departmentId.toString()
     const { data: overviewData } = useSuspenseQuery(moodOverviewQuery(duration, dep))
     const { data: sentimentsComparison } = useSuspenseQuery(sentimentsComparisonQuery(sentimentsFilter, dep))
-    const { data: leaderboardsData } = useSuspenseQuery(leaderboardsQuery(lKw, dep, lduration))
+    const { data: leaderboardsData } = useSuspenseQuery(leaderboardsQuery(dep, lduration))
     const { data: notificationsData } = useSuspenseQuery(notificationQuery())
 
     const {

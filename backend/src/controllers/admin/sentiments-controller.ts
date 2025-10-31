@@ -221,24 +221,13 @@ export const getSenitmentsComparison = [
 
 export const getLeaderboards = [
     query("dep", "Invalid Department.").trim().escape().optional(),
-    query("kw", "Invalid Keyword.").trim().optional().escape(),
     query("duration", "Invalid Date.").trim().optional().escape(),
     async (req: CustomRequest, res: Response, next: NextFunction) => {
-        const { dep, kw, duration = '30' } = req.query
+        const { dep, duration = '30' } = req.query
         const empId = req.employeeId
 
         const emp = await getEmployeeById(empId!)
         checkEmployeeIfNotExits(emp)
-
-        const keywords = kw ? kw.toString().trim().split(/\s+/) : [];
-        const kwFilter: Prisma.EmployeeWhereInput = keywords.length > 0 ? {
-            AND: keywords.map((word: string) => ({
-                OR: [
-                    { firstName: { contains: word, mode: 'insensitive' } },
-                    { lastName: { contains: word, mode: 'insensitive' } }
-                ] as Prisma.EmployeeWhereInput[]
-            }))
-        } : {}
 
         const isAllTime = duration === 'all'
 
@@ -255,7 +244,6 @@ export const getLeaderboards = [
                             : dep && dep !== 'all'
                                 ? Number(dep)
                                 : undefined,
-                    ...kwFilter
                 },
                 select: {
                     fullName: true,
@@ -263,7 +251,7 @@ export const getLeaderboards = [
                     avatar: true,
                     firstName: true,
                     longestStreak: true,
-                    avgScore: true, // Add this field
+                    avgScore: true,
                     department: true,
                     checkIns: {
                         where: isAllTime ? undefined : {
@@ -301,7 +289,6 @@ export const getLeaderboards = [
                 calculatedStreak = calculatePositiveStreak(scores, settings!.positiveMin);
                 metric = calculatedStreak;
 
-                // Calculate average emotion score for the period
                 tiebreaker = scores.length > 0
                     ? scores.reduce((sum, score) => sum + score, 0) / scores.length
                     : 0;
@@ -329,6 +316,8 @@ export const getLeaderboards = [
             }
             return (a.firstName || '').localeCompare(b.firstName || '');
         })
+
+        console.log(results)
 
         //* Take top 9
         const top9 = results.slice(0, 9)
