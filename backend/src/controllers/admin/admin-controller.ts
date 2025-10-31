@@ -10,6 +10,11 @@ import { checkEmployeeIfNotExits, checkUploadFile, createHttpErrors } from "../.
 import { removeFilesMultiple } from "../../utils/helplers";
 import { NotiStatus } from "../../../prisma/generated/prisma";
 
+/**
+ * @TODO: if all the emotion thredsolds will be changed...
+ * * has to adjust score calculation prompt and getEmotion from range func
+ */
+
 interface CustomRequest extends Request {
     employeeId?: number,
     files?: any

@@ -81,6 +81,144 @@ export const getSenitmentsComparison = [
     }
 ]
 
+// export const getLeaderboards = [
+//     query("dep", "Invalid Department.").trim().escape().optional(),
+//     query("kw", "Invalid Keyword.").trim().optional().escape(),
+//     query("duration", "Invalid Date.").trim().optional().escape(),
+//     async (req: CustomRequest, res: Response, next: NextFunction) => {
+//         const { dep, kw, duration = '30' } = req.query
+//         const empId = req.employeeId
+
+//         const emp = await getEmployeeById(empId!)
+//         checkEmployeeIfNotExits(emp)
+
+//         const keywords = kw ? kw.toString().trim().split(/\s+/) : [];
+//         const kwFilter: Prisma.EmployeeWhereInput = keywords.length > 0 ? {
+//             AND: keywords.map((word: string) => ({
+//                 OR: [
+//                     { firstName: { contains: word, mode: 'insensitive' } },
+//                     { lastName: { contains: word, mode: 'insensitive' } }
+//                 ] as Prisma.EmployeeWhereInput[]
+//             }))
+//         } : {}
+
+//         const isAllTime = duration === 'all'
+
+//         //* Fetch employees with conditional check-ins query
+//         const [employees, settings] = await Promise.all([
+//             prisma.employee.findMany({
+//                 where: {
+//                     department: {
+//                         isActive: true,
+//                     },
+//                     departmentId:
+//                         emp!.role !== 'SUPERADMIN'
+//                             ? emp!.departmentId
+//                             : dep && dep !== 'all'
+//                                 ? Number(dep)
+//                                 : undefined,
+//                     ...kwFilter
+//                 },
+//                 select: {
+//                     fullName: true,
+//                     email: true,
+//                     avatar: true,
+//                     firstName: true,
+//                     longestStreak: true,
+//                     department: true,
+//                     checkIns: isAllTime ? false : {
+//                         where: {
+//                             createdAt: {
+//                                 gte: startOfDay(subDays(new Date(), +duration - 1)),
+//                                 lte: endOfDay(new Date())
+//                             }
+//                         },
+//                         select: {
+//                             emotionScore: true,
+//                             createdAt: true
+//                         },
+//                         orderBy: {
+//                             createdAt: 'desc'
+//                         }
+//                     }
+//                 }
+//             }),
+//             getSystemSettingsData(),
+//         ])
+
+//         //* Calculate metric based on filter type
+//         const results = employees.map(employee => {
+//             let metric: number;
+//             let calculatedStreak: number = 0;
+
+//             if (isAllTime) {
+//                 // *For all time, use longestStreak
+//                 metric = employee.longestStreak || 0;
+//             } else {
+//                 //* For 7 or 30 days, calculate streak from checkIns
+//                 const scores = employee.checkIns.map(c => +c.emotionScore);
+//                 calculatedStreak = calculatePositiveStreak(scores, settings!.positiveMin);
+//                 metric = calculatedStreak;
+//             }
+
+//             return {
+//                 fullName: employee.fullName,
+//                 email: employee.email,
+//                 avatar: employee.avatar,
+//                 department: employee.department,
+//                 streak: isAllTime ? employee.longestStreak || 0 : calculatedStreak,
+//                 metric: metric,
+//                 firstName: employee.firstName
+//             }
+//         })
+
+//         //* Sort by metric (desc), then firstName (asc)
+//         results.sort((a, b) => {
+//             if (b.metric !== a.metric) {
+//                 return b.metric - a.metric
+//             }
+//             return (a.firstName || '').localeCompare(b.firstName || '')
+//         })
+
+//         //* Take top 7
+//         const top7 = results.slice(0, 9)
+
+//         //* Add ranking with tie handling
+//         let currentRank = 1
+//         let previousMetric: number | null = null
+//         let employeesWithSameRank = 0
+
+//         const rankedResults = top7.map((employee) => {
+//             if (previousMetric !== null && employee.metric < previousMetric) {
+//                 //* Metric changed, update rank
+//                 currentRank += employeesWithSameRank
+//                 employeesWithSameRank = 1
+//             } else if (previousMetric === employee.metric) {
+//                 //* Same metric, increment counter
+//                 employeesWithSameRank++
+//             } else {
+//                 //* First employee
+//                 employeesWithSameRank = 1
+//             }
+
+//             previousMetric = employee.metric
+
+//             //* Remove internal fields from final result
+//             const { firstName, metric, ...employeeData } = employee
+
+//             return {
+//                 ...employeeData,
+//                 rank: currentRank
+//             }
+//         })
+
+//         res.status(200).json({
+//             message: "Here is Leaderboards data.",
+//             data: rankedResults,
+//         })
+//     }
+// ]
+
 export const getLeaderboards = [
     query("dep", "Invalid Department.").trim().escape().optional(),
     query("kw", "Invalid Keyword.").trim().optional().escape(),
@@ -125,9 +263,10 @@ export const getLeaderboards = [
                     avatar: true,
                     firstName: true,
                     longestStreak: true,
+                    avgScore: true, // Add this field
                     department: true,
-                    checkIns: isAllTime ? false : {
-                        where: {
+                    checkIns: {
+                        where: isAllTime ? undefined : {
                             createdAt: {
                                 gte: startOfDay(subDays(new Date(), +duration - 1)),
                                 lte: endOfDay(new Date())
@@ -146,19 +285,26 @@ export const getLeaderboards = [
             getSystemSettingsData(),
         ])
 
-        //* Calculate metric based on filter type
+        //* Calculate metric and tiebreaker based on filter type
         const results = employees.map(employee => {
             let metric: number;
+            let tiebreaker: number;
             let calculatedStreak: number = 0;
 
             if (isAllTime) {
-                // *For all time, use longestStreak
+                // *For all time: primary = longestStreak, tiebreaker = avgScore
                 metric = employee.longestStreak || 0;
+                tiebreaker = +employee.avgScore || 0;
             } else {
-                //* For 7 or 30 days, calculate streak from checkIns
+                //* For 7 or 30 days: primary = streak, tiebreaker = average emotion score
                 const scores = employee.checkIns.map(c => +c.emotionScore);
                 calculatedStreak = calculatePositiveStreak(scores, settings!.positiveMin);
                 metric = calculatedStreak;
+
+                // Calculate average emotion score for the period
+                tiebreaker = scores.length > 0
+                    ? scores.reduce((sum, score) => sum + score, 0) / scores.length
+                    : 0;
             }
 
             return {
@@ -168,47 +314,33 @@ export const getLeaderboards = [
                 department: employee.department,
                 streak: isAllTime ? employee.longestStreak || 0 : calculatedStreak,
                 metric: metric,
+                tiebreaker: tiebreaker,
                 firstName: employee.firstName
             }
         })
 
-        //* Sort by metric (desc), then firstName (asc)
+        //* Sort by metric (desc), then tiebreaker (desc), then firstName (asc)
         results.sort((a, b) => {
             if (b.metric !== a.metric) {
-                return b.metric - a.metric
+                return b.metric - a.metric;
             }
-            return (a.firstName || '').localeCompare(b.firstName || '')
+            if (b.tiebreaker !== a.tiebreaker) {
+                return b.tiebreaker - a.tiebreaker;
+            }
+            return (a.firstName || '').localeCompare(b.firstName || '');
         })
 
-        //* Take top 7
-        const top7 = results.slice(0, 7)
+        //* Take top 9
+        const top9 = results.slice(0, 9)
 
-        //* Add ranking with tie handling
-        let currentRank = 1
-        let previousMetric: number | null = null
-        let employeesWithSameRank = 0
-
-        const rankedResults = top7.map((employee) => {
-            if (previousMetric !== null && employee.metric < previousMetric) {
-                //* Metric changed, update rank
-                currentRank += employeesWithSameRank
-                employeesWithSameRank = 1
-            } else if (previousMetric === employee.metric) {
-                //* Same metric, increment counter
-                employeesWithSameRank++
-            } else {
-                //* First employee
-                employeesWithSameRank = 1
-            }
-
-            previousMetric = employee.metric
-
+        //* Add ranking (no ties, sequential ranking)
+        const rankedResults = top9.map((employee, index) => {
             //* Remove internal fields from final result
-            const { firstName, metric, ...employeeData } = employee
+            const { firstName, metric, tiebreaker, ...employeeData } = employee
 
             return {
                 ...employeeData,
-                rank: currentRank
+                rank: index + 1
             }
         })
 
