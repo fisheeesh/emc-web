@@ -58,12 +58,11 @@ export default function EditSystemSettingsModal({ data, onClose }: EditSystemSet
 
             <Form {...form}>
                 <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 py-4">
-                    {/* Positive Threshold - Disabled */}
                     <div className="space-y-3">
                         <FormLabel className="text-green-600 dark:text-green-400 font-semibold">
                             Positive Threshold (Locked)
                         </FormLabel>
-                        <div className="grid grid-cols-2 gap-4">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <div>
                                 <FormLabel className="text-xs text-muted-foreground">Minimum</FormLabel>
                                 <Input
@@ -88,12 +87,11 @@ export default function EditSystemSettingsModal({ data, onClose }: EditSystemSet
                         </FormDescription>
                     </div>
 
-                    {/* Neutral Threshold - Disabled */}
                     <div className="space-y-3">
                         <FormLabel className="text-purple-600 dark:text-purple-400 font-semibold">
                             Neutral Threshold (Locked)
                         </FormLabel>
-                        <div className="grid grid-cols-2 gap-4">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <div>
                                 <FormLabel className="text-xs text-muted-foreground">Minimum</FormLabel>
                                 <Input
@@ -118,12 +116,11 @@ export default function EditSystemSettingsModal({ data, onClose }: EditSystemSet
                         </FormDescription>
                     </div>
 
-                    {/* Negative Threshold - Disabled */}
                     <div className="space-y-3">
                         <FormLabel className="text-orange-600 dark:text-orange-400 font-semibold">
                             Negative Threshold (Locked)
                         </FormLabel>
-                        <div className="grid grid-cols-2 gap-4">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <div>
                                 <FormLabel className="text-xs text-muted-foreground">Minimum</FormLabel>
                                 <Input
@@ -148,12 +145,11 @@ export default function EditSystemSettingsModal({ data, onClose }: EditSystemSet
                         </FormDescription>
                     </div>
 
-                    {/* Critical Threshold - Disabled */}
                     <div className="space-y-3">
                         <FormLabel className="text-red-600 dark:text-red-400 font-semibold">
                             Critical Threshold (Locked)
                         </FormLabel>
-                        <div className="grid grid-cols-2 gap-4">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <div>
                                 <FormLabel className="text-xs text-muted-foreground">Minimum</FormLabel>
                                 <Input
@@ -178,7 +174,6 @@ export default function EditSystemSettingsModal({ data, onClose }: EditSystemSet
                         </FormDescription>
                     </div>
 
-                    {/* Watchlist Duration - Editable */}
                     <FormField
                         control={form.control}
                         name="watchlistTrackMin"
@@ -208,7 +203,7 @@ export default function EditSystemSettingsModal({ data, onClose }: EditSystemSet
                             <Button
                                 type="button"
                                 variant="outline"
-                                className="min-h-[44px] cursor-pointer"
+                                className="min-h-[44px] cursor-pointer w-full"
                                 disabled={isWorking}
                             >
                                 Cancel
