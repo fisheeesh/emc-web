@@ -2,7 +2,7 @@ import fullDark from '@/assets/full-dark.png'
 import fullLight from '@/assets/full-light.png'
 import halfDark from '@/assets/half-dark.png'
 import halfLight from '@/assets/half-light.png'
-import { APP_NAME, NAVLINKS } from '@/lib/constants'
+import { ADMIN_NAVLINKS, APP_NAME, SUPER_NAVLINKS } from '@/lib/constants'
 import useFilterStore from '@/store/filter-store'
 import useUserStore from '@/store/user-store'
 import { useState } from 'react'
@@ -17,6 +17,7 @@ import AuthDropdown from './auth-drop-down'
 import CommonFilter from './common-filter'
 import { ModeToggle } from './mode-toggle'
 import { useTheme } from './theme-provider'
+import CustomBadge from './custom-badge'
 
 export default function Navbar() {
     const { theme } = useTheme()
@@ -25,8 +26,10 @@ export default function Navbar() {
     const [isMobMenuOpen, setIsMobMenuOpen] = useState(false)
     const navigate = useNavigate()
 
+    const navLinks = user?.role === 'SUPERADMIN' ? SUPER_NAVLINKS : ADMIN_NAVLINKS
+
     const renderNavLinks = () =>
-        NAVLINKS.map((link, index) => (
+        navLinks.map((link, index) => (
             <NavLink
                 onClick={() => setIsMobMenuOpen(false)}
                 key={index}
@@ -89,6 +92,8 @@ export default function Navbar() {
                             <div className="max-w-[1400px] mx-auto px-4 space-y-4">
                                 {renderNavLinks()}
                                 <div className='flex flex-col sm:flex-row sm:items-center gap-3 mt-5'>
+                                    <CustomBadge value={user?.role as string} />
+
                                     {user?.role === 'SUPERADMIN' && <CommonFilter
                                         filters={filters.departments}
                                         filterValue='gDep'
