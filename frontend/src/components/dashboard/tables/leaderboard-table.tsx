@@ -221,7 +221,7 @@ export default function LeaderBoardTable({ data, isLoading }: Props) {
                                         <img src={crown} alt="crown" className="w-7 h-4" />
                                     </div>
 
-                                    <div className="col-span-9 flex items-center gap-3">
+                                    <div className="col-span-7 md:col-span-6 flex items-center gap-3">
                                         <span className="md:hidden font-bold text-lg">{emp.rank}</span>
                                         <Avatar className="size-10 border-2 border-muted flex-shrink-0">
                                             <AvatarImage src={emp.avatar} alt={emp.fullName} />
@@ -234,7 +234,7 @@ export default function LeaderBoardTable({ data, isLoading }: Props) {
                                         </div>
                                     </div>
 
-                                    <div className="col-span-2 md:col-span-1">
+                                    <div className="col-span-5 text-right">
                                         <StreakFireIcon value={emp.streak} />
                                     </div>
                                 </div>
