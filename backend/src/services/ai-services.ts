@@ -9,14 +9,15 @@ import {
     createRecommendationSystemPrompt,
     createScorePrompt,
     createScoreSystemPrompt,
-    RecommendationData
+    RecommendationData,
+    ScoreSettings
 } from "../utils/ai-promts";
 import { parseScore } from "../utils/helplers";
 
-export const calculateEmotionScoreWithAI = async (moodMessage: string) => {
+export const calculateEmotionScoreWithAI = async (moodMessage: string, settings: ScoreSettings) => {
     const { text } = await generateText({
         model: groq("llama-3.3-70b-versatile"),
-        prompt: createScorePrompt(moodMessage),
+        prompt: createScorePrompt(moodMessage, settings),
         system: createScoreSystemPrompt()
     })
 

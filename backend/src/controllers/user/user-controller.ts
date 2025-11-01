@@ -75,7 +75,16 @@ export const emotionCheckIn = [
         const [emoji, textFeeling] = moodMessage.split('//')
 
         //* Let AI calculate score
-        const score = await calculateEmotionScoreWithAI(moodMessage)
+        const score = await calculateEmotionScoreWithAI(moodMessage, {
+            positiveMin: systemSettings!.positiveMin,
+            positiveMax: systemSettings!.positiveMax,
+            neutralMin: systemSettings!.neutralMin,
+            neutralMax: systemSettings!.neutralMax,
+            negativeMin: systemSettings!.negativeMin,
+            negativeMax: systemSettings!.negativeMax,
+            criticalMin: systemSettings!.criticalMin,
+            criticalMax: systemSettings!.criticalMax,
+        })
 
         if (score === null) {
             return next(createHttpErrors({
