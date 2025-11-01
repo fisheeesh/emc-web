@@ -10,10 +10,9 @@ import { getEmployeeById } from "../../services/auth-services"
 import { getAllEmpEmotionHistory } from "../../services/emp-services"
 import { getEmployeeEmails, getSystemSettingsData } from "../../services/system-service"
 import { authorize } from "../../utils/authorize"
-import { getOrSetCache } from "../../utils/cache"
 import { checkEmployeeIfNotExits, createHttpErrors } from "../../utils/check"
 import { critical_body, critical_subject, normal_body, normal_subject } from "../../utils/email-templates"
-import { calculatePositiveStreak } from "../../utils/helplers"
+import { calculatePositiveStreak, getStatusFromScore } from "../../utils/helplers"
 
 const prisma = new PrismaClient()
 
@@ -186,7 +185,7 @@ export const emotionCheckIn = [
         res.status(200).json({
             message: "Successfully checked in.",
             currentStreak: currentStreak,
-            longestStreak: newLongestStreak
+            longestStreak: newLongestStreak,
         });
 
         //* Move all notifications to background
@@ -250,6 +249,6 @@ export const getEmpCheckInHistory = async (req: CustomRequest, res: Response, ne
 
     res.status(200).json({
         message: `Here is your history. Emp - ${emp!.email}`,
-        history
+        data: history
     })
 }

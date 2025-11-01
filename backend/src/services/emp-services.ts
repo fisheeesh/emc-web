@@ -78,15 +78,9 @@ export const getAllEmpEmotionHistory = async (employeeId: number) => {
         where: { employeeId },
         select: {
             emoji: true,
-            status: true,
             textFeeling: true,
-            emotionScore: true,
             createdAt: true,
-            employee: {
-                select: {
-                    fullName: true
-                }
-            }
+            checkInTime: true,
         },
         orderBy: { createdAt: 'desc' },
     })

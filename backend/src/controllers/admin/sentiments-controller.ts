@@ -317,8 +317,6 @@ export const getLeaderboards = [
             return (a.firstName || '').localeCompare(b.firstName || '');
         })
 
-        console.log(results)
-
         //* Take top 9
         const top9 = results.slice(0, 9)
 
