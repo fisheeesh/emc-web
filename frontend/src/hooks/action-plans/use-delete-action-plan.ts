@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { superApi } from "@/api"
-import queryClient from "@/api/query"
+import { invalidateActionPlanQueries } from "@/api/super-admin-query"
 import { useMutation } from "@tanstack/react-query"
 import { toast } from "sonner"
 
@@ -12,7 +12,7 @@ const useDeleteActionPlan = () => {
             return res.data
         },
         onSuccess: async () => {
-            queryClient.invalidateQueries({ queryKey: ["action-plans", "infinite"], exact: false })
+            await invalidateActionPlanQueries()
             toast.success("Success", {
                 description: `Action Plan has been deleted successfully.`
             })

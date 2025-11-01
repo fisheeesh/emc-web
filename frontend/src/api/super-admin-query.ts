@@ -23,6 +23,13 @@ export const invalidateDepQueries = async () => {
     ]);
 };
 
+export const invalidateActionPlanQueries = async () => {
+    await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ["critical", "infinite"], exact: false }),
+        queryClient.invalidateQueries({ queryKey: ['summary'], exact: false }),
+    ])
+}
+
 const fetchEmpInfinite = async ({ pageParam = null, kw = null, dep = null, role = null, jobType = null, accType = null, status = null, ts = null }: {
     pageParam?: number | null, kw?: string | null, dep?: string | null, role?: string | null, jobType?: string | null, accType?: string | null, status?: string | null, ts?: string | null
 }) => {
