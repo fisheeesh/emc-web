@@ -506,6 +506,8 @@ export const login = [
             return res.status(200).json({
                 message: "Successfully logged in from mobile.",
                 employeeId: employee!.id,
+                fullName: `${employee!.firstName} ${employee!.lastName}`,
+                email: employee!.email,
                 accessToken,
                 refreshToken,
             });

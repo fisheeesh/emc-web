@@ -244,9 +244,9 @@ export const getEmpCheckInHistory = async (req: CustomRequest, res: Response, ne
     const emp = await getEmployeeById(empId!)
     checkEmployeeIfNotExits(emp)
 
-    // const history = await getAllEmpEmotionHistory(emp!.id)
-    const cacheKey = `emotion-history-${emp!.id}`
-    const history = await getOrSetCache(cacheKey, async () => getAllEmpEmotionHistory(emp!.id))
+    const history = await getAllEmpEmotionHistory(emp!.id)
+    // const cacheKey = `emotion-history-${emp!.id}`
+    // const history = await getOrSetCache(cacheKey, async () => getAllEmpEmotionHistory(emp!.id))
 
     res.status(200).json({
         message: `Here is your history. Emp - ${emp!.email}`,
