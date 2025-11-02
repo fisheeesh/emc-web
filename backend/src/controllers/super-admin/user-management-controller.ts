@@ -399,7 +399,6 @@ export const updateEmployeeInformation = [
             message: "Employee data updated successfully.",
             empId: updatedEmp.id
         })
-
     }
 ]
 

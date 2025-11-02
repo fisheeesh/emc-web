@@ -1,20 +1,22 @@
 import { NextFunction, Request, Response } from "express"
 import { body, validationResult } from "express-validator"
 import sanitizeHtml from 'sanitize-html'
-import { NotifType, PrismaClient, Status } from "../../..//prisma/generated/prisma"
+import { Gender, NotifType, PrismaClient, Status } from "../../..//prisma/generated/prisma"
 import { errorCodes } from "../../config/error-codes"
 import { CacheQueue } from "../../jobs/queues/cache-queue"
 import { EmailQueue } from "../../jobs/queues/email-queue"
 import { calculateEmotionScoreWithAI } from "../../services/ai-services"
 import { getEmployeeById } from "../../services/auth-services"
-import { getAllEmpEmotionHistory } from "../../services/emp-services"
+import { getAllEmpEmotionHistory, updateEmpDataById } from "../../services/emp-services"
 import { getEmployeeEmails, getSystemSettingsData } from "../../services/system-service"
 import { authorize } from "../../utils/authorize"
 import { checkEmployeeIfNotExits, createHttpErrors } from "../../utils/check"
 import { critical_body, critical_subject, normal_body, normal_subject } from "../../utils/email-templates"
 import { calculatePositiveStreak } from "../../utils/helplers"
+import { prisma } from "../../config/prisma-client"
+import cloudinary from "../../config/cloudinary"
 
-const prisma = new PrismaClient()
+const prismaClient = new PrismaClient()
 
 interface CustomRequest extends Request {
     employeeId?: number
@@ -56,7 +58,7 @@ export const emotionCheckIn = [
         //* Receive emp's today mood message
         const { moodMessage } = req.body
         const empId = req.employeeId
-        const emp = await prisma.employee.findUnique({
+        const emp = await prismaClient.employee.findUnique({
             where: { id: empId },
             include: {
                 checkIns: {
@@ -116,7 +118,7 @@ export const emotionCheckIn = [
         const newLongestStreak = Math.max(emp!.longestStreak || 0, currentStreak);
 
         //* Optimized transaction - only critical DB operations
-        await prisma.$transaction(async (tx) => {
+        await prismaClient.$transaction(async (tx) => {
             //* Single combined update instead of multiple queries
             const statusUpdate = isRecovered ? Status.NORMAL : (isNewCritical ? Status.CRITICAL : undefined);
 
@@ -252,3 +254,137 @@ export const getEmpCheckInHistory = async (req: CustomRequest, res: Response, ne
         data: history
     })
 }
+
+export const getEmployeeData = async (req: CustomRequest, res: Response, next: NextFunction) => {
+    const empId = req.employeeId
+    const emp = await getEmployeeById(empId!)
+
+    checkEmployeeIfNotExits(emp)
+
+    const empData = await prisma.employee.findUnique({
+        where: { id: empId },
+        select: {
+            id: true,
+            fullName: true,
+            email: true,
+            gender: true,
+            workStyle: true,
+            jobType: true,
+            position: true,
+            avatar: true,
+            birthdate: true,
+            phone: true,
+            country: true,
+            department: {
+                select: {
+                    name: true,
+                }
+            },
+            createdAt: true,
+        }
+    })
+
+    res.status(200).json({
+        message: "Here is employee data",
+        data: empData
+    })
+}
+
+export const updateEmployeeDataById = [
+    body("id", "EmpId is required.").isInt({ gt: 0 }),
+    body("firstName", "First Name is required.").trim().notEmpty().escape(),
+    body("lastName", "Last Name is required.").trim().notEmpty().escape(),
+    body("phone", "Invalid phone number.").trim().notEmpty().matches(/^[\d]+$/).isLength({ min: 5, max: 12 }),
+    body("gender", "Gender is required.").trim().notEmpty().escape()
+        .custom(value => {
+            if (!Object.values(Gender).includes(value as Gender)) {
+                throw new Error("Invalid Gender.")
+            }
+            return true
+        }),
+    body("birthdate", "Birth Date is required.").trim().notEmpty().escape(),
+    async (req: CustomRequest, res: Response, next: NextFunction) => {
+        const errors = validationResult(req).array({ onlyFirstError: true })
+        if (errors.length > 0) {
+            if (req.file) {
+                try {
+                    await cloudinary.uploader.destroy((req.file as any).filename);
+                } catch (error) {
+                    console.error('Error deleting file from Cloudinary:', error);
+                }
+            }
+            return next(createHttpErrors({
+                message: errors[0].msg,
+                status: 400,
+                code: errorCodes.invalid
+            }))
+        }
+
+        const empId = req.employeeId
+        const emp = await getEmployeeById(empId!)
+
+        if (!emp) {
+            if (req.file) {
+                try {
+                    await cloudinary.uploader.destroy((req.file as any).filename);
+                } catch (error) {
+                    console.error('Error deleting file from Cloudinary:', error);
+                }
+            }
+            return next(createHttpErrors({
+                message: "Employee not found.",
+                status: 404,
+                code: errorCodes.notFound
+            }))
+        }
+
+        const { id, firstName, lastName, phone, gender, birthdate } = req.body
+
+        if (Number(emp.id) !== Number(id)) {
+            if (req.file) {
+                try {
+                    await cloudinary.uploader.destroy((req.file as any).filename);
+                } catch (error) {
+                    console.error('Error deleting file from Cloudinary:', error);
+                }
+            }
+            return next(createHttpErrors({
+                message: "You are not allowed to edit other employee data",
+                status: 403,
+                code: errorCodes.forbidden
+            }))
+        }
+
+        const data: any = {
+            firstName,
+            lastName,
+            phone,
+            gender,
+            birthdate,
+            avatar: req.file
+        }
+
+        if (req.file) {
+            //* Store the new Cloudinary URL and public_id
+            data.avatar = (req.file as any).path;
+            data.avatarPublicId = (req.file as any).filename;
+
+            //* Delete the old image from Cloudinary if it exists
+            if (emp.avatarPublicId) {
+                try {
+                    await cloudinary.uploader.destroy(emp.avatarPublicId);
+                    console.log('Old avatar deleted from Cloudinary:', emp.avatarPublicId);
+                } catch (error) {
+                    console.error('Error deleting old avatar from Cloudinary:', error);
+                }
+            }
+        }
+
+        const updatedEmp = await updateEmpDataById(+id, data)
+
+        res.status(200).json({
+            message: "Employee data updated successfully.",
+            empId: updatedEmp.id
+        })
+    }
+]

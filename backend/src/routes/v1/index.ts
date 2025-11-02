@@ -15,7 +15,7 @@ router.get("/api/v1/health", getSimpleHealthCheck)
 
 //* main routes
 router.use("/api/v1", authRoutes)
-router.use("/api/v1/user", userRoutes)
+router.use("/api/v1/user", auth, userRoutes)
 router.use("/api/v1/admin", auth, authorize(true, "ADMIN", "SUPERADMIN"), adminRoutes)
 router.use("/api/v1/super-admin", auth, authorize(true, "SUPERADMIN"), superAdminRoutes)
 
