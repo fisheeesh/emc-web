@@ -44,7 +44,6 @@ import { Input } from "../ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
 import useMarkAsCompleted from "@/hooks/action-plans/use-mark-as-completed";
 import { GiGlassCelebration } from "react-icons/gi";
-import moment from "moment";
 
 type QuickAction = {
     name: string;
@@ -263,7 +262,7 @@ export default function ActionModal({ employee, action, onClose }: Props) {
                                     <CalendarIcon className="text-red-600" size={18} />
                                     <h4 className="font-semibold text-sm text-gray-700 dark:text-gray-300">Due Date</h4>
                                 </div>
-                                <p className="text-base font-en">{moment(action.dueDate).format("LL")}</p>
+                                <p className="text-base font-en">{action.dueDate}</p>
                             </div>
 
                             <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4 shadow-sm">
@@ -271,7 +270,7 @@ export default function ActionModal({ employee, action, onClose }: Props) {
                                     <GiGlassCelebration className="text-amber-600" size={18} />
                                     <h4 className="font-semibold text-sm text-gray-700 dark:text-gray-300">Completed At</h4>
                                 </div>
-                                <p className="text-base font-en">{action.completedAt ? moment(action.completedAt).format("LL") : "Not Yet"}</p>
+                                <p className="text-base font-en">{action.completedAt ?? "Not Yet"}</p>
                             </div>
                         </div>
 

@@ -13,7 +13,6 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import useDeleteActionPlan from "@/hooks/action-plans/use-delete-action-plan";
 import { PRIORITY, RSTATUS, RType, TSFILTER } from "@/lib/constants";
 import { formatId } from "@/lib/utils";
-import moment from "moment";
 import { useState } from "react";
 import { FaListCheck } from "react-icons/fa6";
 import { GoFileSymlinkFile } from "react-icons/go";
@@ -126,10 +125,10 @@ export default function ActionsTable({ data, status, error, isFetchingNextPage, 
                                                     <CustomBadge value={action.status} />
                                                 </TableCell>
                                                 <TableCell>
-                                                    <span className="whitespace-nowrap font-en">{moment(action.dueDate).format("LL")}</span>
+                                                    <span className="whitespace-nowrap font-en">{action.dueDate}</span>
                                                 </TableCell>
                                                 <TableCell>
-                                                    <span className="whitespace-nowrap font-en">{action.criticalEmployee.resovledAt ? moment(action.criticalEmployee.resovledAt).format("LL") : '—'}</span>
+                                                    <span className="whitespace-nowrap font-en">{action.criticalEmployee.resovledAt ?? '—'}</span>
                                                 </TableCell>
                                                 <TableCell>
                                                     <Dialog>

@@ -14,7 +14,6 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import useDeleteCriticalEmp from "@/hooks/emps/use-delete-critical-emp";
 import { CRITICALSTATUS } from "@/lib/constants";
 import { getInitialName } from "@/lib/utils";
-import moment from "moment";
 import { useState } from "react";
 import { GrMoreVertical, GrNotes } from "react-icons/gr";
 import { IoSparklesOutline } from "react-icons/io5";
@@ -108,10 +107,10 @@ export default function CriticalTable({ data, status, error, isFetchingNextPage,
                                                     <span className="whitespace-nowrap font-en">{emp.emotionScore}</span>
                                                 </TableCell>
                                                 <TableCell className="text-center">
-                                                    <span className="whitespace-nowrap font-en">{moment(emp.createdAt).format('LL')}</span>
+                                                    <span className="whitespace-nowrap font-en">{emp.createdAt}</span>
                                                 </TableCell>
                                                 <TableCell className="text-center">
-                                                    <span className="whitespace-nowrap font-en">{emp.resolvedAt ? moment(emp.resolvedAt).format("LL") : '—'}</span>
+                                                    <span className="whitespace-nowrap font-en">{emp.resolvedAt ?? '—'}</span>
                                                 </TableCell>
                                                 <TableCell className="text-center">
                                                     <Dialog>

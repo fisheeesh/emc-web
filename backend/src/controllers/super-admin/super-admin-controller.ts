@@ -248,32 +248,31 @@ export const getSummaryData = [
     }
 ]
 
-export const getEmotions = [
-    async (req: CustomRequest, res: Response, next: NextFunction) => {
-        const categories = await prisma.emotionCategory.findMany({
-            orderBy: { order: 'asc' },
-            include: {
-                emotions: {
-                    orderBy: { order: 'asc' },
-                    select: {
-                        icon: true,
-                        label: true,
-                    },
+export const getEmotions = async (req: CustomRequest, res: Response, next: NextFunction) => {
+    const categories = await prisma.emotionCategory.findMany({
+        orderBy: { order: 'asc' },
+        include: {
+            emotions: {
+                orderBy: { order: 'asc' },
+                select: {
+                    icon: true,
+                    label: true,
                 },
             },
-        });
+        },
+    });
 
-        const data = categories.map(category => ({
-            title: category.title,
-            emotions: category.emotions,
-        }));
+    const data = categories.map(category => ({
+        title: category.title,
+        emotions: category.emotions,
+    }));
 
-        res.status(200).json({
-            message: "Emotion categories retrieved successfully",
-            data,
-        });
-    }
-];
+    res.status(200).json({
+        message: "Emotion categories retrieved successfully",
+        data,
+    });
+}
+    ;
 
 export const createEmotion = [
     body("title")
