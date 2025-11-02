@@ -274,7 +274,8 @@ export const getEmployeeData = async (req: CustomRequest, res: Response, next: N
             avatar: true,
             birthdate: true,
             phone: true,
-            country: true,
+            firstName: true,
+            lastName: true,
             department: {
                 select: {
                     name: true,
