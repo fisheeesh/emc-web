@@ -272,6 +272,7 @@ export const getEmployeeData = async (req: CustomRequest, res: Response, next: N
             jobType: true,
             position: true,
             avatar: true,
+            accType: true,
             birthdate: true,
             phone: true,
             firstName: true,
