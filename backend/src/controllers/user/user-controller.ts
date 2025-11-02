@@ -125,7 +125,7 @@ export const emotionCheckIn = [
                 tx.emotionCheckIn.create({
                     data: {
                         employeeId: emp!.id,
-                        emoji: emoji.trim(),
+                        emoji: emoji.split("(")[0].trim(),
                         textFeeling: textFeeling.trim(),
                         emotionScore: score!,
                     }
