@@ -11,6 +11,7 @@ import Empty from "@/components/ui/empty";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { EMOTION_FILTER, TSFILTER } from "@/lib/constants";
 import { getInitialName } from "@/lib/utils";
+import moment from "moment";
 import { BsCalendar2Check } from "react-icons/bs";
 
 interface Props {
@@ -103,7 +104,7 @@ export default function AttendanceTable({ data, status, error, isFetchingNextPag
                                                     }
                                                 </TableCell>
                                                 <TableCell className="text-center">
-                                                    <span className="whitespace-nowrap font-en">{att.checkInTime}</span>
+                                                    <span className="whitespace-nowrap font-en">{moment(att.createdAt).format('MMMM D, YYYY [at] h:mm A')}</span>
                                                 </TableCell>
                                             </TableRow>
                                         ))

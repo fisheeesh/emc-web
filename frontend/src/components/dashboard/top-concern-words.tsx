@@ -16,6 +16,7 @@ import { useSearchParams } from "react-router";
 import CommonFilter from "../shared/common-filter";
 import Empty from "../ui/empty";
 import { Skeleton } from "../ui/skeleton";
+import moment from "moment";
 
 const getWordColor = (index: number) => {
     const colors = [
@@ -90,9 +91,7 @@ export function TopConcernsWordCloud({ concernsData, recommendation, generatedAt
                                 {isCached && <TiPin className="text-red-600" />}
                                 Last analyzed:
                                 <span className="font-en">
-                                    {new Date(generatedAt).toLocaleTimeString("en-US", {
-                                        year: "numeric", month: "long", day: "numeric", hour: "numeric", minute: "numeric"
-                                    })}
+                                    {moment(generatedAt).format("LLL")}
                                 </span>
                             </p>
                         )}

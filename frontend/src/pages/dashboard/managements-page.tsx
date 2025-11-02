@@ -4,7 +4,7 @@ import { SummaryCards } from "@/components/dashboard/summary-cards"
 import SystemSettingsCard from "@/components/dashboard/system-settings-card"
 import ActionsTable from "@/components/dashboard/tables/actions-table"
 import DepartmentTable from "@/components/dashboard/tables/dep-table"
-import EmpTables from "@/components/dashboard/tables/emp-tables"
+import EmpTable from "@/components/dashboard/tables/emp-table"
 import useTitle from "@/hooks/ui/use-title"
 import useCountryStore from "@/store/country-store"
 import useSystemStore from "@/store/system-store"
@@ -97,7 +97,7 @@ export default function ManagementsPage() {
                 <EmotionDisplay data={allEmotionCate.data} />
             </div>
             <div className="w-full">
-                <EmpTables
+                <EmpTable
                     data={allEmps}
                     status={empStatus}
                     error={empError}

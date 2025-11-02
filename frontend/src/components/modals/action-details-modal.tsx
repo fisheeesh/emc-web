@@ -6,6 +6,7 @@ import useUserStore from "@/store/user-store";
 import { zodResolver } from "@hookform/resolvers/zod";
 import type { MDXEditorMethods } from "@mdxeditor/editor";
 import { CheckCircle2, Clock } from "lucide-react";
+import moment from "moment";
 import { useRef } from "react";
 import { useForm, type SubmitHandler } from "react-hook-form";
 import { AiOutlineIdcard } from "react-icons/ai";
@@ -140,14 +141,14 @@ export default function ActionDetailsModal({ action, onClose }: { action: Action
                             <MdOutlineCalendarMonth className="text-rose-600" size={18} />
                             <h4 className="font-semibold text-sm text-gray-700 dark:text-gray-300">Due Date</h4>
                         </div>
-                        <p className="text-sm font-en text-gray-600 dark:text-gray-400">{action.dueDate}</p>
+                        <p className="text-sm font-en text-gray-600 dark:text-gray-400">{moment(action.dueDate).format("LL")}</p>
                     </div>
                     <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4 shadow-sm">
                         <div className="flex items-center gap-2 mb-2">
                             <GiGlassCelebration className="text-amber-600" size={18} />
                             <h4 className="font-semibold text-sm text-gray-700 dark:text-gray-300">Completed At</h4>
                         </div>
-                        <p className="text-sm font-en text-gray-600 dark:text-gray-400">{action.completedAt ?? "Not Yet"}</p>
+                        <p className="text-sm font-en text-gray-600 dark:text-gray-400">{action.completedAt ? moment(action.completedAt).format("LL") : "Not Yet"}</p>
                     </div>
                 </div>
 

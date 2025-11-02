@@ -12,7 +12,7 @@ import { getEmployeeEmails, getSystemSettingsData } from "../../services/system-
 import { authorize } from "../../utils/authorize"
 import { checkEmployeeIfNotExits, createHttpErrors } from "../../utils/check"
 import { critical_body, critical_subject, normal_body, normal_subject } from "../../utils/email-templates"
-import { calculatePositiveStreak, getStatusFromScore } from "../../utils/helplers"
+import { calculatePositiveStreak } from "../../utils/helplers"
 
 const prisma = new PrismaClient()
 

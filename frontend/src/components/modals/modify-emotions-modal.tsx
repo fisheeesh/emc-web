@@ -194,7 +194,6 @@ export default function ModifyEmotionsModal({ onClose, data }: ModifyEmotionsMod
                             </SelectItem>
                         </SelectContent>
                     </Select>
-                    {/* Optional: Show status badge */}
                     <p className="text-xs text-muted-foreground">
                         {isExistingCategory ? (
                             <span className="text-blue-600 font-medium">Updating existing category</span>

@@ -83,6 +83,7 @@ interface AttendanceOverviewData {
     textFeeling: string,
     emotionScore: number,
     checkInTime: string,
+    createdAt: string,
     status: "positive" | "neutral" | "negative" | "critical",
     employee: Employee,
 }

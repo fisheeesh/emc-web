@@ -8,6 +8,7 @@ import { Briefcase, Calendar, Globe, Mail, MapPinned, Phone, User } from 'lucide
 import { MdOutlineSick } from "react-icons/md";
 import EmpEmotionChart from '../dashboard/charts/emp-emotion-chart';
 import AttendanceTimeSection from '../shared/attendance-time-section';
+import moment from 'moment';
 
 export default function EmpDetailsModal({ employee }: { employee: Employee }) {
     return (
@@ -22,7 +23,7 @@ export default function EmpDetailsModal({ employee }: { employee: Employee }) {
                         <div className='items-start flex-col'>
                             <DialogTitle className="text-2xl font-semibold">{employee.fullName}</DialogTitle>
                             <p className="text-xs text-muted-foreground font-en">{generateEmployeeId(employee.id)}</p>
-                            <p className="text-xs text-muted-foreground font-en">Added on {employee.createdAt}</p>
+                            <p className="text-xs text-muted-foreground font-en">Added on {moment(employee.createdAt).format("LL")}</p>
                         </div>
                     </div>
                 </DialogHeader>
@@ -86,7 +87,7 @@ export default function EmpDetailsModal({ employee }: { employee: Employee }) {
                                         <Calendar className="w-5 h-5 text-gray-400" />
                                         <span className="text-sm text-muted-foreground w-32">Date of Birth</span>
                                     </div>
-                                    <span className="text-sm font-medium font-en">{employee.birthdate ?? "NULL"}</span>
+                                    <span className="text-sm font-medium font-en">{employee.birthdate ? moment(employee.birthdate).format("LL") : "NULL"}</span>
                                     <span className="text-sm text-muted-foreground ml-4 font-en hidden md:block">Age: {employee.age ?? "NULL"}</span>
                                 </div>
 
@@ -103,7 +104,7 @@ export default function EmpDetailsModal({ employee }: { employee: Employee }) {
                                         <MdOutlineSick className="w-5 h-5 text-gray-400" />
                                         <span className="text-sm text-muted-foreground w-32">Last Critical Time</span>
                                     </div>
-                                    <span className="text-sm font-medium font-en">{employee.lastCritical ?? "NULL"}</span>
+                                    <span className="text-sm font-medium font-en">{employee.lastCritical ? moment(employee.lastCritical).format("LL") : "NULL"}</span>
                                 </div>
 
                                 <div className="flex items-center gap-8 py-2">
