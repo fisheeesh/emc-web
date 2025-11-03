@@ -22,6 +22,7 @@ export default function AttendanceDashboardPage() {
     const ts = searchParams.get('ts')
     const empStatus = searchParams.get('empStatus') || "all"
     const attDate = searchParams.get('attDate')
+    const tz = searchParams.get('tz') || Intl.DateTimeFormat().resolvedOptions().timeZone
     const ciDate = searchParams.get('ciDate')
     const ciMonth = searchParams.get('ciMonth')
     const ciYear = searchParams.get('ciYear')
@@ -37,7 +38,7 @@ export default function AttendanceDashboardPage() {
         isFetchingNextPage: isAttFetchingNextPage,
         fetchNextPage: fetchAttNextPage,
         hasNextPage: hasAttNextPage,
-    } = useInfiniteQuery(attendanceOverviewQuery(kw, empStatus, attDate, dep, ts))
+    } = useInfiniteQuery(attendanceOverviewQuery(kw, empStatus, attDate, dep, ts, tz))
     const { data: checkInHoursData } = useSuspenseQuery(checkInHoursQuery(ciDate, ciMonth, ciYear, dep))
 
     const allAtts = attData?.pages.flatMap(page => page.data) ?? []

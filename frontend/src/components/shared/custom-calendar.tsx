@@ -28,6 +28,7 @@ export default function CustomCalendar({ popover = true, filterValue }: Props) {
         if (date && newDate && date.toDateString() === newDate.toDateString()) {
             setDate(undefined);
             searchParams.delete(filterValue);
+            searchParams.delete('tz');
 
             if (!popover) {
                 searchParams.delete("ciYear");
@@ -42,9 +43,17 @@ export default function CustomCalendar({ popover = true, filterValue }: Props) {
         if (newDate) {
             setDate(newDate);
 
-            //? Create a date at midnight in LOCAL timezone, then convert to ISO
-            const localDate = new Date(newDate.getFullYear(), newDate.getMonth(), newDate.getDate());
-            searchParams.set(filterValue, localDate.toISOString());
+            //* Format date as YYYY-MM-DD
+            const year = newDate.getFullYear();
+            const month = String(newDate.getMonth() + 1).padStart(2, '0');
+            const day = String(newDate.getDate()).padStart(2, '0');
+            const dateString = `${year}-${month}-${day}`;
+
+            //* Get user's timezone
+            const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+
+            searchParams.set(filterValue, dateString);
+            searchParams.set('tz', timezone);
 
             if (!popover) {
                 searchParams.delete("ciYear");
@@ -54,6 +63,7 @@ export default function CustomCalendar({ popover = true, filterValue }: Props) {
         } else {
             setDate(undefined);
             searchParams.delete(filterValue);
+            searchParams.delete('tz');
 
             if (!popover) {
                 searchParams.delete("ciYear");

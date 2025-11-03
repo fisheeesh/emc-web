@@ -36,11 +36,11 @@ export const departmentsQuery = () => ({
 })
 
 const fetchMoodOverview = async (q?: string | null, dep?: string | null) => {
-    let query = "?"
-    if (q) query += `duration=${q}`
+    const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    let query = `?tz=${timezone}`
+    if (q) query += `&duration=${q}`
     if (dep) query += `&dep=${dep}`
     const res = await api.get(`admin/mood-overview${query}`)
-
     return res.data
 }
 
@@ -50,11 +50,11 @@ export const moodOverviewQuery = (q?: string | null, dep?: string | null) => ({
 })
 
 export const fetchSentimentsComparison = async (q?: string | null, dep?: string | null) => {
-    let query = "?"
-    if (q) query += `duration=${q}`
+    const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    let query = `?tz=${timezone}`
+    if (q) query += `&duration=${q}`
     if (dep) query += `&dep=${dep}`
     const res = await api.get(`admin/sentiments-comparison${query}`)
-
     return res.data
 }
 
@@ -64,8 +64,8 @@ export const sentimentsComparisonQuery = (q?: string | null, dep?: string | null
 })
 
 const fetchDailyAttendance = async (dep?: string | null) => {
-    const res = await api.get(`admin/daily-attendance?dep=${dep}`)
-
+    const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    const res = await api.get(`admin/daily-attendance?dep=${dep}&tz=${timezone}`)
     return res.data
 }
 
@@ -74,13 +74,14 @@ export const dailyAttendanceQuery = (dep?: string | null) => ({
     queryFn: () => fetchDailyAttendance(dep),
 })
 
-const fetchAttendanceOverview = async ({ pageParam = null, q = null, empStatus = null, date = null, dep = null, ts = null }: {
+const fetchAttendanceOverview = async ({ pageParam = null, q = null, empStatus = null, date = null, dep = null, ts = null, tz = null }: {
     pageParam?: number | null,
     q?: string | null,
     empStatus?: string | null,
     date?: string | null,
     dep?: string | null,
-    ts?: string | null
+    ts?: string | null,
+    tz?: string | null
 }) => {
     let query = pageParam ? `?limit=7&cursor=${pageParam}` : "?limit=7"
     if (q) query += `&kw=${q}`
@@ -88,14 +89,14 @@ const fetchAttendanceOverview = async ({ pageParam = null, q = null, empStatus =
     if (date) query += `&date=${date}`
     if (dep) query += `&dep=${dep}`
     if (ts) query += `&ts=${ts}`
+    if (tz) query += `&tz=${tz}`
     const res = await api.get(`admin/attendance-overview${query}`)
-
     return res.data
 }
 
-export const attendanceOverviewQuery = (q: string | null = null, empStatus: string | null = null, date: string | null = null, dep: string | null = null, ts: string | null = null) => ({
-    queryKey: ['attendance-overview', 'infinite', q, empStatus, date, dep, ts],
-    queryFn: ({ pageParam = null }: { pageParam: number | null }) => fetchAttendanceOverview({ pageParam, q, empStatus, date, dep, ts }),
+export const attendanceOverviewQuery = (q: string | null = null, empStatus: string | null = null, date: string | null = null, dep: string | null = null, ts: string | null = null, tz: string | null = null) => ({
+    queryKey: ['attendance-overview', 'infinite', q, empStatus, date, dep, ts, tz],
+    queryFn: ({ pageParam = null }: { pageParam: number | null }) => fetchAttendanceOverview({ pageParam, q, empStatus, date, dep, ts, tz }),
     initialPageParam: null,
     // @ts-expect-error ignore type check
     getNextPageParam: (lastPage, pages) => lastPage.nextCursor ?? undefined
@@ -107,14 +108,14 @@ const fetchCheckInHours = async ({ date, month, year, dep }: {
     year?: string | null,
     dep?: string | null,
 }) => {
-    let query = "?"
+    const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    let query = `?tz=${timezone}`
     if (date) query += `&duration=${date}&type=day`
     else if (month) query += `&duration=${month}&type=month`
     else if (year) query += `&duration=${year}&type=year`
     if (dep) query += `&dep=${dep}`
 
     const res = await api.get(`admin/check-in-hours${query}`)
-
     return res.data
 }
 

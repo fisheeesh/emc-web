@@ -5,6 +5,8 @@ import { getEmployeeById } from "../../services/auth-services";
 import { getAttendanceOverviewInfiniteData, getCheckInHoursData, getDailyAttendanceData } from "../../services/emotion-check-in-services";
 import { checkEmployeeIfNotExits } from "../../utils/check";
 import { getEmotionRange } from "../../utils/helplers";
+import { toZonedTime, fromZonedTime } from "date-fns-tz";
+import { getDateRangeInTimezone } from "../../utils/timezone-helpers";
 
 interface CustomRequest extends Request {
     employeeId?: number
@@ -12,17 +14,34 @@ interface CustomRequest extends Request {
 
 export const getDailyAttendance = [
     query("dep", "Invalid Department.").trim().escape().optional(),
+    query("tz", "Invalid timezone").optional().trim(),
     async (req: CustomRequest, res: Response, next: NextFunction) => {
         const empId = req.employeeId
         const emp = await getEmployeeById(empId!)
         checkEmployeeIfNotExits(emp)
 
-        const { dep } = req.query
+        const { dep, tz = 'UTC' } = req.query
+        const timezone = tz as string;
 
-        const start = startOfDay(subDays(new Date(), 9))
-        const end = endOfDay(new Date())
+        //* Get current date in user's timezone
+        const now = new Date();
+        const zonedNow = toZonedTime(now, timezone);
 
-        const { totalEmp, totalPresent, result, percentages } = await getDailyAttendanceData(emp!.departmentId, dep as string, emp!.role, start, end)
+        const localStart = startOfDay(subDays(zonedNow, 9));
+        const localEnd = endOfDay(zonedNow);
+
+        //* Convert to UTC for database
+        const utcStart = fromZonedTime(localStart, timezone);
+        const utcEnd = fromZonedTime(localEnd, timezone);
+
+        const { totalEmp, totalPresent, result, percentages } = await getDailyAttendanceData(
+            emp!.departmentId,
+            dep as string,
+            emp!.role,
+            utcStart,
+            utcEnd,
+            timezone
+        );
 
         res.status(200).json({
             message: "Here is daily attendance.",
@@ -38,33 +57,58 @@ export const getCheckInHours = [
     query("dep", "Invalid Department.").trim().escape().optional(),
     query("duration", "Invalid Date.").trim().optional().escape(),
     query("type", "Invalid Type.").trim().optional().escape(),
+    query("tz", "Invalid timezone").optional().trim(),
     async (req: CustomRequest, res: Response, next: NextFunction) => {
-        const { duration, type, dep } = req.query
-        const empId = req.employeeId
-        const emp = await getEmployeeById(empId!)
-        checkEmployeeIfNotExits(emp)
+        const { duration, type, dep, tz = 'UTC' } = req.query;
+        const empId = req.employeeId;
+        const emp = await getEmployeeById(empId!);
+        checkEmployeeIfNotExits(emp);
 
-        const durationFilter =
-            type === 'day' ? {
-                gte: startOfDay(new Date(duration as string)),
-                lte: endOfDay(new Date(duration as string))
-            } : type === 'month' ? {
-                gte: startOfMonth(new Date(duration as string)),
-                lte: endOfMonth(new Date(duration as string))
-            } : type === 'year' ? {
-                gte: startOfYear(new Date(duration as string)),
-                lte: endOfYear(new Date(duration as string))
-            } : {
-                gte: startOfDay(new Date()),
-                lte: endOfDay(new Date())
-            }
+        const timezone = tz as string;
+        let durationFilter: { gte: Date; lte: Date };
 
-        const data = await getCheckInHoursData(emp!.departmentId, dep as string, emp!.role, durationFilter)
+        if (type === 'day' && duration) {
+            const { start, end } = getDateRangeInTimezone(duration as string, timezone);
+            durationFilter = { gte: start, lte: end };
+        } else if (type === 'month' && duration) {
+            const [year, month] = (duration as string).split('-').map(Number);
+            const localDate = new Date(year, month - 1, 1);
+
+            const localStart = startOfMonth(localDate);
+            const localEnd = endOfMonth(localDate);
+
+            const utcStart = fromZonedTime(localStart, timezone);
+            const utcEnd = fromZonedTime(localEnd, timezone);
+
+            durationFilter = { gte: utcStart, lte: utcEnd };
+        } else if (type === 'year' && duration) {
+            const year = parseInt(duration as string);
+            const localDate = new Date(year, 0, 1);
+
+            const localStart = startOfYear(localDate);
+            const localEnd = endOfYear(localDate);
+
+            const utcStart = fromZonedTime(localStart, timezone);
+            const utcEnd = fromZonedTime(localEnd, timezone);
+
+            durationFilter = { gte: utcStart, lte: utcEnd };
+        } else {
+            const { start, end } = getDateRangeInTimezone(undefined, timezone);
+            durationFilter = { gte: start, lte: end };
+        }
+
+        const data = await getCheckInHoursData(
+            emp!.departmentId,
+            dep as string,
+            emp!.role,
+            durationFilter,
+            timezone
+        );
 
         res.status(200).json({
             message: "Here is check in hours.",
             data
-        })
+        });
     }
 ]
 
@@ -75,16 +119,17 @@ export const getAttendanceOverView = [
     query("kw", "Invalid Keyword.").trim().optional().escape(),
     query("status", "Invalid Status").trim().optional().escape(),
     query("date", "Invalid Date").trim().optional().escape(),
+    query("tz", "Invalid timezone").optional().trim(),
     query("ts", "Invalid Timestamp").trim().optional().escape(),
     async (req: CustomRequest, res: Response, next: NextFunction) => {
-        const empId = req.employeeId
-        const { limit = 7, cursor: lastCursor, kw, status, date, dep, ts = 'desc' } = req.query
+        const empId = req.employeeId;
+        const { limit = 7, cursor: lastCursor, kw, status, date, dep, ts = 'desc', tz = 'UTC' } = req.query;
 
-        const emp = await getEmployeeById(empId!)
-        checkEmployeeIfNotExits(emp)
+        const emp = await getEmployeeById(empId!);
+        checkEmployeeIfNotExits(emp);
 
-        const start = startOfDay(date ? new Date(date as string) : new Date());
-        const end = endOfDay(date ? new Date(date as string) : new Date());
+        const timezone = tz as string;
+        const { start, end } = getDateRangeInTimezone(date as string | undefined, timezone);
 
         const where: any = {
             createdAt: { gte: start, lte: end },
@@ -161,12 +206,12 @@ export const getAttendanceOverView = [
             }
         }
 
-        const attendances = await getAttendanceOverviewInfiniteData(options)
-        const hasNextPage = attendances!.length > +limit
+        const attendances = await getAttendanceOverviewInfiniteData(options);
+        const hasNextPage = attendances!.length > +limit;
 
-        if (hasNextPage) attendances!.pop()
+        if (hasNextPage) attendances!.pop();
 
-        const nextCursor = hasNextPage ? attendances![attendances!.length - 1].id : null
+        const nextCursor = hasNextPage ? attendances![attendances!.length - 1].id : null;
 
         res.status(200).json({
             message: "Here is Attendance OverView Data.",
@@ -174,6 +219,6 @@ export const getAttendanceOverView = [
             nextCursor,
             prevCursor: lastCursor || undefined,
             data: attendances
-        })
+        });
     }
 ]

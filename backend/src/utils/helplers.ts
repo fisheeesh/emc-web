@@ -1,7 +1,6 @@
 import { groq } from '@ai-sdk/groq';
 import { generateText } from 'ai';
 import { endOfDay, startOfDay, subDays, subMonths } from 'date-fns';
-import { toZonedTime } from 'date-fns-tz';
 import { marked } from 'marked';
 import { unlink } from "node:fs/promises";
 import path from "path";
@@ -166,12 +165,9 @@ export const removeFiles = async (originalFile: string, optimizeFile?: string | 
     }
 }
 
-export function roundToHour(date: Date): string {
-    //* UTC -> Thai
-    const zoned = toZonedTime(date, 'Asia/Bangkok');
-
-    let h = zoned.getHours();
-    const m = zoned.getMinutes();
+export function roundToHourLocal(date: Date): string {
+    let h = date.getHours();
+    const m = date.getMinutes();
 
     if (m > 30) h += 1;
     if (h > 23) h = 23;

@@ -12,6 +12,7 @@ import { getEmployeeEmails, getSystemSettingsData } from "../../services/system-
 import { checkEmployeeIfNotExits, createHttpErrors } from "../../utils/check";
 import { completion_body, completion_subject, request_body, request_subject } from "../../utils/email-templates";
 import { calculatePositiveStreak } from "../../utils/helplers";
+import { toZonedTime, fromZonedTime } from "date-fns-tz";
 
 interface CustomRequest extends Request {
     employeeId?: number
@@ -22,57 +23,80 @@ const prismaClient = new PrismaClient()
 export const getMoodOverview = [
     query("dep", "Invalid Department.").trim().escape().optional(),
     query("duration", "Invalid Duration").trim().escape().optional(),
+    query("tz", "Invalid timezone").optional().trim(),
     async (req: CustomRequest, res: Response, next: NextFunction) => {
-        const empId = req.employeeId
-        const { duration = '1', dep } = req.query
+        const empId = req.employeeId;
+        const { duration = '1', dep, tz = 'UTC' } = req.query;
 
-        const emp = await getEmployeeById(empId!)
-        checkEmployeeIfNotExits(emp)
+        const emp = await getEmployeeById(empId!);
+        checkEmployeeIfNotExits(emp);
 
-        const now = new Date()
-        let start: Date
-        const end = endOfDay(now)
+        const timezone = tz as string;
+        const now = new Date();
+        const zonedNow = toZonedTime(now, timezone);
+
+        let start: Date;
+        const end = endOfDay(zonedNow);
 
         if (+duration === 30) {
-            start = startOfMonth(now)
+            start = startOfMonth(zonedNow);
         } else {
-            start = startOfDay(subDays(now, +duration - 1))
+            start = startOfDay(subDays(zonedNow, +duration - 1));
         }
+
+        //* Convert to UTC
+        const utcStart = fromZonedTime(start, timezone);
+        const utcEnd = fromZonedTime(end, timezone);
 
         const durationFilter = {
-            gte: start,
-            lte: end
-        }
+            gte: utcStart,
+            lte: utcEnd
+        };
 
-        const percentages = await getMoodPercentages(emp!.departmentId, dep as string, emp!.role, durationFilter)
-        // const cacheKey = `emotion-mood-overview-${JSON.stringify(durationFilter)}`
-        // const percentages = await getOrSetCache(cacheKey, async () => getTodayMoodPercentages(emp!.departmentId, durationFilter))
+        const percentages = await getMoodPercentages(
+            emp!.departmentId,
+            dep as string,
+            emp!.role,
+            durationFilter
+        );
 
         res.status(200).json({
             message: "Here is Today Mood Overview Data.",
             data: percentages
-        })
+        });
     }
 ]
 
 export const getSenitmentsComparison = [
     query("dep", "Invalid Department.").trim().escape().optional(),
     query("duration", "Invalid Duration").trim().escape().optional(),
+    query("tz", "Invalid timezone").optional().trim(),
     async (req: CustomRequest, res: Response, next: NextFunction) => {
         const empId = req.employeeId;
-        const { duration = "7", dep } = req.query;
+        const { duration = "7", dep, tz = 'UTC' } = req.query;
 
         const emp = await getEmployeeById(empId!);
         checkEmployeeIfNotExits(emp);
 
+        const timezone = tz as string;
         const now = new Date();
+        const zonedNow = toZonedTime(now, timezone);
 
-        const start = startOfDay(subDays(now, +duration - 1))
-        const end = endOfDay(now)
+        const start = startOfDay(subDays(zonedNow, +duration - 1));
+        const end = endOfDay(zonedNow);
 
-        const result = await getSentimentsComparisonData(emp!.departmentId, dep as string, emp!.role, start, end);
-        // const cacheKey = `emotion-comparison-${JSON.stringify(durationFilter)}`
-        // const result = await getOrSetCache(cacheKey, async () => getSentimentsComparisonData(durationFilter, emp!.departmentId))
+        //* Convert to UTC
+        const utcStart = fromZonedTime(start, timezone);
+        const utcEnd = fromZonedTime(end, timezone);
+
+        const result = await getSentimentsComparisonData(
+            emp!.departmentId,
+            dep as string,
+            emp!.role,
+            utcStart,
+            utcEnd,
+            timezone
+        );
 
         return res.status(200).json({
             message: "Here is Sentiments Comparison Data.",

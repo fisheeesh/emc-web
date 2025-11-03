@@ -1,7 +1,8 @@
 import { eachDayOfInterval, endOfDay, format, startOfDay } from "date-fns";
+import { toZonedTime } from "date-fns-tz";
 import { PrismaClient } from "../../prisma/generated/prisma";
 import { prisma } from "../config/prisma-client";
-import { departmentFilter, roundToHour } from "../utils/helplers";
+import { departmentFilter, roundToHourLocal } from "../utils/helplers";
 import { getSystemSettingsData } from "./system-service";
 
 const prismaClient = new PrismaClient()
@@ -80,9 +81,15 @@ export const getMoodPercentages = async (uDepartmentId: number, qDepartmentId: s
     }
 }
 
-export const getSentimentsComparisonData = async (uDepartmentId: number, qDepartmentId: string, role: string, start: Date, end: Date) => {
+export const getSentimentsComparisonData = async (
+    uDepartmentId: number,
+    qDepartmentId: string,
+    role: string,
+    start: Date,
+    end: Date,
+    timezone: string = 'UTC'
+) => {
     try {
-        //* Get all check-ins based on date-range in emp's depart
         const checkIns = await prismaClient.emotionCheckIn.findMany({
             where: {
                 createdAt: {
@@ -95,58 +102,57 @@ export const getSentimentsComparisonData = async (uDepartmentId: number, qDepart
                 emotionScore: true,
                 createdAt: true
             }
-        })
+        });
 
-        //* Get system settings to compute scores
-        const systemSettings = await getSystemSettingsData()
-
-        //* Set sample output
+        const systemSettings = await getSystemSettingsData();
         const dayMap: Record<
             string,
             { positive: number, neutral: number, negative: number, critical: number }
-        > = {}
+        > = {};
 
         for (const entry of checkIns) {
-            const checkInDate = format(entry.createdAt, "MMM dd");
+            //* Convert to user's timezone
+            const zonedDate = toZonedTime(entry.createdAt, timezone);
+            const checkInDate = format(zonedDate, "MMM dd");
 
-            //* Store them by checkInDate
             if (!dayMap[checkInDate]) {
                 dayMap[checkInDate] = {
                     positive: 0,
                     neutral: 0,
                     negative: 0,
                     critical: 0
-                }
+                };
             }
 
-            const score = Number(entry.emotionScore)
+            const score = Number(entry.emotionScore);
 
-            //* Increase count based on entry's emotionScore
-            if (score >= systemSettings!.positiveMin) dayMap[checkInDate].positive++
-            else if (score >= systemSettings!.neutralMin) dayMap[checkInDate].neutral++
-            else if (score >= systemSettings!.negativeMin) dayMap[checkInDate].negative++
-            else dayMap[checkInDate].critical++
+            if (score >= systemSettings!.positiveMin) dayMap[checkInDate].positive++;
+            else if (score >= systemSettings!.neutralMin) dayMap[checkInDate].neutral++;
+            else if (score >= systemSettings!.negativeMin) dayMap[checkInDate].negative++;
+            else dayMap[checkInDate].critical++;
         }
 
-        //* Also set values to interval days to avoid jump data in the chart
-        const days = eachDayOfInterval({ start, end })
+        //* Generate days in user's timezone
+        const zonedStart = toZonedTime(start, timezone);
+        const zonedEnd = toZonedTime(end, timezone);
+        const days = eachDayOfInterval({ start: zonedStart, end: zonedEnd });
 
         const result = days.map(day => {
-            const key = format(day, "MMM dd")
+            const key = format(day, "MMM dd");
             return {
                 checkInDate: key,
                 positive: dayMap[key]?.positive ?? 0,
                 neutral: dayMap[key]?.neutral ?? 0,
                 negative: dayMap[key]?.negative ?? 0,
                 critical: dayMap[key]?.critical ?? 0
-            }
-        })
+            };
+        });
 
-        return result
+        return result;
     } catch (error) {
-        return error
+        return error;
     }
-}
+};
 
 interface DailyAttendanceData {
     totalEmp: number,
@@ -155,9 +161,15 @@ interface DailyAttendanceData {
     percentages: any
 }
 
-export const getDailyAttendanceData = async (uDepartmentId: number, qDepartmentId: string, role: string, start: Date, end: Date): Promise<DailyAttendanceData> => {
+export const getDailyAttendanceData = async (
+    uDepartmentId: number,
+    qDepartmentId: string,
+    role: string,
+    start: Date,
+    end: Date,
+    timezone: string = 'UTC'
+): Promise<DailyAttendanceData> => {
     try {
-        //* Get all emp from the department
         const totalEmp = await prismaClient.employee.count({
             where: {
                 department: {
@@ -170,9 +182,8 @@ export const getDailyAttendanceData = async (uDepartmentId: number, qDepartmentI
                             ? Number(qDepartmentId)
                             : undefined
             }
-        })
+        });
 
-        //* Get all check-in emps in the department
         const totalPresent = await prismaClient.emotionCheckIn.count({
             where: {
                 createdAt: {
@@ -181,9 +192,8 @@ export const getDailyAttendanceData = async (uDepartmentId: number, qDepartmentI
                 },
                 ...departmentFilter(role, uDepartmentId, qDepartmentId)
             }
-        })
+        });
 
-        //* Get all check-ins made by today
         const checkIns = await prismaClient.emotionCheckIn.findMany({
             where: {
                 createdAt: {
@@ -195,60 +205,61 @@ export const getDailyAttendanceData = async (uDepartmentId: number, qDepartmentI
             select: {
                 createdAt: true
             }
-        })
+        });
 
-        //* Set sample output
-        const dayMap: Record<
-            string, { value: number }
-        > = {}
+        const dayMap: Record<string, { value: number }> = {};
 
         for (const entry of checkIns) {
-            //* Format date
-            const checkInDate = format(entry.createdAt, "MMM dd");
-            //* Check if there is, plus 1, if not set to 1
-            if (!dayMap[checkInDate]) dayMap[checkInDate] = { value: 1 }
-            else dayMap[checkInDate].value++
+            //* Convert UTC to user's timezone
+            const zonedDate = toZonedTime(entry.createdAt, timezone);
+            const checkInDate = format(zonedDate, "MMM dd");
+
+            if (!dayMap[checkInDate]) dayMap[checkInDate] = { value: 1 };
+            else dayMap[checkInDate].value++;
         }
 
-        //? We also want to show the interval days in the chart to avoid jumping data
-        const days = eachDayOfInterval({ start, end })
+        //* Generate days in user's timezone
+        const zonedStart = toZonedTime(start, timezone);
+        const zonedEnd = toZonedTime(end, timezone);
+        const days = eachDayOfInterval({ start: zonedStart, end: zonedEnd });
 
-        //* Loop through each day between start and end and set data. If there is no data, set to 0
         const result = days.map(day => {
-            const key = format(day, "MMM dd")
+            const key = format(day, "MMM dd");
             return {
                 checkInDate: key,
                 value: dayMap[key]?.value ?? 0
-            }
-        })
+            };
+        });
 
-        //* Calculate percentages
-        const percentages = result.map(data => {
-            return {
-                ...data,
-                value: +((data.value / Math.max(totalEmp, 1) * 100)).toFixed(2)
-            }
-        })
+        const percentages = result.map(data => ({
+            ...data,
+            value: +((data.value / Math.max(totalEmp, 1) * 100)).toFixed(2)
+        }));
 
         return {
             totalEmp,
             totalPresent,
             result,
             percentages
-        }
+        };
     } catch (error) {
         return {
             totalEmp: 0,
             totalPresent: 0,
             result: [],
             percentages: []
-        }
+        };
     }
-}
+};
 
-export const getCheckInHoursData = async (uDepartmentId: number, qDepartmentId: string, role: string, durationFilter: any) => {
+export const getCheckInHoursData = async (
+    uDepartmentId: number,
+    qDepartmentId: string,
+    role: string,
+    durationFilter: any,
+    timezone: string = 'UTC'
+) => {
     try {
-        //* Get all check-in made by today
         const checkIns = await prismaClient.emotionCheckIn.findMany({
             where: {
                 createdAt: durationFilter,
@@ -257,33 +268,31 @@ export const getCheckInHoursData = async (uDepartmentId: number, qDepartmentId: 
             select: {
                 createdAt: true
             }
-        })
+        });
 
-        //* Set sample hours data from 00:00 to 23:00
         const hourOrders = Array.from({ length: 24 }, (_, i) => {
-            return `${String(i).padStart(2, '0')}:00`
-        })
-        //* Format data for easier manipulation
-        const counts = new Map(hourOrders.map(h => [h, 0]))
+            return `${String(i).padStart(2, '0')}:00`;
+        });
+
+        const counts = new Map(hourOrders.map(h => [h, 0]));
 
         for (const { createdAt } of checkIns) {
-            //* Round to nearest hour
-            const bucket = roundToHour(createdAt)
-            counts.set(bucket, (counts.get(bucket) || 0) + 1)
+            //* Convert to user's timezone
+            const zonedDate = toZonedTime(createdAt, timezone);
+            const bucket = roundToHourLocal(zonedDate);
+            counts.set(bucket, (counts.get(bucket) || 0) + 1);
         }
 
-        //* Customize desired result
         const result = hourOrders.map(checkInHour => ({
             checkInHour,
             value: counts.get(checkInHour)
-        }))
+        }));
 
-        return result
-
+        return result;
     } catch (error) {
-        console.log(error)
+        console.log(error);
     }
-}
+};
 
 export const getAttendanceOverviewInfiniteData = async (options: any) => {
     try {
