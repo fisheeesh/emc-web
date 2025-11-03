@@ -26,6 +26,7 @@ import { ACC_FILTER, EMOTION_FILTER, JOBS_FILTER, ROLES_FILTER, TSFILTER } from 
 import { getInitialName } from "@/lib/utils";
 import { updateEmpSchema } from "@/lib/validators";
 import useUserStore from "@/store/user-store";
+import moment from "moment";
 import { useState } from "react";
 import { BsEye } from "react-icons/bs";
 import { GrMoreVertical } from "react-icons/gr";
@@ -43,7 +44,7 @@ interface Props {
     hasNextPage: boolean
 }
 
-export default function EmpTables({ data, status, error, isFetchingNextPage, fetchNextPage, hasNextPage }: Props) {
+export default function EmpTable({ data, status, error, isFetchingNextPage, fetchNextPage, hasNextPage }: Props) {
     const { user } = useUserStore()
     const [editingEmp, setEditingEmp] = useState<Employee | null>(null);
     const [viewEmp, setViewEmp] = useState<Employee | null>(null);
@@ -152,7 +153,7 @@ export default function EmpTables({ data, status, error, isFetchingNextPage, fet
                                                     <CustomBadge value={emp.status} />
                                                 </TableCell>
                                                 <TableCell>
-                                                    <span className="whitespace-nowrap font-en">{emp.createdAt}</span>
+                                                    <span className="whitespace-nowrap font-en">{moment(emp.createdAt).format("LL")}</span>
                                                 </TableCell>
                                                 <TableCell>
                                                     <Dialog>

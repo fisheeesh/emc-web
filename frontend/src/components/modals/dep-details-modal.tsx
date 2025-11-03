@@ -2,6 +2,7 @@ import CustomBadge from "@/components/shared/custom-badge";
 import { Button } from "@/components/ui/button";
 import { DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Separator } from "@/components/ui/separator";
+import moment from "moment";
 import { BsBuilding } from "react-icons/bs";
 
 export default function DepartmentDetailsModal({ department }: { department: DepartmentData }) {
@@ -103,7 +104,7 @@ export default function DepartmentDetailsModal({ department }: { department: Dep
                     <Separator />
                     <div className="space-y-2">
                         <h3 className="text-sm font-semibold text-muted-foreground">Created At</h3>
-                        <p className="text-sm font-en">{department.createdAt}</p>
+                        <p className="text-sm font-en">{moment(department.createdAt).format("LL")}</p>
                     </div>
                 </div>
                 <DialogFooter className='py-5 border-t mt-5'>

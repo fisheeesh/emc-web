@@ -41,7 +41,10 @@ export default function CustomCalendar({ popover = true, filterValue }: Props) {
 
         if (newDate) {
             setDate(newDate);
-            searchParams.set(filterValue, newDate.toDateString());
+
+            //? Create a date at midnight in LOCAL timezone, then convert to ISO
+            const localDate = new Date(newDate.getFullYear(), newDate.getMonth(), newDate.getDate());
+            searchParams.set(filterValue, localDate.toISOString());
 
             if (!popover) {
                 searchParams.delete("ciYear");
