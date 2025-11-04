@@ -280,4 +280,10 @@ VITE_API_URL=http://localhost:8080
 
 ---
 
-**Built with ❤️ for creating intuitive, data-driven experiences that empower organizations to support employee well-being through thoughtful design and powerful insights.**
+<div align="center">
+
+**Built with ❤️ by Software Engineering students at Mae Fah Luang University**
+
+*Creating healthier, more empathetic workplaces where every voice matters and every emotion counts.*
+
+</div>
