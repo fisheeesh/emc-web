@@ -295,7 +295,11 @@ This application was developed as a **senior project** at **Mae Fah Luang Univer
 We would like to thank:
 - **ATA IT (Thailand)** for the initial project inspiration and collaboration opportunity
 - **Mae Fah Luang University** for academic guidance and support
-- All contributors and testers who helped shape this system
+- All my team members who helped shape this system to completion:
+  - **Swan Yi Phyo** (Full-Stack Developer/Mobile Developer) - 6531503187
+  - **Kaung Htut Hlaing** (Project Manager/Backend Developer) - 6531503145
+  - **Khun Shine Si Thu** (UI/UX Designer) - 6531503149
+  - **Myat Thu Kyaw** (Front-end Developer) - 6531503159
 
 ---
 
