@@ -197,7 +197,7 @@ export function SummaryCards({ data, isLoading }: Props) {
                                 {data.positiveRate.trend === 'up' ? <IoIosTrendingUp className="size-4" /> : <IoIosTrendingDown className="size-4" />}
                             </div>
                             <div className="text-muted-foreground">
-                                Positive & neutral emotions this month
+                                Positive emotions this month
                             </div>
                         </>
                     )}

@@ -118,24 +118,26 @@ export const getSummaryData = [
             });
 
             //* Check-in Rate -> employees who checked in today vs total active employees
-            const today = new Date();
-            today.setHours(0, 0, 0, 0);
-
+            //* Check-in Rate -> employees who checked in this month vs total active employees
             const totalEmployees = await prisma.employee.count({
                 where: whereClause
             });
 
-            const checkedInToday = await prisma.emotionCheckIn.count({
+            //* This month check-ins
+            const thisMonthCheckIns = await prisma.emotionCheckIn.count({
                 where: {
                     createdAt: {
-                        gte: today
+                        gte: startOfMonth
                     },
                     employee: whereClause
                 }
             });
 
-            const checkInRate = totalEmployees > 0
-                ? (checkedInToday / totalEmployees * 100)
+            //* Calculate days elapsed in current month how many days have passed this month
+            const daysInCurrentMonth = now.getDate();
+
+            const checkInRate = (totalEmployees * daysInCurrentMonth) > 0
+                ? (thisMonthCheckIns / (totalEmployees * daysInCurrentMonth) * 100)
                 : 0;
 
             //? Last month check-in rate
@@ -167,7 +169,7 @@ export const getSummaryData = [
                 ? ((checkInRate - lastMonthCheckInRate) / lastMonthCheckInRate * 100)
                 : 0;
 
-            //* Positive Emotion Rate (emotions >= 0.4 this month)
+            //* Positive Emotion Rate
             const settings = await getSystemSettingsData()
             const thisMonthEmotions = await prisma.emotionCheckIn.groupBy({
                 by: ['emotionScore'],
@@ -272,7 +274,6 @@ export const getEmotions = async (req: CustomRequest, res: Response, next: NextF
         data,
     });
 }
-    ;
 
 export const createEmotion = [
     body("title")
