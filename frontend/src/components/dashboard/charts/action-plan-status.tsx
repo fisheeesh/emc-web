@@ -22,15 +22,15 @@ const chartConfig = {
     },
     pending: {
         label: "Pending",
-        color: "var(--chart-5)",
+        color: "#a855f7",
     },
     approved: {
         label: "Approved",
-        color: "var(--chart-2)",
+        color: "#22c55e",
     },
     rejected: {
         label: "Rejected",
-        color: "var(--chart-1)",
+        color: "#ef4444",
     },
 } satisfies ChartConfig
 
