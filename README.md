@@ -11,6 +11,7 @@
 - [🚀 Get Started](#-get-started)
 - [🐳 Running with Docker](#-running-with-docker)
 - [📚 Documentation](#-documentation)
+- [🎓 Project Background](#-project-background)
 - [⚖️ License](#️-license)
 
 ---
@@ -72,7 +73,8 @@ Experience the Emotion Check-in System in action:
 - **Backend API**: [https://api.emotioncheckinsystem.com](https://api.emotioncheckinsystem.com)
 
 > **Demo Credentials**:
-> - Super Admin: `admin@ata.it.th` / `Admin1234$`
+> - Super Admin: `super-admin@ata.it.th` / `Super1234$`
+> - Admin: `admin@ata.it.th`/ `Admin1234$`
 
 ---
 
@@ -267,10 +269,46 @@ DATABASE_URL="postgresql://your_user:your_password@postgres:5432/your_db"
 
 ---
 
+## 🎓 Project Background
+
+This application was developed as a **senior project** at **Mae Fah Luang University** by the **Software Engineering** department, originally inspired by and in collaboration with **ATA IT (Thailand)**.
+
+### Academic Context
+- **Institution**: Mae Fah Luang University
+- **Department**: Software Engineering
+- **Project Type**: Senior Project
+- **Year**: 2024-2025
+
+### Important Notes
+
+> ⚠️ **Data Privacy & Responsibility**  
+> All privacy inquiries and data subject requests should be directed to **6531503187@lamduan.mfu.ac.th**.  
+> **ATA IT is not responsible** for the operation, data handling, or privacy practices of this application.
+
+> 📧 **Contact Information**  
+> For questions, support, or feedback about this project:
+> - **Email**: 6531503187@lamduan.mfu.ac.th
+> - **Website**: https://emotioncheckinsystem.com
+
+### Acknowledgments
+
+We would like to thank:
+- **ATA IT (Thailand)** for the initial project inspiration and collaboration opportunity
+- **Mae Fah Luang University** for academic guidance and support
+- All contributors and testers who helped shape this system
+
+---
+
 ## ⚖️ License
 
 This project is licensed under the [MIT License](LICENSE).
 
 ---
 
-**Built with ❤️ for creating healthier, more empathetic workplaces where every voice matters and every emotion counts.**
+<div align="center">
+
+**Built with ❤️ by Software Engineering students at Mae Fah Luang University**
+
+*Creating healthier, more empathetic workplaces where every voice matters and every emotion counts.*
+
+</div>

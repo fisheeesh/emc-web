@@ -42,6 +42,7 @@ HR and Super Admin can then use a web dashboard to view overall trends in employ
 - **Daily Check-ins**: Employees submit emotional state with emoji selections and optional notes
 - **Attendance Recording**: Automatic attendance logging with check-in timestamps
 - **Check-in History**: Comprehensive history tracking with infinite scrolling and search capabilities
+- **Profile Management**: Employees can view and update their personal information and avatar
 
 ### AI-Powered Analysis
 - **Emotion Score Calculation**: AI-driven sentiment analysis for accurate emotion scoring
@@ -115,7 +116,6 @@ HR and Super Admin can then use a web dashboard to view overall trends in employ
 ---
 
 ## Folder Structure
-
 ```
 backend/
 ├─ prisma/                                      # Database schema and migrations
@@ -144,7 +144,7 @@ backend/
 │  │  │  ├─ dep-controller.ts                   # Department CRUD operations
 │  │  │  └─ user-management-controller.ts       # User CRUD, bulk CSV import for mass registration
 │  │  └─ user/
-│  │     └─ user-controller.ts                  # Employee daily emotion check-in, personal check-in history
+│  │     └─ user-controller.ts                  # Employee daily emotion check-in, personal check-in history, profile management
 │  │
 │  ├─ jobs/                                     # Background job processing with BullMQ
 │  │  ├─ queues/
@@ -170,7 +170,7 @@ backend/
 │  │     ├─ super-admin/
 │  │     │  └─ super-admin-routes.ts            # Super admin routes for user/department management, system analytics
 │  │     └─ user/
-│  │        └─ user-routes.ts                   # Employee routes for check-in and personal history
+│  │        └─ user-routes.ts                   # Employee routes for check-in, history, and profile management
 │  │
 │  ├─ services/                                 # Business logic layer
 │  │  ├─ action-plan-services.ts                # Action plan business logic: create, update, delete, track completion
@@ -202,7 +202,6 @@ backend/
 ## Environment Variables
 
 Create a `.env` file in the root directory (production values should be set in your hosting environment):
-
 ```env
 NODE_ENV="development"
 PORT="8080"
@@ -241,7 +240,6 @@ DASHBOARD_URL="your-deployed-frontend-url"
 ### CORS Configuration
 
 The application uses a strict whitelist for CORS. Update the whitelist in your code to include your deployed frontend URLs:
-
 ```javascript
 var whitelist = [
     'http://localhost:5173',
@@ -387,6 +385,11 @@ npm run dev:node
 | `/test` | GET | Test endpoint for user access | Yes (Employee/Admin/SuperAdmin) |
 | `/check-in` | POST | Submit daily emotion check-in and attendance | Yes (Employee/Admin/SuperAdmin) |
 | `/my-history` | GET | Get personal check-in history (searchable, infinite scroll) | Yes (Employee/Admin/SuperAdmin) |
+| `/emotion-categories` | GET | Get all available emotion categories with emojis | Yes (Employee/Admin/SuperAdmin) |
+| `/emp-data` | GET | Get current employee profile data (name, email, avatar, etc.) | Yes (Employee/Admin/SuperAdmin) |
+| `/emp-data` | PATCH | Update employee profile information (supports avatar upload) | Yes (Employee/Admin/SuperAdmin) |
+
+> **Note**: The `/emp-data` PATCH endpoint supports multipart/form-data for avatar uploads. Use the field name `avatar` when uploading profile pictures.
 
 > All protected endpoints enforce **auth** middleware.  
 > Admin endpoints enforce **authorize(true, "ADMIN", "SUPERADMIN")**.  
@@ -449,7 +452,6 @@ Ensure all environment variables from `.env` are configured in your hosting plat
 ## Error Response Shape
 
 All API errors follow a consistent response format:
-
 ```json
 {
   "message": "Human-readable error description",
@@ -500,6 +502,19 @@ HR and Super Admins can:
 - **Validation**: Automatic validation and error reporting for bulk imports
 - **Progress Tracking**: Real-time feedback during bulk operations
 
+### Employee Profile Management
+Employees can:
+- View their complete profile information
+- Update personal details (name, contact information)
+- Upload and change profile avatars
+- Manage their account settings
+
 ---
 
-**Built with ❤️ for creating healthier, more empathetic workplaces where every voice matters.**
+<div align="center">
+
+**Built with ❤️ by Software Engineering students at Mae Fah Luang University**
+
+*Creating healthier, more empathetic workplaces where every voice matters and every emotion counts.*
+
+</div>
