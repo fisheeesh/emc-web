@@ -21,16 +21,19 @@ import {
     PopoverTrigger,
 } from "@/components/ui/popover";
 import useCreateActionPlan from "@/hooks/action-plans/use-create-action-plan";
+import useMarkAsCompleted from "@/hooks/action-plans/use-mark-as-completed";
 import useGenerateAIRecommendation from "@/hooks/ai/use-generate-ai-recommendation";
 import { cn } from "@/lib/utils";
 import { actionFormSchema } from "@/lib/validators";
 import useUserStore from "@/store/user-store";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { type MDXEditorMethods } from "@mdxeditor/editor";
-import { AlertTriangle, Calendar as CalendarIcon, CheckCircle2, ChevronDownIcon, Clock, Download, Mail, MessageSquare, Phone, User } from "lucide-react";
+import { AlertTriangle, Calendar as CalendarIcon, CheckCircle2, ChevronDownIcon, Clock, Mail, MessageSquare, Phone, User } from "lucide-react";
+import moment from "moment";
 import React, { useRef } from "react";
 import { useForm, type SubmitHandler } from "react-hook-form";
 import { FaRegThumbsUp } from "react-icons/fa";
+import { GiGlassCelebration } from "react-icons/gi";
 import { LiaBrainSolid } from "react-icons/lia";
 import { MdAdminPanelSettings, MdEventNote, MdFlag } from "react-icons/md";
 import { toast } from "sonner";
@@ -42,9 +45,6 @@ import Spinner from "../shared/spinner";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
-import useMarkAsCompleted from "@/hooks/action-plans/use-mark-as-completed";
-import { GiGlassCelebration } from "react-icons/gi";
-import moment from "moment";
 
 type QuickAction = {
     name: string;
@@ -157,24 +157,14 @@ export default function ActionModal({ employee, action, onClose }: Props) {
         return (
             <DialogContent className="w-full mx-auto max-h-[95vh] overflow-visible sm:max-w-[1200px] lg:px-8">
                 <div className="max-h-[calc(90vh-2rem)] overflow-y-auto no-scrollbar">
-                    <DialogHeader className="flex flex-col md:flex-row items-start justify-between space-y-0 pb-5 border-b">
-                        <div className="space-y-1.5">
-                            <DialogTitle className="text-lg md:text-xl font-bold flex items-center gap-2">
-                                <CheckCircle2 className="text-green-600 size-5 md:size-7" />
-                                Action Plan Details - {employee?.name || 'Employee'}
-                            </DialogTitle>
-                            <DialogDescription className="text-xs md:text-sm text-start">
-                                View the action plan created for this employee's wellbeing support.
-                            </DialogDescription>
-                        </div>
-                        <Button
-                            variant="outline"
-                            size="icon"
-                            className="cursor-pointer shrink-0 mr-5"
-                            onClick={() => toast.success("SYP's TODO", { description: "Will implement this later on" })}
-                        >
-                            <Download className="h-4 w-4" />
-                        </Button>
+                    <DialogHeader className="pb-5 border-b space-y-1.5">
+                        <DialogTitle className="text-lg md:text-xl font-bold flex items-center gap-2">
+                            <CheckCircle2 className="text-green-600 size-5 md:size-7" />
+                            Action Plan Details - {employee?.name || 'Employee'}
+                        </DialogTitle>
+                        <DialogDescription className="text-xs md:text-sm text-start">
+                            View the action plan created for this employee's wellbeing support.
+                        </DialogDescription>
                     </DialogHeader>
 
                     <div className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-950/30 dark:to-indigo-950/30 border border-blue-200 dark:border-blue-800 rounded-lg p-4 mt-4">

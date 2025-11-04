@@ -39,7 +39,7 @@ export const COMMON_DATAS: CommonData[] = [
 
 export const OVERVIEW_FILTER = [
     { name: 'Today', value: '1' },
-    { name: 'This Week', value: '7' },
+    { name: 'Last 7 days', value: '7' },
     { name: 'This Month', value: '30' },
 ]
 
@@ -81,7 +81,7 @@ export const ROLES_FILTER = [
 export const ACC_FILTER = [
     { name: "All Acc. Types", value: "all" },
     { name: "Active", value: "ACTIVE" },
-    { name: "FREEZE", value: "FREEZE" }
+    { name: "Freeze", value: "FREEZE" }
 ]
 
 export const JOBS_FILTER = [

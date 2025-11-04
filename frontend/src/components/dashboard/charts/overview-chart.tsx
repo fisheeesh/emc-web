@@ -50,6 +50,7 @@ export default function OverViewChart({ percentages }: Props) {
                     filterValue="duration"
                     filters={OVERVIEW_FILTER}
                     otherClasses="min-h-[44px] sm:min-w-[90px]"
+                    font="font-en"
                 />
             </CardHeader>
             {

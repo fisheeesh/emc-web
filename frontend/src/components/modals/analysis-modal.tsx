@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
+import queryClient from "@/api/query";
 import {
     DialogContent,
     DialogDescription,
@@ -6,15 +7,14 @@ import {
     DialogTitle
 } from "@/components/ui/dialog";
 import useGenerateAIAnalysis from "@/hooks/ai/use-generate-ai-analysis";
+import useRegenerateAIAnalysis from "@/hooks/ai/use-regenerate-ai-analysis";
 import { DialogClose } from "@radix-ui/react-dialog";
-import { Download, Loader2 } from "lucide-react";
+import { Loader2 } from "lucide-react";
 import { useState } from "react";
 import { IoSparklesOutline } from "react-icons/io5";
 import { RiRefreshLine } from "react-icons/ri";
 import { toast } from "sonner";
 import { Button } from "../ui/button";
-import useRegenerateAIAnalysis from "@/hooks/ai/use-regenerate-ai-analysis";
-import queryClient from "@/api/query";
 
 interface Props {
     analysis?: Analysis;
@@ -208,24 +208,14 @@ export default function AIAnalysisModal({ analysis: initialAnalysis, empName, cr
                 </div>
             ) : (
                 <>
-                    <DialogHeader className="flex flex-col md:flex-row items-start justify-between space-y-0 pb-4 border-b">
-                        <div className="space-y-1.5">
-                            <DialogTitle className="flex items-center gap-2 text-xl font-bold">
-                                <IoSparklesOutline className="text-xl text-pink-400" />
-                                AI-Powered Weekly Emotional Analysis
-                            </DialogTitle>
-                            <DialogDescription className="line-clamp-1 text-start">
-                                Summary of {empName}'s emotional state across the week
-                            </DialogDescription>
-                        </div>
-                        <Button
-                            variant="outline"
-                            size="icon"
-                            className="cursor-pointer shrink-0 mr-5"
-                            onClick={() => toast.success("SYP's TODO", { description: "Will implement this later on." })}
-                        >
-                            <Download className="h-4 w-4" />
-                        </Button>
+                    <DialogHeader className="pb-4 border-b space-y-1.5">
+                        <DialogTitle className="flex items-center gap-2 text-xl font-bold">
+                            <IoSparklesOutline className="text-xl text-pink-400" />
+                            AI-Powered Weekly Emotional Analysis
+                        </DialogTitle>
+                        <DialogDescription className="line-clamp-1 text-start">
+                            Summary of {empName}'s emotional state across the week
+                        </DialogDescription>
                     </DialogHeader>
 
                     <div id="analysis" className="space-y-6 mt-4 font-en">

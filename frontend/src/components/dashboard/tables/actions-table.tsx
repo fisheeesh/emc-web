@@ -18,9 +18,7 @@ import { useState } from "react";
 import { FaListCheck } from "react-icons/fa6";
 import { GoFileSymlinkFile } from "react-icons/go";
 import { GrMoreVertical } from "react-icons/gr";
-import { ImFilePdf } from "react-icons/im";
 import { RiDeleteBin5Line } from "react-icons/ri";
-import { toast } from "sonner";
 
 interface Props {
     data: ActionPlan[]
@@ -150,17 +148,6 @@ export default function ActionsTable({ data, status, error, isFetchingNextPage, 
                                                                         >
                                                                             <FaListCheck className="text-black dark:text-white" />
                                                                             Check Details
-                                                                        </Button>
-                                                                    </DropdownMenuItem>
-                                                                    <DropdownMenuItem asChild className="cursor-pointer">
-                                                                        <Button
-                                                                            onClick={() => toast.success("SYP's TODO", { description: "Will implement this later on." })}
-                                                                            size='icon'
-                                                                            variant='ghost'
-                                                                            className="w-full cursor-pointer flex justify-start gap-2 px-1.5"
-                                                                        >
-                                                                            <ImFilePdf className="text-black dark:text-white" />
-                                                                            Export PDF
                                                                         </Button>
                                                                     </DropdownMenuItem>
                                                                     <DropdownMenuItem asChild className="cursor-pointer">
