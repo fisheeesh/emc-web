@@ -157,10 +157,10 @@ export const deleteNotification = [
             code: errorCodes.notFound
         }))
 
-        if (notification.departmentId !== emp?.departmentId) return next(createHttpErrors({
+        if (notification.departmentId !== emp?.departmentId && emp!.role !== 'SUPERADMIN') return next(createHttpErrors({
             message: "You are not allowed to delete another department's notification",
-            status: 401,
-            code: errorCodes.unauthorized
+            status: 403,
+            code: errorCodes.forbidden
         }))
 
         await prisma.notification.delete({

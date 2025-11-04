@@ -96,7 +96,7 @@ export const emotionCheckIn = [
         }
 
         const trackWindow = systemSettings!.watchlistTrackMin;
-        const previousScores = emp!.checkIns.slice(0, trackWindow - 1).map(e => +e.emotionScore);
+        const previousScores = emp!.checkIns.slice(0, trackWindow).map(e => +e.emotionScore);
         const recentScoresWithCurrent = [+score!, ...previousScores];
 
         const isValid = recentScoresWithCurrent.every(s => s >= systemSettings!.neutralMin);

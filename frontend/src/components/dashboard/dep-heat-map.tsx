@@ -46,7 +46,7 @@ export function DepartmentHeatmap({ depHeatmapData }: { depHeatmapData: DepHeatM
                     Departments Wellbeing Heatmap
                 </CardTitle>
                 <CardDescription>
-                    Real-time wellbeing status across all departments based on the last <span className="font-en">3</span> months of data
+                    Real-time wellbeing status across all departments based on continuous monitoring
                 </CardDescription>
             </CardHeader>
             <CardContent>
@@ -129,7 +129,7 @@ export function DepartmentHeatmap({ depHeatmapData }: { depHeatmapData: DepHeatM
                     <div className="flex items-center gap-1">
                         <div className="w-3 h-3 rounded-full bg-red-500"></div>
                         <span className="text-gray-600 dark:text-gray-400 flex items-center gap-1">
-                            Critical <span className="font-en flex items-center gap-1">({settings.criticalMin}.0 <GoArrowBoth /> {settings.criticalMax})</span></span>
+                            Critical <span className="font-en flex items-center gap-1">({settings.criticalMin}.0 <GoArrowBoth /> {settings.criticalMax}.0)</span></span>
                     </div>
                 </div>
             </CardContent>

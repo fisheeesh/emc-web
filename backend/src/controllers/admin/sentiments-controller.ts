@@ -480,7 +480,7 @@ export const deleteCriticalEmpById = [
             code: errorCodes.notFound
         }))
 
-        if (emp?.departmentId !== cEmp.employee.departmentId) return next(createHttpErrors({
+        if (emp?.departmentId !== cEmp.employee.departmentId && emp!.role !== 'SUPERADMIN') return next(createHttpErrors({
             message: "You are not allowed to delete critical employee's information from other department.",
             status: 403,
             code: errorCodes.forbidden
@@ -632,7 +632,7 @@ export const deleteWatchlistEmpById = [
             code: errorCodes.notFound
         }))
 
-        if (emp?.departmentId !== wEmp.departmentId) return next(createHttpErrors({
+        if (emp?.departmentId !== wEmp.departmentId && emp!.role !== 'SUPERADMIN') return next(createHttpErrors({
             message: "You are not allowed to delete watchlist employee's information from other department.",
             status: 403,
             code: errorCodes.forbidden

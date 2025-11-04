@@ -193,7 +193,7 @@ export default function EditSystemSettingsModal({ data, onClose }: EditSystemSet
                                 <FormDescription className="text-xs">
                                     Number of days to track employees on watchlist <span className="font-en">(14 to 365)</span>
                                 </FormDescription>
-                                <FormMessage />
+                                <FormMessage className="font-en" />
                             </FormItem>
                         )}
                     />

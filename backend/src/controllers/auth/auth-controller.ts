@@ -455,7 +455,7 @@ export const login = [
                 await updateEmployeeData(employee!.id, employeeData)
             } else {
                 //* If password is wrong for 3 times -> freeze the account *might attack*
-                if (employee!.errorLoginCount >= 3) {
+                if (employee!.errorLoginCount >= 2) {
                     const employeeData = {
                         accType: 'FREEZE'
                     }
