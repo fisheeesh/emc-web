@@ -25,7 +25,7 @@ export const invalidateDepQueries = async () => {
 
 export const invalidateActionPlanQueries = async () => {
     await Promise.all([
-        queryClient.invalidateQueries({ queryKey: ["critical", "infinite"], exact: false }),
+        queryClient.invalidateQueries({ queryKey: ["action-plans", "infinite"], exact: false }),
         queryClient.invalidateQueries({ queryKey: ['summary'], exact: false }),
     ])
 }

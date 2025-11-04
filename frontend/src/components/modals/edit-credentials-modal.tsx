@@ -179,7 +179,7 @@ export default function EditCredentialsModal({ user, onClose }: EditCredentialsM
                                         <FormLabel>Email Address</FormLabel>
                                         <FormControl>
                                             <Input
-                                                className="min-h-[44px] placeholder:font-raleway font-en"
+                                                className="min-h-[44px] font-en"
                                                 type="email"
                                                 placeholder={user.email}
                                                 disabled={editType !== "email" || editingCredentials}
