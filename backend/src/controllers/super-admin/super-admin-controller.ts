@@ -165,9 +165,7 @@ export const getSummaryData = [
                 ? (lastMonthCheckIns / (lastMonthEmployees * lastMonthDays) * 100)
                 : 0;
 
-            const checkInRateChange = lastMonthCheckInRate > 0
-                ? ((checkInRate - lastMonthCheckInRate) / lastMonthCheckInRate * 100)
-                : 0;
+            const checkInRateChange = Number((checkInRate - lastMonthCheckInRate).toFixed(1));
 
             //* Positive Emotion Rate
             const settings = await getSystemSettingsData()
@@ -234,7 +232,7 @@ export const getSummaryData = [
                     },
                     checkInRate: {
                         rate: Number(checkInRate.toFixed(1)),
-                        change: Number(checkInRateChange.toFixed(1)),
+                        change: checkInRateChange,
                         trend: checkInRateChange >= 0 ? 'up' : 'down'
                     },
                     positiveRate: {
