@@ -105,14 +105,14 @@ export const emotionCheckIn = [
         const allRecentScores = [+score!, ...emp!.checkIns.map(e => +e.emotionScore)];
         const currentStreak = calculatePositiveStreak(allRecentScores, systemSettings!.positiveMin);
 
-        const sureCritical = recentScoresWithCurrent.length >= 5 && recentScoresWithCurrent.slice(0, 5).every(s => s >= systemSettings!.criticalMin)
+        const sureCritical = recentScoresWithCurrent.length >= 5 && recentScoresWithCurrent.slice(0, 5).every(s => s <= systemSettings!.criticalMin)
 
         //* Calculate avgScore upfront
         const newEmotionSum = +emp!.emotionSum + score!;
         const newEmotionCount = emp!.emotionCount + 1;
         const avgScore = newEmotionSum / newEmotionCount;
         const isRecovered = emp!.status === Status.WATCHLIST && isValid
-        const isNewCritical = avgScore >= systemSettings!.criticalMin && sureCritical && emp!.status !== Status.CRITICAL && emp!.status !== Status.WATCHLIST
+        const isNewCritical = avgScore <= systemSettings!.criticalMin && sureCritical && emp!.status !== Status.CRITICAL && emp!.status !== Status.WATCHLIST
 
         //* Update longestStreak if current is better
         const newLongestStreak = Math.max(emp!.longestStreak || 0, currentStreak);
