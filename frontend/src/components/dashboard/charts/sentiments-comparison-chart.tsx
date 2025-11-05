@@ -76,7 +76,7 @@ export default function SentimentsComparisonChart({ data }: Props) {
                 },
                 ticks: {
                     padding: 10,
-                    stepSize: 2,
+                    stepSize: 4,
                     font: { size: 11, weight: "bold" },
                     color: `${theme === 'dark' ? '#cbd5e1' : ''}`,
                 },

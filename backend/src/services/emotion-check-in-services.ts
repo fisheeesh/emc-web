@@ -22,64 +22,56 @@ export const createEmotionCheckIn = async (emotion: any) => {
     })
 }
 
-export const getMoodPercentages = async (uDepartmentId: number, qDepartmentId: string, role: string, durationFilter: any) => {
+export const getMoodPercentages = async (
+    uDepartmentId: number,
+    qDepartmentId: string,
+    role: string,
+    durationFilter: any
+) => {
     try {
-        //* Get the most recent check-in for each employee in the duration period
-        const recentCheckIns = await prismaClient.emotionCheckIn.findMany({
+        //* Get ALL check-ins in the duration period
+        const checkIns = await prismaClient.emotionCheckIn.findMany({
             where: {
                 ...departmentFilter(role, uDepartmentId, qDepartmentId),
                 createdAt: durationFilter,
             },
-            orderBy: {
-                createdAt: 'desc'
-            },
             select: {
-                employeeId: true,
-                emotionScore: true
+                emotionScore: true,
             }
-        })
-
-        //* Count total employees in the department
-        const totalEmp = await prismaClient.employee.count({
-            where: {
-                departmentId:
-                    role !== 'SUPERADMIN'
-                        ? uDepartmentId
-                        : qDepartmentId && qDepartmentId !== 'all'
-                            ? Number(qDepartmentId)
-                            : undefined
-            }
-        })
+        });
 
         //* Get system settings to compute scores
-        const systemSettings = await getSystemSettingsData()
+        const systemSettings = await getSystemSettingsData();
 
         let posi = 0, neu = 0, nega = 0, crit = 0;
 
-        for (const row of recentCheckIns) {
-            const score = Number(row.emotionScore) ?? 0
+        //* Count All check-ins in the period
+        for (const checkIn of checkIns) {
+            const score = Number(checkIn.emotionScore);
 
-            if (score >= systemSettings!.positiveMin) posi++
-            else if (score >= systemSettings!.neutralMin) neu++
-            else if (score >= systemSettings!.negativeMin) nega++
-            else crit++
+            if (score >= systemSettings!.positiveMin) posi++;
+            else if (score >= systemSettings!.neutralMin) neu++;
+            else if (score >= systemSettings!.negativeMin) nega++;
+            else crit++;
         }
 
-        const denom = Math.max(totalEmp, 1)
+        //* Use total check-ins as denominator
+        const totalCheckIns = checkIns.length;
+        const denom = Math.max(totalCheckIns, 1);
 
-        //*  Make sure the final result is an array of numbers instead of strings. Since .toFixed() returns a string
+        //* Calculate percentages (should sum to 100%)
         const percentages = [
             ((posi / denom) * 100).toFixed(2),
             ((neu / denom) * 100).toFixed(2),
             ((nega / denom) * 100).toFixed(2),
             ((crit / denom) * 100).toFixed(2),
-        ].map(Number)
+        ].map(Number);
 
-        return percentages
+        return percentages;
     } catch (error) {
-        return error
+        return error;
     }
-}
+};
 
 export const getSentimentsComparisonData = async (
     uDepartmentId: number,
