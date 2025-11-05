@@ -417,7 +417,7 @@ export const request_body = (cEmpName: string, adminName: string, depName: strin
                 
                 <p style="color: #6b7280; margin: 20px 0;">Please review and approve this action plan to begin employee support intervention.</p>
                 
-                <a href="${dashboardLink}}/dashboard/managements" style="display: inline-block; background: #2563eb; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; margin: 20px 0;">Review Action Plan</a>
+                <a href="${dashboardLink}/dashboard/managements" style="display: inline-block; background: #2563eb; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; margin: 20px 0;">Review Action Plan</a>
                 
                 <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 30px 0;">
                 
