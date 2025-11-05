@@ -162,7 +162,7 @@ interface ActionPlan {
         employee: {
             fullName: string,
         },
-        resovledAt: string
+        resolvedAt: string
     },
     contact: string,
     priority: string,

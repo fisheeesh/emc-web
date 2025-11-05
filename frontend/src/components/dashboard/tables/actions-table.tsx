@@ -127,7 +127,7 @@ export default function ActionsTable({ data, status, error, isFetchingNextPage, 
                                                     <span className="whitespace-nowrap font-en">{moment(action.dueDate).format("LL")}</span>
                                                 </TableCell>
                                                 <TableCell>
-                                                    <span className="whitespace-nowrap font-en">{action.criticalEmployee.resovledAt ? moment(action.criticalEmployee.resovledAt).format("LL") : '—'}</span>
+                                                    <span className="whitespace-nowrap font-en">{action.criticalEmployee.resolvedAt ? moment(action.criticalEmployee.resolvedAt).format("LL") : '—'}</span>
                                                 </TableCell>
                                                 <TableCell>
                                                     <Dialog>

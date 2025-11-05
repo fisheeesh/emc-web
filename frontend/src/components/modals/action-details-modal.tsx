@@ -109,7 +109,7 @@ export default function ActionDetailsModal({ action, onClose }: { action: Action
                             <MdOutlineMailOutline className="text-purple-600" size={18} />
                             <h4 className="font-semibold text-sm text-gray-700 dark:text-gray-300">Contact</h4>
                         </div>
-                        <p className="text-sm text-gray-600 dark:text-gray-400">{action.contact}</p>
+                        <p className="text-sm text-gray-600 dark:text-gray-400 font-en">{action.contact}</p>
                     </div>
 
                     <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4 shadow-sm">
