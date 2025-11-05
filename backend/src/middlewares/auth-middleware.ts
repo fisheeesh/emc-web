@@ -3,7 +3,7 @@ import { errorCodes } from "../config/error-codes";
 import { createHttpErrors } from "../utils/check";
 
 import jwt from 'jsonwebtoken';
-import { getEmployeeById } from "../services/auth-services";
+import { getEmployeeById, updateEmployeeData } from "../services/auth-services";
 import { cookieConfig } from "../config/cookies.config";
 
 interface CustomRequest extends Request {
@@ -73,13 +73,15 @@ export const auth = async (req: CustomRequest, res: Response, next: NextFunction
             { expiresIn: 60 * 60 * 24 * 30 }
         )
 
+        await updateEmployeeData(employee.id, { rndToken: newRefreshToken })
+
         if (platform === "mobile") {
             //* return JSON tokens to mobile
             res.setHeader("x-access-token", newAccessToken);
             res.setHeader("x-refresh-token", newRefreshToken);
         } else {
-            res.cookie("accessToken", accessToken, cookieConfig.accessToken)
-                .cookie("refreshToken", refreshToken, cookieConfig.refreshToken)
+            res.cookie("accessToken", newAccessToken, cookieConfig.accessToken)
+                .cookie("refreshToken", newRefreshToken, cookieConfig.refreshToken)
         }
 
         console.log("rotation done")
