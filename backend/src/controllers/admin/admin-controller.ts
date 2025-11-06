@@ -9,6 +9,8 @@ import { getAllDepartmentsData, getEmployeeEmails } from "../../services/system-
 import { checkEmployeeIfNotExits, checkUploadFile, createHttpErrors } from "../../utils/check";
 import { removeFilesMultiple } from "../../utils/helplers";
 import { NotiStatus } from "../../../prisma/generated/prisma";
+import axios from 'axios';
+import fs from 'fs';
 
 /**
  * @TODO: if all the emotion thredsolds will be changed...
@@ -215,13 +217,47 @@ export const makeAnnouncement = [
             code: errorCodes.invalid
         }))
 
-        const attachments = req.files && req.files.length > 0
-            ? (req.files as Express.Multer.File[]).map(file => ({
-                filename: file.originalname,
-                path: file.path,
-                contentType: file.mimetype
-            }))
-            : undefined;
+        let attachments: Array<{ filename: string; content: string }> | undefined;
+
+        if (req.files && req.files.length > 0) {
+            const files = req.files as Express.Multer.File[];
+
+            //* Read files and convert to base64 immediately
+            attachments = await Promise.all(files.map(async (file) => {
+                let base64Content: string;
+
+                //* Check if path is a URL (Cloudinary) or local file path
+                if (file.path.startsWith('http://') || file.path.startsWith('https://')) {
+                    //* Download from Cloudinary URL
+                    try {
+                        const response = await axios.get(file.path, {
+                            responseType: 'arraybuffer'
+                        });
+                        base64Content = Buffer.from(response.data).toString('base64');
+                    } catch (error) {
+                        console.error(`Failed to download attachment: ${file.path}`, error);
+                        throw error;
+                    }
+                } else {
+                    //* Read local file
+                    const fileBuffer = fs.readFileSync(file.path);
+                    base64Content = fileBuffer.toString('base64');
+
+                    //* Delete local file immediately after reading
+                    try {
+                        fs.unlinkSync(file.path);
+                        console.log(`Deleted local file: ${file.path}`);
+                    } catch (err) {
+                        console.error(`Failed to delete local file: ${file.path}`, err);
+                    }
+                }
+
+                return {
+                    filename: file.originalname,
+                    content: base64Content
+                };
+            }));
+        }
 
         await EmailQueue.add("announcement-email", {
             customName: `${emp!.fullName} | ${emp!.department.name}`,
