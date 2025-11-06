@@ -2,6 +2,14 @@ import { Request } from "express";
 import multer, { FileFilterCallback } from "multer";
 import { CloudinaryStorage } from "multer-storage-cloudinary";
 import cloudinary from "../config/cloudinary";
+import path from "path";
+import fs from "fs";
+
+//* Ensure uploads directory exists
+const uploadsDir = path.join(process.cwd(), 'uploads', 'attachments');
+if (!fs.existsSync(uploadsDir)) {
+    fs.mkdirSync(uploadsDir, { recursive: true });
+}
 
 //* Image file filter
 const fileFilter = (req: Request, file: Express.Multer.File, cb: FileFilterCallback) => {
@@ -83,8 +91,21 @@ const attachmentFileFilter = (req: Request, file: Express.Multer.File, cb: FileF
     }
 };
 
-//* Cloudinary storage for attachments
-const attachmentStorage = new CloudinaryStorage({
+//* Local disk storage for attachments (development)
+const localAttachmentStorage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        cb(null, uploadsDir);
+    },
+    filename: (req, file, cb) => {
+        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+        const originalName = file.originalname.split('.').slice(0, -1).join('.');
+        const extension = path.extname(file.originalname);
+        cb(null, `${originalName}-${uniqueSuffix}${extension}`);
+    }
+});
+
+//* Cloudinary storage for attachments (production)
+const cloudinaryAttachmentStorage = new CloudinaryStorage({
     cloudinary: cloudinary,
     params: {
         folder: 'employees/attachments',
@@ -97,6 +118,10 @@ const attachmentStorage = new CloudinaryStorage({
         }
     } as any
 });
+
+//* Choose storage based on environment
+const isProduction = process.env.NODE_ENV === 'production';
+const attachmentStorage = isProduction ? cloudinaryAttachmentStorage : localAttachmentStorage;
 
 //* Multer configuration for email attachments
 export const uploadAttachments = multer({

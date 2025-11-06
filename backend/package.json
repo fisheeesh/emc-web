@@ -42,6 +42,7 @@
     "@types/node-cron": "^3.0.11",
     "@types/sanitize-html": "^2.16.0",
     "ai": "^5.0.26",
+    "axios": "^1.13.2",
     "bcrypt": "^6.0.0",
     "bullmq": "^5.58.2",
     "cloudinary": "^1.41.3",
