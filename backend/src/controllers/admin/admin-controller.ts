@@ -11,6 +11,7 @@ import { removeFilesMultiple } from "../../utils/helplers";
 import { NotiStatus } from "../../../prisma/generated/prisma";
 import axios from 'axios';
 import fs from 'fs';
+import cloudinary from "../../config/cloudinary";
 
 /**
  * @TODO: if all the emotion thredsolds will be changed...
@@ -220,26 +221,55 @@ export const makeAnnouncement = [
         let attachments: Array<{ filename: string; content: string }> | undefined;
 
         if (req.files && req.files.length > 0) {
-            const files = req.files as Express.Multer.File[];
+            const files = req.files as any[];
 
             //* Read files and convert to base64 immediately
             attachments = await Promise.all(files.map(async (file) => {
                 let base64Content: string;
 
-                //* Check if path is a URL (Cloudinary) or local file path
+                //* Check if file has Cloudinary metadata (production)
                 if (file.path.startsWith('http://') || file.path.startsWith('https://')) {
-                    //* Download from Cloudinary URL
                     try {
-                        const response = await axios.get(file.path, {
-                            responseType: 'arraybuffer'
+                        //* Option 1: Try to use public_id from multer-storage-cloudinary
+                        const publicId = file.filename;
+
+                        console.log(`Attempting to download Cloudinary file with public_id: ${publicId}`);
+
+                        //* Use Cloudinary Admin API to get the resource as base64
+                        const result = await cloudinary.api.resource(publicId, {
+                            resource_type: 'raw',
+                            type: 'upload'
                         });
+
+                        //* Download the secure_url with authentication
+                        const response = await axios.get(result.secure_url, {
+                            responseType: 'arraybuffer',
+                            headers: {
+                                'User-Agent': 'Mozilla/5.0'
+                            },
+                            timeout: 30000
+                        });
+
                         base64Content = Buffer.from(response.data).toString('base64');
-                    } catch (error) {
-                        console.error(`Failed to download attachment: ${file.path}`, error);
-                        throw error;
+                        console.log(`Successfully downloaded from Cloudinary: ${file.originalname}`);
+                    } catch (error: any) {
+                        console.error(`Failed to download attachment: ${file.path}`, error.message);
+
+                        //* If all else fails, try direct axios download (will fail if ACL restricted)
+                        try {
+                            const response = await axios.get(file.path, {
+                                responseType: 'arraybuffer',
+                                timeout: 30000
+                            });
+                            base64Content = Buffer.from(response.data).toString('base64');
+                            console.log(`Downloaded via direct URL: ${file.originalname}`);
+                        } catch (directError) {
+                            console.error(`All download attempts failed for: ${file.path}`);
+                            throw new Error(`Unable to download attachment ${file.originalname}. Please check Cloudinary permissions.`);
+                        }
                     }
                 } else {
-                    //* Read local file
+                    //* Read local file (development)
                     const fileBuffer = fs.readFileSync(file.path);
                     base64Content = fileBuffer.toString('base64');
 
