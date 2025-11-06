@@ -90,7 +90,7 @@ export const createNewEmployee = [
             }
             return true
         }),
-    body("department", "Department is required.").trim().notEmpty().escape(),
+    body("department", "Department is required.").trim().notEmpty(),
     body("country", "Country is required.").trim().notEmpty().escape(),
     body("birthdate", "Birth Date is required.").trim().notEmpty().escape(),
     async (req: CustomRequest, res: Response, next: NextFunction) => {
@@ -319,7 +319,7 @@ export const updateEmployeeInformation = [
             }
             return true
         }),
-    body("department", "Department is required.").trim().notEmpty().escape(),
+    body("department", "Department is required.").trim().notEmpty(),
     body("country", "Country is required.").trim().notEmpty().escape(),
     body("birthdate", "Birth Date is required.").trim().notEmpty().escape(),
     async (req: CustomRequest, res: Response, next: NextFunction) => {
