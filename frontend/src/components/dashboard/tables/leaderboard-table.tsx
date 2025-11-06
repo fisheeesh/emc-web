@@ -23,6 +23,8 @@ export default function LeaderBoardTable({ data, isLoading }: Props) {
     const top3 = data.slice(0, 3);
     const remaining = data.slice(3);
 
+    //? Only reorder for podium display when we have exactly 3 employees
+    //? For less than 3, keep them in rank order
     const podiumOrder = top3.length === 3 ? [top3[1], top3[0], top3[2]] : top3;
 
     const getMedalImage = (rank: number) => {
@@ -32,10 +34,10 @@ export default function LeaderBoardTable({ data, isLoading }: Props) {
         return "";
     };
 
-    const getPodiumImage = (index: number) => {
-        if (index === 2) return second;
-        if (index === 1) return first;
-        if (index === 3) return third;
+    const getPodiumImage = (rank: number) => {
+        if (rank === 2) return second;
+        if (rank === 1) return first;
+        if (rank === 3) return third;
         return "";
     };
 
@@ -132,9 +134,8 @@ export default function LeaderBoardTable({ data, isLoading }: Props) {
                         <div className="w-full col-span-1 lg:col-span-2">
                             <div className="p-4 sm:p-6">
                                 <div className="flex items-end justify-center">
-                                    {podiumOrder.map((emp, index) => {
-                                        const isFirst = index === 1;
-                                        const podiumNumber = index === 0 ? "2" : index === 1 ? "1" : "3";
+                                    {podiumOrder.map((emp) => {
+                                        const isFirst = emp.rank === 1;
 
                                         return (
                                             <div
@@ -148,8 +149,8 @@ export default function LeaderBoardTable({ data, isLoading }: Props) {
                                                     <Avatar className={`${isFirst
                                                         ? 'size-12 md:size-14 lg:size-16'
                                                         : 'size-10 md:size-12 lg:size-14'
-                                                        } border-2 sm:border-3 ${index === 0 ? 'border-gray-400' :
-                                                            index === 1 ? 'border-yellow-400' :
+                                                        } border-2 sm:border-3 ${emp.rank === 2 ? 'border-gray-400' :
+                                                            emp.rank === 1 ? 'border-yellow-400' :
                                                                 'border-amber-600'
                                                         } shadow-xl`}>
                                                         <AvatarImage src={emp.avatar} alt={emp.fullName} />
@@ -191,7 +192,7 @@ export default function LeaderBoardTable({ data, isLoading }: Props) {
                                                             ? 'text-3xl sm:text-4xl md:text-5xl lg:text-6xl'
                                                             : 'text-2xl sm:text-3xl md:text-4xl lg:text-5xl'
                                                             }`}>
-                                                            {podiumNumber}
+                                                            {emp.rank}
                                                         </span>
                                                     </div>
                                                 </div>
