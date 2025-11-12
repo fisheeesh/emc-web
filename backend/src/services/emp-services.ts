@@ -192,10 +192,10 @@ export const getEmployeesInfiniteData = async (options: any, status: string) => 
             checkInTimes.sort((a, b) => a.getTime() - b.getTime());
 
             //* Earliest check-in
-            earliestCheckIn = format(checkInTimes[0], 'h:mm a');
+            earliestCheckIn = format(checkInTimes[checkInTimes.length - 1], 'h:mm a');
 
             //* Latest check-in
-            latestCheckIn = format(checkInTimes[checkInTimes.length - 1], 'h:mm a');
+            latestCheckIn = format(checkInTimes[0], 'h:mm a');
 
             //* Average check-in time
             const totalMinutes = checkInTimes.reduce((sum, time) => {
