@@ -28,7 +28,7 @@ import { actionFormSchema } from "@/lib/validators";
 import useUserStore from "@/store/user-store";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { type MDXEditorMethods } from "@mdxeditor/editor";
-import { AlertTriangle, Calendar as CalendarIcon, CheckCircle2, ChevronDownIcon, Clock, Mail, MessageSquare, Phone, User } from "lucide-react";
+import { AlertTriangle, Calendar as CalendarIcon, CheckCircle2, ChevronDownIcon, Clock, FileText, MessageSquare, Phone, User, UserPlus } from "lucide-react";
 import moment from "moment";
 import React, { useRef } from "react";
 import { useForm, type SubmitHandler } from "react-hook-form";
@@ -54,9 +54,9 @@ type QuickAction = {
 
 const QUICK_ACTIONS: QuickAction[] = [
     { name: "Schedule one-on-one Call", value: "Schedule 1-on-1 Call", icon: <Phone size={18} /> },
-    { name: "Send Check-in Email", value: "Send Check-in Email", icon: <Mail size={18} /> },
-    { name: "Book HR Meeting", value: "Book HR Meeting", icon: <CalendarIcon size={18} /> },
     { name: "Send Supportive Message", value: "Send Supportive Message", icon: <MessageSquare size={18} /> },
+    { name: "Assign Peer Support Buddy", value: "Assign Peer Support Buddy", icon: <UserPlus size={18} /> },
+    { name: "Create Support Plan", value: "Create Support Plan", icon: <FileText size={18} /> },
 ]
 
 interface Props {
