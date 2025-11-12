@@ -188,7 +188,8 @@ export const getLeaderboards = [
                 streak: isAllTime ? employee.longestStreak || 0 : calculatedStreak,
                 metric: metric,
                 tiebreaker: tiebreaker,
-                firstName: employee.firstName
+                //? Fallback to first word of fullName
+                firstName: employee.firstName || employee.fullName.split(' ')[0] 
             }
         })
 
@@ -200,7 +201,10 @@ export const getLeaderboards = [
             if (b.tiebreaker !== a.tiebreaker) {
                 return b.tiebreaker - a.tiebreaker;
             }
-            return (a.firstName || '').localeCompare(b.firstName || '');
+            //? Enhanced null handling for firstName comparison
+            const nameA = a.firstName || a.fullName || '';
+            const nameB = b.firstName || b.fullName || '';
+            return nameA.localeCompare(nameB);
         })
 
         //* Take top 9

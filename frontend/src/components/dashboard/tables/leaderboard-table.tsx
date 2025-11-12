@@ -23,9 +23,15 @@ export default function LeaderBoardTable({ data, isLoading }: Props) {
     const top3 = data.slice(0, 3);
     const remaining = data.slice(3);
 
-    //? Only reorder for podium display when we have exactly 3 employees
-    //? For less than 3, keep them in rank order
-    const podiumOrder = top3.length === 3 ? [top3[1], top3[0], top3[2]] : top3;
+    //? Reorder for podium display based on number of employees
+    //? For 3 employees: [2nd, 1st, 3rd] (left, center, right)
+    //? For 2 employees: [2nd, 1st] (left, center)
+    //? For 1 employee: [1st] (center only)
+    const podiumOrder = top3.length === 3
+        ? [top3[1], top3[0], top3[2]]
+        : top3.length === 2
+            ? [top3[1], top3[0]]
+            : top3;
 
     const getMedalImage = (rank: number) => {
         if (rank === 2) return silver;
@@ -39,6 +45,11 @@ export default function LeaderBoardTable({ data, isLoading }: Props) {
         if (rank === 1) return first;
         if (rank === 3) return third;
         return "";
+    };
+
+    const getSafeInitials = (fullName: string) => {
+        if (!fullName || fullName.trim() === '') return 'NA';
+        return getInitialName(fullName);
     };
 
     if (isLoading) {
@@ -153,10 +164,10 @@ export default function LeaderBoardTable({ data, isLoading }: Props) {
                                                             emp.rank === 1 ? 'border-yellow-400' :
                                                                 'border-amber-600'
                                                         } shadow-xl`}>
-                                                        <AvatarImage src={emp.avatar} alt={emp.fullName} />
+                                                        {emp.avatar && <AvatarImage src={emp.avatar} alt={emp.fullName} />}
                                                         <AvatarFallback className={`${isFirst ? 'text-sm sm:text-base md:text-lg' : 'text-xs sm:text-sm md:text-base'
                                                             } font-bold`}>
-                                                            {getInitialName(emp.fullName)}
+                                                            {getSafeInitials(emp.fullName)}
                                                         </AvatarFallback>
                                                     </Avatar>
 
@@ -215,7 +226,7 @@ export default function LeaderBoardTable({ data, isLoading }: Props) {
                             {remaining.map((emp) => (
                                 <div
                                     key={emp.rank}
-                                    className="grid grid-cols-12 gap-4 items-center px-6 py-4 bg-card rounded-lg border"
+                                    className="grid grid-cols-12 gap-4 items-center px-6 py-4 bg-card rounded-lg border hover:bg-muted/50 transition-colors"
                                 >
                                     <div className="hidden md:flex flex-col col-span-1 space-y-1 items-center justify-center">
                                         <span className="font-medium">{emp.rank}</span>
@@ -225,9 +236,9 @@ export default function LeaderBoardTable({ data, isLoading }: Props) {
                                     <div className="col-span-7 md:col-span-6 flex items-center gap-3">
                                         <span className="md:hidden font-bold text-lg">{emp.rank}</span>
                                         <Avatar className="size-10 border-2 border-muted flex-shrink-0">
-                                            <AvatarImage src={emp.avatar} alt={emp.fullName} />
+                                            {emp.avatar && <AvatarImage src={emp.avatar} alt={emp.fullName} />}
                                             <AvatarFallback className="text-sm">
-                                                {getInitialName(emp.fullName)}
+                                                {getSafeInitials(emp.fullName)}
                                             </AvatarFallback>
                                         </Avatar>
                                         <div className="min-w-0 flex-1">
