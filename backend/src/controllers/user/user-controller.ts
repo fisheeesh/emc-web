@@ -112,7 +112,7 @@ export const emotionCheckIn = [
         const newEmotionCount = emp!.emotionCount + 1;
         const avgScore = newEmotionSum / newEmotionCount;
         const isRecovered = emp!.status === Status.WATCHLIST && isValid
-        const isNewCritical = avgScore <= systemSettings!.criticalMin && sureCritical && emp!.status !== Status.CRITICAL && emp!.status !== Status.WATCHLIST
+        const isNewCritical = sureCritical && emp!.status !== Status.CRITICAL && emp!.status !== Status.WATCHLIST
 
         //* Update longestStreak if current is better
         const newLongestStreak = Math.max(emp!.longestStreak || 0, currentStreak);
