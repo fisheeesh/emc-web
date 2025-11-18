@@ -43,7 +43,7 @@ export function DepartmentHeatmap({ depHeatmapData }: { depHeatmapData: DepHeatM
             <CardHeader>
                 <CardTitle className="text-xl md:text-2xl flex items-center gap-2">
                     <BsBuildings className="hidden md:block" />
-                    Departments Wellbeing Heatmap
+                    Department Wellbeing Snapshot
                 </CardTitle>
                 <CardDescription>
                     Real-time wellbeing status across all departments based on continuous monitoring

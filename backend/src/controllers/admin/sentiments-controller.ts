@@ -189,7 +189,7 @@ export const getLeaderboards = [
                 metric: metric,
                 tiebreaker: tiebreaker,
                 //? Fallback to first word of fullName
-                firstName: employee.firstName || employee.fullName.split(' ')[0] 
+                firstName: employee.firstName || employee.fullName.split(' ')[0]
             }
         })
 

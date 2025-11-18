@@ -74,8 +74,8 @@ export function ResponseTimeChart({ chartData }: { chartData: AvgResponseTime[] 
 
                     <div className="flex flex-col items-center gap-1 p-3 rounded-lg bg-green-50 dark:bg-green-950/20 border border-green-100 dark:border-green-900/30">
                         <p className="text-xs text-gray-600 dark:text-gray-400">Fastest</p>
-                        <p className="text-lg font-bold text-green-700 dark:text-green-400 font-en">
-                            {fastestDept.responseTime}h
+                        <p className="text-lg font-bold line-clamp-1 text-green-700 dark:text-green-400 font-en">
+                            {fastestDept.responseTime < 1 ? "Less than an hour" : fastestDept.responseTime + "h"}
                         </p>
                         <p className="text-xs text-gray-500 truncate w-full text-center">
                             {fastestDept.department}
@@ -85,7 +85,7 @@ export function ResponseTimeChart({ chartData }: { chartData: AvgResponseTime[] 
                     <div className="flex flex-col items-center gap-1 p-3 rounded-lg bg-orange-50 dark:bg-orange-950/20 border border-orange-100 dark:border-orange-900/30">
                         <p className="text-xs text-gray-600 dark:text-gray-400">Slowest</p>
                         <p className="text-lg font-bold text-orange-700 dark:text-orange-400 font-en">
-                            {slowestDept.responseTime}h
+                            {slowestDept.responseTime < 1 ? "Less than an hour" : slowestDept.responseTime + "h"}
                         </p>
                         <p className="text-xs text-gray-500 truncate w-full text-center">
                             {slowestDept.department}
@@ -124,7 +124,7 @@ export function ResponseTimeChart({ chartData }: { chartData: AvgResponseTime[] 
                             content={
                                 <ChartTooltipContent
                                     formatter={(value) => (
-                                        <span className="font-en">{Number(value).toFixed(1)} hours</span>
+                                        <span className="font-en">{Number(value) < 1 ? "Less than an hour" : Number(value).toFixed(1) + "hours"}</span>
                                     )}
                                 />
                             }

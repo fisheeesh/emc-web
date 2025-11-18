@@ -1,4 +1,4 @@
-import { differenceInHours } from "date-fns"
+import { differenceInMinutes } from "date-fns"
 import { NextFunction, Request, Response } from "express"
 import { query } from "express-validator"
 import { prisma } from "../../config/prisma-client"
@@ -124,12 +124,14 @@ export const getActionAvgReponseTime = async (req: CustomRequest, res: Response,
 
         dep.criticalEmployees.forEach(criticalEmp => {
             if (criticalEmp.actionPlan) {
-                const hoursDifference = differenceInHours(
+                //$ Use differenceInMinutes and convert to hours with decimals
+                const minutesDifference = differenceInMinutes(
                     criticalEmp.actionPlan.createdAt,
                     criticalEmp.createdAt
                 )
 
-                if (hoursDifference >= 0) {
+                if (minutesDifference >= 0) {
+                    const hoursDifference = minutesDifference / 60
                     totalResponseTime += hoursDifference
                     count++
                 }

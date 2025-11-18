@@ -61,10 +61,10 @@ export const getMoodPercentages = async (
 
         //* Calculate percentages (should sum to 100%)
         const percentages = [
-            ((posi / denom) * 100).toFixed(2),
-            ((neu / denom) * 100).toFixed(2),
-            ((nega / denom) * 100).toFixed(2),
-            ((crit / denom) * 100).toFixed(2),
+            ((posi / denom) * 100).toFixed(1),
+            ((neu / denom) * 100).toFixed(1),
+            ((nega / denom) * 100).toFixed(1),
+            ((crit / denom) * 100).toFixed(1),
         ].map(Number);
 
         return percentages;
