@@ -35,9 +35,22 @@ const chartConfig = {
 } satisfies ChartConfig
 
 export function ActionPlanStatusChart({ chartData }: { chartData: ActionPlanStatus[] }) {
-    const totalPlans = chartData.reduce((acc, curr) => acc + curr.count, 0)
+    const numericChartData = chartData.map(d => ({
+        ...d,
+        count: Number(d.count ?? 0),
+    }))
 
-    if (!chartData.length || totalPlans === 0) {
+    const totalPlans = numericChartData.reduce((acc, curr) => acc + curr.count, 0)
+
+    const getCount = (status: string) =>
+        numericChartData.find(d => d.status.toLowerCase() === status.toLowerCase())?.count ?? 0
+
+    const getPercent = (status: string) => {
+        const count = getCount(status)
+        return totalPlans > 0 ? (count / totalPlans) * 100 : 0
+    }
+
+    if (!numericChartData.length || totalPlans === 0) {
         return (
             <Card className="flex flex-col">
                 <CardHeader className="pb-0">
@@ -76,28 +89,32 @@ export function ActionPlanStatusChart({ chartData }: { chartData: ActionPlanStat
                             content={
                                 <ChartTooltipContent
                                     hideLabel
-                                    formatter={(value, name) => (
-                                        <div className="flex items-center gap-2">
-                                            <span className="capitalize">{name}:</span>
-                                            <span className="font-en font-semibold">{value}</span>
-                                            <span className="text-xs text-muted-foreground font-en">
-                                                ({((Number(value) / totalPlans) * 100).toFixed(1)}%)
-                                            </span>
-                                        </div>
-                                    )}
+                                    formatter={(value, name) => {
+                                        const numericValue = Number(value ?? 0)
+                                        const pct = totalPlans > 0 ? ((numericValue / totalPlans) * 100).toFixed(1) : "0.0"
+                                        return (
+                                            <div className="flex items-center gap-2">
+                                                <span className="capitalize">{name}:</span>
+                                                <span className="font-en font-semibold">{numericValue}</span>
+                                                <span className="text-xs text-muted-foreground font-en">
+                                                    ({pct}%)
+                                                </span>
+                                            </div>
+                                        )
+                                    }}
                                 />
                             }
                         />
                         <Pie
-                            data={chartData}
+                            data={numericChartData}
                             dataKey="count"
                             nameKey="status"
                             innerRadius={60}
                             outerRadius={90}
                             strokeWidth={2}
                         >
-                            {chartData.map((entry, index) => (
-                                <Cell key={`cell-${index}`} fill={entry.fill} />
+                            {numericChartData.map((entry, index) => (
+                                <Cell key={`cell-${index}`} fill={entry.fill ?? `var(--color-${entry.status})`} />
                             ))}
                         </Pie>
                     </PieChart>
@@ -107,30 +124,30 @@ export function ActionPlanStatusChart({ chartData }: { chartData: ActionPlanStat
                     <div className="flex flex-col items-center gap-1 p-3 rounded-lg bg-purple-50 dark:bg-purple-950/20 border border-purple-100 dark:border-purple-900/30">
                         <p className="text-xs text-gray-600 dark:text-gray-400">Pending</p>
                         <p className="text-2xl font-bold text-purple-700 dark:text-purple-400 font-en">
-                            {chartData.find(d => d.status === 'pending')?.count || 0}
+                            {getCount("pending")}
                         </p>
                         <p className="text-xs text-gray-500 font-en">
-                            {((chartData.find(d => d.status === 'pending')?.count || 0 / totalPlans) * 100).toFixed(1)}%
+                            {getPercent("pending").toFixed(1)}%
                         </p>
                     </div>
 
                     <div className="flex flex-col items-center gap-1 p-3 rounded-lg bg-green-50 dark:bg-green-950/20 border border-green-100 dark:border-green-900/30">
                         <p className="text-xs text-gray-600 dark:text-gray-400">Approved</p>
                         <p className="text-2xl font-bold text-green-700 dark:text-green-400 font-en">
-                            {chartData.find(d => d.status === 'approved')?.count || 0}
+                            {getCount("approved")}
                         </p>
                         <p className="text-xs text-gray-500 font-en">
-                            {((chartData.find(d => d.status === 'approved')?.count || 0 / totalPlans) * 100).toFixed(1)}%
+                            {getPercent("approved").toFixed(1)}%
                         </p>
                     </div>
 
                     <div className="flex flex-col items-center gap-1 p-3 rounded-lg bg-red-50 dark:bg-red-950/20 border border-red-100 dark:border-red-900/30">
                         <p className="text-xs text-gray-600 dark:text-gray-400">Rejected</p>
                         <p className="text-2xl font-bold text-red-700 dark:text-red-400 font-en">
-                            {chartData.find(d => d.status === 'rejected')?.count || 0}
+                            {getCount("rejected")}
                         </p>
                         <p className="text-xs text-gray-500 font-en">
-                            {((chartData.find(d => d.status === 'rejected')?.count || 0 / totalPlans) * 100).toFixed(1)}%
+                            {getPercent("rejected").toFixed(1)}%
                         </p>
                     </div>
                 </div>
@@ -138,3 +155,5 @@ export function ActionPlanStatusChart({ chartData }: { chartData: ActionPlanStat
         </Card>
     )
 }
+
+export default ActionPlanStatusChart
